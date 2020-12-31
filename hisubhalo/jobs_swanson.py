@@ -4,7 +4,7 @@
 #SBATCH --job-name=swanson_subhalo
 #SBATCH --output=output_swanson.dat
 #SBATCH --time=3:00:00
-#SBATCH --ntasks=50
+#SBATCH --ntasks=4
 #SBATCH --mail-user=cosinga@umd.edu
 #SBATCH --mail-type=ALL
 #SBATCH --account=astronomy-hi
