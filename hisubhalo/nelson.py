@@ -11,9 +11,17 @@ SNAPSHOT = sys.argv[2]
 BOXSIZE = 75000 #kpc/h
 HOME = '/lustre/cosinga/subhalo'+str(SNAPSHOT)+'/'
 SAVE = '/lustre/cosinga/subhalo_output/'
+MEANBARYONICMASS=1.4e6/10e10*.6774 #10e10/h solar masses
+# these values were taken from Pillepich 2018 -> average baryonic mass in table
 def isred(gr, stmass):#color definition as given by Benedikt
     return gr> 0.65 + 0.02*(np.log10(stmass)-10.28)
-def is_resolved
+def is_resolved(stmass, gasmass):
+    """
+    tests if the subhalo is well-resolved.
+    """
+    refmass = MEANBARYONICMASS*200
+    return stmass > refmass and gasmass > refmass
+
 ###################################
 logfile = open(SAVE+'nelson_log'+str(SNAPSHOT)+'.txt', 'a')
 try:
@@ -23,7 +31,7 @@ except IOError:
 else:
     try:
         pos = f['Subhalo']['SubhaloCM'] #kpc/h
-        mass = f['Subhalo']['SubhaloMass']
+        mass = f['Subhalo']['SubhaloMassType']
         photo = f['Subhalo']['SubhaloStellarPhotometrics']
     except:
         logfile.write("chunk "+str(CHUNK)+ '\'s subhalo data was empty')
@@ -37,13 +45,13 @@ else:
         for j,b in enumerate(bins):
             rmag = photo[j][5]
             gmag = photo[j][4]
-            if rmag<=LUM_MIN and isred(gmag-rmag,rmag):
+            if is_resolved(mass[j][4], mass[j][0]) and isred(gmag-rmag,rmag):
                 redfield[b[0],b[1],b[2]]+= mass[j]
                 counts[2]+=1
-            if rmag<=LUM_MIN and not isred(gmag-rmag,rmag):
+            if is_resolved(mass[j][4], mass[j][0]) and not isred(gmag-rmag,rmag):
                 bluefield[b[0],b[1],b[2]]+= mass[j]
                 counts[0]+=1
-            if not rmag<=LUM_MIN:
+            if not is_resolved(mass[j][4], mass[j][0]):
                 nondetfield[b[0],b[1],b[2]]+= mass[j]
                 counts[1]+=1
         w = hp.File(SAVE+'nelson_'+str(SNAPSHOT)+'.'+str(CHUNK)+'.hdf5', 'w')
