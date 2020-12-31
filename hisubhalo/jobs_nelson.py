@@ -74,7 +74,7 @@ while complete < n_commands:
             print("[%4d s] Completed  %3d  %s" % (dt, p, commands[p]))
 
     while len(pipes) < N_PROC and i < n_commands:
-        logName = "Command_%03d.log" % (i)
+        logName = "nelson_Command_%03d.log" % (i)
         fLog = open(logName, 'w')
         arguments = ['srun', '--share', '-N1', '-n1']
         arguments.extend(commands[i].split())
