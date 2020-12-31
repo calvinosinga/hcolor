@@ -8,7 +8,7 @@
 #SBATCH --mail-user=cosinga@umd.edu
 #SBATCH --mail-type=ALL
 #SBATCH --account=astronomy-hi
-#SBATCH --mem-per-cpu=60000
+#SBATCH --mem-per-cpu=70000
 
 ########################################################################################################
 # 
