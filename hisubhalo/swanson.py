@@ -26,7 +26,7 @@ else:
         mass = f['Subhalo']['SubhaloMass']
         photo = f['Subhalo']['SubhaloStellarPhotometrics']
     except:
-        logfile.write("chunk "+str(CHUNK)+ '\'s subhalo data was empty')
+        logfile.write("chunk "+str(CHUNK)+ '\'s subhalo data was empty \n')
     else:
         redfield = np.zeros(grid, dtype=np.float32)
         bluefield = np.zeros(grid, dtype=np.float32)
