@@ -15,12 +15,12 @@ MEANBARYONICMASS=1.4e6/10e10*.6774 #10e10/h solar masses
 # these values were taken from Pillepich 2018 -> average baryonic mass in table
 def isred(gr, stmass):#color definition as given by Benedikt
     return gr> 0.65 + 0.02*(np.log10(stmass)-10.28)
-def is_resolved(stmass, gasmass):
+def is_resolved(stmass):
     """
     tests if the subhalo is well-resolved.
     """
     refmass = MEANBARYONICMASS*200
-    return stmass > refmass and gasmass > refmass
+    return stmass > refmass
 
 ###################################
 logfile = open(SAVE+'nelson_log'+str(SNAPSHOT)+'.txt', 'a')
@@ -43,16 +43,15 @@ else:
         edges = np.linspace(0,BOXSIZE, grid[0]-1) #definitions of bins
         bins = np.digitize(pos,edges)
         for j,b in enumerate(bins):
-            rmag = photo[j][5]
-            gmag = photo[j][4]
-            if is_resolved(mass[j][4], mass[j][0]) and isred(gmag-rmag,rmag):
-                redfield[b[0],b[1],b[2]]+= mass[j]
+            gr = photo[j][4]-photo[j][5]
+            if is_resolved(mass[j][4]) and isred(gr,mass[j][4]):
+                redfield[b[0],b[1],b[2]]+= np.sum(mass[j])
                 counts[2]+=1
-            if is_resolved(mass[j][4], mass[j][0]) and not isred(gmag-rmag,rmag):
-                bluefield[b[0],b[1],b[2]]+= mass[j]
+            if is_resolved(mass[j][4]) and not isred(gr,mass[j][4]):
+                bluefield[b[0],b[1],b[2]]+= np.sum(mass[j])
                 counts[0]+=1
-            if not is_resolved(mass[j][4], mass[j][0]):
-                nondetfield[b[0],b[1],b[2]]+= mass[j]
+            if not is_resolved(mass[j][4]):
+                nondetfield[b[0],b[1],b[2]]+= np.sum(mass[j])
                 counts[1]+=1
         w = hp.File(SAVE+'nelson_'+str(SNAPSHOT)+'.'+str(CHUNK)+'.hdf5', 'w')
         w.create_dataset("red",data=redfield)
