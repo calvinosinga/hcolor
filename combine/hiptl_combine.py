@@ -12,11 +12,11 @@ STATUS = sys.argv[4]
 total = np.zeros((4, 2048, 2048, 2048), dtype=np.float32)
 logfile = open(BASE+"combine_test_log.txt",'w')
 for i in files:
-    logfile.write("unzipping file " + str(i)+"\n")
-    rzip = zf.ZipFile(BASE + "hiptl_"+str(SNAPSHOT)+'.'+str(i)+'.hdf5.zip','r')
-    rzip.extractall()
-    rzip.close()
-    logfile.write("unzipped file " + str(i)+"\n")
+    #logfile.write("unzipping file " + str(i)+"\n")
+    #rzip = zf.ZipFile(BASE + "hiptl_"+str(SNAPSHOT)+'.'+str(i)+'.hdf5.zip','r')
+    #rzip.extractall()
+    #rzip.close()
+    #logfile.write("unzipped file " + str(i)+"\n")
     logfile.write("at this point, the running total has size: " + str(sys.getsizeof(total))+"\n")
     logfile.write("now starting to add to running total:\n")
     if STATUS == 'delete':
