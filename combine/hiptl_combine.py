@@ -33,3 +33,8 @@ w = hp.File(BASE+"hiptl_"+SNAPSHOT+'.'+START+'.'+END+'.hdf5','w')
 for k in range(keys):
     w.create_dataset(keys[k], data=total[k,:,:,:])
 w.close()
+wzip = zf.ZipFile(BASE+"hiptl_"+SNAPSHOT+'.'+START+'.'+END+'.hdf5.zip', 'w')
+wzip.write(BASE+"hiptl_"+SNAPSHOT+'.'+START+'.'+END+'.hdf5', compress_type=zf.ZIP_DEFLATED)
+wzip.close()
+if STATUS=='delete':
+    os.remove(BASE+"hiptl_"+SNAPSHOT+'.'+START+'.'+END+'.hdf5')
