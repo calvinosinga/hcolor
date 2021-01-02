@@ -14,7 +14,7 @@ logfile = open(BASE+"combine_test_log.txt",'w')
 for i in files:
     logfile.write("unzipping file " + str(i)+"\n")
     rzip = zf.ZipFile(BASE + "hiptl_"+str(SNAPSHOT)+'.'+str(i)+'.hdf5.zip','r')
-    rzip.extractall(BASE)
+    rzip.extractall()
     rzip.close()
     logfile.write("unzipped file " + str(i)+"\n")
     logfile.write("at this point, the running total has size: " + str(sys.getsizeof(total))+"\n")
