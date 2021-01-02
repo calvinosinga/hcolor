@@ -7,7 +7,7 @@
 #SBATCH --ntasks=1
 #SBATCH --mail-user=cosinga@umd.edu
 #SBATCH --account=astronomy-hi
-#SBATCH --mem-per-cpu=250000
+#SBATCH --mem-per-cpu=150000
 #SBATCH --mail-type=ALL
 
 python3 /lustre/cosinga/hcolor/combine/hiptl_combine.py 0 1 99 no
