@@ -1,4 +1,0 @@
-python3 /lustre/cosinga/hcolor/hisubhalo/nelson.py 0 99
-python3 /lustre/cosinga/hcolor/hisubhalo/nelson.py 1 99
-python3 /lustre/cosinga/hcolor/hisubhalo/nelson.py 2 99
-python3 /lustre/cosinga/hcolor/hisubhalo/nelson.py 3 99

@@ -1,4 +1,0 @@
-python3 /lustre/cosinga/hcolor/hisubhalo/swanson.py 0 99
-python3 /lustre/cosinga/hcolor/hisubhalo/swanson.py 1 99
-python3 /lustre/cosinga/hcolor/hisubhalo/swanson.py 2 99
-python3 /lustre/cosinga/hcolor/hisubhalo/swanson.py 3 99
