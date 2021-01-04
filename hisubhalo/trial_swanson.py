@@ -10,7 +10,7 @@ SNAPSHOT = sys.argv[2]
 BOXSIZE = 75000 #kpc/h
 HOME = '/lustre/cosinga/subhalo'+str(SNAPSHOT)+'/'
 SAVE = '/lustre/cosinga/subhalo_output/'
-FILENO=sys.argv[1]
+FILENO=int(sys.argv[1])
 def isred(gr, rband):#color definition as given in Swanson
     return gr> .9 - .03*(rband+23)
 ###################################
