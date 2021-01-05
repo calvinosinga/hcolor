@@ -1,6 +1,6 @@
 import sys
-fileno = sys.argv[1]
-f = open("commands_hiptl.txt",'r')
+fileno = int(sys.argv[1])
+f = open("commands_hiptl.txt",'w')
 for i in range(int(fileno)):
     if i==fileno-1:
         f.write("python3 /lustre/cosinga/hcolor/hiptl/hiptl.py "+str(i))

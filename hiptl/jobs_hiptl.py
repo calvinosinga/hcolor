@@ -3,8 +3,8 @@
 #SBATCH --share
 #SBATCH --job-name=hiptl
 #SBATCH --output=output_hiptl.dat
-#SBATCH --time=1:00:00
-#SBATCH --ntasks=1
+#SBATCH --time=5:00:00
+#SBATCH --ntasks=448
 #SBATCH --mail-user=cosinga@umd.edu
 #SBATCH --mail-type=ALL
 #SBATCH --account=astronomy-hi
