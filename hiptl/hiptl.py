@@ -1,8 +1,8 @@
 import numpy as np
 import h5py as hp
 import sys
-import zipfile as zf
-import os
+#import zipfile as zf
+#import os
 CHUNK = sys.argv[1]
 BASE = '/lustre/diemer/illustris/hih2/' 
 HOME = '/lustre/cosinga/ptl99/'
@@ -27,8 +27,8 @@ for m in models:
     masshi = masshi.astype('float32')# decreases size by 50 MB
     for ptl,b in enumerate(bins):
         field[b[0],b[1],b[2]] += masshi[ptl]
-    w.create_dataset(m, data=field)
-wzip = zf.ZipFile(SAVE+'hiptl_99.'+CHUNK+'.hdf5.zip', 'w')
-wzip.write(SAVE+'hiptl_99.'+CHUNK+'.hdf5', compress_type=zf.ZIP_DEFLATED)
-wzip.close()
-os.remove(SAVE+'hiptl_99.'+CHUNK+'.hdf5')
+    w.create_dataset(m, data=field, compression="gzip", compression_opts=9)
+#wzip = zf.ZipFile(SAVE+'hiptl_99.'+CHUNK+'.hdf5.zip', 'w')
+#wzip.write(SAVE+'hiptl_99.'+CHUNK+'.hdf5', compress_type=zf.ZIP_DEFLATED)
+#wzip.close()
+#os.remove(SAVE+'hiptl_99.'+CHUNK+'.hdf5')

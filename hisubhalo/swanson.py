@@ -48,9 +48,9 @@ for i in range(FILENO):
                     nondetfield[b[0],b[1],b[2]]+= mass[j]
                     counts[1]+=1
 
-w.create_dataset("red",data=redfield)
-w.create_dataset("blue",data=bluefield)
-w.create_dataset("nondetection",data=nondetfield)
+w.create_dataset("red",data=redfield, compression="gzip",compression_opts=9)
+w.create_dataset("blue",data=bluefield, compression="gzip", compression_opts=9)
+w.create_dataset("nondetection",data=nondetfield, compression="gzip", compression_opts=9)
 w.create_dataset('counts',data=counts)
 w.close()
 
