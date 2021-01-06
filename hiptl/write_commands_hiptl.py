@@ -5,5 +5,5 @@ for i in range(int(fileno)):
     if i==fileno-1:
         f.write("python3 /lustre/cosinga/hcolor/hiptl/hiptl.py "+str(i))
     else:
-        f.write("python3 /lustre/cosinga/hcolor/hiptl/hiptl.pt "+str(i)+"\n")
+        f.write("python3 /lustre/cosinga/hcolor/hiptl/hiptl.py "+str(i)+"\n")
 
