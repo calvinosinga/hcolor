@@ -3,7 +3,7 @@ import sys
 import numpy as np
 import h5py as hp
 
-HOME='/lustre/cosinga/'
+HOME='/lustre/cosinga/final_fields/'
 filename = sys.argv[1]
 savename = sys.argv[2]
 BOXSIZE = 75000.0 #kpc/h

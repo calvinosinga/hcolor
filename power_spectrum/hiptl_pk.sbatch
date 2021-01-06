@@ -8,6 +8,7 @@
 #SBATCH --account=astronomy-hi
 #SBATCH --mail-type=ALL
 #SBATCH --output=hiptl_pk.dat
+#SBATCH --mail-user=cosinga@umd.edu
 
 . ~/.profile
-python3 /lustre/cosinga/hcolor/power_spectrum/pk.py 
+python3 /lustre/cosinga/hcolor/power_spectrum/pk.py 'hiptl_99.final.hdf5' 'hiptl_99_pk.txt' 
