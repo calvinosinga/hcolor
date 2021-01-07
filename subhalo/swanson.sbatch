@@ -11,4 +11,4 @@
 #SBATCH --output=swanson.dat
 
 . ~/.profile
-python3 /lustre/cosinga/hcolor/hisubhalo/swanson.py 448 99
+python3 /lustre/cosinga/hcolor/subhalo/swanson.py 448 99

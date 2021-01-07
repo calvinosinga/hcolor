@@ -11,4 +11,4 @@
 #SBATCH --output=nelson.dat
 
 . ~/.profile
-python3 /lustre/cosinga/hcolor/hisubhalo/nelson.py 448 99
+python3 /lustre/cosinga/hcolor/subhalo/nelson.py 448 99
