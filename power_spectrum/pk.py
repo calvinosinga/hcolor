@@ -18,5 +18,5 @@ for k in keys:
         field = field/avg; field = field - 1
         pk = Pk(field, BOXSIZE, axis=0, MAS='NGP')
         tpk = np.transpose([pk.k3D, pk.Pk[:,0]])
-        np.savetxt(HOME+savename+'_'+k, tpk)
+        np.savetxt(HOME+savename+'_'+k+".txt", tpk)
 f.close()
