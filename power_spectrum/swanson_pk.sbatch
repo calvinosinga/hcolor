@@ -11,4 +11,4 @@
 #SBATCH --mail-user=cosinga@umd.edu
 
 . ~/.profile
-python3 /lustre/cosinga/hcolor/power_spectrum/pk.py 'swanson_99.final.hdf5' 'swanson_99_pk.txt' 
+python3 /lustre/cosinga/hcolor/power_spectrum/pk.py 'swanson_99.final.hdf5' 'swanson_99_pk' 
