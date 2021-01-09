@@ -24,6 +24,6 @@ for m in models:
         total += f[m][:]
         logfile.write("after adding, the running total has size: " + str(sys.getsizeof(total))+"\n")
         f.close()
-    w.create_dataset(m, data=total)
+    w.create_dataset(m, data=total, compression="gzip", compression_opts=9)
 w.close()
 logfile.close()

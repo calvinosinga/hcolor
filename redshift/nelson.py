@@ -1,6 +1,8 @@
 import numpy as np
 import h5py as hp
 import sys
+# import zipfile as zf
+# import os
 
 ########## INPUTS #################
 grid = (2048,2048,2048)
