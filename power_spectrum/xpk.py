@@ -1,0 +1,25 @@
+from Pk_library import XPk
+import sys
+import numpy as np
+import h5py as hp
+
+HOME='/lustre/cosinga/final_fields/'
+firstfile = sys.argv[1]
+firstfield = sys.argv[2]
+secondfile = sys.argv[3]
+secondfield = sys.argv[4]
+savename = sys.argv[5]
+BOXSIZE = 75000.0 #kpc/h
+grid = (2048, 2048, 2048)
+f = hp.File(HOME+filename, 'r')
+keys = list(f.keys())
+for k in keys:
+    field = f[k][:]
+    if field.shape == grid:
+        field = field/(BOXSIZE**3) #converts to a density
+        avg = np.mean(field).astype(np.float32)
+        field = field/avg; field = field - 1
+        pk = Pk(field, BOXSIZE, axis=0, MAS='NGP')
+        tpk = np.transpose([pk.k3D, pk.Pk[:,0]])
+        np.savetxt(HOME+savename+'_'+k+".txt", tpk)
+f.close()
