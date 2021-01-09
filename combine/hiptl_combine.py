@@ -19,7 +19,7 @@ for m in models:
     for i in files:
         f = hp.File(BASE+i,'r')
         total += f[m][:]
-        logfile.write("new sum:" + str(np.sum(total)+"\n")
+        logfile.write("new sum:" + str(np.sum(total))+"\n")
         f.close()
     w.create_dataset(m, data=total, compression="gzip", compression_opts=9)
 w.close()

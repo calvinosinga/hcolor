@@ -21,3 +21,5 @@ field += n['red'][:]
 n.create_dataset("detection", data=field, compression="gzip", compression_opts=9)
 field += n['nondetection'][:]
 n.create_dataset("total", data=field, compression="gzip", compression_opts = 9)
+s.close()
+n.close()
