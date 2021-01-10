@@ -12,4 +12,4 @@
 
 . ~/.profile
 python3 /lustre/cosinga/hcolor/combine/hiptl_combine.py 0 100 99
-rm /lustre/cosinga/hiptl_output/hiptl_99.{0..100}.hdf5
+
