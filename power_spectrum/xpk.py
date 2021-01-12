@@ -30,4 +30,4 @@ for i in ffields:
             ggrid = ggrid/np.mean(ggrid); ggrid = ggrid - 1
             res = XPk([fgrid, ggrid], BOXSIZE, axis = 0, MAS=['NGP', 'NGP'])
             xpk = np.transpose([res.k3D, res.XPk[:,0,0]])
-            np.savetxt(HOME+savename+'_'+i+'-'+j+'.txt', xpk)
+            np.savetxt(HOME+'pk/'+savename+'_'+i+'-'+j+'.txt', xpk)

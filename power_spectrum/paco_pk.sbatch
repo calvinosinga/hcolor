@@ -1,5 +1,4 @@
 #!/bin/bash
-
 #SBATCH --share
 #SBATCH --job-name=paco_pk
 #SBATCH --time=4:00:00
