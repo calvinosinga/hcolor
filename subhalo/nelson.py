@@ -6,6 +6,7 @@ import sys
 grid = (2048,2048,2048)
 FILENO = int(sys.argv[1])
 SNAPSHOT = sys.argv[2]
+RUN = sys.argv[3]
 BOXSIZE = 75000 #kpc/h
 HOME = '/lustre/cosinga/subhalo'+str(SNAPSHOT)+'/'
 SAVE = '/lustre/cosinga/subhalo_output/'
@@ -13,7 +14,12 @@ MEANBARYONICMASS=1.4e6/1e10*.6774 #1e10/h solar masses
 # these values were taken from Pillepich 2018 -> average baryonic mass in table
 # in another Pillepich paper from 2017 the median? gas cell mass from the graph appears ~2 x 10^6
 def isred(gr, stmass):#color definition as given by Benedikt
-    return gr> 0.65 + 0.02*(np.log10(stmass)-10.28)
+    if RUN == 'high':
+        return gr> 0.675 + 0.02*(np.log10(stmass)-10.28)
+    elif RUN == 'low':
+        return gr> 0.625 + 0.02*(np.log10(stmass)-10.28)
+    elif RUN == 'mid':
+        return gr> 0.65 + 0.02*(np.log10(stmass)-10.28)
 def is_resolved(stmass, gasmass):
     """
     tests if the subhalo is well-resolved.
@@ -22,14 +28,14 @@ def is_resolved(stmass, gasmass):
     return stmass > refmass and gasmass > refmass
 
 ###################################
-logfile = open(SAVE+'nelson_log'+str(SNAPSHOT)+'.txt', 'a')
+logfile = open(SAVE+'nelson_'+RUN+'_log'+str(SNAPSHOT)+'.txt', 'a')
 logfile.write('the refmass is: %.4E\n'%(200*MEANBARYONICMASS))
 redfield = np.zeros(grid, dtype=np.float32)
 bluefield = np.zeros(grid, dtype=np.float32)
 nondetfield = np.zeros(grid, dtype=np.float32)
 counts = np.zeros(3)
 edges = np.linspace(0,BOXSIZE, grid[0]-1) #definitions of bins
-w = hp.File(SAVE+'nelson_'+str(SNAPSHOT)+'.final.hdf5', 'w')
+w = hp.File(SAVE+'nelson_'+RUN+'_'+str(SNAPSHOT)+'.final.hdf5', 'w')
 for i in range(FILENO):
     try:
         f = hp.File(HOME+'fof_subhalo_tab_0'+str(SNAPSHOT)+'.'+str(i)+'.hdf5','r')
