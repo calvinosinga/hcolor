@@ -3,7 +3,7 @@
 #SBATCH --share
 #SBATCH --job-name=hiptl
 #SBATCH --output=output_hiptl.dat
-#SBATCH --time=1:00:00
+#SBATCH --time=8:00:00
 #SBATCH --ntasks=50
 #SBATCH --mail-user=cosinga@umd.edu
 #SBATCH --mail-type=ALL

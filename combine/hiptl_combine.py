@@ -1,7 +1,6 @@
 import numpy as np
 import h5py as hp
 import sys
-import os
 BASE = '/lustre/cosinga/hiptl_output/'
 START = sys.argv[1]
 END = sys.argv[2]
