@@ -3,7 +3,7 @@
 #SBATCH --job-name=hisubhalo-all_xpk
 #SBATCH --time=1-10:00:00
 #SBATCH --ntasks=1
-#SBATCH --mem-per-cpu=150000
+#SBATCH --mem-per-cpu=180000
 #SBATCH --account=astronomy-hi
 #SBATCH --mail-type=ALL
 #SBATCH --output=hisubhalo-all_xpk.dat
