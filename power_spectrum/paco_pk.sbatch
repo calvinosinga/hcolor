@@ -10,4 +10,4 @@
 #SBATCH --mail-user=cosinga@umd.edu
 
 . ~/.profile
-python3 /lustre/cosinga/hcolor/power_spectrum/pk.py 'paco_99.final.hdf5' 'paco_99_pk' 'paco'
+python3 /lustre/cosinga/hcolor/power_spectrum/pk.py 'paco_99.final.hdf5' 'paco_99_pk' 'no'

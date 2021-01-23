@@ -1,9 +1,9 @@
 #!/bin/bash
 
 #SBATCH --share
-#SBATCH --job-name=hiptl_combine
-#SBATCH --output=out_hiptl_combine.dat
-#SBATCH --time=2-1:00:00
+#SBATCH --job-name=hiptl_final
+#SBATCH --output=out_hiptl_final.dat
+#SBATCH --time=1-1:00:00
 #SBATCH --ntasks=1
 #SBATCH --mail-user=cosinga@umd.edu
 #SBATCH --account=astronomy-hi
