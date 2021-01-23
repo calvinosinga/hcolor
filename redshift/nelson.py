@@ -1,13 +1,13 @@
 import numpy as np
 import h5py as hp
 import sys
-# import zipfile as zf
-# import os
+import redshift_space_library as rsl
 
 ########## INPUTS #################
 grid = (2048,2048,2048)
 FILENO = int(sys.argv[1])
 SNAPSHOT = sys.argv[2]
+RUN = sys.argv[3]
 BOXSIZE = 75000 #kpc/h
 HOME = '/lustre/cosinga/subhalo'+str(SNAPSHOT)+'/'
 SAVE = '/lustre/cosinga/subhalo_output/'
@@ -15,7 +15,12 @@ MEANBARYONICMASS=1.4e6/1e10*.6774 #1e10/h solar masses
 # these values were taken from Pillepich 2018 -> average baryonic mass in table
 # in another Pillepich paper from 2017 the median? gas cell mass from the graph appears ~2 x 10^6
 def isred(gr, stmass):#color definition as given by Benedikt
-    return gr> 0.65 + 0.02*(np.log10(stmass)-10.28)
+    if RUN == 'high':
+        return gr> 0.675 + 0.02*(np.log10(stmass)-10.28)
+    elif RUN == 'low':
+        return gr> 0.625 + 0.02*(np.log10(stmass)-10.28)
+    elif RUN == 'mid':
+        return gr> 0.65 + 0.02*(np.log10(stmass)-10.28)
 def is_resolved(stmass, gasmass):
     """
     tests if the subhalo is well-resolved.
