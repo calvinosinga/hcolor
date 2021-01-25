@@ -30,13 +30,14 @@ cons = [headfile['Header'].attrs[u'Redshift'], headfile['Header'].attrs[u'Omega0
 HUBBLE = 100*np.sqrt(cons[1]*(1+cons[0])**3+cons[2]) #km/s/(Mpc/h)
 axes = (0,1,2)
 for a in axes:
-    rsl.pos_redshift_space(pos, vel, BOXSIZE,HUBBLE/1000, cons[0],a)
+    print(type(BOXSIZE), type(cons[0]), type(a), type(pos[0,0]), type(vel[0,0]))
+    rsl.pos_redshift_space(pos.astype('float32'), vel.astype('float32'), float(BOXSIZE),float(HUBBLE/1000), float(cons[0]),float(a))
     bins = np.digitize(pos,edges)
     for m in models:
         field = np.zeros(grid, dtype=np.float32)
         mass = f[m][:]
         for j,b in enumerate(bins):
             field[b[0],b[1],b[2]] += mass[j]
-        w.create_dataset(m, data=field, compression="gzip", compression_opts=9)
+        w.create_dataset(m+'_%d'%a, data=field, compression="gzip", compression_opts=9)
 
 w.close()
