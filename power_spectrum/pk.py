@@ -6,10 +6,7 @@ import h5py as hp
 HOME='/lustre/cosinga/final_fields/'
 filename = sys.argv[1]
 savename = sys.argv[2]
-is_overdensity = False
-if len(sys.argv) > 3:
-    if sys.argv[3] == 'paco':
-        is_overdensity=True
+
 print('the filename is: ' + filename)
 BOXSIZE = 75000.0 #kpc/h
 grid = (2048, 2048, 2048)
@@ -20,10 +17,9 @@ for k in keys:
     field = f[k][:]
     print("the shape of the field is: " + str(field.shape))
     if field.shape == grid:
-        if not is_overdensity:
-            field = field/(BOXSIZE**3) #converts to a density
-            avg = np.mean(field).astype(np.float32)
-            field = field/avg; field = field - 1
+        field = field/(BOXSIZE**3) #converts to a density
+        avg = np.mean(field).astype(np.float32)
+        field = field/avg; field = field - 1
         pk = Pk(field, BOXSIZE, axis=0, MAS='NGP')
         tpk = np.transpose([pk.k3D, pk.Pk[:,0]])
         np.savetxt(HOME+'pk/'+savename+'_'+k+".txt", tpk)
