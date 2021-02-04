@@ -14,7 +14,7 @@ h=0.6774
 BOXSIZE = 75.0 #kpc/h
 HOME = '/lustre/cosinga/subhalo'+str(SNAPSHOT)+'/'
 SAVE = '/lustre/cosinga/subhalo_output/'
-MEANBARYONICMASS=1.4e6 #1e10/h solar masses
+MEANBARYONICMASS=1.4e6 #solar masses
 # these values were taken from Pillepich 2018 -> average baryonic mass in table
 # in another Pillepich paper from 2017 the median? gas cell mass from the graph appears ~2 x 10^6
 def isred(gr, stmass):#color definition as given by Benedikt
