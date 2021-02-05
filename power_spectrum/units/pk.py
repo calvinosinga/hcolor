@@ -8,7 +8,7 @@ filename = sys.argv[1]
 savename = sys.argv[2]
 
 print('the filename is: ' + filename)
-BOXSIZE = 75000.0 #kpc/h
+BOXSIZE = 75.0 #Mpc/h
 grid = (2048, 2048, 2048)
 f = hp.File(HOME+filename, 'r')
 keys = list(f.keys())
@@ -22,5 +22,5 @@ for k in keys:
         field = field/avg; field = field - 1
         pk = Pk(field, BOXSIZE, axis=0, MAS='NGP')
         tpk = np.transpose([pk.k3D, pk.Pk[:,0]])
-        np.savetxt(HOME+'pk/'+savename+'_'+k+".txt", tpk)
+        np.savetxt(HOME+'pk/'+savename+'_'+k+"_Mpc.txt", tpk)
 f.close()

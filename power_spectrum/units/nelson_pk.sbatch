@@ -10,6 +10,6 @@
 #SBATCH --mail-user=cosinga@umd.edu
 
 . ~/.profile
-python3 /lustre/cosinga/hcolor/power_spectrum/pk.py 'nelson_99.final.hdf5' 'nelson_99_pk' 
-python3 /lustre/cosinga/hcolor/power_spectrum/pk.py 'nelson_high_99.final.hdf5' 'nelson_high_99_pk' 
-python3 /lustre/cosinga/hcolor/power_spectrum/pk.py 'nelson_low_99.final.hdf5' 'nelson_low_99_pk' 
+python3 /lustre/cosinga/hcolor/power_spectrum/units/pk.py 'nelson_mid_99.final.hdf5' 'nelson_99_pk' 
+python3 /lustre/cosinga/hcolor/power_spectrum/units/pk.py 'nelson_high_99.final.hdf5' 'nelson_high_99_pk' 
+python3 /lustre/cosinga/hcolor/power_spectrum/units/pk.py 'nelson_low_99.final.hdf5' 'nelson_low_99_pk' 
