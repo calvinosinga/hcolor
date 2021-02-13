@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #SBATCH --share
-#SBATCH --job-name=hiptl_combine
-#SBATCH --output=out_hiptl_combine.dat
+#SBATCH --job-name=hiptl_combine2
+#SBATCH --output=out_hiptl_combine2.dat
 #SBATCH --time=2-1:00:00
 #SBATCH --ntasks=1
 #SBATCH --mail-user=cosinga@umd.edu
@@ -11,5 +11,5 @@
 #SBATCH --mail-type=ALL
 
 . ~/.profile
-python3 /lustre/cosinga/hcolor/combine/hiptl_combine.py 200 448 99
+python3 /lustre/cosinga/hcolor/combine/hiptl_combine.py 200 300 99
 
