@@ -1,9 +1,9 @@
 #!/bin/python3
 
 #SBATCH --share
-#SBATCH --job-name=hiptl
+#SBATCH --job-name=hiptl_units
 #SBATCH --output=output_hiptl.dat
-#SBATCH --time=8:00:00
+#SBATCH --time=2-8:00:00
 #SBATCH --ntasks=50
 #SBATCH --mail-user=cosinga@umd.edu
 #SBATCH --mail-type=ALL
@@ -46,7 +46,7 @@ start_time = time.time()
 # N_PROC = int(float(os.environ["SLURM_JOB_CPUS_PER_NODE"]))
 N_PROC = int(os.environ["SLURM_NTASKS"])
 # Find commands to execute
-f = open('/lustre/cosinga/hcolor/hiptl/commands_hiptl.txt', 'r')
+f = open('/lustre/cosinga/hcolor/hiptl/units/commands_hiptl.txt', 'r')
 #print(N_PROC)
 commands = []
 for line in f.readlines():

@@ -1,3 +1,6 @@
+"""
+This is a hiptl run, except I'm switching to a solar masses and Mpc/h units
+"""
 import numpy as np
 import h5py as hp
 import sys
@@ -5,15 +8,16 @@ CHUNK = sys.argv[1]
 BASE = '/lustre/diemer/illustris/hih2/' 
 HOME = '/lustre/cosinga/ptl99/'
 SAVE = '/lustre/cosinga/hiptl_output/'
-BOXSIZE = 75000 #kpc/h
+BOXSIZE = 75.0 #Mpc/h
+h = .6774
 grid = (2048,2048,2048)
 fileno = 448
 field = np.zeros(grid, dtype=np.float32) # 35 GB
 edges = np.linspace(0,BOXSIZE,grid[0]-1)
 hih2file = hp.File(BASE+"hih2_particles_099."+CHUNK+".hdf5", 'r')
 ptlfile = hp.File(HOME+"snap_099."+CHUNK+".hdf5", 'r')
-mass = ptlfile['PartType0']['Masses'][:] #~50 MB
-pos = ptlfile['PartType0']['CenterOfMass'][:] # ~150 MB
+mass = ptlfile['PartType0']['Masses'][:]*1e10/h #~50 MB, in solar masses
+pos = ptlfile['PartType0']['CenterOfMass'][:]/1e3 # ~150 MB, Mpc/h
 f_neut_h = hih2file['PartType0']['f_neutral_H'][:] #~100 MB
 models = ['GD14', 'GK11', 'K13', 'S14']
 w = hp.File(SAVE+'hiptl_99.'+CHUNK+'.hdf5', 'w')

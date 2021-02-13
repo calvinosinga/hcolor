@@ -1,3 +1,6 @@
+"""
+Subhalo Run except I'm using Mpc/h and solar masses as my units.
+"""
 import numpy as np
 import h5py as hp
 import sys
@@ -7,10 +10,11 @@ grid = (2048,2048,2048)
 FILENO = int(sys.argv[1])
 SNAPSHOT = sys.argv[2]
 RUN = sys.argv[3]
-BOXSIZE = 75000 #kpc/h
+h=0.6774
+BOXSIZE = 75.0 #kpc/h
 HOME = '/lustre/cosinga/subhalo'+str(SNAPSHOT)+'/'
 SAVE = '/lustre/cosinga/subhalo_output/'
-MEANBARYONICMASS=1.4e6/1e10*.6774 #1e10/h solar masses
+MEANBARYONICMASS=1.4e6 #solar masses
 # these values were taken from Pillepich 2018 -> average baryonic mass in table
 # in another Pillepich paper from 2017 the median? gas cell mass from the graph appears ~2 x 10^6
 def isred(gr, stmass):#color definition as given by Benedikt
@@ -43,8 +47,8 @@ for i in range(FILENO):
         logfile.write('failed to open file for '+str(i)+'\n')
     else:
         try:
-            pos = f['Subhalo']['SubhaloCM'] #kpc/h
-            mass = f['Subhalo']['SubhaloMassType']
+            pos = f['Subhalo']['SubhaloCM']/1e3 #Mpc/h
+            mass = f['Subhalo']['SubhaloMassType']*1e10/h #solar masses
             photo = f['Subhalo']['SubhaloStellarPhotometrics']
         except:
             logfile.write("chunk "+str(i)+ '\'s subhalo data was empty\n')

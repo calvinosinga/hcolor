@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --share
-#SBATCH --job-name=hisubhalo_pk
+#SBATCH --job-name=hisubhalo_pk_mpc
 #SBATCH --time=4:00:00
 #SBATCH --ntasks=1
 #SBATCH --mem-per-cpu=150000
@@ -11,4 +11,4 @@
 #SBATCH --mail-user=cosinga@umd.edu
 
 . ~/.profile
-python3 /lustre/cosinga/hcolor/power_spectrum/pk.py 'hisubhalo_99.final.hdf5' 'hisubhalo_99_pk' 
+python3 /lustre/cosinga/hcolor/power_spectrum/units/pk.py 'hisubhalo_99.final.hdf5' 'hisubhalo_99_pk_mpc' 

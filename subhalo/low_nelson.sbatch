@@ -11,4 +11,4 @@
 #SBATCH --output=nelson_low.dat
 
 . ~/.profile
-python3 /lustre/cosinga/hcolor/subhalo/nelson.py 448 99 'low'
+python3 /lustre/cosinga/hcolor/subhalo/units/nelson.py 448 99 'low'
