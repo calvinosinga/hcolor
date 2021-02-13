@@ -11,4 +11,4 @@
 #SBATCH --output=hisubhalo.dat
 
 . ~/.profile
-python3 /lustre/cosinga/hcolor/hisubhalo/units/hisubhalounits.py 99
+python3 /lustre/cosinga/hcolor/hisubhalo/hisubhalo.py 99 CIC

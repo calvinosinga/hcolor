@@ -11,4 +11,4 @@
 #SBATCH --output=nelson_mid.dat
 
 . ~/.profile
-python3 /lustre/cosinga/hcolor/subhalo/units/nelson.py 448 99 'mid'
+python3 /lustre/cosinga/hcolor/subhalo/units/nelson.py 448 99 'mid' CIC
