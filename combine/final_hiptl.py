@@ -6,7 +6,7 @@ BASE = '/lustre/cosinga/hiptl_output/'
 logfile = open(BASE+"final_test_log.txt",'w')
 w = hp.File(BASE+"hiptl_99.final.hdf5",'w')
 models = ['GD14', 'GK11', 'K13', 'S14']
-files = ['hiptl_99.200.448.hdf5', 'hiptl_99.0.100.hdf5','hiptl_99.100.200.hdf5']
+files = ['hiptl_99.300.448.hdf5', 'hiptl_99.0.100.hdf5','hiptl_99.100.200.hdf5', 'hiptl_99.200.300.hdf5']
 for m in models:
     total = np.zeros((2048, 2048, 2048), dtype=np.float32)
     logfile.write("starting model "+m+'\n')
