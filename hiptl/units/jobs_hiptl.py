@@ -1,7 +1,7 @@
 #!/bin/python3
 
 #SBATCH --share
-#SBATCH --job-name=hiptl
+#SBATCH --job-name=hiptl_units
 #SBATCH --output=output_hiptl.dat
 #SBATCH --time=2-8:00:00
 #SBATCH --ntasks=50
