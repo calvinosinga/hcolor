@@ -54,36 +54,36 @@ for i in range(FILENO):
         except:
             logfile.write("chunk "+str(i)+ '\'s subhalo data was empty\n')
         else:
-            bins = np.digitize(pos,edges)
-            for j,b in enumerate(bins):
-                gr = photo[j][4]-photo[j][5]
-                total_mass = np.sum(mass,axis=1)
-                stmass = mass[:,4]
-                # now getting the indices of resolved subhaloes
-                resolved_idx = is_resolved(stmass, mass[:,0])
+#           bins = np.digitize(pos,edges)
+#          for j,b in enumerate(bins):
+            gr = photo[:][4]-photo[:][5]
+            total_mass = np.sum(mass,axis=1)
+            stmass = mass[:,4]
+            # now getting the indices of resolved subhaloes
+            resolved_idx = is_resolved(stmass, mass[:,0])
 
-                # now creating field for the nondetected subhaloes
-                nondetection_idx = np.invert(resolved_idx)
-                nondetection_count = np.sum(nondetection_idx)
-                masl.MA(pos[nondetection_idx], nondetfield, BOXSIZE, MAS, total_mass[nondetection_idx])
+            # now creating field for the nondetected subhaloes
+            nondetection_idx = np.invert(resolved_idx)
+            nondetection_count = np.sum(nondetection_idx)
+            masl.MA(pos[nondetection_idx], nondetfield, BOXSIZE, MAS, total_mass[nondetection_idx])
 
-                # removing unresolved from pos/mass/gr/stmass
-                total_mass = total_mass[resolved_idx]
-                pos = pos[resolved_idx]
-                gr = gr[resolved_idx]
-                stmass = stmass[resolved_idx]
+            # removing unresolved from pos/mass/gr/stmass
+            total_mass = total_mass[resolved_idx]
+            pos = pos[resolved_idx]
+            gr = gr[resolved_idx]
+            stmass = stmass[resolved_idx]
 
-                # now creating field for the red subhaloes
-                red_idx = isred(gr, stmass)
-                red_count = np.sum(red_idx)
-                masl.MA(pos[red_idx], redfield, BOXSIZE, MAS, total_mass[red_idx])
+            # now creating field for the red subhaloes
+            red_idx = isred(gr, stmass)
+            red_count = np.sum(red_idx)
+            masl.MA(pos[red_idx], redfield, BOXSIZE, MAS, total_mass[red_idx])
 
-                # now creating field for the blue subhaloes
-                blue_idx = np.invert(red_idx)
-                blue_count = np.sum(blue_idx)
-                masl.MA(pos[blue_idx], bluefield, BOXSIZE, MAS, total_mass[blue_idx])
+            # now creating field for the blue subhaloes
+            blue_idx = np.invert(red_idx)
+            blue_count = np.sum(blue_idx)
+            masl.MA(pos[blue_idx], bluefield, BOXSIZE, MAS, total_mass[blue_idx])
 
-                counts = np.array([blue_count, nondetection_count, red_count])
+            counts = np.array([blue_count, nondetection_count, red_count])
                 
                 # if is_resolved(mass[j][4], mass[j][0]) and isred(gr,mass[j][4]):
                 #     redfield[b[0],b[1],b[2]]+= np.sum(mass[j])
