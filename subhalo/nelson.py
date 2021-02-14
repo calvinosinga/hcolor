@@ -56,7 +56,7 @@ for i in range(FILENO):
         else:
 #           bins = np.digitize(pos,edges)
 #          for j,b in enumerate(bins):
-            gr = photo[:][4]-photo[:][5]
+            gr = photo[:,4]-photo[:,5]
             total_mass = np.sum(mass,axis=1)
             stmass = mass[:,4]
             # now getting the indices of resolved subhaloes
