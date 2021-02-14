@@ -6,7 +6,7 @@ import h5py as hp
 HOME='/lustre/cosinga/final_fields/'
 filename = sys.argv[1]
 savename = sys.argv[2]
-
+MAS = sys.argv[3]
 print('the filename is: ' + filename)
 BOXSIZE = 75.0 #Mpc/h
 grid = (2048, 2048, 2048)
@@ -20,7 +20,7 @@ for k in keys:
         field = field/(BOXSIZE**3) #converts to a density
         avg = np.mean(field).astype(np.float32)
         field = field/avg; field = field - 1
-        pk = Pk(field, BOXSIZE, axis=0, MAS='NGP')
+        pk = Pk(field, BOXSIZE, axis=0, MAS=MAS)
         tpk = np.transpose([pk.k3D, pk.Pk[:,0]])
-        np.savetxt(HOME+'pk/'+savename+'_'+k+"_Mpc.txt", tpk)
+        np.savetxt(HOME+'pk/'+savename+'_'+k+".txt", tpk)
 f.close()

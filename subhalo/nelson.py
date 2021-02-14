@@ -48,9 +48,9 @@ for i in range(FILENO):
         logfile.write('failed to open file for '+str(i)+'\n')
     else:
         try:
-            pos = f['Subhalo']['SubhaloCM']/1e3 #Mpc/h
-            mass = f['Subhalo']['SubhaloMassType']*1e10/h #solar masses
-            photo = f['Subhalo']['SubhaloStellarPhotometrics']
+            pos = f['Subhalo']['SubhaloCM'][:]/1e3 #Mpc/h
+            mass = f['Subhalo']['SubhaloMassType'][:]*1e10/h #solar masses
+            photo = f['Subhalo']['SubhaloStellarPhotometrics'][:]
         except:
             logfile.write("chunk "+str(i)+ '\'s subhalo data was empty\n')
         else:
