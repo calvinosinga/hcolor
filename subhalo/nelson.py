@@ -51,7 +51,7 @@ for i in range(FILENO):
             pos = f['Subhalo']['SubhaloCM'][:]/1e3 #Mpc/h
             mass = f['Subhalo']['SubhaloMassType'][:]*1e10/h #solar masses
             photo = f['Subhalo']['SubhaloStellarPhotometrics'][:]
-        except:
+        except KeyError:
             logfile.write("chunk "+str(i)+ '\'s subhalo data was empty\n')
         else:
 #           bins = np.digitize(pos,edges)
