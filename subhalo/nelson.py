@@ -33,7 +33,7 @@ def is_resolved(stmass, gasmass):
     return resolved_in_gasmass * resolved_in_stmass
 
 ###################################
-logfile = open(SAVE+'nelson_'+RUN+'_log'+str(SNAPSHOT)+'.txt', 'a')
+logfile = open(SAVE+'nelson_'+RUN+'_log'+str(SNAPSHOT)+'.txt', 'w')
 logfile.write('the refmass is: %.4E\n'%(200*MEANBARYONICMASS))
 redfield = np.zeros(grid, dtype=np.float32)
 bluefield = np.zeros(grid, dtype=np.float32)

@@ -9,10 +9,12 @@ import numpy as np
 import sys
 idx = int(sys.argv[1])
 
-f = hp.File("/lustre/cosinga/final_fields/nelson_99.final.hdf5", 'r')
+f = hp.File("/lustre/cosinga/final_fields/nelson_mid_99.final.hdf5", 'r')
 for k in ('blue', 'red', 'total'):
+    print(np.count_nonzero(f[k]))
     slc = f[k][idx-100:idx+100,:,:]
     print(slc.shape)
+
     slc = np.sum(slc, axis=0)
     print(slc.shape)
     slc /= 200
