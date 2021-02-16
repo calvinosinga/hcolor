@@ -11,4 +11,4 @@
 #SBATCH --output=nelson_high.dat
 
 . ~/.profile
-python3 /lustre/cosinga/hcolor/subhalo/nelson.py 448 99 'high' CIC
+python3 /lustre/cosinga/hcolor/subhalo/nelson.py 448 99 'high' 'CIC'

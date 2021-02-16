@@ -56,6 +56,7 @@ for i in range(FILENO):
         else:
 #           bins = np.digitize(pos,edges)
 #          for j,b in enumerate(bins):
+            logfile.write("starting procedure for chunk %d"%i)
             gr = photo[:,4]-photo[:,5]
             total_mass = np.sum(mass,axis=1)
             stmass = mass[:,4]
@@ -64,7 +65,7 @@ for i in range(FILENO):
 
             # now creating field for the nondetected subhaloes
             nondetection_idx = np.invert(resolved_idx)
-            nondetection_count = np.sum(nondetection_idx)
+            count[1] += np.sum(nondetection_idx) #adding to running nondet total
             masl.MA(pos[nondetection_idx], nondetfield, BOXSIZE, MAS, total_mass[nondetection_idx])
 
             # removing unresolved from pos/mass/gr/stmass
