@@ -38,7 +38,7 @@ logfile.write('the refmass is: %.4E\n'%(200*MEANBARYONICMASS))
 redfield = np.zeros(grid, dtype=np.float32)
 bluefield = np.zeros(grid, dtype=np.float32)
 nondetfield = np.zeros(grid, dtype=np.float32)
-counts = np.zeros(3)
+count = np.zeros(3)
 edges = np.linspace(0,BOXSIZE, grid[0]-1) #definitions of bins
 w = hp.File(SAVE+'nelson_'+RUN+'_'+str(SNAPSHOT)+'.final.hdf5', 'w')
 for i in range(FILENO):
@@ -76,28 +76,16 @@ for i in range(FILENO):
 
             # now creating field for the red subhaloes
             red_idx = isred(gr, stmass)
-            red_count = np.sum(red_idx)
+            count[2] += np.sum(red_idx)
             masl.MA(pos[red_idx], redfield, BOXSIZE, MAS, total_mass[red_idx])
 
             # now creating field for the blue subhaloes
             blue_idx = np.invert(red_idx)
-            blue_count = np.sum(blue_idx)
+            count[0] += np.sum(blue_idx)
             masl.MA(pos[blue_idx], bluefield, BOXSIZE, MAS, total_mass[blue_idx])
-
-            counts = np.array([blue_count, nondetection_count, red_count])
-                
-                # if is_resolved(mass[j][4], mass[j][0]) and isred(gr,mass[j][4]):
-                #     redfield[b[0],b[1],b[2]]+= np.sum(mass[j])
-                #     counts[2]+=1
-                # if is_resolved(mass[j][4], mass[j][0]) and not isred(gr,mass[j][4]):
-                #     bluefield[b[0],b[1],b[2]]+= np.sum(mass[j])
-                #     counts[0]+=1
-                # if not is_resolved(mass[j][4], mass[j][0]):
-                #     nondetfield[b[0],b[1],b[2]]+= np.sum(mass[j])
-                #     counts[1]+=1
 
 w.create_dataset("red",data=redfield, compression="gzip", compression_opts=9)
 w.create_dataset("blue",data=bluefield, compression="gzip", compression_opts=9)
 w.create_dataset("nondetection",data=nondetfield, compression="gzip", compression_opts=9)
-w.create_dataset('counts',data=counts, compression="gzip", compression_opts=9)
+w.create_dataset('counts',data=count, compression="gzip", compression_opts=9)
 w.close()

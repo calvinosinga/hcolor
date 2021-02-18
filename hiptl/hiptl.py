@@ -11,9 +11,7 @@ SAVE = '/lustre/cosinga/hiptl_output/'
 BOXSIZE = 75.0 #Mpc/h
 h = .6774
 grid = (2048,2048,2048)
-fileno = 448
-# field = np.zeros(grid, dtype=np.float32) # 35 GB
-edges = np.linspace(0,BOXSIZE,grid[0]-1)
+
 hih2file = hp.File(BASE+"hih2_particles_099."+CHUNK+".hdf5", 'r')
 ptlfile = hp.File(HOME+"snap_099."+CHUNK+".hdf5", 'r')
 mass = ptlfile['PartType0']['Masses'][:]*1e10/h #~50 MB, in solar masses
