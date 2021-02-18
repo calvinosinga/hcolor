@@ -61,7 +61,7 @@ for i in range(FILENO):
             cons = f['Header'].attrs
             redshift = cons[u'Redshift']
             omega_L = cons[u'OmegaLambda']
-            omaga_m = cons[u'Omega0']
+            omega_m = cons[u'Omega0']
             HUBBLE = 100.0*np.sqrt(omega_m*(1+redshift)**3+omega_L) #km/s/(Mpc/h)
 
             logfile.write("starting procedure for chunk %d"%i)
