@@ -27,6 +27,8 @@ logfile.write("the models used are: "+str(models)+'\n')
 for m in models:
     field = np.zeros(grid, dtype=np.float32)
     mass = f[m][:] # already in solar masses
+    mass = mass.astype(np.float32)
+    pos = pos.astype(np.float32)
     # for j,b in enumerate(bins):
     #     field[b[0],b[1],b[2]] += mass[j]
     masl.MA(pos,field,BOXSIZE,MAS, mass)
