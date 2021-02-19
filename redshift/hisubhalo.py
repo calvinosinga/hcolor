@@ -7,7 +7,7 @@ import MAS_library as masl
 ########## INPUTS #################
 grid = (2048,2048,2048)
 SNAPSHOT = sys.argv[1]
-BOXSIZE = 75 #Mpc/h
+BOXSIZE = 75.0 #Mpc/h
 HOME = '/lustre/cosinga/subhalo'+str(SNAPSHOT)+'/'
 SAVE = '/lustre/cosinga/subhalo_output/'
 
@@ -38,7 +38,7 @@ for a in axes:
     for m in models:
         field = np.zeros(grid, dtype=np.float32)
         mass = f[m][:]
-        masl.MA(pos.astype(np.float32), field, float(BOXSIZE), 'CIC', mass.astype(np.float32)
+        masl.MA(pos.astype(np.float32), field, float(BOXSIZE), 'CIC', mass.astype(np.float32))
         w.create_dataset(m+'_%d'%a, data=field, compression="gzip", compression_opts=9)
 
 w.close()
