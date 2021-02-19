@@ -11,4 +11,4 @@
 #SBATCH --mail-user=cosinga@umd.edu
 
 . ~/.profile
-python3 /lustre/cosinga/hcolor/power_spectrum/pk.py 'hiptl_99.final.hdf5' 'hiptl_99_pk' 
+python3 /lustre/cosinga/hcolor/power_spectrum/pk.py 'hiptl_99.final.hdf5' 'hiptl_99_pk' 'CIC' 

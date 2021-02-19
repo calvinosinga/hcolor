@@ -11,12 +11,12 @@
 #SBATCH --output=nelson_rs.dat
 
 . ~/.profile
-python3 /lustre/cosinga/hcolor/subhalo/nelson.py 448 99 'mid' 0
-python3 /lustre/cosinga/hcolor/subhalo/nelson.py 448 99 'mid' 1
-python3 /lustre/cosinga/hcolor/subhalo/nelson.py 448 99 'mid' 2
-python3 /lustre/cosinga/hcolor/subhalo/nelson.py 448 99 'high' 0
-python3 /lustre/cosinga/hcolor/subhalo/nelson.py 448 99 'high' 1
-python3 /lustre/cosinga/hcolor/subhalo/nelson.py 448 99 'high' 2
-python3 /lustre/cosinga/hcolor/subhalo/nelson.py 448 99 'low' 0
-python3 /lustre/cosinga/hcolor/subhalo/nelson.py 448 99 'low' 1
-python3 /lustre/cosinga/hcolor/subhalo/nelson.py 448 99 'low' 2
+python3 /lustre/cosinga/hcolor/subhalo/nelson.py 448 99 'mid' 0 'CIC'
+python3 /lustre/cosinga/hcolor/subhalo/nelson.py 448 99 'mid' 1 'CIC'
+python3 /lustre/cosinga/hcolor/subhalo/nelson.py 448 99 'mid' 2 'CIC'
+python3 /lustre/cosinga/hcolor/subhalo/nelson.py 448 99 'high' 0 'CIC'
+python3 /lustre/cosinga/hcolor/subhalo/nelson.py 448 99 'high' 1 'CIC'
+python3 /lustre/cosinga/hcolor/subhalo/nelson.py 448 99 'high' 2 'CIC'
+python3 /lustre/cosinga/hcolor/subhalo/nelson.py 448 99 'low' 0 'CIC'
+python3 /lustre/cosinga/hcolor/subhalo/nelson.py 448 99 'low' 1 'CIC'
+python3 /lustre/cosinga/hcolor/subhalo/nelson.py 448 99 'low' 2 'CIC'
