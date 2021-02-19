@@ -38,7 +38,7 @@ for a in axes:
     for m in models:
         field = np.zeros(grid, dtype=np.float32)
         mass = f[m][:]
-        masl.MA(pos, field, BOXSIZE, 'CIC', mass)
+        masl.MA(pos.astype(np.float32), field, float(BOXSIZE), 'CIC', mass.astype(np.float32)
         w.create_dataset(m+'_%d'%a, data=field, compression="gzip", compression_opts=9)
 
 w.close()

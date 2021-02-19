@@ -8,7 +8,7 @@ grid = (2048,2048,2048)
 FILENO = int(sys.argv[1])
 SNAPSHOT = sys.argv[2]
 RUN = sys.argv[3]
-AXIS = int(sys.argv[4])
+AXIS = float(sys.argv[4])
 
 h=0.6774
 BOXSIZE = 75.0 #Mpc/h
@@ -78,7 +78,7 @@ for i in range(FILENO):
             # now creating field for the nondetected subhaloes
             nondetection_idx = np.invert(resolved_idx)
             count[1] += np.sum(nondetection_idx) #adding to running nondet total
-            masl.MA(pos[nondetection_idx], nondetfield, BOXSIZE, MAS, total_mass[nondetection_idx])
+            masl.MA(pos[nondetection_idx], nondetfield, float(BOXSIZE), 'CIC', total_mass[nondetection_idx])
 
             # removing unresolved from pos/mass/gr/stmass
             total_mass = total_mass[resolved_idx]
@@ -89,12 +89,12 @@ for i in range(FILENO):
             # now creating field for the red subhaloes
             red_idx = isred(gr, stmass)
             count[2] += np.sum(red_idx)
-            masl.MA(pos[red_idx], redfield, BOXSIZE, MAS, total_mass[red_idx])
+            masl.MA(pos[red_idx], redfield, BOXSIZE, 'CIC', total_mass[red_idx])
 
             # now creating field for the blue subhaloes
             blue_idx = np.invert(red_idx)
             count[0] += np.sum(blue_idx)
-            masl.MA(pos[blue_idx], bluefield, BOXSIZE, MAS, total_mass[blue_idx])
+            masl.MA(pos[blue_idx], bluefield, BOXSIZE, 'CIC', total_mass[blue_idx])
 
 w.create_dataset("red",data=redfield, compression="gzip", compression_opts=9)
 w.create_dataset("blue",data=bluefield, compression="gzip", compression_opts=9)
