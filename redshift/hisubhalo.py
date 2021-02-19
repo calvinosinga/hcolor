@@ -12,7 +12,7 @@ HOME = '/lustre/cosinga/subhalo'+str(SNAPSHOT)+'/'
 SAVE = '/lustre/cosinga/subhalo_output/'
 
 ###################################
-logfile = open(SAVE+'hisubhalo_rs_log'+str(SNAPSHOT)+'.txt', 'a')
+logfile = open(SAVE+'hisubhalo_rs_log'+str(SNAPSHOT)+'.txt', 'w')
 w = hp.File(SAVE+'hisubhalo_rs_'+str(SNAPSHOT)+'.final.hdf5', 'w')
 f = hp.File(HOME+'hih2_galaxy_0'+str(SNAPSHOT)+'.hdf5','r')
 headfile = hp.File(HOME+'fof_subhalo_tab_099.0.hdf5', 'r')
