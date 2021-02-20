@@ -1,9 +1,9 @@
 #!/bin/bash
 
 #SBATCH --share
-#SBATCH --job-name=hiptl_rs_final
-#SBATCH --output=out_hiptl_rs_final.dat
-#SBATCH --time=1-1:00:00
+#SBATCH --job-name=hptlrs_combine0
+#SBATCH --output=out_hiptl_combine0.dat
+#SBATCH --time=2-1:00:00
 #SBATCH --ntasks=1
 #SBATCH --mail-user=cosinga@umd.edu
 #SBATCH --account=astronomy-hi
@@ -11,5 +11,5 @@
 #SBATCH --mail-type=ALL
 
 . ~/.profile
-python3 /lustre/cosinga/hcolor/combine/final_hiptl.py 'hiptl_rs_' 99
+python3 /lustre/cosinga/hcolor/combine/hiptl_combine.py 0 100 99 "hiptl_rs_"
 

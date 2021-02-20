@@ -11,5 +11,5 @@
 #SBATCH --mail-type=ALL
 
 . ~/.profile
-python3 /lustre/cosinga/hcolor/combine/hiptl_combine.py 100 200 99
+python3 /lustre/cosinga/hcolor/combine/hiptl_combine.py 100 200 99 "hiptl_"
 

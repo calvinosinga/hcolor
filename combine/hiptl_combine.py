@@ -6,10 +6,11 @@ START = sys.argv[1]
 END = sys.argv[2]
 filenos = np.arange(int(START), int(END))
 SNAPSHOT = sys.argv[3]
-logfile = open(BASE+"combine_test_log.txt",'w')
-w = hp.File(BASE+"hiptl_"+SNAPSHOT+'.'+START+'.'+END+'.hdf5','w')
+PREFIX = sys.argv[4]
+logfile = open(BASE+"combine_log.txt",'w')
+w = hp.File(BASE+PREFIX+SNAPSHOT+'.'+START+'.'+END+'.hdf5','w')
 models = ['GD14', 'GK11', 'K13', 'S14']
-files = ['hiptl_'+str(SNAPSHOT)+'.'+str(i)+'.hdf5' for i in filenos]
+files = [PREFIX+str(SNAPSHOT)+'.'+str(i)+'.hdf5' for i in filenos]
 logfile.write('first file: ' + files[0]+'\n')
 logfile.write('last file: ' + files[-1]+'\n')
 for m in models:
