@@ -12,5 +12,3 @@
 
 . ~/.profile
 python3 /lustre/cosinga/hcolor/power_spectrum/xpk.py 'nelson_mid_99.final.hdf5' 'ALL' 'nelson_mid_99.final.hdf5' 'ALL' 'nelson_mid_99_xpk'
-python3 /lustre/cosinga/hcolor/power_spectrum/xpk.py 'nelson_low_99.final.hdf5' 'ALL' 'nelson_low_99.final.hdf5' 'ALL' 'nelson_low_99_xpk'
-python3 /lustre/cosinga/hcolor/power_spectrum/xpk.py 'nelson_high_99.final.hdf5' 'ALL' 'nelson_high_99.final.hdf5' 'ALL' 'nelson_high_99_xpk'
