@@ -9,7 +9,14 @@ SNAPSHOT = sys.argv[3]
 PREFIX = sys.argv[4]
 logfile = open(BASE+"combine_log.txt",'w')
 w = hp.File(BASE+PREFIX+SNAPSHOT+'.'+START+'.'+END+'.hdf5','w')
+
 models = ['GD14', 'GK11', 'K13', 'S14']
+if PREFIX == 'hiptl_rs_':
+    temp = []
+    for m in models:
+        for a in (0,1,2):
+            temp.append(m+'_'+str(a))
+    models = temp
 files = [PREFIX+str(SNAPSHOT)+'.'+str(i)+'.hdf5' for i in filenos]
 logfile.write('first file: ' + files[0]+'\n')
 logfile.write('last file: ' + files[-1]+'\n')

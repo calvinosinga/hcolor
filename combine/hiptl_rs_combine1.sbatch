@@ -2,8 +2,8 @@
 
 #SBATCH --share
 #SBATCH --job-name=hptlrs_combine1
-#SBATCH --output=out_hiptl_combine1.dat
-#SBATCH --time=2-1:00:00
+#SBATCH --output=out_hiptlrs_combine1.dat
+#SBATCH --time=2-22:00:00
 #SBATCH --ntasks=1
 #SBATCH --mail-user=cosinga@umd.edu
 #SBATCH --account=astronomy-hi
