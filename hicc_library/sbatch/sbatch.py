@@ -7,9 +7,10 @@ import illustris_python as il
 
 class Sbatch():
 
-    def __init__(self, paths, fieldname, simname, snapshot):
+    def __init__(self, paths, fieldname, simname, snapshot, resolution):
+        self.resolution = resolution
         if fieldname == 'hiptl':
-            self.field = hiptl(paths, simname, snapshot)
+            self.field = hiptl(paths, simname, snapshot, resolution)
         elif fieldname == 'hisubhalo':
             self.field = hisubhalo()
         elif fieldname == 'ptl':
@@ -48,19 +49,18 @@ class Sbatch():
         return
     
     def _compute_grid_memory(self):
-        return int(self.field.res**3/1e6 + 5000)
+        return int(self.resolution**3/1e6 + 5000)
 
     def _compute_pk_memory(self):
         return int(self._compute_grid_memory()*2.25)
 
-
-
 class hiptl(Sbatch):
 
-    def __init__(self, paths, simname, snapshot):
+    def __init__(self, paths, simname, snapshot, resolution):
         self.simpath = paths[simname]
         self.snapshot = snapshot
         self.sbatch_path = paths['sbatch']
+        self.resolution = resolution
         return
     
     def makeSbatch(self):

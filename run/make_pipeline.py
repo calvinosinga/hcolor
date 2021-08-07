@@ -8,7 +8,6 @@ import numpy as np
 import h5py as hp
 from hicc_library.sbatch.sbatch import Sbatch
 
-
 SIMNAME = sys.argv.pop(1)
 SNAPSHOT = int(sys.argv.pop(1))
 RESOLUTION = int(sys.argv.pop(1))
@@ -62,16 +61,18 @@ for i in RUNNAMES:
 
 fields = []
 for i in RUNNAMES:
-    fields.append(Sbatch(paths, i, SIMNAME, SNAPSHOT))
+    fields.append(Sbatch(paths, i, SIMNAME, SNAPSHOT, RESOLUTION))
     
 # letting the Fields object create the individual sbatch files, saving the output to put into pipeline
 lines=[]
 for f in fields:
-    lines.append(f.makeSbatch(paths['output']+"sbatch/", SIMNAME, SNAPSHOT, RESOLUTION))
+    lines.append(f.makeSbatch())
 
 # create pk sbatch files
 
 # save paths here
+print("the path dictionary:")
+print(paths)
 
 # creating the pipeline
-pipe = open(paths['output']+'sbatch/pipeline.bash')
+pipe = open(paths['output']+'sbatch/pipeline.bash', 'w')
