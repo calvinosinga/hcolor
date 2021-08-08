@@ -18,3 +18,17 @@ field = Field(FIELDNAME, SIMNAME, SNAPSHOT, RESOLUTION, CHUNK)
 
 field.computeGrids()
 field.saveGrids()
+
+#####################################
+        # if fieldname == 'hiptl':
+        #     self.field = hiptl(simname, snapshot, resolution, chunk)
+        # elif fieldname == 'hisubhalo':
+        #     self.field = hisubhalo()
+        # elif fieldname == 'ptl':
+        #     self.field = ptl()
+        # elif fieldname == 'vn':
+        #     self.field = vn()
+        # elif fieldname == 'galaxy':
+        #     self.field = galaxy()
+        # else:
+        #     raise NotImplementedError("there is no field named %s"%fieldname)

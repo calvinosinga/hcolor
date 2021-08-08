@@ -24,15 +24,17 @@ print("runs given: "+str(RUNNAMES))
 # defining basic path names: adjust paths here
 LSTR = '/lustre/cosinga/'
 HIH2 = '/lustre/diemer/illustris/hih2/'
-
+HCOLOR = LSTR + '/hcolor/'
 # this directory stores the basic paths that will be used throughout the run
 paths = {}
 
 paths[SIMNAME] = LSTR+'%s/'%SIMNAME
 paths['output'] = LSTR+'hcolor/output/'
 paths['output'] = paths['output']+'hicc_%sB_%03dS_%dR_'%(SIMNAME, SNAPSHOT, RESOLUTION)
-
-
+paths['snapshot'] = paths[SIMNAME]+'/snapdir_%03d/'%(SNAPSHOT)
+paths['load_header'] = paths['snapshot']+'snap_%03d.0.hdf5'
+paths['create_grid'] = HCOLOR + 'run/create_grid.py'
+paths['combine'] = HCOLOR + 'run/combine.py'
 # create output directory
 for i in range(25):
     if not os.path.isdir(paths['output']+str(i)):
@@ -47,7 +49,7 @@ def create_subdirectory(subdir):
     paths[splt[-1]] = paths['output']+subdir+'/'
     return
 
-create_subdirectory("fields")
+create_subdirectory("grids")
 create_subdirectory("slices")
 create_subdirectory("sbatch")
 create_subdirectory("sbatch/logs")
@@ -55,7 +57,8 @@ create_subdirectory("results")
 create_subdirectory("results/plots")
 
 for i in RUNNAMES:
-    create_subdirectory("results/plots/"+i+"/")
+    create_subdirectory("results/plots/"+i)
+    create_subdirectory("slices/"+i)
 
 # getting the properties of the runs given
 
@@ -64,9 +67,12 @@ for i in RUNNAMES:
     fields.append(Sbatch(paths, i, SIMNAME, SNAPSHOT, RESOLUTION))
     
 # letting the Fields object create the individual sbatch files, saving the output to put into pipeline
-lines=[]
+dependencies={}
+jobnames = []
 for f in fields:
-    lines.append(f.makeSbatch())
+    sjobs, sdeps = f.makeSbatch()
+    jobnames.extend(sjobs)
+    dependencies.update(sdeps)
 
 # create pk sbatch files
 
@@ -74,5 +80,17 @@ for f in fields:
 print("the path dictionary:")
 print(paths)
 
+# add hih2 hiptl, tng snapshot, postprocessing files to path,
 # creating the pipeline
 pipe = open(paths['output']+'sbatch/pipeline.bash', 'w')
+
+# helper method to write jobs and their dependencies
+def write_line(varname, sname, jdep):
+    pipe.write("$%s=(sbatch --dependency=afterok:"%varname)
+    for i in range(len(jdep)):
+        if not jdep[i] == jdep[-1]:
+            pipe.write(jdep[i]+':')
+        else:
+            pipe.write(jdep[i])
+    pipe.write(" %s"%sname)
+

@@ -3,37 +3,45 @@ This file is responsible for the creation of the contituent sbatch files that ma
 up the pipeline.
 """
 import os
-from hicc_library.paths import getPaths
 from hicc_library.fields.hiptl import hiptl
+import numpy as np
+import h5py as hp
 
 class Field():
 
-    def __init__(self, paths, fieldname, simname = '', snapshot = 0, resolution = 0, chunk = 0):
-        if fieldname == 'hiptl':
-            self.field = hiptl(simname, snapshot, resolution, chunk)
-        elif fieldname == 'hisubhalo':
-            self.field = hisubhalo()
-        elif fieldname == 'ptl':
-            self.field = ptl()
-        elif fieldname == 'vn':
-            self.field = vn()
-        elif fieldname == 'galaxy':
-            self.field = galaxy()
-        else:
-            raise NotImplementedError("there is no field named %s"%fieldname)
-        return
-    
-    def makeSbatch(self, path):
-        self.field.makeSbatch(path)
+    def __init__(self, paths, simname, snapshot, axis, resolution):
+        self.simname = simname
+        self.snapshot = snapshot
+        self.resolution = resolution
+        self.axis = axis
+
+        # expected to be given in subclasses
+        self.gridnames = []
+
+
+
+        # getting basic simulation information
+        
+        f = hp.File(paths['load_header'], 'r')
+        self.header = dict(f['Header'].attrs)
+        self.header = dict(f['Header'].attrs)
+        temp = dict(f['Parameters'].attrs)
+        paramparams = ['BoxSize', 'HubbleParam']
+        for p in paramparams:
+            self.header[p] = temp[p]
+        self.header['BoxSize'] = self._convertPos(self.header['BoxSize'])
+        self.header['MassTable'] = self._convertMass(self.header['MassTable'])
+
+        # other variables expected to be assigned values later in analysis
+        self.grid = None
+        self.pos = None
+        self.vel = None
+        self.mass = None
         return
     
     
     def computeGrids(self):
         self.field.computeGrids()
-        return
-    
-    def saveGrids(self):
-        self.field.saveGrids()
         return
     
     def computePk(self):
@@ -44,48 +52,54 @@ class Field():
         self.field.computeCorr()
         return
     
-    # helper methods for subclasses
-    def _default_sbatch_settings(self, jobname):
-        sbatch_dir = {}
-        sbatch_dir['job-name']=jobname
-        sbatch_dir['output']='logs/'+jobname+'.log'
-        sbatch_dir['ntasks']='1'
-        sbatch_dir['mail-user']='cosinga@umd.edu'
-        sbatch_dir['mail-type']='ALL'
-        sbatch_dir['account']='astronomy-hi'
-        sbatch_dir['time']='2-1:00:00'
-        return sbatch_dir
-    
-    def _sbatch_lines(self, write_file, sbatch_dir):
-        write_file.write("#!/bin/bash\n")
-        write_file.write("#SBATCH --share\n")
-        keylist = list(sbatch_dir.keys())
-        for k in keylist:
-            write_file.write('#SBATCH --'+k+'='+sbatch_dir[k]+'\n')
+    def _toRedshiftSpace(self):
+        if self.pos is None or self.vel is None:
+            raise ValueError("position or velocity have not been defined yet")
+        boxsize = self._convertPos(self.header["BoxSize"])
+        hubble = self.header["HubbleParam"]*100 # defined using big H
+        redshift = self.header['Redshift']
+
+        factor = (1+redshift)/hubble
+        self.pos[:,self.axis] += self.vel[:,self.axis]*factor
+
+        # handle periodic boundary conditions
+        self.pos[:, self.axis] = np.where((self.pos[:,self.axis]>boxsize) | (self.pos[:,self.axis]<0), 
+                (self.pos[:,self.axis]+boxsize)%boxsize, self.pos[:,self.axis])
+        
+        # tell the Grid object that we've moved to redshift space
+        self.grid.toRSS()
         return
+
+    def _convertMass(self, mass=None):
+        """
+        Converts mass units from 1e10 M_sun/h to M_sun
+        """
+        if mass is None:
+            self.mass *= 1e10/self.header['HubbleParam']
+            return
+        else:
+            mass *= 1e10/self.header['HubbleParam']
+            return mass
     
-    def _compute_grid_memory(self):
-        return int(self.field.res**3/1e6 + 5000)
-
-    def _compute_pk_memory(self):
-        return int(self._compute_grid_memory()*2.25)
-
-
-
-
-
-class hisubhalo(Field):
-    def __init__(self, name):
-        super().__init__(name)
-
-class ptl(Field):
-    def __init__(self, name):
-        super().__init__(name)
-
-class vn(Field):
-    def __init__(self, name):
-        super().__init__(name)
-
-class galaxy(Field):
-    def __init__(self, name):
-        super().__init__(name)
+    def _convertPos(self, pos=None):
+        """
+        Converts position units from ckpc/h to Mpc
+        """
+        if pos is None:
+            self.pos *= self.header["Time"]/1e3
+            return
+        else:
+            pos *= self.header["Time"]/1e3
+            return pos
+    
+    def _convertVel(self, vel=None):
+        """
+        Multiplies velocities by scale factor^0.5
+        """
+        if vel is None:
+            self.vel *= np.sqrt(self.header["Time"])
+            return
+        else:
+            vel *= np.sqrt(self.header["Time"])
+            return vel
+    

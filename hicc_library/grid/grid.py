@@ -7,10 +7,9 @@ import h5py as hp
 
 class Grid():
 
-    def __init__(self, name, res):
-        self.name = name
+    def __init__(self, res):
         self.grid = np.zeros((res,res,res), dtype=np.float32)
-        self.rss = False
+        self.in_rss = False
         self.is_computed = False
         return
     
@@ -19,14 +18,10 @@ class Grid():
             raise RuntimeError("grid is empty; has not been computed")
         return self.grid
     
-    def isRSS(self):
-        return self.rss
-    
     def toRSS(self):
-        #TODO
-        self.rss = True
+        self.in_rss = True
         return
-
+    
     def getResolution(self):
         return self.grid.shape[0]
     
@@ -62,9 +57,9 @@ class Grid():
         return
 
 class Chunk(Grid):
-    def __init__(self, name, res, chunk_num):
-        super().__init__(name, res)
-        self.combine = 0
+    def __init__(self, res, chunk_num):
+        super().__init__( res)
+        self.combine = 1
         self.chunk_nums = [chunk_num]
         return
     
