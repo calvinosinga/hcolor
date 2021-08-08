@@ -10,7 +10,9 @@ from hicc_library.sbatch.sbatch import Sbatch
 
 SIMNAME = sys.argv.pop(1)
 SNAPSHOT = int(sys.argv.pop(1))
+AXIS = int(sys.argv.pop(1))
 RESOLUTION = int(sys.argv.pop(1))
+
 sys.argv.pop(0) # removing unneeded script name
 
 RUNNAMES = sys.argv
@@ -18,6 +20,7 @@ RUNNAMES = sys.argv
 
 print("simulation name: %s"%SIMNAME)
 print("snapshot: %03d"%SNAPSHOT)
+print("axis: %d"%AXIS)
 print("resolution of grid: %d"%RESOLUTION)
 print("runs given: "+str(RUNNAMES))
 
@@ -64,15 +67,17 @@ for i in RUNNAMES:
 
 fields = []
 for i in RUNNAMES:
-    fields.append(Sbatch(paths, i, SIMNAME, SNAPSHOT, RESOLUTION))
+    fields.append(Sbatch(paths, i, SIMNAME, SNAPSHOT, AXIS, RESOLUTION))
     
 # letting the Fields object create the individual sbatch files, saving the output to put into pipeline
 dependencies={}
 jobnames = []
+varnames = []
 for f in fields:
-    sjobs, sdeps = f.makeSbatch()
+    svars, sjobs, sdeps = f.makeSbatch()
     jobnames.extend(sjobs)
     dependencies.update(sdeps)
+    varnames.extend(svars)
 
 # create pk sbatch files
 
@@ -85,12 +90,22 @@ print(paths)
 pipe = open(paths['output']+'sbatch/pipeline.bash', 'w')
 
 # helper method to write jobs and their dependencies
-def write_line(varname, sname, jdep):
-    pipe.write("$%s=(sbatch --dependency=afterok:"%varname)
-    for i in range(len(jdep)):
-        if not jdep[i] == jdep[-1]:
-            pipe.write(jdep[i]+':')
-        else:
-            pipe.write(jdep[i])
-    pipe.write(" %s"%sname)
+def write_line(varname, sname, jdep=None):
+    if jdep is None:
+        pipe.write("$%s=(sbatch %s)\n"%(varname, sname))
+    else:
+        pipe.write("$%s=(sbatch --dependency=afterok:"%varname)
+        for i in range(len(jdep)):
+            if not jdep[i] == jdep[-1]:
+                pipe.write(jdep[i]+':')
+            else:
+                pipe.write(jdep[i])
+        pipe.write(" %s\n"%sname)
+    return
+
+for i in range(len(jobnames)):
+    try:
+        write_line(varnames[i], jobnames[i], dependencies[varnames[i]])
+    except KeyError:
+        write_line(varnames[i], jobnames[i])
 
