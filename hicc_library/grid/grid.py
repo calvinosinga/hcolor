@@ -22,6 +22,9 @@ class Grid():
         self.in_rss = True
         return
     
+    def isChunk(self):
+        return False
+    
     def getResolution(self):
         return self.grid.shape[0]
     
@@ -62,6 +65,9 @@ class Chunk(Grid):
         self.combine = 1
         self.chunk_nums = [chunk_num]
         return
+    
+    def isChunk(self):
+        return True
     
     def combine(self, other_chunk):
         self.grid += other_chunk.getGrid()

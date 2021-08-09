@@ -9,16 +9,21 @@ class Sbatch():
 
     def __init__(self, paths, fieldname, simname, snapshot, axis, resolution):
         self.resolution = resolution
+        self.log_path = ''
         if fieldname == 'hiptl':
             self.field = hiptl(paths, simname, snapshot, axis, resolution)
         elif fieldname == 'hisubhalo':
-            self.field = hisubhalo()
+            self.field = hisubhalo(paths, simname, snapshot, axis, resolution)
         elif fieldname == 'ptl':
-            self.field = ptl()
+            self.field = ptl(paths, simname, snapshot, axis, resolution)
         elif fieldname == 'vn':
-            self.field = vn()
+            self.field = vn(paths, simname, snapshot, axis, resolution)
         elif fieldname == 'galaxy':
-            self.field = galaxy()
+            self.field = galaxy(paths, simname, snapshot, axis, resolution)
+        elif fieldname == 'dust':
+            self.field = dust(paths, simname, snapshot, axis, resolution)
+        elif fieldname == 'nden':
+            self.field = nden(paths, simname, snapshot, axis, resolution)
         else:
             raise NotImplementedError("there is no field named %s"%fieldname)
         return
@@ -32,7 +37,7 @@ class Sbatch():
     def _default_sbatch_settings(self, jobname):
         sbatch_dir = {}
         sbatch_dir['job-name']=jobname
-        sbatch_dir['output']='logs/'+jobname+'.log'
+        sbatch_dir['output']=self.log_path+jobname+'.log'
         sbatch_dir['ntasks']='1'
         sbatch_dir['mail-user']='cosinga@umd.edu'
         sbatch_dir['mail-type']='ALL'
@@ -43,11 +48,25 @@ class Sbatch():
     def _sbatch_lines(self, write_file, sbatch_dir):
         write_file.write("#!/bin/bash\n")
         write_file.write("#SBATCH --share\n")
-        write_file.write('#SBATCH --requeue')
+        write_file.write('#SBATCH --requeue\n')
         keylist = list(sbatch_dir.keys())
         for k in keylist:
             write_file.write('#SBATCH --'+k+'='+sbatch_dir[k]+'\n')
+        write_file.write('\n')
         return
+    
+    def _write_python_line(self, write_file, cmdargs=None):
+        if cmdargs is None:
+            cmdargs = self._default_cmd_line()
+        write_file.write("python3")
+        for c in cmdargs:
+            write_file.write(" "+str(c))
+        write_file.write('\n')
+        return
+    
+    def _default_cmd_line(self, name):
+        return [self.create_grid_path, name, self.simname, self.snapshot, self.axis, 
+                self.resolution]
     
     def _compute_grid_memory(self):
         return int(self.resolution**3/1e6 + 5000)
@@ -58,12 +77,14 @@ class Sbatch():
 class hiptl(Sbatch):
 
     def __init__(self, paths, simname, snapshot, axis, resolution):
+        self.fieldname = 'hiptl'
         self.simname= simname
         self.simpath = paths[simname]
 
         self.snapshot = snapshot
 
         self.sbatch_path = paths['sbatch']
+        self.log_path = paths['logs']+self.fieldname+'/'
         self.axis = axis
         self.resolution = resolution
         self.create_grid_path = paths['create_grid']
@@ -75,65 +96,423 @@ class hiptl(Sbatch):
         # getting basic simulation information - mostly for the number of files
         header = il.groupcat.loadHeader(self.simpath, self.snapshot)
 
-        sbatches = ['hiptl.sbatch', 'hiptl_combine1.sbatch', 'hiptl_combine2.sbatch']
+        fn = self.fieldname
+        # what the names of the sbatch files will be -> returned so that pipeline can use them
+        sbatches = ['%s.sbatch'%fn, '%s_combine1.sbatch'%fn, '%s_combine2.sbatch'%fn]
+
+        # the corresponding varnames of those jobs so that the pipeline can match them to the
+        # right dependencies
+        varnames = ['%sgrid'%fn, '%scombine1'%fn, '%scombine2'%fn]
+
+        # name which jobs depend on another one finishing
+        dependencies = {}
+        for i in range(len(varnames)-1):
+            dependencies[varnames[i+1]] = [varnames[i]]
         grid_mem = self._compute_grid_memory()
+
+        ###### NOW WRITING SBATCH FILES ##################
         # making the first hiptl sbatch files
         grid_job = open(self.sbatch_path+sbatches[0], 'w')
-        grid_dir = self._default_sbatch_settings('hiptl')
+        grid_dir = self._default_sbatch_settings(fn)
         grid_dir['array']='0-%d'%(header['NumFiles']-1)
-        grid_dir['output']='logs/hiptl%a.log'
+        grid_dir['output']=self.log_path+fn+'%a.log'
         grid_dir['mem-per-cpu']='%d'%grid_mem
 
-        self._sbatch_lines(grid_job,grid_dir)
+        self._sbatch_lines(grid_job, grid_dir)
         idx_name = "$SLURM_ARRAY_TASK_ID"
-        grid_job.write("python3 %s %s %d %d %d %s\n"%(self.create_grid_path,
-                self.simname, self.snapshot, self.axis, self.resolution, idx_name))
+        grid_cmd_args = (self.create_grid_path, '%s', self.simname, self.snapshot, 
+                self.axis, self.resolution, idx_name)
+        
+        self._write_python_line(grid_job, grid_cmd_args)
+        
         grid_job.close()
         
+
         # making the first combine sbatch file
         combine1_job = open(self.sbatch_path+sbatches[1],'w')
-        combine1_dir = self._default_sbatch_settings("hiptl_combine1")
+        combine1_dir = self._default_sbatch_settings("%s_combine1"%fn)
+
         combine1_dir['array']='0-%d:20'%(header['NumFiles']-header['NumFiles']%20)
-        combine1_dir['output']='logs/hiptl_combine1%a.log'
+        combine1_dir['output']=self.log_path+fn+'_combine1%a.log'
         combine1_dir['mem-per-cpu']='%d'%(grid_mem*2)
         
         self._sbatch_lines(combine1_job, combine1_dir)
 
-        combine1_job.write("python3 %s %s %d %d %d %s\n"%(self.combine_path,
-                self.simname, self.snapshot, self.axis, self.resolution, idx_name))
+        cmd_args = (self.combine_path, fn, self.simname, self.snapshot, self.axis, 
+                self.resolution, idx_name)
+        self._write_python_line(combine1_job, cmd_args)
 
         combine1_job.close()
 
+
         # making the second combine sbatch file
         combine2_job = open(self.sbatch_path+sbatches[2], 'w')
-        combine2_dir = self._default_sbatch_settings("hiptl_combine2")
+        combine2_dir = self._default_sbatch_settings("%s_combine2"%fn)
         combine2_dir['mem-per-cpu']='%d'%(grid_mem*2)
 
         self._sbatch_lines(combine2_job, combine2_dir)
 
-        combine2_job.write("python3 %s %s %d %d %d\n"%(self.combine_path,
-                self.simname, self.snapshot, self.axis, self.resolution))
+        cmd_args = (self.combine_path, fn,
+                self.simname, self.snapshot, self.axis, self.resolution)
+        self._write_python_line(combine2_job, cmd_args)
 
         combine2_job.close()
 
-        varnames = ['hiptlgrid', 'hiptlcombine1', 'hiptlcombine2']
-        dependencies = {}
-        for i in range(len(varnames)-1):
-            dependencies[varnames[i]] = [varnames[i+1]]
         return varnames, sbatches, dependencies
 
-# class hisubhalo(Field):
-#     def __init__(self, name):
-#         super().__init__(name)
+class hisubhalo(Sbatch):
+    def __init__(self, paths, simname, snapshot, axis, resolution):
+        self.fieldname = 'hisubhalo'
+        self.simname = simname
+        self.simpath = paths[simname]
 
-# class ptl(Field):
-#     def __init__(self, name):
-#         super().__init__(name)
+        self.snapshot = snapshot
 
-# class vn(Field):
-#     def __init__(self, name):
-#         super().__init__(name)
+        self.sbatch_path = paths['sbatch']
+        self.log_path = paths['logs']+self.fieldname+'/'
+        self.axis = axis
+        self.resolution = resolution
+        self.create_grid_path = paths['create_grid']
+        return
 
-# class galaxy(Field):
-#     def __init__(self, name):
-#         super().__init__(name)
+    def makeSbatch(self):
+        fn = self.fieldname
+        sbatches = ['%s.sbatch'%fn]
+        varnames = ['%sgrid'%fn]
+        dependencies = {}
+
+        gridjob = open(self.sbatch_path+sbatches[0], 'w')
+        griddir = self._default_sbatch_settings(fn)
+        griddir["mem-per-cpu"] = self._compute_grid_memory()
+
+        self._sbatch_lines(gridjob, griddir)
+
+        cmd_args = self._default_cmd_line(fn)
+
+        self._write_python_line(gridjob, cmd_args)
+
+        gridjob.close()
+        return varnames, sbatches, dependencies
+
+class ptl(Sbatch):
+    def __init__(self, paths, simname, snapshot, axis, resolution):
+        self.fieldname = 'ptl'
+        self.simname= simname
+        self.simpath = paths[simname]
+
+        self.snapshot = snapshot
+
+        self.sbatch_path = paths['sbatch']
+        self.log_path = paths['logs']+self.fieldname+'/'
+        self.axis = axis
+        self.resolution = resolution
+        self.create_grid_path = paths['create_grid']
+        self.combine_path = paths['combine']
+        return
+    
+    def makeSbatch(self):
+        fn = self.fieldname
+        # getting basic simulation information - mostly for the number of files
+        header = il.groupcat.loadHeader(self.simpath, self.snapshot)
+
+        # what the names of the sbatch files will be -> returned so that pipeline can use them
+        sbatches = ['%s.sbatch'%fn, '%s_combine1.sbatch'%fn, '%s_combine2.sbatch'%fn]
+
+        # the corresponding varnames of those jobs so that the pipeline can match them to the
+        # right dependencies
+        varnames = ['%sgrid'%fn, '%scombine1'%fn, '%scombine2'%fn]
+
+        # name which jobs depend on another one finishing
+        dependencies = {}
+        for i in range(len(varnames)-1):
+            dependencies[varnames[i+1]] = [varnames[i]]
+        grid_mem = self._compute_grid_memory()
+
+        ###### NOW WRITING SBATCH FILES ##################
+        # making the first ptl sbatch files
+        grid_job = open(self.sbatch_path+sbatches[0], 'w')
+        grid_dir = self._default_sbatch_settings(fn)
+        grid_dir['array']='0-%d'%(header['NumFiles']-1)
+        grid_dir['output']=self.log_path+fn+'%a.log'
+        grid_dir['mem-per-cpu']='%d'%grid_mem
+
+        self._sbatch_lines(grid_job, grid_dir)
+        idx_name = "$SLURM_ARRAY_TASK_ID"
+        grid_cmd_args = (self.create_grid_path, fn, self.simname, self.snapshot, 
+                self.axis, self.resolution, idx_name)
+        
+        self._write_python_line(grid_job, grid_cmd_args)
+        
+        grid_job.close()
+        
+
+        # making the first combine sbatch file
+        combine1_job = open(self.sbatch_path+sbatches[1],'w')
+        combine1_dir = self._default_sbatch_settings("%s_combine1"%fn)
+
+        combine1_dir['array']='0-%d:20'%(header['NumFiles']-header['NumFiles']%20)
+        combine1_dir['output']=self.log_path+fn+'_combine1%a.log'
+        combine1_dir['mem-per-cpu']='%d'%(grid_mem*2)
+        
+        self._sbatch_lines(combine1_job, combine1_dir)
+
+        cmd_args = (self.combine_path, fn, self.simname, self.snapshot, self.axis, 
+                self.resolution, idx_name)
+        
+        self._write_python_line(combine1_job, cmd_args)
+
+        combine1_job.close()
+
+
+        # making the second combine sbatch file
+        combine2_job = open(self.sbatch_path+sbatches[2], 'w')
+        combine2_dir = self._default_sbatch_settings("%s_combine2"%fn)
+        combine2_dir['mem-per-cpu']='%d'%(grid_mem*2)
+
+        self._sbatch_lines(combine2_job, combine2_dir)
+
+        cmd_args = (self.combine_path, fn,
+                self.simname, self.snapshot, self.axis, self.resolution)
+        self._write_python_line(combine2_job, cmd_args)
+
+        combine2_job.close()
+        return varnames, sbatches, dependencies
+
+class vn(Sbatch):
+    def __init__(self, paths, simname, snapshot, axis, resolution):
+        self.fieldname = 'vn'
+        self.simname= simname
+        self.simpath = paths[simname]
+
+        self.snapshot = snapshot
+
+        self.sbatch_path = paths['sbatch']
+        self.log_path = paths['logs']+self.fieldname+'/'
+        self.axis = axis
+        self.resolution = resolution
+        self.create_grid_path = paths['create_grid']
+        self.combine_path = paths['combine']
+        return
+    
+    def makeSbatch(self):
+        fn = self.fieldname
+        # getting basic simulation information - mostly for the number of files
+        header = il.groupcat.loadHeader(self.simpath, self.snapshot)
+
+        # what the names of the sbatch files will be -> returned so that pipeline can use them
+        sbatches = ['%s.sbatch'%fn, '%s_combine1.sbatch'%fn, '%s_combine2.sbatch'%fn]
+
+        # the corresponding varnames of those jobs so that the pipeline can match them to the
+        # right dependencies
+        varnames = ['%sgrid'%fn, '%scombine1'%fn, '%scombine2'%fn]
+
+        # name which jobs depend on another one finishing
+        dependencies = {}
+        for i in range(len(varnames)-1):
+            dependencies[varnames[i+1]] = [varnames[i]]
+        grid_mem = self._compute_grid_memory()
+
+        ###### NOW WRITING SBATCH FILES ##################
+        # making the first ptl sbatch files
+        grid_job = open(self.sbatch_path+sbatches[0], 'w')
+        grid_dir = self._default_sbatch_settings(fn)
+        grid_dir['array']='0-%d'%(header['NumFiles']-1)
+        grid_dir['output']=self.log_path+fn+'%a.log'
+        grid_dir['mem-per-cpu']='%d'%grid_mem
+
+        self._sbatch_lines(grid_job, grid_dir)
+        idx_name = "$SLURM_ARRAY_TASK_ID"
+        grid_cmd_args = (self.create_grid_path, fn, self.simname, self.snapshot, 
+                self.axis, self.resolution, idx_name)
+        
+        self._write_python_line(grid_job, grid_cmd_args)
+        
+        grid_job.close()
+        
+
+        # making the first combine sbatch file
+        combine1_job = open(self.sbatch_path+sbatches[1],'w')
+        combine1_dir = self._default_sbatch_settings("%s_combine1"%fn)
+
+        combine1_dir['array']='0-%d:20'%(header['NumFiles']-header['NumFiles']%20)
+        combine1_dir['output']=self.log_path+fn+'_combine1%a.log'
+        combine1_dir['mem-per-cpu']='%d'%(grid_mem*2)
+        
+        self._sbatch_lines(combine1_job, combine1_dir)
+
+        cmd_args = (self.combine_path, fn, self.simname, self.snapshot, self.axis, 
+                self.resolution, idx_name)
+        
+        self._write_python_line(combine1_job, cmd_args)
+
+        combine1_job.close()
+
+
+        # making the second combine sbatch file
+        combine2_job = open(self.sbatch_path+sbatches[2], 'w')
+        combine2_dir = self._default_sbatch_settings("%s_combine2"%fn)
+        combine2_dir['mem-per-cpu']='%d'%(grid_mem*2)
+
+        self._sbatch_lines(combine2_job, combine2_dir)
+
+        cmd_args = (self.combine_path, fn,
+                self.simname, self.snapshot, self.axis, self.resolution)
+        self._write_python_line(combine2_job, cmd_args)
+
+        combine2_job.close()
+        return varnames, sbatches, dependencies
+
+class galaxy(Sbatch):
+    def __init__(self, paths, simname, snapshot, axis, resolution):
+        self.fieldname = 'galaxy'
+        self.simname = simname
+        self.simpath = paths[simname]
+
+        self.snapshot = snapshot
+
+        self.sbatch_path = paths['sbatch']
+        self.log_path = paths['logs']+self.fieldname+'/'
+        self.axis = axis
+        self.resolution = resolution
+        self.create_grid_path = paths['create_grid']
+        return
+
+    def makeSbatch(self):
+        fn = self.fieldname
+        sbatches = ['%s.sbatch'%fn]
+        varnames = ['%sgrid'%fn]
+        dependencies = {}
+
+        gridjob = open(self.sbatch_path+sbatches[0], 'w')
+        griddir = self._default_sbatch_settings(fn)
+        griddir["mem-per-cpu"] = self._compute_grid_memory()
+
+        self._sbatch_lines(gridjob, griddir)
+
+        cmd_args = self._default_cmd_line(fn)
+
+        self._write_python_line(gridjob, cmd_args)
+
+        gridjob.close()
+        return varnames, sbatches, dependencies
+
+class nden(Sbatch):
+    def __init__(self, paths, simname, snapshot, axis, resolution):
+        self.fieldname = 'nden'
+        self.simname= simname
+        self.simpath = paths[simname]
+
+        self.snapshot = snapshot
+
+        self.sbatch_path = paths['sbatch']
+        self.log_path = paths['logs']+self.fieldname+'/'
+        self.axis = axis
+        self.resolution = resolution
+        self.create_grid_path = paths['create_grid']
+        self.combine_path = paths['combine']
+        return
+    
+    def makeSbatch(self):
+
+        # getting basic simulation information - mostly for the number of files
+        header = il.groupcat.loadHeader(self.simpath, self.snapshot)
+
+        fn = self.fieldname
+        # what the names of the sbatch files will be -> returned so that pipeline can use them
+        sbatches = ['%s.sbatch'%fn, '%s_combine1.sbatch'%fn, '%s_combine2.sbatch'%fn]
+
+        # the corresponding varnames of those jobs so that the pipeline can match them to the
+        # right dependencies
+        varnames = ['%sgrid'%fn, '%scombine1'%fn, '%scombine2'%fn]
+
+        # name which jobs depend on another one finishing
+        dependencies = {}
+        for i in range(len(varnames)-1):
+            dependencies[varnames[i+1]] = [varnames[i]]
+        grid_mem = self._compute_grid_memory()
+
+        ###### NOW WRITING SBATCH FILES ##################
+        # making the first hiptl sbatch files
+        grid_job = open(self.sbatch_path+sbatches[0], 'w')
+        grid_dir = self._default_sbatch_settings(fn)
+        grid_dir['array']='0-%d'%(header['NumFiles']-1)
+        grid_dir['output']=self.log_path+fn+'%a.log'
+        grid_dir['mem-per-cpu']='%d'%grid_mem
+
+        self._sbatch_lines(grid_job, grid_dir)
+        idx_name = "$SLURM_ARRAY_TASK_ID"
+        grid_cmd_args = (self.create_grid_path, '%s', self.simname, self.snapshot, 
+                self.axis, self.resolution, idx_name)
+        
+        self._write_python_line(grid_job, grid_cmd_args)
+        
+        grid_job.close()
+        
+
+        # making the first combine sbatch file
+        combine1_job = open(self.sbatch_path+sbatches[1],'w')
+        combine1_dir = self._default_sbatch_settings("%s_combine1"%fn)
+
+        combine1_dir['array']='0-%d:20'%(header['NumFiles']-header['NumFiles']%20)
+        combine1_dir['output']=self.log_path+fn+'_combine1%a.log'
+        combine1_dir['mem-per-cpu']='%d'%(grid_mem*2)
+        
+        self._sbatch_lines(combine1_job, combine1_dir)
+
+        cmd_args = (self.combine_path, fn, self.simname, self.snapshot, self.axis, 
+                self.resolution, idx_name)
+        self._write_python_line(combine1_job, cmd_args)
+
+        combine1_job.close()
+
+
+        # making the second combine sbatch file
+        combine2_job = open(self.sbatch_path+sbatches[2], 'w')
+        combine2_dir = self._default_sbatch_settings("%s_combine2"%fn)
+        combine2_dir['mem-per-cpu']='%d'%(grid_mem*2)
+
+        self._sbatch_lines(combine2_job, combine2_dir)
+
+        cmd_args = (self.combine_path, fn,
+                self.simname, self.snapshot, self.axis, self.resolution)
+        self._write_python_line(combine2_job, cmd_args)
+
+        combine2_job.close()
+
+        return varnames, sbatches, dependencies
+
+class dust(Sbatch):
+    def __init__(self, paths, simname, snapshot, axis, resolution):
+        self.fieldname = 'dust'
+        self.simname = simname
+        self.simpath = paths[simname]
+
+        self.snapshot = snapshot
+
+        self.sbatch_path = paths['sbatch']
+        self.log_path = paths['logs']+self.fieldname+'/'
+        self.axis = axis
+        self.resolution = resolution
+        self.create_grid_path = paths['create_grid']
+        return
+
+    def makeSbatch(self):
+        fn = self.fieldname
+        sbatches = ['%s.sbatch'%fn]
+        varnames = ['%sgrid'%fn]
+        dependencies = {}
+
+        gridjob = open(self.sbatch_path+sbatches[0], 'w')
+        griddir = self._default_sbatch_settings(fn)
+        griddir["mem-per-cpu"] = self._compute_grid_memory()
+
+        self._sbatch_lines(gridjob, griddir)
+
+        cmd_args = self._default_cmd_line(fn)
+
+        self._write_python_line(gridjob, cmd_args)
+
+        gridjob.close()
+        return varnames, sbatches, dependencies
+
+# class colorptl(Sbatch):
