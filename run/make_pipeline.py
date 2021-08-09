@@ -51,7 +51,7 @@ def create_subdirectory(subdir, savepath=True):
     os.mkdir(paths['output']+subdir+'/')
     splt = subdir.split("/")
     # make sure they aren't saving over other paths
-    if not savepath:
+    if savepath:
         paths[splt[-1]] = paths['output']+subdir+'/'
     return
 
