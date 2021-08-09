@@ -35,8 +35,8 @@ paths = {}
 paths[SIMNAME] = LSTR+'%s/'%SIMNAME
 paths['output'] = LSTR+'hcolor/output/'
 paths['output'] = paths['output']+'hicc_%sB_%03dS_%dR_'%(SIMNAME, SNAPSHOT, RESOLUTION)
-paths['snapshot'] = paths[SIMNAME]+'/snapdir_%03d/'%(SNAPSHOT)
-paths['load_header'] = paths['snapshot']+'snap_%03d.0.hdf5'
+paths['snapshot'] = paths[SIMNAME]+'/snapdir_%03d'%(SNAPSHOT)
+paths['load_header'] = paths['snapshot']+'snap_%03d.0.hdf5'%SNAPSHOT
 paths['create_grid'] = HCOLOR + 'run/create_grid.py'
 paths['combine'] = HCOLOR + 'run/combine.py'
 # create output directory
@@ -105,15 +105,15 @@ pipe.write("PATHFILE=%s\n"%pathpath)
 # helper method to write jobs and their dependencies
 def write_line(varname, sname, jdep=None):
     if jdep is None:
-        pipe.write("$%s=(sbatch --export=ALL,PATHFILE=$PATHFILE %s)\n\n"%(varname, sname))
+        pipe.write("%s=$(sbatch --export=ALL,PATHFILE=$PATHFILE %s)\n"%(varname, sname))
     else:
-        pipe.write("$%s=(sbatch --export=ALL,PATHFILE=$PATHFILE --dependency=afterok:"%varname)
+        pipe.write("%s=$(sbatch --export=ALL,PATHFILE=$PATHFILE --dependency=afterok:"%varname)
         for i in range(len(jdep)):
             if not jdep[i] == jdep[-1]:
                 pipe.write('$'+jdep[i]+':')
             else:
                 pipe.write('$'+jdep[i])
-        pipe.write(" %s\n"%sname)
+        pipe.write(" %s)\n"%sname)
     pipe.write("%s=\"${%s##* }\"\n\n"%(varname, varname))
     return
 
