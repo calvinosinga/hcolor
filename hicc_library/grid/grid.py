@@ -7,10 +7,15 @@ import h5py as hp
 
 class Grid():
 
-    def __init__(self, res):
-        self.grid = np.zeros((res,res,res), dtype=np.float32)
+    def __init__(self, gridname, res, grid=None):
+        if not grid is None:
+            self.grid = np.zeros((res,res,res), dtype=np.float32)
+        else:
+            self.grid = grid
         self.in_rss = False
+        self.gridname = gridname
         self.is_computed = False
+        self.resolution = res
         return
     
     def getGrid(self):
@@ -26,9 +31,11 @@ class Grid():
         return False
     
     def getResolution(self):
-        return self.grid.shape[0]
+        return self.resolution
     
     def CICW(self, pos, boxsize, mass):
+        if self.grid==None:
+            raise ValueError("grid has not been given a value yet")
         ptls = pos.shape[0]; coord = pos.shape[1]; dims = self.grid.shape[0]
         inv_cell_size = dims/boxsize
         
@@ -58,18 +65,37 @@ class Grid():
     def plotSlice(self):
         #TODO
         return
+    
+    def saveGrid(self, outfile):
+        dat = outfile.create_dataset(self.gridname, data=self.grid, compression="gzip", compression_opts=9)
+        dct = dat.attrs
+        dct["resolution"] = self.resolution
+        dct["in_rss"] = self.in_rss
+        return dat
+
 
 class Chunk(Grid):
-    def __init__(self, res, chunk_num):
-        super().__init__( res)
+    def __init__(self, res, chunk_num, grid=None):
+        super().__init__(res, grid)
         self.combine = 1
-        self.chunk_nums = [chunk_num]
+        if isinstance(chunk_num, list):
+            self.chunk_nums = chunk_num
+        else:
+            self.chunk_nums = [chunk_num]
         return
     
     def isChunk(self):
         return True
     
+    def saveGrid(self, outfile):
+        dat = super().saveGrid(outfile)
+        dat.attrs['chunks'] = self.chunk_nums
+        dat.attrs['combine'] = self.combine
+        return dat
+        
     def combine(self, other_chunk):
         self.grid += other_chunk.getGrid()
         self.combine += 1
         self.chunk_nums.extend(other_chunk.chunk_nums)
+        return
+    

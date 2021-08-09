@@ -120,7 +120,7 @@ class hiptl(Sbatch):
 
         self._sbatch_lines(grid_job, grid_dir)
         idx_name = "$SLURM_ARRAY_TASK_ID"
-        grid_cmd_args = (self.create_grid_path, '%s', self.simname, self.snapshot, 
+        grid_cmd_args = (self.create_grid_path, fn, self.simname, self.snapshot, 
                 self.axis, self.resolution, idx_name)
         
         self._write_python_line(grid_job, grid_cmd_args)
@@ -138,8 +138,8 @@ class hiptl(Sbatch):
         
         self._sbatch_lines(combine1_job, combine1_dir)
 
-        cmd_args = (self.combine_path, fn, self.simname, self.snapshot, self.axis, 
-                self.resolution, idx_name)
+        cmd_args = (self.combine_path, fn, idx_name, 
+                "$((%s+20))"%idx_name, 1, "%s_combine%s"%(fn,idx_name))
         self._write_python_line(combine1_job, cmd_args)
 
         combine1_job.close()
@@ -151,9 +151,9 @@ class hiptl(Sbatch):
         combine2_dir['mem-per-cpu']='%d'%(grid_mem*2)
 
         self._sbatch_lines(combine2_job, combine2_dir)
-
-        cmd_args = (self.combine_path, fn,
-                self.simname, self.snapshot, self.axis, self.resolution)
+        numcombine = int(header['NumFiles']/20) + 1
+        cmd_args = (self.combine_path, "%s_combine"%fn, 0, numcombine,
+                1, "%s.hdf5"%fn)
         self._write_python_line(combine2_job, cmd_args)
 
         combine2_job.close()
@@ -211,10 +211,11 @@ class ptl(Sbatch):
         return
     
     def makeSbatch(self):
-        fn = self.fieldname
+
         # getting basic simulation information - mostly for the number of files
         header = il.groupcat.loadHeader(self.simpath, self.snapshot)
 
+        fn = self.fieldname
         # what the names of the sbatch files will be -> returned so that pipeline can use them
         sbatches = ['%s.sbatch'%fn, '%s_combine1.sbatch'%fn, '%s_combine2.sbatch'%fn]
 
@@ -229,7 +230,7 @@ class ptl(Sbatch):
         grid_mem = self._compute_grid_memory()
 
         ###### NOW WRITING SBATCH FILES ##################
-        # making the first ptl sbatch files
+        # making the first hiptl sbatch files
         grid_job = open(self.sbatch_path+sbatches[0], 'w')
         grid_dir = self._default_sbatch_settings(fn)
         grid_dir['array']='0-%d'%(header['NumFiles']-1)
@@ -256,9 +257,8 @@ class ptl(Sbatch):
         
         self._sbatch_lines(combine1_job, combine1_dir)
 
-        cmd_args = (self.combine_path, fn, self.simname, self.snapshot, self.axis, 
-                self.resolution, idx_name)
-        
+        cmd_args = (self.combine_path, fn, idx_name, 
+                "$((%s+20))"%idx_name, 1, "%s_combine%s"%(fn,idx_name))
         self._write_python_line(combine1_job, cmd_args)
 
         combine1_job.close()
@@ -270,12 +270,13 @@ class ptl(Sbatch):
         combine2_dir['mem-per-cpu']='%d'%(grid_mem*2)
 
         self._sbatch_lines(combine2_job, combine2_dir)
-
-        cmd_args = (self.combine_path, fn,
-                self.simname, self.snapshot, self.axis, self.resolution)
+        numcombine = int(header['NumFiles']/20) + 1
+        cmd_args = (self.combine_path, "%s_combine"%fn, 0, numcombine,
+                1, "%s.hdf5"%fn)
         self._write_python_line(combine2_job, cmd_args)
 
         combine2_job.close()
+
         return varnames, sbatches, dependencies
 
 class vn(Sbatch):
@@ -295,10 +296,11 @@ class vn(Sbatch):
         return
     
     def makeSbatch(self):
-        fn = self.fieldname
+
         # getting basic simulation information - mostly for the number of files
         header = il.groupcat.loadHeader(self.simpath, self.snapshot)
 
+        fn = self.fieldname
         # what the names of the sbatch files will be -> returned so that pipeline can use them
         sbatches = ['%s.sbatch'%fn, '%s_combine1.sbatch'%fn, '%s_combine2.sbatch'%fn]
 
@@ -313,7 +315,7 @@ class vn(Sbatch):
         grid_mem = self._compute_grid_memory()
 
         ###### NOW WRITING SBATCH FILES ##################
-        # making the first ptl sbatch files
+        # making the first hiptl sbatch files
         grid_job = open(self.sbatch_path+sbatches[0], 'w')
         grid_dir = self._default_sbatch_settings(fn)
         grid_dir['array']='0-%d'%(header['NumFiles']-1)
@@ -340,9 +342,8 @@ class vn(Sbatch):
         
         self._sbatch_lines(combine1_job, combine1_dir)
 
-        cmd_args = (self.combine_path, fn, self.simname, self.snapshot, self.axis, 
-                self.resolution, idx_name)
-        
+        cmd_args = (self.combine_path, fn, idx_name, 
+                "$((%s+20))"%idx_name, 1, "%s_combine%s"%(fn,idx_name))
         self._write_python_line(combine1_job, cmd_args)
 
         combine1_job.close()
@@ -354,12 +355,13 @@ class vn(Sbatch):
         combine2_dir['mem-per-cpu']='%d'%(grid_mem*2)
 
         self._sbatch_lines(combine2_job, combine2_dir)
-
-        cmd_args = (self.combine_path, fn,
-                self.simname, self.snapshot, self.axis, self.resolution)
+        numcombine = int(header['NumFiles']/20) + 1
+        cmd_args = (self.combine_path, "%s_combine"%fn, 0, numcombine,
+                1, "%s.hdf5"%fn)
         self._write_python_line(combine2_job, cmd_args)
 
         combine2_job.close()
+
         return varnames, sbatches, dependencies
 
 class galaxy(Sbatch):
@@ -441,7 +443,7 @@ class nden(Sbatch):
 
         self._sbatch_lines(grid_job, grid_dir)
         idx_name = "$SLURM_ARRAY_TASK_ID"
-        grid_cmd_args = (self.create_grid_path, '%s', self.simname, self.snapshot, 
+        grid_cmd_args = (self.create_grid_path, fn, self.simname, self.snapshot, 
                 self.axis, self.resolution, idx_name)
         
         self._write_python_line(grid_job, grid_cmd_args)
@@ -459,8 +461,8 @@ class nden(Sbatch):
         
         self._sbatch_lines(combine1_job, combine1_dir)
 
-        cmd_args = (self.combine_path, fn, self.simname, self.snapshot, self.axis, 
-                self.resolution, idx_name)
+        cmd_args = (self.combine_path, fn, idx_name, 
+                "$((%s+20))"%idx_name, 1, "%s_combine%s"%(fn,idx_name))
         self._write_python_line(combine1_job, cmd_args)
 
         combine1_job.close()
@@ -472,9 +474,9 @@ class nden(Sbatch):
         combine2_dir['mem-per-cpu']='%d'%(grid_mem*2)
 
         self._sbatch_lines(combine2_job, combine2_dir)
-
-        cmd_args = (self.combine_path, fn,
-                self.simname, self.snapshot, self.axis, self.resolution)
+        numcombine = int(header['NumFiles']/20) + 1
+        cmd_args = (self.combine_path, "%s_combine"%fn, 0, numcombine,
+                1, "%s.hdf5"%fn)
         self._write_python_line(combine2_job, cmd_args)
 
         combine2_job.close()

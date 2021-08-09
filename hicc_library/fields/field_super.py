@@ -3,13 +3,12 @@ This file is responsible for the creation of the contituent sbatch files that ma
 up the pipeline.
 """
 import os
-from hicc_library.fields.hiptl import hiptl
 import numpy as np
 import h5py as hp
 
 class Field():
 
-    def __init__(self, paths, simname, snapshot, axis, resolution):
+    def __init__(self, paths, simname, snapshot, axis, resolution, outfile):
         self.simname = simname
         self.snapshot = snapshot
         self.resolution = resolution
@@ -17,7 +16,7 @@ class Field():
 
         # expected to be given in subclasses
         self.gridnames = []
-
+        self.gridsave = hp.File(outfile, 'w')
 
 
         # getting basic simulation information
@@ -103,3 +102,4 @@ class Field():
             vel *= np.sqrt(self.header["Time"])
             return vel
     
+

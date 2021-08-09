@@ -8,15 +8,11 @@ from hicc_library.grid.grid import Chunk
 
 class hiptl(Field):
 
-    def __init__(self, paths, simname, snapshot, resolution, chunk):
-        super().__init__(paths, simname, snapshot, resolution)
+    def __init__(self, paths, simname, snapshot, resolution, chunk, outfile):
+        super().__init__(paths, simname, snapshot, resolution, outfile)
 
         self.chunk = chunk
         self.gridnames = ['GD14', 'GK11', 'S14', 'K13']
-        self.priority = [1,1,1,1]
-        self.priority = {self.gridnames[i]:self.priority[i] for i in range(len(self.priority))}
-        self.gridsave = hp.File(paths['grids'] + 
-                "hiptl%s_%03d.%d.hdf5"%(simname,snapshot,chunk), 'w')
 
         self.hih2file = hp.File(paths['hih2ptl'] +
                 "hih2_particles_%03d.%d.hdf5"%(snapshot,chunk), 'r')
@@ -53,7 +49,7 @@ class hiptl(Field):
         self.grid.CICW(self.pos, self.header['BoxSize'], self.mass)
 
         # save them to file
-        self._saveHI(gridname)
+        self.grid.saveGrid(self.gridsave)
 
         # now create new chunk for redshift space
         gridname = gridname+'rs'
@@ -65,17 +61,9 @@ class hiptl(Field):
         else:
             raise ValueError("the grid does not know that we are in redshift-space!")
         
-        self._saveHI(gridname)
+        self.grid.saveGrid(self.gridsave)
         return
-    
-    def _saveHI(self, gridname):
-        dat = self.gridsave.create_dataset(gridname, data=self.grid.getGrid(), 
-                compression="gzip", compression_opts=9)
-        dat.attrs["in_rss"] = self.grid.in_rss
-        dat.attrs["num_constituent"] = self.grid.combine
-        dat.attrs["chunks"] = self.grid.chunk_nums
-        dat.attrs["priority"] = self.priority[gridname]
-        return
+
     
     def _loadSnapshotData(self):
         f = hp.File(self.loadsnap, 'r')

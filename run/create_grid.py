@@ -1,6 +1,4 @@
 
-
-from run.make_pipeline import RESOLUTION
 import sys
 from hicc_library.fields.field_super import Field
 
