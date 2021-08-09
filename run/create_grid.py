@@ -1,32 +1,33 @@
 
 import sys
-from hicc_library.fields.field_super import Field
+import h5py as hp
+import os
+from hicc_library.fields.hiptl import hiptl
 
-SIMNAME = sys.argv[1]
-SNAPSHOT = int(sys.argv[2])
-FIELDNAME = sys.argv[3]
-RESOLUTION = int(sys.argv[4])
+FIELDNAME = sys.argv[1]
+SIMNAME = sys.argv[2]
+SNAPSHOT = int(sys.argv[3])
+AXIS = int(sys.argv[4])
+RESOLUTION = int(sys.argv[5])
 if len(sys.argv) > 4:
     CHUNK = sys.argv[5]
 else:
     CHUNK = 0 # the groupcat runs don't need to operate on chunks
 
-
-field = Field(FIELDNAME, SIMNAME, SNAPSHOT, RESOLUTION, CHUNK)
-
-field.computeGrids()
-field.saveGrids()
+paths = hp.File(os.getenv('PATHFILE'),'r')
 
 #####################################
-        # if fieldname == 'hiptl':
-        #     self.field = hiptl(simname, snapshot, resolution, chunk)
-        # elif fieldname == 'hisubhalo':
-        #     self.field = hisubhalo()
-        # elif fieldname == 'ptl':
-        #     self.field = ptl()
-        # elif fieldname == 'vn':
-        #     self.field = vn()
-        # elif fieldname == 'galaxy':
-        #     self.field = galaxy()
-        # else:
-        #     raise NotImplementedError("there is no field named %s"%fieldname)
+if FIELDNAME == 'hiptl':
+    field = hiptl(paths, SIMNAME, SNAPSHOT, RESOLUTION, CHUNK, FIELDNAME+'%d'%CHUNK)
+# elif FIELDNAME == 'hisubhalo':
+# self.field = hisubhalo()
+# elif FIELDNAME == 'ptl':
+# self.field = ptl()
+# elif FIELDNAME == 'vn':
+# self.field = vn()
+# elif FIELDNAME == 'galaxy':
+# self.field = galaxy()
+else:
+    raise NotImplementedError("there is no field named %s"%FIELDNAME)
+
+field.computeGrids()

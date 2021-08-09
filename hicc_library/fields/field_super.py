@@ -16,7 +16,7 @@ class Field():
 
         # expected to be given in subclasses
         self.gridnames = []
-        self.gridsave = hp.File(outfile, 'w')
+        self.gridsave = hp.File(outfile+'.hdf5', 'w')
 
 
         # getting basic simulation information
@@ -38,18 +38,8 @@ class Field():
         self.mass = None
         return
     
-    
     def computeGrids(self):
-        self.field.computeGrids()
-        return
-    
-    def computePk(self):
-        self.field.computePk()
-        return
-    
-    def computeCorr(self):
-        self.field.computeCorr()
-        return
+        pass
     
     def _toRedshiftSpace(self):
         if self.pos is None or self.vel is None:
