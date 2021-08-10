@@ -71,6 +71,7 @@ class Grid():
         dct = dat.attrs
         dct["resolution"] = self.resolution
         dct["in_rss"] = self.in_rss
+        dct["gridname"] = self.gridname
         return dat
 
 

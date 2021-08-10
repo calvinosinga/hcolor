@@ -39,6 +39,8 @@ paths['snapshot'] = paths[SIMNAME]+'/snapdir_%03d'%(SNAPSHOT)
 paths['load_header'] = paths['snapshot']+'snap_%03d.0.hdf5'%SNAPSHOT
 paths['create_grid'] = HCOLOR + 'run/create_grid.py'
 paths['combine'] = HCOLOR + 'run/combine.py'
+paths['hih2ptl'] = HIH2
+paths['post'] = paths[SIMNAME]+'/postprocessing/'
 # create output directory
 for i in range(25):
     if not os.path.isdir(paths['output']+str(i)):

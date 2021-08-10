@@ -19,14 +19,6 @@ paths = hp.File(os.getenv('PATHFILE'),'r')
 #####################################
 if FIELDNAME == 'hiptl':
     field = hiptl(paths, SIMNAME, SNAPSHOT, RESOLUTION, CHUNK, FIELDNAME+'%d'%CHUNK)
-# elif FIELDNAME == 'hisubhalo':
-# self.field = hisubhalo()
-# elif FIELDNAME == 'ptl':
-# self.field = ptl()
-# elif FIELDNAME == 'vn':
-# self.field = vn()
-# elif FIELDNAME == 'galaxy':
-# self.field = galaxy()
 else:
     raise NotImplementedError("there is no field named %s"%FIELDNAME)
 

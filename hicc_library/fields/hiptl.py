@@ -10,21 +10,25 @@ class hiptl(Field):
 
     def __init__(self, paths, simname, snapshot, resolution, chunk, outfile):
         super().__init__(paths, simname, snapshot, resolution, outfile)
-
         self.chunk = chunk
         self.gridnames = ['GD14', 'GK11', 'S14', 'K13']
 
         self.hih2file = hp.File(paths['hih2ptl'] +
                 "hih2_particles_%03d.%d.hdf5"%(snapshot,chunk), 'r')
         
-        self.loadsnap = paths['snapshot']+'snap_%03d.%d.hdf5'
+        self.loadsnap = paths['snapshot']+'snap_%03d.%d.hdf5'%(snapshot, chunk)
         self._loadSnapshotData()
+
+        self.fieldname = 'hiptl'
         return
     
     def computeGrids(self):
         for g in self.gridnames:
             self._computeHI(g)
         
+        self._toRedshiftSpace()
+        for g in self.gridnames:
+            self._computeHI(g+'rs')
         self.gridsave.close()
         return
     
@@ -32,7 +36,7 @@ class hiptl(Field):
     def _computeHI(self, gridname):
         
         self.grid = Chunk(gridname, self.resolution, self.chunk)
-        
+        self.grid.in_rss = self.in_rss
         # getting data from hih2 files
         neutfrac = self.hih2file['PartType0']['f_neutral_H'][:]
         molfrac = self.hih2file['PartType0']['f_mol_'+gridname][:]
@@ -49,19 +53,7 @@ class hiptl(Field):
         self.grid.CICW(self.pos, self.header['BoxSize'], self.mass)
 
         # save them to file
-        self.grid.saveGrid(self.gridsave)
-
-        # now create new chunk for redshift space
-        gridname = gridname+'rs'
-        self.grid = Chunk(gridname, self.resolution, self.chunk)
-        self._toRedshiftSpace()
-
-        if self.grid.in_rss:
-            self.grid.CICW(self.pos, self.header['BoxSize'], self.mass)
-        else:
-            raise ValueError("the grid does not know that we are in redshift-space!")
-        
-        self.grid.saveGrid(self.gridsave)
+        self.saveData()
         return
 
     

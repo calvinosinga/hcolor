@@ -3,6 +3,7 @@ This file is responsible for the creation of the contituent sbatch files that ma
 up the pipeline.
 """
 import os
+import illustris_python as il
 import numpy as np
 import h5py as hp
 
@@ -13,6 +14,8 @@ class Field():
         self.snapshot = snapshot
         self.resolution = resolution
         self.axis = axis
+        self.paths = paths
+        self.in_rss = False #used to tell grids if the positions are redshifted or not
 
         # expected to be given in subclasses
         self.gridnames = []
@@ -23,7 +26,6 @@ class Field():
         
         f = hp.File(paths['load_header'], 'r')
         self.header = dict(f['Header'].attrs)
-        self.header = dict(f['Header'].attrs)
         temp = dict(f['Parameters'].attrs)
         paramparams = ['BoxSize', 'HubbleParam']
         for p in paramparams:
@@ -33,6 +35,7 @@ class Field():
 
         # other variables expected to be assigned values later in analysis
         self.grid = None
+        self.fieldname = ''
         self.pos = None
         self.vel = None
         self.mass = None
@@ -41,9 +44,31 @@ class Field():
     def computeGrids(self):
         pass
     
+    def saveData(self):
+        # saves grid. resolution, rss (combine info if chunk) -> attrs
+        dat = self.grid.saveGrid(self.gridsave)
+        dct = dict(dat.attrs)
+        dct['simname'] = self.simname
+        dct['snapshot'] = self.snapshot
+        dct['axis'] = self.axis
+        return dat
+    
+    def _loadSnapshotData(self):
+        """
+        The fields that use snapshot data vary in what they need too much,
+        so the implementation is left to the subclasses.
+        """
+        pass
+    
+    def _loadGalaxyData(self, fields):
+        return il.groupcat.loadSubhalos(self.paths[self.simname],
+                self.snapshot, fields=fields)
+    
     def _toRedshiftSpace(self):
         if self.pos is None or self.vel is None:
             raise ValueError("position or velocity have not been defined yet")
+        if self.in_rss:
+            raise ValueError("already in redshift-space!")
         boxsize = self._convertPos(self.header["BoxSize"])
         hubble = self.header["HubbleParam"]*100 # defined using big H
         redshift = self.header['Redshift']
@@ -55,8 +80,7 @@ class Field():
         self.pos[:, self.axis] = np.where((self.pos[:,self.axis]>boxsize) | (self.pos[:,self.axis]<0), 
                 (self.pos[:,self.axis]+boxsize)%boxsize, self.pos[:,self.axis])
         
-        # tell the Grid object that we've moved to redshift space
-        self.grid.toRSS()
+        self.in_rss = True
         return
 
     def _convertMass(self, mass=None):
