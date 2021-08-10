@@ -2,6 +2,7 @@
 import sys
 import h5py as hp
 import os
+import pickle
 from hicc_library.fields.hiptl import hiptl
 
 FIELDNAME = sys.argv[1]
@@ -14,7 +15,7 @@ if len(sys.argv) > 4:
 else:
     CHUNK = 0 # the groupcat runs don't need to operate on chunks
 
-paths = hp.File(os.getenv('PATHFILE'),'r')
+paths = pickle.load(os.getenv('PATHFILE'),'r')
 
 
 #####################################

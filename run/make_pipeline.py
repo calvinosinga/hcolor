@@ -6,8 +6,8 @@ import sys
 import os
 import numpy as np
 import h5py as hp
-from numpy.core.fromnumeric import var
 from hicc_library.sbatch.sbatch import Sbatch
+import pickle
 
 SIMNAME = sys.argv.pop(1)
 SNAPSHOT = int(sys.argv.pop(1))
@@ -90,12 +90,10 @@ for f in fields:
 # save paths here
 print("the path dictionary:")
 print(paths)
-pathpath = paths['output']+'paths.hdf5'
-w_path = hp.File(pathpath, 'w')
-klist = list(paths.keys())
-for key in klist:
-    w_path.create_dataset(key, data=paths[key])
-
+pathpath = paths['output']+'paths.pkl'
+w_path = open(pathpath, 'w')
+pickle.dump(paths, w_path)
+w_path.close()
 
 # add hih2 hiptl, tng snapshot, postprocessing files to path,
 # creating the pipeline
