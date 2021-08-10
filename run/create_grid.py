@@ -10,16 +10,17 @@ SNAPSHOT = int(sys.argv[3])
 AXIS = int(sys.argv[4])
 RESOLUTION = int(sys.argv[5])
 if len(sys.argv) > 4:
-    CHUNK = sys.argv[5]
+    CHUNK = int(sys.argv[5])
 else:
     CHUNK = 0 # the groupcat runs don't need to operate on chunks
 
 paths = hp.File(os.getenv('PATHFILE'),'r')
 
-#####################################
-if FIELDNAME == 'hiptl':
-    field = hiptl(paths, SIMNAME, SNAPSHOT, RESOLUTION, CHUNK, FIELDNAME+'%d'%CHUNK)
-else:
-    raise NotImplementedError("there is no field named %s"%FIELDNAME)
 
-field.computeGrids()
+#####################################
+#if FIELDNAME == 'hiptl':
+#    field = hiptl(paths, SIMNAME, SNAPSHOT, RESOLUTION, CHUNK, FIELDNAME+'%d'%CHUNK)
+#else:
+#    raise NotImplementedError("there is no field named %s"%FIELDNAME)
+
+#field.computeGrids()
