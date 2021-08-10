@@ -8,8 +8,8 @@ from hicc_library.grid.grid import Chunk
 
 class hiptl(Field):
 
-    def __init__(self, paths, simname, snapshot, resolution, chunk, outfile):
-        super().__init__(paths, simname, snapshot, resolution, outfile)
+    def __init__(self, paths, simname, snapshot, axis, resolution, chunk, outfile):
+        super().__init__(paths, simname, snapshot, axis, resolution, outfile)
         self.chunk = chunk
         self.gridnames = ['GD14', 'GK11', 'S14', 'K13']
 
