@@ -9,6 +9,7 @@ import h5py as hp
 from hicc_library.sbatch.sbatch import Sbatch
 import pickle
 
+PREFIX = sys.argv.pop(1)
 SIMNAME = sys.argv.pop(1)
 SNAPSHOT = int(sys.argv.pop(1))
 AXIS = int(sys.argv.pop(1))
@@ -18,7 +19,7 @@ sys.argv.pop(0) # removing unneeded script name
 
 RUNNAMES = sys.argv
 
-
+print("output directory prefix:%s"%PREFIX)
 print("simulation name: %s"%SIMNAME)
 print("snapshot: %03d"%SNAPSHOT)
 print("axis: %d"%AXIS)
@@ -34,13 +35,13 @@ paths = {}
 
 paths[SIMNAME] = LSTR+'%s/'%SIMNAME
 paths['output'] = LSTR+'hcolor/output/'
-paths['output'] = paths['output']+'hicc_%sB_%03dS_%dR_'%(SIMNAME, SNAPSHOT, RESOLUTION)
-paths['snapshot'] = paths[SIMNAME]+'/snapdir_%03d'%(SNAPSHOT)
+paths['output'] = paths['output']+'%s_%sB_%03dS_%dR_'%(PREFIX, SIMNAME, SNAPSHOT, RESOLUTION)
+paths['snapshot'] = paths[SIMNAME]+'snapdir_%03d/'%(SNAPSHOT)
 paths['load_header'] = paths['snapshot']+'snap_%03d.0.hdf5'%SNAPSHOT
 paths['create_grid'] = HCOLOR + 'run/create_grid.py'
 paths['combine'] = HCOLOR + 'run/combine.py'
 paths['hih2ptl'] = HIH2
-paths['post'] = paths[SIMNAME]+'/postprocessing/'
+paths['post'] = paths[SIMNAME]+'postprocessing/'
 # create output directory
 for i in range(25):
     if not os.path.isdir(paths['output']+str(i)):
