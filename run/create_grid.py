@@ -13,15 +13,17 @@ RESOLUTION = int(sys.argv[5])
 if len(sys.argv) > 4:
     CHUNK = int(sys.argv[5])
 else:
-    CHUNK = 0 # the groupcat runs don't need to operate on chunks
+    CHUNK = -1 # the groupcat runs don't need to operate on chunks
 
 paths = pickle.load(open(os.getenv('PATHFILE'),'rb'))
-
-
+if CHUNK == -1:
+    outfilepath = paths['grids'] + FIELDNAME + "%sB_%03dS_%dR.hdf5"%(SIMNAME, SNAPSHOT, RESOLUTION)
+else:
+    outfilepath = paths['grids'] + FIELDNAME + "%sB_%03dS_%dR.%d.hdf5"%(SIMNAME, SNAPSHOT, RESOLUTION,CHUNK)
 #####################################
 if FIELDNAME == 'hiptl':
-   field = hiptl(paths, SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, FIELDNAME+'%d'%CHUNK)
+    field = hiptl(paths, SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, outfilepath)
 else:
-   raise NotImplementedError("there is no field named %s"%FIELDNAME)
+    raise NotImplementedError("there is no field named %s"%FIELDNAME)
 
 field.computeGrids()

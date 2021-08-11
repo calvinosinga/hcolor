@@ -19,7 +19,7 @@ class Field():
 
         # expected to be given in subclasses
         self.gridnames = []
-        self.gridsave = hp.File(outfile+'.hdf5', 'w')
+        self.gridsave = hp.File(outfile, 'w')
 
 
         # getting basic simulation information
