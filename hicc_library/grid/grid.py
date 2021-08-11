@@ -8,7 +8,7 @@ import h5py as hp
 class Grid():
 
     def __init__(self, gridname, res, grid=None):
-        if not grid is None:
+        if grid is None:
             self.grid = np.zeros((res,res,res), dtype=np.float32)
         else:
             self.grid = grid
