@@ -15,7 +15,7 @@ if len(sys.argv) > 4:
 else:
     CHUNK = 0 # the groupcat runs don't need to operate on chunks
 
-paths = pickle.load(os.getenv('PATHFILE'),'r')
+paths = pickle.load(open(os.getenv('PATHFILE'),'rb'))
 
 
 #####################################

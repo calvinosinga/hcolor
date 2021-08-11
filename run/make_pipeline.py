@@ -91,8 +91,8 @@ for f in fields:
 print("the path dictionary:")
 print(paths)
 pathpath = paths['output']+'paths.pkl'
-w_path = open(pathpath, 'w')
-pickle.dump(paths, w_path)
+w_path = open(pathpath, 'wb')
+pickle.dump(paths, w_path, pickle.HIGHEST_PROTOCOL)
 w_path.close()
 
 # add hih2 hiptl, tng snapshot, postprocessing files to path,
