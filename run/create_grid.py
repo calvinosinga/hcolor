@@ -11,7 +11,7 @@ SNAPSHOT = int(sys.argv[3])
 AXIS = int(sys.argv[4])
 RESOLUTION = int(sys.argv[5])
 if len(sys.argv) > 4:
-    CHUNK = int(sys.argv[5])
+    CHUNK = int(sys.argv[6])
 else:
     CHUNK = -1 # the groupcat runs don't need to operate on chunks
 
