@@ -10,19 +10,13 @@ import numpy as np
 
 class hisubhalo(Field):
 
-    def __init__(self, paths, simname, snapshot, resolution, outfile):
-        super().__init__(paths, simname, snapshot, resolution, outfile)
+    def __init__(self, gd, simname, snapshot, resolution, outfile):
+        super().__init__(gd, simname, snapshot, resolution, outfile)
 
-        # making a list of the grids to be created
-        models = ['GD14','GK11','K13','S14']
-        proj = ['map','vol']
-        self.gridnames = []
-        for m in models:
-            for p in proj:
-                self.gridnames.append('m_hi_%s_%s'%(m,p))
-        self.gridnames.append('m_hi_L08_map')
+        self.gridnames = self.getMolFracModelsGal()
+ 
 
-        self.hih2file = hp.File(paths['post']+'hih2_galaxy_%03d.hdf5'%snapshot,'r')
+        self.hih2file = hp.File(gd['post']+'hih2_galaxy_%03d.hdf5'%snapshot,'r')
         ids = self.hih2file['id_subhalo'][:] # used to idx into the subhalo catalog
         ids = ids.astype(np.int32)
         fields = ['SubhaloPos', 'SubhaloVel']
@@ -35,14 +29,30 @@ class hisubhalo(Field):
         self._convertVel()
         return
     
+    @staticmethod
+    def getMolFracModelsGal():
+        """
+        Returns a list of the molecular fraction models provided by Diemer+ 2018,
+        specifically the ones that correspond to the subhalo catalog.
+        """
+        models = ['GD14','GK11','K13','S14']
+        proj = ['map','vol']
+        gridnames = []
+        for m in models:
+            for p in proj:
+                gridnames.append('m_hi_%s_%s'%(m,p))
+        gridnames.append('m_hi_L08_map')
+        return gridnames
+    
     def computeGrids(self):
         for g in self.gridnames:
             self._computeHI(g)
         
         self._toRedshiftSpace()
         for g in self.gridnames:
-            self._computeHI(g+'rs')
-        self.gridsave.close()
+            self._computeHI(g)
+        
+        self.outfile.close()
         return
     
     def _computeHI(self, gridname):
@@ -52,5 +62,5 @@ class hisubhalo(Field):
         self.mass = self.hih2file[gridname][:] #already in solar masses
 
         self.grid.CICW(self.pos, self.header['BoxSize'], self.mass)
-        self.grid.saveGrid(self.gridsave)
+        self.saveData()
         return

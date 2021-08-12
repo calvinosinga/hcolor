@@ -11,7 +11,8 @@ class hiptl(Field):
     def __init__(self, gd, simname, snapshot, axis, resolution, chunk, outfile):
         super().__init__(gd, simname, snapshot, axis, resolution, outfile)
         self.chunk = chunk
-        self.gridnames = ['GD14', 'GK11', 'S14', 'K13']
+        self.gridnames = self.getMolFracModelsPtl()
+
         self.hih2file = hp.File(gd['hih2ptl'] +
                 "hih2_particles_%03d.%d.hdf5"%(snapshot,chunk), 'r')
         
@@ -23,14 +24,18 @@ class hiptl(Field):
             print("finished constructor for %s, chunknum = %d"%(self.fieldname,chunk))
         return
     
+    @staticmethod
+    def getMolFracModelsPtl():
+        return ['GD14', 'GK11', 'S14', 'K13']
+    
     def computeGrids(self):
         for g in self.gridnames:
             self._computeHI(g)
         
         self._toRedshiftSpace()
         for g in self.gridnames:
-            self._computeHI(g+'rs')
-        self.gridsave.close()
+            self._computeHI(g)
+        self.outfile.close()
         return
     
     
@@ -39,7 +44,9 @@ class hiptl(Field):
         self.grid = Chunk(gridname, self.resolution, self.chunk)
         self.grid.in_rss = self.in_rss
         
-        self.grid.print(self.v)
+        if self.v:
+            self.grid.print()
+
         # getting data from hih2 files
         neutfrac = self.hih2file['PartType0']['f_neutral_H'][:]
         molfrac = self.hih2file['PartType0']['f_mol_'+gridname][:]

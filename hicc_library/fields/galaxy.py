@@ -8,11 +8,7 @@ from hicc_library.fields.field_super import Field
 import h5py as hp
 import numpy as np
 
-def isRed(gr, stmass):
-    return
 
-def isResolved(stmass):
-    return
 class galaxy(Field):
 
     def __init__(self, paths, simname, snapshot, resolution, outfile):
@@ -39,8 +35,14 @@ class galaxy(Field):
         self.plotColorStellar()
         return
     
+    @classmethod
+    def isRed():
+        return
+    
+    @classmethod
+    def isResolved():
+        return
     def computeGrids(self):
-        blue_mask = 
         for g in self.gridnames:
             self._computeHI(g)
         

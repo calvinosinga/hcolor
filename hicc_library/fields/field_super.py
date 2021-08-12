@@ -26,9 +26,8 @@ class Field():
             print("the resolution: %d"%self.resolution)
             print("saving to filepath %s"%outfilepath)
         
-        self.in_rss = False #used to tell grids if the positions are redshifted or not
-        
-
+        self.in_rss = False 
+        #used to tell grids if the positions are redshifted or not
 
         # getting basic simulation information
         
@@ -65,7 +64,9 @@ class Field():
     def _loadSnapshotData(self):
         """
         The fields that use snapshot data vary in what they need too much,
-        so the implementation is left to the subclasses.
+        so the implementation is left to the subclasses. ptl, for example, needs
+        data on all of the particles whereas hiptl just needs gas particles.
+        Thus anything put here will necessarily be overwritten anyway in a subclass.
         """
         pass
     
