@@ -15,6 +15,14 @@ if len(sys.argv) > 4:
 else:
     CHUNK = -1 # the groupcat runs don't need to operate on chunks
 
+print("the cmd-line arguments for create_grid.py:")
+print("fieldname:%s"%FIELDNAME)
+print("simulation name:%s"%SIMNAME)
+print("snapshot:%s"%SNAPSHOT)
+print("axis:%s"%AXIS)
+print("resolution:%s"%RESOLUTION)
+print("chunk (if not given, will be -1):%s"%CHUNK)
+
 paths = pickle.load(open(os.getenv('PATHFILE'),'rb'))
 if CHUNK == -1:
     outfilepath = paths['grids'] + FIELDNAME + "%sB_%03dS_%dR.hdf5"%(SIMNAME, SNAPSHOT, RESOLUTION)

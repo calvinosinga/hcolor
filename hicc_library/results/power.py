@@ -2,7 +2,7 @@
 Defines the Power class, which is where the information necessary to create a power spectrum
 is stored.
 """
-from hicc_library.results.null_result import Result
+from hicc_library.results.result_super import Result
 from Pk_library import Pk
 import time
 import numpy as np

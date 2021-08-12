@@ -9,7 +9,7 @@ import h5py as hp
 
 class Field():
 
-    def __init__(self, paths, simname, snapshot, axis, resolution, outfile):
+    def __init__(self, paths, simname, snapshot, axis, resolution, outfilepath):
         self.simname = simname
         self.snapshot = snapshot
         self.resolution = resolution
@@ -19,7 +19,7 @@ class Field():
 
         # expected to be given in subclasses
         self.gridnames = []
-        self.gridsave = hp.File(outfile, 'w')
+        self.outfilepath = outfilepath
 
 
         # getting basic simulation information

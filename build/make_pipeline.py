@@ -6,7 +6,7 @@ import sys
 import os
 import numpy as np
 import h5py as hp
-from hicc_library.sbatch.sbatch import Sbatch
+from sbatch import Sbatch
 import pickle
 
 PREFIX = sys.argv.pop(1)
