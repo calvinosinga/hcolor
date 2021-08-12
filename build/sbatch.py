@@ -51,7 +51,7 @@ class Sbatch():
         write_file.write('#SBATCH --requeue\n')
         keylist = list(sbatch_dir.keys())
         for k in keylist:
-            write_file.write('#SBATCH --'+k+'='+sbatch_dir[k]+'\n')
+            write_file.write('#SBATCH --'+k+'='+str(sbatch_dir[k])+'\n')
         write_file.write('\n')
         return
     
