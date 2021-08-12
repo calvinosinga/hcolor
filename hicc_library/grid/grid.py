@@ -18,6 +18,12 @@ class Grid():
         self.resolution = res
         return
     
+    def print(self, verbose):
+        if verbose:
+            print("\n\nprinting the properties of a grid")
+            print(self.__dict__)
+        return
+    
     def getGrid(self):
         if not self.is_computed:
             raise RuntimeError("grid is empty; has not been computed")

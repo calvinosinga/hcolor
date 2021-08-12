@@ -9,22 +9,30 @@ import h5py as hp
 
 class Field():
 
-    def __init__(self, paths, simname, snapshot, axis, resolution, outfilepath):
+    def __init__(self, gd, simname, snapshot, axis, resolution, outfilepath):
         self.simname = simname
         self.snapshot = snapshot
         self.resolution = resolution
         self.axis = axis
-        self.paths = paths
-        self.in_rss = False #used to tell grids if the positions are redshifted or not
+        self.gd = gd
+        self.v = gd['verbose']
+        self.outfile = hp.File(outfilepath, 'r')
 
-        # expected to be given in subclasses
-        self.gridnames = []
-        self.outfilepath = outfilepath
+        if self.v:
+            print("\n\ninputs given to superclass constructor:")
+            print("the simulation name: %s"%self.simname)
+            print("the snapshot: %d"%self.snapshot)
+            print("the axis: %d"%self.axis)
+            print("the resolution: %d"%self.resolution)
+            print("saving to filepath %s"%outfilepath)
+        
+        self.in_rss = False #used to tell grids if the positions are redshifted or not
+        
 
 
         # getting basic simulation information
         
-        f = hp.File(paths['load_header'], 'r')
+        f = hp.File(gd['load_header'], 'r')
         self.header = dict(f['Header'].attrs)
         temp = dict(f['Parameters'].attrs)
         paramparams = ['BoxSize', 'HubbleParam']
@@ -39,6 +47,7 @@ class Field():
         self.pos = None
         self.vel = None
         self.mass = None
+        self.gridnames = []
         return
     
     def computeGrids(self):
@@ -46,7 +55,7 @@ class Field():
     
     def saveData(self):
         # saves grid. resolution, rss (combine info if chunk) -> attrs
-        dat = self.grid.saveGrid(self.gridsave)
+        dat = self.grid.saveGrid(self.outfile)
         dct = dict(dat.attrs)
         dct['simname'] = self.simname
         dct['snapshot'] = self.snapshot
@@ -61,7 +70,7 @@ class Field():
         pass
     
     def _loadGalaxyData(self, fields):
-        return il.groupcat.loadSubhalos(self.paths[self.simname],
+        return il.groupcat.loadSubhalos(self.gd[self.simname],
                 self.snapshot, fields=fields)
     
     def _toRedshiftSpace(self):

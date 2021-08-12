@@ -8,18 +8,19 @@ from hicc_library.grid.grid import Chunk
 
 class hiptl(Field):
 
-    def __init__(self, paths, simname, snapshot, axis, resolution, chunk, outfile):
-        super().__init__(paths, simname, snapshot, axis, resolution, outfile)
+    def __init__(self, gd, simname, snapshot, axis, resolution, chunk, outfile):
+        super().__init__(gd, simname, snapshot, axis, resolution, outfile)
         self.chunk = chunk
         self.gridnames = ['GD14', 'GK11', 'S14', 'K13']
-
-        self.hih2file = hp.File(paths['hih2ptl'] +
+        self.hih2file = hp.File(gd['hih2ptl'] +
                 "hih2_particles_%03d.%d.hdf5"%(snapshot,chunk), 'r')
         
-        self.loadsnap = paths['snapshot']+'snap_%03d.%d.hdf5'%(snapshot, chunk)
+        self.loadsnap = gd['snapshot']+'snap_%03d.%d.hdf5'%(snapshot, chunk)
         self._loadSnapshotData()
 
         self.fieldname = 'hiptl'
+        if gd['verbose']:
+            print("finished constructor for %s, chunknum = %d"%chunk)
         return
     
     def computeGrids(self):
