@@ -40,8 +40,6 @@ class Grid():
         return self.resolution
     
     def CICW(self, pos, boxsize, mass):
-        if self.grid==None:
-            raise ValueError("grid has not been given a value yet")
         ptls = pos.shape[0]; coord = pos.shape[1]; dims = self.grid.shape[0]
         inv_cell_size = dims/boxsize
         
@@ -82,8 +80,8 @@ class Grid():
 
 
 class Chunk(Grid):
-    def __init__(self, res, chunk_num, grid=None):
-        super().__init__(res, grid)
+    def __init__(self, gridname, res, chunk_num, grid=None):
+        super().__init__(gridname, res, grid)
         self.combine = 1
         if isinstance(chunk_num, list):
             self.chunk_nums = chunk_num

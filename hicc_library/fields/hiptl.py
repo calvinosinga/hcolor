@@ -20,7 +20,7 @@ class hiptl(Field):
 
         self.fieldname = 'hiptl'
         if gd['verbose']:
-            print("finished constructor for %s, chunknum = %d"%chunk)
+            print("finished constructor for %s, chunknum = %d"%(self.fieldname,chunk))
         return
     
     def computeGrids(self):
@@ -38,6 +38,8 @@ class hiptl(Field):
         
         self.grid = Chunk(gridname, self.resolution, self.chunk)
         self.grid.in_rss = self.in_rss
+        
+        self.grid.print(self.v)
         # getting data from hih2 files
         neutfrac = self.hih2file['PartType0']['f_neutral_H'][:]
         molfrac = self.hih2file['PartType0']['f_mol_'+gridname][:]

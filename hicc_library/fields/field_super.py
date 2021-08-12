@@ -16,7 +16,7 @@ class Field():
         self.axis = axis
         self.gd = gd
         self.v = gd['verbose']
-        self.outfile = hp.File(outfilepath, 'r')
+        self.outfile = hp.File(outfilepath, 'w')
 
         if self.v:
             print("\n\ninputs given to superclass constructor:")
