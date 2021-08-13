@@ -108,8 +108,6 @@ class Chunk(Grid):
         dat = super().saveGrid(outfile)
         dat.attrs['chunks'] = self.chunk_nums
         dat.attrs['combine'] = self.combine
-        if self.is_computed:
-            dat.attrs['cicw_runtime'] = [self.cicw_time]
         return dat
         
     def combine(self, other_chunk):

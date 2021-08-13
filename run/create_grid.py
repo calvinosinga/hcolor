@@ -25,9 +25,9 @@ print("chunk (if not given, will be -1):%d"%CHUNK)
 
 gd = pickle.load(open(os.getenv('PATHFILE'),'rb'))
 if CHUNK == -1:
-    outfilepath = gd['grids'] + FIELDNAME + "%sB_%03dS_%dR.hdf5"%(SIMNAME, SNAPSHOT, RESOLUTION)
+    outfilepath = gd[FIELDNAME]
 else:
-    outfilepath = gd['grids'] + FIELDNAME + "%sB_%03dS_%dR.%d.hdf5"%(SIMNAME, SNAPSHOT, RESOLUTION,CHUNK)
+    outfilepath = gd[FIELDNAME] %CHUNK
 #####################################
 if FIELDNAME == 'hiptl':
     field = hiptl(gd, SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, outfilepath)
@@ -35,3 +35,4 @@ else:
     raise NotImplementedError("there is no field named %s"%FIELDNAME)
 
 field.computeGrids()
+field.computeAux()

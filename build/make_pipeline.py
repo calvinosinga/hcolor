@@ -6,6 +6,7 @@ import sys
 import os
 import numpy as np
 import h5py as hp
+from numpy.lib.npyio import save
 from sbatch import Sbatch
 import pickle
 
@@ -39,7 +40,7 @@ HCOLOR = LSTR + 'hcolor/'
 gd['verbose']=VERBOSE
 gd[SIMNAME] = LSTR+'%s/'%SIMNAME
 gd['output'] = LSTR+'hcolor/output/'
-gd['output'] = gd['output']+'%s_%sB_%03dS_%dR_'%(PREFIX, SIMNAME, SNAPSHOT, RESOLUTION)
+gd['output'] = gd['output']+'%s_%sB_%03dS_%dA_%dR_'%(PREFIX, SIMNAME, SNAPSHOT, AXIS, RESOLUTION)
 gd['snapshot'] = gd[SIMNAME]+'snapdir_%03d/'%(SNAPSHOT)
 gd['load_header'] = gd['snapshot']+'snap_%03d.0.hdf5'%SNAPSHOT
 gd['create_grid'] = HCOLOR + 'run/create_grid.py'
@@ -85,12 +86,15 @@ for i in RUNNAMES:
 dependencies={}
 jobnames = []
 varnames = []
+savefiles = {}
 for f in fields:
-    svars, sjobs, sdeps = f.makeSbatch()
+    svars, sjobs, sdeps, ssave = f.makeSbatch()
     jobnames.extend(sjobs)
     dependencies.update(sdeps)
     varnames.extend(svars)
+    savefiles.update(ssave)
 
+gd.update(savefiles)
 # create pk sbatch files
 
 

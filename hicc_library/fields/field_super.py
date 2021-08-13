@@ -52,6 +52,12 @@ class Field():
     def computeGrids(self):
         pass
     
+    def computeAux(self):
+        """
+        Compute auxiliary information/plots
+        """
+        return
+    
     def saveData(self):
         # saves grid. resolution, rss (combine info if chunk) -> attrs
         dat = self.grid.saveGrid(self.outfile)

@@ -7,31 +7,50 @@ import illustris_python as il
 
 class Sbatch():
 
-    def __init__(self, paths, fieldname, simname, snapshot, axis, resolution):
+    def __init__(self, gd, fieldname, simname, snapshot, axis, resolution):
         self.resolution = resolution
         self.log_path = ''
         if fieldname == 'hiptl':
-            self.field = hiptl(paths, simname, snapshot, axis, resolution)
+            self.field = hiptl(gd, simname, snapshot, axis, resolution)
         elif fieldname == 'hisubhalo':
-            self.field = hisubhalo(paths, simname, snapshot, axis, resolution)
+            self.field = hisubhalo(gd, simname, snapshot, axis, resolution)
         elif fieldname == 'ptl':
-            self.field = ptl(paths, simname, snapshot, axis, resolution)
+            self.field = ptl(gd, simname, snapshot, axis, resolution)
         elif fieldname == 'vn':
-            self.field = vn(paths, simname, snapshot, axis, resolution)
+            self.field = vn(gd, simname, snapshot, axis, resolution)
         elif fieldname == 'galaxy':
-            self.field = galaxy(paths, simname, snapshot, axis, resolution)
+            self.field = galaxy(gd, simname, snapshot, axis, resolution)
         elif fieldname == 'dust':
-            self.field = dust(paths, simname, snapshot, axis, resolution)
+            self.field = dust(gd, simname, snapshot, axis, resolution)
         elif fieldname == 'nden':
-            self.field = nden(paths, simname, snapshot, axis, resolution)
+            self.field = nden(gd, simname, snapshot, axis, resolution)
         else:
             raise NotImplementedError("there is no field named %s"%fieldname)
         return
     
     def makeSbatch(self):
         return self.field.makeSbatch()    
-    
+
+
     # helper methods for subclasses
+
+    def _name_savefiles(self, step_names, has_chunks):
+        """
+        Returns a formatted savefile name for each step in making the grids. The last formatted string
+        is for the chunk, to be given later in the create_grid/combine process
+        """
+        savefiles = {}
+        
+        for i in step_names:
+            s="%s_%sB_%03dS_%dA_%dR"%(step_names[i], self.simname, 
+                        self.snapshot, self.axis, self.resolution)
+            if has_chunks:
+                s += "_%s.hdf5"
+            else:
+                s += ".hdf5"
+        
+            savefiles[step_names[i]] = s
+        return savefiles
 
     
     def _default_sbatch_settings(self, jobname):
@@ -72,23 +91,26 @@ class Sbatch():
         return int(self.resolution**3/1e6 + 5000)
 
     def _compute_pk_memory(self):
-        return int(self._compute_grid_memory()*2.25)
+        return int(self._compute_grid_memory()*2.25)         
+
 
 class hiptl(Sbatch):
 
-    def __init__(self, paths, simname, snapshot, axis, resolution):
+    def __init__(self, gd, simname, snapshot, axis, resolution):
+        # major class variables
         self.fieldname = 'hiptl'
         self.simname= simname
-        self.simpath = paths[simname]
-
-        self.snapshot = snapshot
-
-        self.sbatch_path = paths['sbatch']
-        self.log_path = paths['logs']+self.fieldname+'/'
+        self.simpath = gd[simname]
         self.axis = axis
         self.resolution = resolution
-        self.create_grid_path = paths['create_grid']
-        self.combine_path = paths['combine']
+        self.snapshot = snapshot
+
+        # loading necessary paths
+        self.sbatch_path = gd['sbatch']
+        self.log_path = gd['logs']+self.fieldname+'/'
+        self.create_grid_path = gd['create_grid']
+        self.combine_path = gd['combine']
+
         return
     
     def makeSbatch(self):
@@ -109,6 +131,8 @@ class hiptl(Sbatch):
         for i in range(len(varnames)-1):
             dependencies[varnames[i+1]] = [varnames[i]]
         grid_mem = self._compute_grid_memory()
+
+        savefiles = self._name_savefiles(varnames, True)
 
         ###### NOW WRITING SBATCH FILES ##################
         # making the first hiptl sbatch files
@@ -158,21 +182,23 @@ class hiptl(Sbatch):
 
         combine2_job.close()
 
-        return varnames, sbatches, dependencies
+        return varnames, sbatches, dependencies, savefiles
+    
+
 
 class hisubhalo(Sbatch):
-    def __init__(self, paths, simname, snapshot, axis, resolution):
+    def __init__(self, gd, simname, snapshot, axis, resolution):
         self.fieldname = 'hisubhalo'
         self.simname = simname
-        self.simpath = paths[simname]
+        self.simpath = gd[simname]
 
         self.snapshot = snapshot
 
-        self.sbatch_path = paths['sbatch']
-        self.log_path = paths['logs']+self.fieldname+'/'
+        self.sbatch_path = gd['sbatch']
+        self.log_path = gd['logs']+self.fieldname+'/'
         self.axis = axis
         self.resolution = resolution
-        self.create_grid_path = paths['create_grid']
+        self.create_grid_path = gd['create_grid']
         return
 
     def makeSbatch(self):
@@ -195,19 +221,19 @@ class hisubhalo(Sbatch):
         return varnames, sbatches, dependencies
 
 class ptl(Sbatch):
-    def __init__(self, paths, simname, snapshot, axis, resolution):
+    def __init__(self, gd, simname, snapshot, axis, resolution):
         self.fieldname = 'ptl'
         self.simname= simname
-        self.simpath = paths[simname]
+        self.simpath = gd[simname]
 
         self.snapshot = snapshot
 
-        self.sbatch_path = paths['sbatch']
-        self.log_path = paths['logs']+self.fieldname+'/'
+        self.sbatch_path = gd['sbatch']
+        self.log_path = gd['logs']+self.fieldname+'/'
         self.axis = axis
         self.resolution = resolution
-        self.create_grid_path = paths['create_grid']
-        self.combine_path = paths['combine']
+        self.create_grid_path = gd['create_grid']
+        self.combine_path = gd['combine']
         return
     
     def makeSbatch(self):
@@ -239,7 +265,7 @@ class ptl(Sbatch):
 
         self._sbatch_lines(grid_job, grid_dir)
         idx_name = "$SLURM_ARRAY_TASK_ID"
-        grid_cmd_args = (self.create_grid_path, fn, self.simname, self.snapshot, 
+        grid_cmd_args = (self.create_grid_path, varnames[0], self.simname, self.snapshot, 
                 self.axis, self.resolution, idx_name)
         
         self._write_python_line(grid_job, grid_cmd_args)
@@ -257,8 +283,8 @@ class ptl(Sbatch):
         
         self._sbatch_lines(combine1_job, combine1_dir)
 
-        cmd_args = (self.combine_path, fn, idx_name, 
-                "$((%s+20))"%idx_name, 1, "%s_combine%s"%(fn,idx_name))
+        cmd_args = (self.combine_path, varnames[0], idx_name, 
+                "$((%s+20))"%idx_name, 1, varnames[1])
         self._write_python_line(combine1_job, cmd_args)
 
         combine1_job.close()
@@ -271,8 +297,8 @@ class ptl(Sbatch):
 
         self._sbatch_lines(combine2_job, combine2_dir)
         numcombine = int(header['NumFiles']/20) + 1
-        cmd_args = (self.combine_path, "%s_combine"%fn, 0, numcombine,
-                1, "%s.hdf5"%fn)
+        cmd_args = (self.combine_path, varnames[1], 0, numcombine,
+                1, varnames[2])
         self._write_python_line(combine2_job, cmd_args)
 
         combine2_job.close()
@@ -280,19 +306,19 @@ class ptl(Sbatch):
         return varnames, sbatches, dependencies
 
 class vn(Sbatch):
-    def __init__(self, paths, simname, snapshot, axis, resolution):
+    def __init__(self, gd, simname, snapshot, axis, resolution):
         self.fieldname = 'vn'
         self.simname= simname
-        self.simpath = paths[simname]
+        self.simpath = gd[simname]
 
         self.snapshot = snapshot
 
-        self.sbatch_path = paths['sbatch']
-        self.log_path = paths['logs']+self.fieldname+'/'
+        self.sbatch_path = gd['sbatch']
+        self.log_path = gd['logs']+self.fieldname+'/'
         self.axis = axis
         self.resolution = resolution
-        self.create_grid_path = paths['create_grid']
-        self.combine_path = paths['combine']
+        self.create_grid_path = gd['create_grid']
+        self.combine_path = gd['combine']
         return
     
     def makeSbatch(self):
@@ -365,18 +391,18 @@ class vn(Sbatch):
         return varnames, sbatches, dependencies
 
 class galaxy(Sbatch):
-    def __init__(self, paths, simname, snapshot, axis, resolution):
+    def __init__(self, gd, simname, snapshot, axis, resolution):
         self.fieldname = 'galaxy'
         self.simname = simname
-        self.simpath = paths[simname]
+        self.simpath = gd[simname]
 
         self.snapshot = snapshot
 
-        self.sbatch_path = paths['sbatch']
-        self.log_path = paths['logs']+self.fieldname+'/'
+        self.sbatch_path = gd['sbatch']
+        self.log_path = gd['logs']+self.fieldname+'/'
         self.axis = axis
         self.resolution = resolution
-        self.create_grid_path = paths['create_grid']
+        self.create_grid_path = gd['create_grid']
         return
 
     def makeSbatch(self):
@@ -399,19 +425,19 @@ class galaxy(Sbatch):
         return varnames, sbatches, dependencies
 
 class nden(Sbatch):
-    def __init__(self, paths, simname, snapshot, axis, resolution):
+    def __init__(self, gd, simname, snapshot, axis, resolution):
         self.fieldname = 'nden'
         self.simname= simname
-        self.simpath = paths[simname]
+        self.simpath = gd[simname]
 
         self.snapshot = snapshot
 
-        self.sbatch_path = paths['sbatch']
-        self.log_path = paths['logs']+self.fieldname+'/'
+        self.sbatch_path = gd['sbatch']
+        self.log_path = gd['logs']+self.fieldname+'/'
         self.axis = axis
         self.resolution = resolution
-        self.create_grid_path = paths['create_grid']
-        self.combine_path = paths['combine']
+        self.create_grid_path = gd['create_grid']
+        self.combine_path = gd['combine']
         return
     
     def makeSbatch(self):
@@ -484,18 +510,18 @@ class nden(Sbatch):
         return varnames, sbatches, dependencies
 
 class dust(Sbatch):
-    def __init__(self, paths, simname, snapshot, axis, resolution):
+    def __init__(self, gd, simname, snapshot, axis, resolution):
         self.fieldname = 'dust'
         self.simname = simname
-        self.simpath = paths[simname]
+        self.simpath = gd[simname]
 
         self.snapshot = snapshot
 
-        self.sbatch_path = paths['sbatch']
-        self.log_path = paths['logs']+self.fieldname+'/'
+        self.sbatch_path = gd['sbatch']
+        self.log_path = gd['logs']+self.fieldname+'/'
         self.axis = axis
         self.resolution = resolution
-        self.create_grid_path = paths['create_grid']
+        self.create_grid_path = gd['create_grid']
         return
 
     def makeSbatch(self):
