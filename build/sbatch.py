@@ -42,10 +42,9 @@ class Sbatch():
         savefiles = {}
         
         for i in step_names:
-            s="%s_%sB_%03dS_%dA_%dR"%(step_names[i], self.simname, 
-                        self.snapshot, self.axis, self.resolution)
+            s="%s_%sB_%03dS_%dA_%dR"%(i, self.simname, self.snapshot, self.axis, self.resolution)
             if has_chunks:
-                s += "_%s.hdf5"
+                s += ".%s.hdf5"
             else:
                 s += ".hdf5"
         
