@@ -48,7 +48,7 @@ class Sbatch():
             else:
                 s += ".hdf5"
         
-            savefiles[step_names[i]] = s
+            savefiles[i] = s
         return savefiles
 
     
