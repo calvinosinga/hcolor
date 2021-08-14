@@ -6,7 +6,6 @@ import sys
 import os
 import numpy as np
 import h5py as hp
-from numpy.lib.npyio import save
 from sbatch import Sbatch
 import pickle
 
@@ -52,8 +51,8 @@ gd['post'] = gd[SIMNAME]+'postprocessing/'
 if not os.path.isdir(gd['output']+'/'):
     os.mkdir(gd['output']+'/')
     gd['output'] = gd['output'] + '/'
-else:
-    raise ValueError("output folder already exists: please use different prefix")
+#else:
+#    raise ValueError("output folder already exists: please use different prefix")
 
 # create subdirectories: 
 def create_subdirectory(subdir, savepath=True):

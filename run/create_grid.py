@@ -29,7 +29,7 @@ if CHUNK == -1:
 else:
     outfilepath = gd[FIELDNAME] %CHUNK
 #####################################
-if FIELDNAME == 'hiptl':
+if 'hiptl' in FIELDNAME:
     field = hiptl(gd, SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, outfilepath)
 else:
     raise NotImplementedError("there is no field named %s"%FIELDNAME)

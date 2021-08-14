@@ -3,7 +3,7 @@ This file is responsible for the creation of the contituent sbatch files that ma
 up the pipeline.
 """
 import os
-import illustris_python as il
+import h5py as hp
 
 class Sbatch():
 
@@ -17,21 +17,24 @@ class Sbatch():
 
         # if the field is based on the particle catalog, we need to run combine procedures
         # which makes the making of the sbatch files a bit more complicated
-        self.is_ptl = False
-
-        # load number of files
-        header = il.groupcat.loadHeader(self.simpath, self.snapshot)
-        self.numfiles = header['NumFiles']
+        self.is_ptl = True
 
         # getting needed paths
         self.sbatch_path = gd['sbatch']
         self.log_path = gd['logs']+self.fieldname+'/'
         self.create_grid_path = gd['create_grid']
         self.combine_path = gd['combine']
+        self.simpath = gd["load_header"]
+
+        # load number of files
+        f = hp.File(gd["load_header"],'r')
+        header = dict(f['Header'].attrs)
+
+        self.numfiles = header['NumFilesPerSnapshot']
         return
     
-    def isPtl(self):
-        self.is_ptl = True
+    def isCat(self):
+        self.is_ptl = False
         return
     
     def makeSbatch(self):
@@ -73,7 +76,7 @@ class Sbatch():
 
         self._sbatch_lines(grid_job, grid_dir)
         idx_name = "$SLURM_ARRAY_TASK_ID"
-        grid_cmd_args = (self.create_grid_path, fn, self.simname, self.snapshot, 
+        grid_cmd_args = (self.create_grid_path, varnames[0], self.simname, self.snapshot, 
                 self.axis, self.resolution, idx_name)
         
         self._write_python_line(grid_job, grid_cmd_args)
@@ -91,8 +94,8 @@ class Sbatch():
         
         self._sbatch_lines(combine1_job, combine1_dir)
 
-        cmd_args = (self.combine_path, fn, idx_name, 
-                "$((%s+20))"%idx_name, 1, "%s_combine%s"%(fn,idx_name))
+        cmd_args = (self.combine_path, varnames[0], idx_name, 
+                "$((%s+20))"%idx_name, 1, varnames[1])
         self._write_python_line(combine1_job, cmd_args)
 
         combine1_job.close()
@@ -105,8 +108,8 @@ class Sbatch():
 
         self._sbatch_lines(combine2_job, combine2_dir)
         numcombine = int(self.numfiles/20) + 1
-        cmd_args = (self.combine_path, "%s_combine"%fn, 0, numcombine,
-                1, "%s.hdf5"%fn)
+        cmd_args = (self.combine_path, varnames[1], 0, numcombine,
+                1, varnames[2])
         self._write_python_line(combine2_job, cmd_args)
 
         combine2_job.close()
@@ -141,13 +144,15 @@ class Sbatch():
         savefiles = {}
         
         for i in step_names:
-            s="%s_%sB_%03dS_%dA_%dR"%(i, self.simname, self.snapshot, self.axis, self.resolution)
+            base="%s_%sB_%03dS_%dA_%dR"%(i, self.simname, self.snapshot, self.axis, self.resolution)
             if has_chunks:
-                s += ".%s.hdf5"
+                s = base+ ".%d.hdf5"
             else:
-                s += ".hdf5"
+                s =base + ".hdf5"
         
             savefiles[i] = s
+        savefiles[step_names[-1]] = base+".hdf5"
+        # the last combine file shouldn't have a chunk formatting in it
         return savefiles
 
     
