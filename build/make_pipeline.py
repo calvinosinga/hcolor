@@ -39,7 +39,7 @@ HCOLOR = LSTR + 'hcolor/'
 gd['verbose']=VERBOSE
 gd[SIMNAME] = LSTR+'%s/'%SIMNAME
 gd['output'] = LSTR+'hcolor/output/'
-gd['output'] = gd['output']+'%s_%sB_%03dS_%dA_%dR_'%(PREFIX, SIMNAME, SNAPSHOT, AXIS, RESOLUTION)
+gd['output'] = gd['output']+'%s_%sB_%03dS_%dA_%dR'%(PREFIX, SIMNAME, SNAPSHOT, AXIS, RESOLUTION)
 gd['snapshot'] = gd[SIMNAME]+'snapdir_%03d/snap_%03d.'%(SNAPSHOT,SNAPSHOT) + "%d.hdf5" # chunks are given in fields subclasses
 gd['load_header'] = gd['snapshot']%(0)
 gd['create_grid'] = HCOLOR + 'run/create_grid.py'
@@ -49,9 +49,11 @@ gd['post'] = gd[SIMNAME]+'postprocessing/'
 
 # create output directory
 
-os.mkdir(gd['output']+'/')
-gd['output'] = gd['output']+'/'
-        
+if not os.path.isdir(gd['output']+'/'):
+    os.mkdir(gd['output']+'/')
+    gd['output'] = gd['output'] + '/'
+else:
+    raise ValueError("output folder already exists: please use different prefix")
 
 # create subdirectories: 
 def create_subdirectory(subdir, savepath=True):
