@@ -48,11 +48,10 @@ gd['hih2ptl'] = HIH2 + "hih2_particles_%03d"%SNAPSHOT + ".%d.hdf5"
 gd['post'] = gd[SIMNAME]+'postprocessing/'
 
 # create output directory
-for i in range(25):
-    if not os.path.isdir(gd['output']+str(i)):
-        os.mkdir(gd['output']+str(i)+'/')
-        gd['output'] = gd['output']+str(i)+'/'
-        break
+
+os.mkdir(gd['output']+'/')
+gd['output'] = gd['output']+'/'
+        
 
 # create subdirectories: 
 def create_subdirectory(subdir, savepath=True):
