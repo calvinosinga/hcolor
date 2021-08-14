@@ -36,16 +36,15 @@ LSTR = '/lustre/cosinga/'
 HIH2 = '/lustre/diemer/illustris/hih2/'
 HCOLOR = LSTR + 'hcolor/'
 
-
 gd['verbose']=VERBOSE
 gd[SIMNAME] = LSTR+'%s/'%SIMNAME
 gd['output'] = LSTR+'hcolor/output/'
 gd['output'] = gd['output']+'%s_%sB_%03dS_%dA_%dR_'%(PREFIX, SIMNAME, SNAPSHOT, AXIS, RESOLUTION)
-gd['snapshot'] = gd[SIMNAME]+'snapdir_%03d/'%(SNAPSHOT)
+gd['snapshot'] = gd[SIMNAME]+'snapdir_%03d/snap_%03d.'%(SNAPSHOT,SNAPSHOT) + "%d.hdf5" # chunks are given in fields subclasses
 gd['load_header'] = gd['snapshot']+'snap_%03d.0.hdf5'%SNAPSHOT
 gd['create_grid'] = HCOLOR + 'run/create_grid.py'
 gd['combine'] = HCOLOR + 'run/combine.py'
-gd['hih2ptl'] = HIH2
+gd['hih2ptl'] = HIH2 + "hih2_particles_%03d"%SNAPSHOT + ".%d.hdf5"
 gd['post'] = gd[SIMNAME]+'postprocessing/'
 
 # create output directory
