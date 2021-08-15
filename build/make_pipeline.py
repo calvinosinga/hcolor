@@ -100,7 +100,7 @@ varnames = []
 savefiles = {}
 for f in range(len(fields)):
     if not fields[f] in implemented_fields:
-        raise NotImplementedError("field %s is not yet implemented..."%fields[f])
+        raise NotImplementedError("field %s is not yet implemented..."%RUNNAMES[f])
     else:
         ptl_check_idx = implemented_fields.index(fields[f])
     if not isptl[ptl_check_idx]:
