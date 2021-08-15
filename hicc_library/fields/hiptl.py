@@ -33,15 +33,18 @@ class hiptl(Field):
         
         self._toRedshiftSpace()
         for g in self.gridnames:
-            self._computeHI(g+'rs')
+            self._computeHI(g) # add the redshift moniker later, else get keyerror
         self.outfile.close()
         self.hih2file.close()
         return
     
     
     def _computeHI(self, gridname):
-        
-        self.grid = Chunk(gridname, self.resolution, self.chunk)
+        if self.in_rss:
+            savename = gridname+'_rs'
+        else:
+            savename = gridname
+        self.grid = Chunk(savename, self.resolution, self.chunk)
         self.grid.in_rss = self.in_rss
         
         if self.v:

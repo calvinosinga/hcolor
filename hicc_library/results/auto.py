@@ -3,6 +3,7 @@ import time
 from h5py._hl import dataset
 import numpy as np
 from numpy.lib.npyio import save
+import matplotlib.pyplot as plt
 from Pk_library import Pk, Xi
 
 class Auto():
@@ -15,7 +16,7 @@ class Auto():
 
         self.saved_k = False
         self.saved_k2D = False
-        self.saved_x = False
+        self.saved_r = False
         return
     
 
@@ -57,10 +58,12 @@ class Auto():
 
     def _computeXi(self, grid, dct, savename):
         xi = Xi(grid[:], dct["BoxSize"], axis = dct["axis"], MAS='CIC')
-        if not self.saved_x:
-            self.outfile.create_dataset("")
+        if not self.saved_r:
+            self.outfile.create_dataset("r", data=xi.r3D)
+        self.outfile.create_dataset(savename, data=xi.xi[:,0])
         return
     
-    def _plotSlice(self):
+    def _plotSlice(self, grid, dct):
+        
         return
     

@@ -120,7 +120,7 @@ class galaxy(Field):
     def saveData(self, color_def):
         dat = super().saveData()
         dct = dat.attrs
-        dct['resolution_definition'] = self.res_dict
+        dct.update(self.res_dict)
         dct['color_definition'] = color_def
         dct['is_stmass'] = self.use_stmass
         dct['used_dust'] = False
