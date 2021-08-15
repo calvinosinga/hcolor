@@ -50,7 +50,7 @@ class Field():
         return
     
     def computeGrids(self):
-        pass
+        return
     
     def computeAux(self):
         """
@@ -61,7 +61,7 @@ class Field():
     def saveData(self):
         # saves grid. resolution, rss (combine info if chunk) -> attrs
         dat = self.grid.saveGrid(self.outfile)
-        dct = dict(dat.attrs)
+        dct = dat.attrs
         dct['simname'] = self.simname
         dct['snapshot'] = self.snapshot
         dct['axis'] = self.axis

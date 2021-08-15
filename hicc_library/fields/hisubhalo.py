@@ -10,18 +10,18 @@ import numpy as np
 
 class hisubhalo(Field):
 
-    def __init__(self, gd, simname, snapshot, resolution, outfile):
-        super().__init__(gd, simname, snapshot, resolution, outfile)
-
+    def __init__(self, gd, simname, snapshot, axis, resolution, outfilepath):
+        super().__init__(gd, simname, snapshot, axis, resolution, outfilepath)
+        self.fieldname = 'hisubhalo'
         self.gridnames = self.getMolFracModelsGal()
  
-
+        self.use_cicw = gd['%s_use_cicw']
         self.hih2file = hp.File(gd['post']+'hih2_galaxy_%03d.hdf5'%snapshot,'r')
         ids = self.hih2file['id_subhalo'][:] # used to idx into the subhalo catalog
         ids = ids.astype(np.int32)
         fields = ['SubhaloPos', 'SubhaloVel']
 
-        data = self._loadGalaxyData(fields)
+        data = self._loadGalaxyData(fields) # implemented in superclass
         self.pos = data['SubhaloPos'][ids]
         self.vel = data['SubhaloVel'][ids]
 
@@ -60,7 +60,9 @@ class hisubhalo(Field):
         self.grid = Grid(gridname, self.resolution)
         self.grid.in_rss = self.in_rss
         self.mass = self.hih2file[gridname][:] #already in solar masses
-
-        self.grid.CICW(self.pos, self.header['BoxSize'], self.mass)
+        if self.use_cicw:
+            self.grid.CICW(self.pos, self.header['BoxSize'], self.mass)
+        else:
+            self.grid.CIC(self.pos, self.header['BoxSize'])
         self.saveData()
         return

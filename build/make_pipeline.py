@@ -20,6 +20,7 @@ sys.argv.pop(0) # removing unneeded script name
 
 RUNNAMES = sys.argv
 
+implemented_fields = ['hiptl', 'hisubhalo', 'galaxy']
 print("output directory prefix:%s"%PREFIX)
 print("verbosity:%d"%VERBOSE)
 print("simulation name: %s"%SIMNAME)
@@ -27,6 +28,8 @@ print("snapshot: %03d"%SNAPSHOT)
 print("axis: %d"%AXIS)
 print("resolution of grid: %d"%RESOLUTION)
 print("runs given: "+str(RUNNAMES))
+print("currently implemented fields: "+ str(implemented_fields))
+
 
 # this is the global dictionaries that stores paths and some user input,
 # like verbosity
@@ -45,14 +48,23 @@ gd['create_grid'] = HCOLOR + 'run/create_grid.py'
 gd['combine'] = HCOLOR + 'run/combine.py'
 gd['hih2ptl'] = HIH2 + "hih2_particles_%03d"%SNAPSHOT + ".%d.hdf5"
 gd['post'] = gd[SIMNAME]+'postprocessing/'
+gd['dust'] = gd['post']+'Subhalo_StellarPhot_p07c_cf00dust_res_conv_ns1_rad30pkpc_%03d.hdf5'%SNAPSHOT
+
+# prompting user for other needed input
+isptl = {}
+for r in RUNNAMES:
+    usrval = int(input("does %s use the particle catalog?"))
+    if not usrval in (0,1):
+        raise ValueError("invalid input, must be 1 or 0")
+    isptl[r] = usrval
+
+
 
 # create output directory
-
 if not os.path.isdir(gd['output']+'/'):
     os.mkdir(gd['output']+'/')
     gd['output'] = gd['output'] + '/'
-#else:
-#    raise ValueError("output folder already exists: please use different prefix")
+
 
 # create subdirectories: 
 def create_subdirectory(subdir, savepath=True):
@@ -86,14 +98,23 @@ dependencies={}
 jobnames = []
 varnames = []
 savefiles = {}
-for f in fields:
-    svars, sjobs, sdeps, ssave = f.makeSbatch()
+for f in range(len(fields)):
+    if not fields[f] in implemented_fields:
+        raise NotImplementedError("field %s is not yet implemented..."%fields[f])
+    else:
+        ptl_check_idx = implemented_fields.index(fields[f])
+    if not isptl[ptl_check_idx]:
+        fields[f].isCat()
+
+
+    svars, sjobs, sdeps, ssave = fields[f].makeSbatch()
     jobnames.extend(sjobs)
     dependencies.update(sdeps)
     varnames.extend(svars)
     savefiles.update(ssave)
 
 gd.update(savefiles)
+
 # create pk sbatch files
 
 

@@ -4,6 +4,8 @@ import h5py as hp
 import os
 import pickle
 from hicc_library.fields.hiptl import hiptl
+from hicc_library.fields.hisubhalo import hisubhalo
+from hicc_library.fields.hisubhalo import hisubhalo_num
 
 FIELDNAME = sys.argv[1]
 SIMNAME = sys.argv[2]
@@ -29,8 +31,10 @@ if CHUNK == -1:
 else:
     outfilepath = gd[FIELDNAME] %CHUNK
 #####################################
-if 'hiptl' in FIELDNAME:
+if FIELDNAME == 'hiptlgrid':
     field = hiptl(gd, SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, outfilepath)
+elif FIELDNAME == 'hisubhalogrid':
+    field = hisubhalo(gd, SIMNAME, SNAPSHOT, AXIS, RESOLUTION, outfilepath)
 else:
     raise NotImplementedError("there is no field named %s"%FIELDNAME)
 
