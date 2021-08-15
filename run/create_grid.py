@@ -28,9 +28,9 @@ print("chunk (if not given, will be -1):%d"%CHUNK)
 
 gd = pickle.load(open(os.getenv('PATHFILE'),'rb'))
 if CHUNK == -1:
-    outfilepath = gd[FIELDNAME]
+    outfilepath = gd['grids']+gd[FIELDNAME]
 else:
-    outfilepath = gd[FIELDNAME] %CHUNK
+    outfilepath = gd['grids']+gd[FIELDNAME] %CHUNK
 #####################################
 if FIELDNAME == 'hiptlgrid':
     field = hiptl(gd, SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, outfilepath)
