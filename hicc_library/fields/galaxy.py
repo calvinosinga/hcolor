@@ -20,7 +20,7 @@ class galaxy(Field):
 
         # each run will do each color definition provided, but will need a different run to
         # use a different resolution definition.
-        self.res_def = gd['%s_use_res']
+        self.res_dict = gd['%s_use_res']
         self.use_cicw = gd['%s_use_cicw']
         self.use_stmass = gd['%s_use_stmass']
         self.col_defs = list(self.getColorDefinitions().keys())
@@ -92,8 +92,7 @@ class galaxy(Field):
         return galaxy_red_definition
     
     def computeGrids(self):
-        res_dict = self.getResolutionDefinitions(self.simname)[self.res_def]
-        resolved_mask = self.isResolved(self.mass, self.r, res_dict)
+        resolved_mask = self.isResolved(self.mass, self.r, self.res_dict)
         for col in self.col_defs:
             color_dict = self.getColorDefinitions()[col]
             red_mask = self.isRed(self.gr, self.mass, color_dict)
@@ -121,7 +120,7 @@ class galaxy(Field):
     def saveData(self, color_def):
         dat = super().saveData()
         dct = dat.attrs
-        dct['resolution_definition'] = self.res_def
+        dct['resolution_definition'] = self.res_dict
         dct['color_definition'] = color_def
         dct['is_stmass'] = self.use_stmass
         dct['used_dust'] = False

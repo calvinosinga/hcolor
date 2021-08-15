@@ -94,7 +94,7 @@ class Sbatch():
         combine1_dir = self._default_sbatch_settings("%s_combine1"%fn)
 
         combine1_dir['array']='0-%d:20'%(self.numfiles-self.numfiles%20)
-        combine1_dir['output']=self.log_path+fn+'_combine1%a.log'
+        combine1_dir['output']=self.log_path+fn+'_combine1_%a.log'
         combine1_dir['mem-per-cpu']='%d'%(grid_mem*2)
         
         self._sbatch_lines(combine1_job, combine1_dir)
@@ -108,7 +108,7 @@ class Sbatch():
 
         # making the second combine sbatch file
         combine2_job = open(self.sbatch_path+sbatches[2], 'w')
-        combine2_dir = self._default_sbatch_settings("%s_combine2"%fn)
+        combine2_dir = self._default_sbatch_settings("%s_combine2_"%fn)
         combine2_dir['mem-per-cpu']='%d'%(grid_mem*2)
 
         self._sbatch_lines(combine2_job, combine2_dir)
@@ -149,8 +149,6 @@ class Sbatch():
         fn = self.fieldname
 
         if "galaxy" in self.fieldname:
-            
-
             
             galaxy_min_resolution = galaxy.getResolutionDefinitions(self.simname)
 
