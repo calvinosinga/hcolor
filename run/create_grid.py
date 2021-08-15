@@ -1,4 +1,5 @@
 
+from hicc_library.fields.galaxy import galaxy, galaxy_dust
 import sys
 import h5py as hp
 import os
@@ -35,6 +36,10 @@ if FIELDNAME == 'hiptlgrid':
     field = hiptl(gd, SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, outfilepath)
 elif FIELDNAME == 'hisubhalogrid':
     field = hisubhalo(gd, SIMNAME, SNAPSHOT, AXIS, RESOLUTION, outfilepath)
+elif FIELDNAME == 'galaxygrid':
+    field = galaxy(gd, SIMNAME, SNAPSHOT, AXIS, RESOLUTION, outfilepath)
+elif FIELDNAME == 'galaxy_dustgrid':
+    field = galaxy_dust(gd, SIMNAME, SNAPSHOT, AXIS, RESOLUTION, outfilepath)
 else:
     raise NotImplementedError("there is no field named %s"%FIELDNAME)
 
