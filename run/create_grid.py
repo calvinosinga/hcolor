@@ -12,10 +12,11 @@ SIMNAME = sys.argv[2]
 SNAPSHOT = int(sys.argv[3])
 AXIS = int(sys.argv[4])
 RESOLUTION = int(sys.argv[5])
-if len(sys.argv) > 5:
+try:
     CHUNK = int(sys.argv[6])
-else:
+except IndexError:
     CHUNK = -1 # the groupcat runs don't need to operate on chunks
+
 
 print("the cmd-line arguments for create_grid.py:")
 print("fieldname:%s"%FIELDNAME)

@@ -20,7 +20,7 @@ sys.argv.pop(0) # removing unneeded script name
 
 RUNNAMES = sys.argv
 
-implemented_fields = ['hiptl', 'hisubhalo', 'galaxy']
+implemented_fields = ['hiptl', 'hisubhalo', 'galaxy', 'galaxy_dust', 'vn']
 print("output directory prefix:%s"%PREFIX)
 print("verbosity:%d"%VERBOSE)
 print("simulation name: %s"%SIMNAME)
