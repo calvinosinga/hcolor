@@ -138,7 +138,7 @@ class Sbatch():
 
         self._sbatch_lines(gridjob, griddir)
 
-        cmd_args = self._default_cmd_line(fn)
+        cmd_args = self._default_cmd_line(varnames[0])
 
         self._write_python_line(gridjob, cmd_args)
 
