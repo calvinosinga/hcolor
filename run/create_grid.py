@@ -40,6 +40,8 @@ elif FIELDNAME == 'galaxygrid':
     field = galaxy(gd, SIMNAME, SNAPSHOT, AXIS, RESOLUTION, outfilepath)
 elif FIELDNAME == 'galaxy_dustgrid':
     field = galaxy_dust(gd, SIMNAME, SNAPSHOT, AXIS, RESOLUTION, outfilepath)
+elif FIELDNAME == 'vn':
+    field = vn(gd, SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, outfilepath)
 else:
     raise NotImplementedError("there is no field named %s"%FIELDNAME)
 

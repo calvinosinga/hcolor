@@ -17,7 +17,6 @@ class vn(Field):
         self.TREECOOL = gd['TREECOOL']
         
         self.loadsnap = gd['snapshot']%(chunk)
-
         
         if gd['verbose']:
             print("finished constructor for %s, chunknum = %d"%(self.fieldname,chunk))

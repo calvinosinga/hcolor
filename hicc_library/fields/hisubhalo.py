@@ -15,7 +15,7 @@ class hisubhalo(Field):
         self.fieldname = 'hisubhalo'
         self.gridnames = self.getMolFracModelsGal()
  
-        self.use_cicw = gd['%s_use_cicw']
+        self.use_cicw = gd['%s_use_cicw'%self.fieldname]
         self.hih2file = hp.File(gd['post']+'hih2_galaxy_%03d.hdf5'%snapshot,'r')
         ids = self.hih2file['id_subhalo'][:] # used to idx into the subhalo catalog
         ids = ids.astype(np.int32)
