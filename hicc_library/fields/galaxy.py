@@ -111,7 +111,7 @@ class galaxy(Field):
             for g in self.gridnames:
                 self._computeGal(g+'_'+col+'rs', mask_dict[g])
                 self.saveData(col)
-        self.gridsave.close()
+        self.outfile.close()
         return
     
     def computeAux(self):
@@ -154,6 +154,7 @@ class galaxy_dust(galaxy):
 
         self.gr = photo[:,1,minidx] - photo[:,2, minidx]
         self.r = photo[:,2,minidx]
+        dustfile.close()
         return
     
     def saveData(self, color_def):

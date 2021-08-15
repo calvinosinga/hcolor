@@ -108,7 +108,7 @@ class Sbatch():
 
         # making the second combine sbatch file
         combine2_job = open(self.sbatch_path+sbatches[2], 'w')
-        combine2_dir = self._default_sbatch_settings("%s_combine2_"%fn)
+        combine2_dir = self._default_sbatch_settings("%s_combine2"%fn)
         combine2_dir['mem-per-cpu']='%d'%(grid_mem*2)
 
         self._sbatch_lines(combine2_job, combine2_dir)

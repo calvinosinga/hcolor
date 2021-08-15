@@ -1,12 +1,11 @@
 
 from hicc_library.fields.galaxy import galaxy, galaxy_dust
 import sys
-import h5py as hp
 import os
 import pickle
 from hicc_library.fields.hiptl import hiptl
 from hicc_library.fields.hisubhalo import hisubhalo
-from hicc_library.fields.hisubhalo import hisubhalo_num
+from hicc_library.fields.vn import vn
 
 FIELDNAME = sys.argv[1]
 SIMNAME = sys.argv[2]
