@@ -53,7 +53,7 @@ gd['dust'] = gd['post']+'Subhalo_StellarPhot_p07c_cf00dust_res_conv_ns1_rad30pkp
 # prompting user for other needed input
 isptl = {}
 for r in RUNNAMES:
-    usrval = int(input("does %s use the particle catalog?"))
+    usrval = int(input("does %s use the particle catalog? (1=yes,0=no)"%r))
     if not usrval in (0,1):
         raise ValueError("invalid input, must be 1 or 0")
     isptl[r] = usrval

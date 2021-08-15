@@ -156,8 +156,8 @@ class Sbatch():
 
             # getting user input for HOW galaxies should be run
 
-            use_stmass = int(input('should %s use stmass?(0 for y, 1 for n)'%fn))
-            use_cicw = int(input("should %s use CICW? (etc)"%fn))
+            use_stmass = int(input('should %s use stmass?(1=yes,0=no)'%fn))
+            use_cicw = int(input("should %s use CICW? (1=yes,0=no)"%fn))
             use_res = input("which resolution should %s use? Implemented"%fn+ \
                     str(list(galaxy_min_resolution.keys())))
             
