@@ -16,9 +16,13 @@ OUT_GRID = sys.argv[5]
 gd = pickle.load(open(os.getenv('PATHFILE'),'rb'))
 inpath = gd['grids'] + gd[IN_GRID]
 infiles = [inpath%i for i in range(IN_START, IN_STOP, IN_STEP)]
+
+outpath = gd['grids']+gd[OUT_GRID]
 if gd['verbose']:
     print("infiles:")
     print(infiles)
+
+    print("output going to %s"%outpath)
 
 def getKeys():
     f = hp.File(infiles[0],'r')
@@ -35,7 +39,7 @@ keylist = getKeys()
 print("The grids in the first file: ")
 print(keylist)
 
-w = hp.File(gd[OUT_GRID], 'w')
+w = hp.File(outpath, 'w')
 
 for k in range(len(keylist)):
     f1 = hp.File(infiles[0], 'r')

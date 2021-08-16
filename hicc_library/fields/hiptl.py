@@ -40,11 +40,8 @@ class hiptl(Field):
     
     
     def _computeHI(self, gridname):
-        if self.in_rss:
-            savename = gridname+'_rs'
-        else:
-            savename = gridname
-        self.grid = Chunk(savename, self.resolution, self.chunk)
+        
+        self.grid = Chunk(gridname, self.resolution, self.chunk)
         self.grid.in_rss = self.in_rss
         
         if self.v:
@@ -66,7 +63,7 @@ class hiptl(Field):
         self.grid.CICW(self.pos, self.header['BoxSize'], self.mass)
 
         # save them to file
-        self.saveData()
+        self.saveData() # if we are in redshift space, the grid handles saving with 'rs'
         return
 
     

@@ -146,7 +146,7 @@ class galaxy_dust(galaxy):
         photo = dustfile['Subhalo_StellarPhot_p07c_cf00dust_res_conv_ns1_rad30pkpc']
 
         # using the axis to get the closest projection
-        proj = dict(photo.attrs)['ProjVecs']
+        proj = dict(photo.attrs)['projVecs']
         los = np.zeros_like(proj)
         los[:, self.axis] += 1
 
