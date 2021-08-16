@@ -21,7 +21,7 @@ class galaxy(Field):
         # each run will do each color definition provided, but will need a different run to
         # use a different resolution definition.
         self.use_res = gd['%s_use_res'%self.fieldname]
-        self.res_dict = self.getResolutionDefinitions()[self.use_res]
+        self.res_dict = self.getResolutionDefinitions(self.simname)[self.use_res]
         self.use_cicw = gd['%s_use_cicw'%self.fieldname]
         self.use_stmass = gd['%s_use_stmass'%self.fieldname]
         self.col_defs = list(self.getColorDefinitions().keys())
