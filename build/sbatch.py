@@ -156,7 +156,7 @@ class Sbatch():
 
             use_stmass = int(input('should %s use stmass?(1=yes,0=no)'%fn))
             use_cicw = int(input("should %s use CICW? (1=yes,0=no)"%fn))
-            use_res = input("which resolution should %s use? Implemented"%fn+ \
+            use_res = input("which resolution should %s use? Implemented: "%fn+ \
                     str(list(galaxy_min_resolution.keys())))
             
             if use_res not in list(galaxy_min_resolution.keys()):
@@ -165,7 +165,7 @@ class Sbatch():
 
             gd['%s_use_stmass'%fn] = use_stmass
             gd['%s_use_cicw'%fn] = use_cicw
-            gd['%s_use_res'%fn] = galaxy_min_resolution[use_res]
+            gd['%s_use_res'%fn] = use_res
 
 
         if "hisubhalo" in self.fieldname:

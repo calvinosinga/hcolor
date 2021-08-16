@@ -20,7 +20,8 @@ class galaxy(Field):
 
         # each run will do each color definition provided, but will need a different run to
         # use a different resolution definition.
-        self.res_dict = gd['%s_use_res'%self.fieldname]
+        self.use_res = gd['%s_use_res'%self.fieldname]
+        self.res_dict = self.getResolutionDefinitions()[self.use_res]
         self.use_cicw = gd['%s_use_cicw'%self.fieldname]
         self.use_stmass = gd['%s_use_stmass'%self.fieldname]
         self.col_defs = list(self.getColorDefinitions().keys())
@@ -120,7 +121,7 @@ class galaxy(Field):
     def saveData(self, color_def):
         dat = super().saveData()
         dct = dat.attrs
-        dct.update(self.res_dict)
+        dct['use_res'] = self.use_res
         dct['color_definition'] = color_def
         dct['is_stmass'] = self.use_stmass
         dct['used_dust'] = False
@@ -145,7 +146,7 @@ class galaxy_dust(galaxy):
         photo = dustfile['Subhalo_StellarPhot_p07c_cf00dust_res_conv_ns1_rad30pkpc']
 
         # using the axis to get the closest projection
-        proj = dict(photo.attrs['projVecs'])
+        proj = dict(photo.attrs)['ProjVecs']
         los = np.zeros_like(proj)
         los[:, self.axis] += 1
 

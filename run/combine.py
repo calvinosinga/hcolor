@@ -13,7 +13,7 @@ IN_STOP = int(sys.argv[3])
 IN_STEP = int(sys.argv[4])
 OUT_GRID = sys.argv[5]
 
-gd = pickle.load(os.getenv('PATHFILE'),'r')
+gd = pickle.load(open(os.getenv('PATHFILE'),'rb'))
 inpath = gd[IN_GRID]
 infiles = [inpath%i for i in range(IN_START, IN_STOP, IN_STEP)]
 if gd['verbose']:

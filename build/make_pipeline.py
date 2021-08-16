@@ -48,7 +48,7 @@ gd['create_grid'] = HCOLOR + 'run/create_grid.py'
 gd['combine'] = HCOLOR + 'run/combine.py'
 gd['hih2ptl'] = HIH2 + "hih2_particles_%03d"%SNAPSHOT + ".%d.hdf5"
 gd['post'] = gd[SIMNAME]+'postprocessing/'
-gd['dust'] = gd['post']+'/stellar_light/'+\
+gd['dust'] = gd['post']+'/stellar_light/'+ \
         'Subhalo_StellarPhot_p07c_cf00dust_res_conv_ns1_rad30pkpc_%03d.hdf5'%SNAPSHOT
 
 # prompting user for other needed input
