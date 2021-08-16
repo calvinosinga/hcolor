@@ -100,9 +100,6 @@ class Grid():
         self.cicw_time = time.time() - start
         return
     
-    def plotSlice(self):
-        #TODO
-        return
     
     def saveGrid(self, outfile):
         if self.in_rss:

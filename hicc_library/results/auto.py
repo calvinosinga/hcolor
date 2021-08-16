@@ -1,10 +1,10 @@
 import h5py as hp
 import time
-from h5py._hl import dataset
 import numpy as np
-from numpy.lib.npyio import save
 import matplotlib.pyplot as plt
 from Pk_library import Pk, Xi
+import matplotlib as mpl
+import copy
 
 class Auto():
     def __init__(self, gridfilepath, outfilepath, plotpath):
@@ -30,7 +30,7 @@ class Auto():
             self._computePk(grid, dct, g+"_pk")
             if is_priority:
                 self._computeXi(grid, dct, g+"_xi")
-                self._plotSlice(grid, dct)
+                self._makeSlice(grid, dct, g+"_slc")
         return
     
     def _toOverdensity(self, grid, dct):
@@ -60,10 +60,25 @@ class Auto():
         xi = Xi(grid[:], dct["BoxSize"], axis = dct["axis"], MAS='CIC')
         if not self.saved_r:
             self.outfile.create_dataset("r", data=xi.r3D)
+            self.saved_r = True
         self.outfile.create_dataset(savename, data=xi.xi[:,0])
         return
     
-    def _plotSlice(self, grid, dct):
-        
+    def _makeSlice(self, grid, dct, savename, perc=0.1, mid=None):
+        cmap = copy.copy(mpl.cm.get_cmap("plasma"))
+        # cmap.set_under('w')
+        dim = grid.shape[0]
+        slcidx = int(perc*dim) # the percentage of the volume that should be binned
+        if mid is None:
+            mid = int(dim/2)
+        slc = np.log10(np.sum(grid[:, mid-slcidx:mid+slcidx, :], axis=1))
+        self.outfile.create_dataset(savename, data=slc)
+        plt.imshow(slc, extent=(0, dct['BoxSize'], 0, dct['BoxSize']), origin='lower', cmap=cmap)
+        plt.xlabel("x (Mpc/h)")
+        plt.ylabel("y (Mpc/h)")
+        cbar = plt.colorbar()
+        cbar.set_label("Mass (Solar Masses)")
+        plt.savefig(self.plotpath+savename+".png")
+        plt.clf()
         return
     
