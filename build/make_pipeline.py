@@ -10,7 +10,6 @@ from sbatch import Sbatch
 import pickle
 
 PREFIX = sys.argv.pop(1)
-VERBOSE = int(sys.argv.pop(1))
 SIMNAME = sys.argv.pop(1)
 SNAPSHOT = int(sys.argv.pop(1))
 AXIS = int(sys.argv.pop(1))
@@ -20,6 +19,7 @@ sys.argv.pop(0) # removing unneeded script name
 
 RUNNAMES = sys.argv
 
+VERBOSE = int(input("how verbose should the logs be? (0 for limited, 1 for detailed)"))
 implemented_fields = ['hiptl', 'hisubhalo', 'galaxy', 'galaxy_dust', 'vn']
 print("output directory prefix:%s"%PREFIX)
 print("verbosity:%d"%VERBOSE)
@@ -50,6 +50,8 @@ gd['hih2ptl'] = HIH2 + "hih2_particles_%03d"%SNAPSHOT + ".%d.hdf5"
 gd['post'] = gd[SIMNAME]+'postprocessing/'
 gd['dust'] = gd['post']+'/stellar_light/'+ \
         'Subhalo_StellarPhot_p07c_cf00dust_res_conv_ns1_rad30pkpc_%03d.hdf5'%SNAPSHOT
+gd['auto_result'] = HCOLOR+'run/auto.py'
+gd['cross_result'] = HCOLOR+'run/cross.py'
 
 # prompting user for other needed input
 isptl = {}
@@ -111,7 +113,19 @@ for f in range(len(fields)):
 
 gd.update(savefiles)
 
-# create pk sbatch files
+if gd["verbose"]:
+    print("dependency dictionary: ")
+    print(dependencies)
+
+    print("jobnames list: ")
+    print(jobnames)
+
+    print("savefiles dictionary:")
+    print(savefiles)
+
+    print("varnames list:")
+    print(varnames)
+
 
 
 print("the global dictionary:")

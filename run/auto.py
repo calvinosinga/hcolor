@@ -11,9 +11,14 @@ from hicc_library.results.auto import Auto
 
 gd = pickle.load(open(os.getenv('PATHFILE'),'rb'))
 
-INGRIDPATH = sys.argv[1]
-OUTFILEPATH = sys.argv[2]
+INGRIDKEY = sys.argv[1]
+OUTFILEKEY = sys.argv[2]
+PLOTDIRKEY = sys.argv[3]
 
-res = Auto(INGRIDPATH, OUTFILEPATH)
+INGRIDPATH = gd[INGRIDKEY]
+OUTFILEPATH = gd[OUTFILEKEY]
+PLOTDIR = gd[PLOTDIRKEY]
+
+res = Auto(INGRIDPATH, OUTFILEPATH, PLOTDIR)
 
 res.computeResults()

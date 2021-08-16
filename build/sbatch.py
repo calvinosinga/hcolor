@@ -233,3 +233,7 @@ class Sbatch():
     def _compute_pk_memory(self):
         return int(self._compute_grid_memory()*2.25)
 
+
+class ResultAuto(Sbatch):
+    def __init__(self, gd, fieldname, simname, snapshot, axis, resolution):
+        return

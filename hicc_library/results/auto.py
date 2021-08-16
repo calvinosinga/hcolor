@@ -9,7 +9,6 @@ import copy
 class Auto():
     def __init__(self, gridfilepath, outfilepath, plotpath):
 
-
         self.gridfile = hp.File(gridfilepath, 'r')
         self.outfile = hp.File(outfilepath, 'w')
         self.plotpath = plotpath
