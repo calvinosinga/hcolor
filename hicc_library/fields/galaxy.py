@@ -107,10 +107,18 @@ class galaxy(Field):
             for g in self.gridnames:                
                 self._computeGal(g+'_'+col, mask_dict[g])
                 self.saveData(col)
-            
+        
+        for col in self.col_defs:
+            color_dict = self.getColorDefinitions()[col]
+            red_mask = self.isRed(self.gr, self.mass, color_dict)
+            blue_mask = np.invert(red_mask)
+            all_mask = np.ones_like(blue_mask)
+            mask_dict = {'red':red_mask*resolved_mask, 
+                    'blue':blue_mask*resolved_mask, 
+                    'all':all_mask}
             self._toRedshiftSpace()
             for g in self.gridnames:
-                self._computeGal(g+'_'+col+'rs', mask_dict[g])
+                self._computeGal(g+'_'+col, mask_dict[g]) # rs added in grid's save method
                 self.saveData(col)
         self.outfile.close()
         return
