@@ -50,7 +50,7 @@ for k in range(len(keylist)):
     for i in range(1,len(infiles)):
         f2 = hp.File(infiles[i],'r')
         chunk2, att = setChunk(f2[keylist[k]])
-        chunk1.combine_chunks(chunk2)
+        chunk1.combineChunks(chunk2)
     dat = chunk1.saveGrid(w)
     dat.attrs.update(other_attrs)
 

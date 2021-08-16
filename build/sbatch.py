@@ -4,7 +4,9 @@ up the pipeline.
 """
 import os
 import h5py as hp
+from numpy.core.fromnumeric import var
 from hicc_library.fields.galaxy import galaxy
+import copy
 
 class Sbatch():
 
@@ -26,6 +28,8 @@ class Sbatch():
         self.create_grid_path = gd['create_grid']
         self.combine_path = gd['combine']
         self.simpath = gd["load_header"]
+        self.auto_results_path = gd["auto_result"]
+        self.plot_path = gd['plots'] + self.fieldname+'/'
 
         # load number of files
         f = hp.File(gd["load_header"],'r')
@@ -47,6 +51,7 @@ class Sbatch():
             varnames, sbatches, dependencies, savefiles = self._makePtlSbatch()
         else:
             varnames, sbatches, dependencies, savefiles = self._makeCatSbatch()
+        self._makeAutoResultsSbatch(varnames, sbatches, dependencies, savefiles)
         return varnames, sbatches, dependencies, savefiles
 
 
@@ -145,6 +150,29 @@ class Sbatch():
         gridjob.close()
         return varnames, sbatches, dependencies, savefiles
 
+    def _makeAutoResultsSbatch(self, varnames, sbatches, dependencies, savefiles):
+        auto_sbatch_file = "%s_results_auto.sbatch"%self.fieldname
+        auto_var_name = "%sresults_auto"%self.fieldname
+        auto_savefile = self._get_base_name("%s_auto_"%self.fieldname)
+
+        dependencies[auto_var_name] = varnames[-1]
+        sbatches.append(auto_sbatch_file)
+        varnames.append(auto_var_name)
+        savefiles[auto_var_name] = auto_savefile
+ 
+
+        resjob = open(self.sbatch_path + auto_sbatch_file, 'w')
+
+        resdir = self._default_sbatch_settings(auto_var_name)
+        resdir['mem-per-cpu'] = self._compute_pk_memory()
+        self._sbatch_lines(resjob, resdir)
+
+        cmd_args = [self.auto_results_path, dependencies[auto_var_name], auto_savefile, self.plot_path]
+        self._write_python_line(resjob, cmd_args)
+
+        resjob.close()
+        return
+
     def _add_global(self, gd):
         fn = self.fieldname
 
@@ -181,7 +209,7 @@ class Sbatch():
         savefiles = {}
         
         for i in step_names:
-            base="%s_%sB_%03dS_%dA_%dR"%(i, self.simname, self.snapshot, self.axis, self.resolution)
+            base=self._get_base_name(i)
             if self.is_ptl:
                 s = base+ ".%d.hdf5"
             else:
@@ -192,6 +220,8 @@ class Sbatch():
         # the last combine file shouldn't have a chunk formatting in it
         return savefiles
 
+    def _get_base_name(self, name):
+        return "%s_%sB_%03dS_%dA_%dR"%(name, self.simname, self.snapshot, self.axis, self.resolution)
     
     def _default_sbatch_settings(self, jobname):
         sbatch_dir = {}
@@ -234,6 +264,7 @@ class Sbatch():
         return int(self._compute_grid_memory()*2.25)
 
 
-class ResultAuto(Sbatch):
+class CrossResult(Sbatch):
     def __init__(self, gd, fieldname, simname, snapshot, axis, resolution):
         return
+    

@@ -10,17 +10,20 @@ class Grid():
 
     def __init__(self, gridname, res, grid=None):
         if grid is None:
+            self.is_computed = False
             self.grid = np.zeros((res,res,res), dtype=np.float32)
         else:
             self.grid = grid
+            self.is_computed = True
+            
         self.in_rss = False
         self.gridname = gridname
-        self.is_computed = False
+        
         self.resolution = res
         return
     
     def print(self):       
-        print("\n\nprinting the properties of a grid")
+        print("\nprinting the properties of a grid")
         not_print = ["grid"]
         for key,val in self.__dict__.items():
             if key not in not_print:
@@ -136,7 +139,7 @@ class Chunk(Grid):
         dat.attrs['combine'] = self.combine
         return dat
         
-    def combine_chunks(self, other_chunk):
+    def combineChunks(self, other_chunk):
         self.grid += other_chunk.getGrid()
         self.combine += 1
         self.chunk_nums.extend(other_chunk.chunk_nums)
