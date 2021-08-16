@@ -118,9 +118,9 @@ class Grid():
 
 
 class Chunk(Grid):
-    def __init__(self, gridname, res, chunk_num, grid=None):
+    def __init__(self, gridname, res, chunk_num, grid=None, combine=1):
         super().__init__(gridname, res, grid)
-        self.combine = 1
+        self.combine = combine
         if isinstance(chunk_num, list):
             self.chunk_nums = chunk_num
         else:
