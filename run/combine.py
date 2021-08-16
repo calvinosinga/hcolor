@@ -46,13 +46,13 @@ for k in range(len(keylist)):
         print("\ncombining chunks for %s"%keylist[k])
     f1 = hp.File(infiles[0], 'r')
     chunk1, other_attrs = setChunk(f1[keylist[k]])
-    print(type(chunk1))
-    if isinstance(chunk1, np.int64):
-        print(chunk1)
+    print(chunk1)
     print(other_attrs)
     for i in range(1,len(infiles)):
         f2 = hp.File(infiles[i],'r')
+        print(chunk1)
         chunk2, att = setChunk(f2[keylist[k]])
+        print(chunk1)
         chunk1.combine(chunk2)
     dat = chunk1.saveGrid(w)
     dat.attrs.update(other_attrs)
