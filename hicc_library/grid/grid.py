@@ -136,7 +136,7 @@ class Chunk(Grid):
         dat.attrs['combine'] = self.combine
         return dat
         
-    def combine(self, other_chunk):
+    def combine_chunks(self, other_chunk):
         self.grid += other_chunk.getGrid()
         self.combine += 1
         self.chunk_nums.extend(other_chunk.chunk_nums)

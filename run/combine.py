@@ -31,7 +31,8 @@ def getKeys():
 
 def setChunk(dataset):
     att = dict(dataset.attrs)
-    ch = Chunk(att.pop('gridname'), att.pop('resolution'), att.pop('chunks'), dataset[:], att.pop("combine"))
+    ch = Chunk(att.pop('gridname'), att.pop('resolution'), att.pop('chunks'), 
+            dataset[:], att.pop("combine"))
     return ch, att
 
 keylist = getKeys()
@@ -46,14 +47,10 @@ for k in range(len(keylist)):
         print("\ncombining chunks for %s"%keylist[k])
     f1 = hp.File(infiles[0], 'r')
     chunk1, other_attrs = setChunk(f1[keylist[k]])
-    print(chunk1)
-    print(other_attrs)
     for i in range(1,len(infiles)):
         f2 = hp.File(infiles[i],'r')
-        print(chunk1)
         chunk2, att = setChunk(f2[keylist[k]])
-        print(chunk1)
-        chunk1.combine(chunk2)
+        chunk1.combine_chunks(chunk2)
     dat = chunk1.saveGrid(w)
     dat.attrs.update(other_attrs)
 
