@@ -21,6 +21,9 @@ RUNNAMES = sys.argv
 
 VERBOSE = int(input("how verbose should the logs be? (0 for limited, 1 for detailed)"))
 implemented_fields = ['hiptl', 'hisubhalo', 'galaxy', 'galaxy_dust', 'vn']
+HI_fields = ['hiptl', 'hisubhalo', 'vn']
+matter_fields = ['galaxy','galaxy_dust']
+
 print("output directory prefix:%s"%PREFIX)
 print("verbosity:%d"%VERBOSE)
 print("simulation name: %s"%SIMNAME)
@@ -112,6 +115,15 @@ for f in range(len(fields)):
     savefiles.update(ssave)
 
 gd.update(savefiles)
+
+for i in range(len(fields)):
+    for j in range(len(fields)):
+        if fields[i] in HI_fields and fields[j] in matter_fields:
+            cvar, csb, cdep, csave = Sbatch.makeCrossSbatch(fields[i], fields[j])
+            jobnames.extend(cvar)
+            dependencies.update(cdep)
+            varnames.extend(svars)
+            savefiles.update(csave)
 
 if gd["verbose"]:
     print("dependency dictionary: ")

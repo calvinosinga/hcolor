@@ -2,9 +2,11 @@
 This file is responsible for the creation of the contituent sbatch files that make
 up the pipeline.
 """
+from _typeshed import Self
 import os
 import h5py as hp
 from numpy.core.fromnumeric import var
+from numpy.lib.utils import deprecate
 from hicc_library.fields.galaxy import galaxy
 import copy
 
@@ -23,13 +25,7 @@ class Sbatch():
         self.is_ptl = True
 
         # getting needed paths
-        self.sbatch_path = gd['sbatch']
-        self.log_path = gd['logs']+self.fieldname+'/'
-        self.create_grid_path = gd['create_grid']
-        self.combine_path = gd['combine']
-        self.simpath = gd["load_header"]
-        self.auto_results_path = gd["auto_result"]
-        self.plot_path = gd['plots'] + self.fieldname+'/'
+        self._load_paths_gd(gd)
 
         # load number of files
         f = hp.File(gd["load_header"],'r')
@@ -52,10 +48,42 @@ class Sbatch():
         else:
             varnames, sbatches, dependencies, savefiles = self._makeCatSbatch()
         self._makeAutoResultsSbatch(varnames, sbatches, dependencies, savefiles)
+        self.varnames = varnames
+        self.sbatches = sbatches
+        self.dependencies = dependencies
+        self.savefiles = savefiles
         return varnames, sbatches, dependencies, savefiles
+    
+    @staticmethod
+    def makeCrossSbatch(first_sbatch, second_sbatch, plotpath):
+        fn1 = first_sbatch.fieldname
+        fn2 = first_sbatch.fieldname
 
+        cross_sbatch_file = ["%s-%s_results_cross.sbatch"]%(fn1, fn2)
+        cross_var_name = ["%s-%sresults_cross"%(fn1, fn2)]
+        cross_savefile = {}
+        cross_savefile[cross_var_name] = \
+                [first_sbatch._get_base_name("%s-%s"%(fn1, fn2))]
 
-    # helper methods for subclasses
+        # the cross results depend on the last job from each field
+        last_jobs = [second_sbatch.varnames[-1], first_sbatch.varnames[-1]]
+        dependency = {}
+        dependency[cross_var_name[0]] = last_jobs
+
+        crossjob = open(first_sbatch.sbatch_path + cross_sbatch_file[0], 'w')
+
+        crossdir = first_sbatch._default_sbatch_settings(cross_var_name[0])
+        crossdir['mem-per-cpu'] = first_sbatch._calculate_xpk_memory()
+        first_sbatch._sbatch_lines(crossjob, crossdir)
+
+        cmd_args = [first_sbatch.cross_path, last_jobs[0], last_jobs[1], 
+                cross_savefile[cross_var_name], plotpath]
+        
+        first_sbatch._write_python(crossjob, cmd_args)
+
+        crossjob.close()
+        return cross_var_name, cross_sbatch_file, dependency, cross_savefile
+    # helper methods
 
     def _makePtlSbatch(self):
         # getting basic simulation information - mostly for the number of files
@@ -253,6 +281,17 @@ class Sbatch():
         write_file.write('\n')
         return
     
+    def _load_paths_gd(self, gd):
+        self.cross_path = gd['cross_result']
+        self.sbatch_path = gd['sbatch']
+        self.log_path = gd['logs']+self.fieldname+'/'
+        self.create_grid_path = gd['create_grid']
+        self.combine_path = gd['combine']
+        self.simpath = gd["load_header"]
+        self.auto_results_path = gd["auto_result"]
+        self.plot_path = gd['plots'] + self.fieldname+'/'
+        return
+    
     def _default_cmd_line(self, name):
         return [self.create_grid_path, name, self.simname, self.snapshot, self.axis, 
                 self.resolution]
@@ -262,9 +301,8 @@ class Sbatch():
 
     def _compute_pk_memory(self):
         return int(self._compute_grid_memory()*2.25)
+    
+    def _compute_xpk_memory(self):
+        return int(self._compute_pk_memory() * 2.25)
 
-
-class CrossResult(Sbatch):
-    def __init__(self, gd, fieldname, simname, snapshot, axis, resolution):
-        return
     
