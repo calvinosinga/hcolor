@@ -56,29 +56,29 @@ class Sbatch():
     @staticmethod
     def makeCrossSbatch(first_sbatch, second_sbatch, plotpath):
         fn1 = first_sbatch.fieldname
-        fn2 = first_sbatch.fieldname
+        fn2 = second_sbatch.fieldname
 
         cross_sbatch_file = ["%s-%s_cross.sbatch"%(fn1, fn2)]
         cross_var_name = ["%s-%s_cross"%(fn1, fn2)]
         cross_savefile = {}
-        cross_savefile[cross_var_name] = \
+        cross_savefile[cross_var_name[0]] = \
                 [first_sbatch._get_base_name("%s-%s"%(fn1, fn2))]
 
         # the cross results depend on the last job from each field
-        last_jobs = [second_sbatch.varnames[-1], first_sbatch.varnames[-1]]
+        last_jobs = [second_sbatch.varnames[-2], first_sbatch.varnames[-2]]
         dependency = {}
         dependency[cross_var_name[0]] = last_jobs
 
         crossjob = open(first_sbatch.sbatch_path + cross_sbatch_file[0], 'w')
 
         crossdir = first_sbatch._default_sbatch_settings(cross_var_name[0])
-        crossdir['mem-per-cpu'] = first_sbatch._calculate_xpk_memory()
+        crossdir['mem-per-cpu'] = first_sbatch._compute_xpk_memory()
         first_sbatch._sbatch_lines(crossjob, crossdir)
 
         cmd_args = [first_sbatch.cross_path, last_jobs[0], last_jobs[1], 
-                cross_savefile[cross_var_name], plotpath]
+                cross_savefile[cross_var_name[0]], plotpath]
         
-        first_sbatch._write_python(crossjob, cmd_args)
+        first_sbatch._write_python_line(crossjob, cmd_args)
 
         crossjob.close()
         return cross_var_name, cross_sbatch_file, dependency, cross_savefile

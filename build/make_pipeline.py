@@ -114,8 +114,6 @@ for f in range(len(fields)):
     varnames.extend(svars)
     savefiles.update(ssave)
 
-gd.update(savefiles)
-
 for i in range(len(fields)):
     for j in range(len(fields)):
         fn1 = fields[i].fieldname
@@ -124,10 +122,12 @@ for i in range(len(fields)):
             xplotpath = gd['plots'] + '%s-%s/'%(fn1,fn2)
             os.mkdir(xplotpath)
             cvar, csb, cdep, csave = Sbatch.makeCrossSbatch(fields[i], fields[j], xplotpath)
-            jobnames.extend(cvar)
+            jobnames.extend(csb)
             dependencies.update(cdep)
-            varnames.extend(svars)
+            varnames.extend(cvar)
             savefiles.update(csave)
+
+gd.update(savefiles)
 
 if gd["verbose"]:
     print("dependency dictionary: ")
