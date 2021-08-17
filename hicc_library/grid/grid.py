@@ -100,7 +100,7 @@ class Grid():
             self.grid[index_u[0],index_u[1],index_d[2]] += u[0]*u[1]*d[2]*mass[i]
             self.grid[index_u[0],index_u[1],index_u[2]] += u[0]*u[1]*u[2]*mass[i]
         self.is_computed = True
-        self.cicw_time = time.time() - start
+        self.cicw_runtime = time.time() - start
         return
     
     
@@ -110,20 +110,23 @@ class Grid():
         else:
             grid_save_name = self.gridname
         
-        dat = outfile.create_dataset(grid_save_name, data=self.grid, compression="gzip", compression_opts=9)
+        dat = outfile.create_dataset(grid_save_name, data=self.grid, 
+                compression="gzip", compression_opts=9)
+        
         dct = dat.attrs
         dct["resolution"] = self.resolution
         dct["in_rss"] = self.in_rss
         dct["gridname"] = self.gridname
         if self.is_computed:
-            dct["cicw_runtime"] = self.cicw_time
+            dct["cicw_runtime"] = self.cicw_runtime
         return dat
 
 
 class Chunk(Grid):
-    def __init__(self, gridname, res, chunk_num, grid=None, combine=1):
+    def __init__(self, gridname, res, chunk_num, grid=None, combine=1, cicw_runtime=0):
         super().__init__(gridname, res, grid)
         self.combine = combine
+        self.cicw_runtime = cicw_runtime
         if isinstance(chunk_num, list):
             self.chunk_nums = chunk_num
         else:
@@ -143,6 +146,6 @@ class Chunk(Grid):
         self.grid += other_chunk.getGrid()
         self.combine += 1
         self.chunk_nums.extend(other_chunk.chunk_nums)
-        # TODO: combine cicw runtimes
+        self.cicw_runtime += other_chunk.cicw_runtime
         return
     
