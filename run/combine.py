@@ -48,10 +48,14 @@ for k in range(len(keylist)):
     f1 = hp.File(infiles[0], 'r')
     chunk1, other_attrs = setChunk(f1[keylist[k]])
     for i in range(1,len(infiles)):
-        f2 = hp.File(infiles[i],'r')
-        chunk2, att = setChunk(f2[keylist[k]])
-        chunk1.combineChunks(chunk2)
+        try:
+            f2 = hp.File(infiles[i],'r')
+        except OSError:
+            print("did not find file %s"%infiles[i])
+        else:
+            chunk2, att = setChunk(f2[keylist[k]])
+            chunk1.combineChunks(chunk2)
     dat = chunk1.saveGrid(w)
     dat.attrs.update(other_attrs)
-
-# TODO: delete other grids
+w.close()
+# TODO: delete other grids, track combine_time
