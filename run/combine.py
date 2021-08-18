@@ -18,7 +18,11 @@ gd = pickle.load(open(os.getenv('PATHFILE'),'rb'))
 inpath = gd['grids'] + gd[IN_GRID]
 infiles = [inpath%i for i in range(IN_START, IN_STOP, IN_STEP)]
 
-outpath = gd['grids']+gd[OUT_GRID]%IN_START
+if '%s' in gd[OUT_GRID]:
+    outpath = gd['grids']+gd[OUT_GRID]%IN_START
+else:
+    outpath = gd['grids']+gd[OUT_GRID]
+
 if gd['verbose']:
     print("infiles:")
     print(infiles)

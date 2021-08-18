@@ -65,6 +65,7 @@ class Field():
         dct['simname'] = self.simname
         dct['snapshot'] = self.snapshot
         dct['axis'] = self.axis
+        dct['priority'] = self.priority
         return dat
     
     def _loadSnapshotData(self):

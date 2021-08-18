@@ -6,6 +6,8 @@ import numpy as np
 import h5py as hp
 import time
 
+from numpy.lib.function_base import trim_zeros
+
 class Grid():
 
     def __init__(self, gridname, res, grid=None):
@@ -18,7 +20,7 @@ class Grid():
             
         self.in_rss = False
         self.gridname = gridname
-        
+        self.ignore = False
         self.resolution = res
         return
     
@@ -103,6 +105,9 @@ class Grid():
         self.cicw_runtime = time.time() - start
         return
     
+    def ignoreGrid(self):
+        self.ignore = True
+        return
     
     def saveGrid(self, outfile):
         if self.in_rss:
@@ -117,6 +122,7 @@ class Grid():
         dct["resolution"] = self.resolution
         dct["in_rss"] = self.in_rss
         dct["gridname"] = self.gridname
+        dct["ignore"] = self.ignore
         if self.is_computed:
             dct["cicw_runtime"] = self.cicw_runtime
         return dat

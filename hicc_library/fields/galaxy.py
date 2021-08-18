@@ -107,6 +107,7 @@ class galaxy(Field):
             for g in self.gridnames:                
                 self._computeGal(g+'_'+col, mask_dict[g])
                 self.saveData(col)
+
         
         # now doing redshift-space grids
         self._toRedshiftSpace()
@@ -118,9 +119,11 @@ class galaxy(Field):
             mask_dict = {'red':red_mask*resolved_mask, 
                     'blue':blue_mask*resolved_mask, 
                     'all':all_mask}
+            
             for g in self.gridnames:
                 self._computeGal(g+'_'+col, mask_dict[g]) # rs added in grid's save method
                 self.saveData(col)
+
         self.outfile.close()
         return
     
@@ -145,6 +148,8 @@ class galaxy(Field):
             self.grid.CICW(self.pos[mask], self.header['BoxSize'], self.mass[mask])
         else:
             self.grid.CIC(self.pos[mask], self.header['BoxSize'])
+        if 'nelson' not in gridname:
+            self.grid.ignoreGrid()
         return
 
 class galaxy_dust(galaxy):
