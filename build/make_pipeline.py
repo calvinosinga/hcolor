@@ -20,9 +20,9 @@ sys.argv.pop(0) # removing unneeded script name
 RUNNAMES = sys.argv
 
 VERBOSE = int(input("how verbose should the logs be? (0 for limited, 1 for detailed)"))
-implemented_fields = ['hiptl', 'hisubhalo', 'galaxy', 'galaxy_dust', 'vn']
+implemented_fields = ['hiptl', 'hisubhalo', 'galaxy', 'galaxy_dust', 'vn', 'galaxy-ptl']
 HI_fields = ['hiptl', 'hisubhalo', 'vn']
-matter_fields = ['galaxy','galaxy_dust']
+matter_fields = ['galaxy','galaxy_dust', 'galaxy_ptl']
 
 print("output directory prefix:%s"%PREFIX)
 print("verbosity:%d"%VERBOSE)
@@ -63,7 +63,6 @@ for r in RUNNAMES:
     if not usrval in (0,1):
         raise ValueError("invalid input, must be 1 or 0")
     isptl[r] = usrval
-
 
 
 # create output directory
@@ -146,8 +145,8 @@ if gd["verbose"]:
 
 print("the global dictionary:")
 print(gd)
-pathpath = gd['output']+'gd.pkl'
-w_path = open(pathpath, 'wb')
+gdpath = gd['output']+'gd.pkl'
+w_path = open(gdpath, 'wb')
 pickle.dump(gd, w_path, pickle.HIGHEST_PROTOCOL)
 w_path.close()
 
@@ -156,14 +155,14 @@ w_path.close()
 pipe = open(gd['output']+'sbatch/pipeline.bash', 'w')
 
 pipe.write("#!/bin/bash\n")
-pipe.write("PATHFILE=%s\n"%pathpath)
+pipe.write("GDFILE=%s\n"%gdpath)
 
 # helper method to write jobs and their dependencies
 def write_line(varname, sname, jdep=None):
     if jdep is None:
-        pipe.write("%s=$(sbatch --export=ALL,PATHFILE=$PATHFILE %s)\n"%(varname, sname))
+        pipe.write("%s=$(sbatch --export=ALL,GDFILE=$GDFILE %s)\n"%(varname, sname))
     else:
-        pipe.write("%s=$(sbatch --export=ALL,PATHFILE=$PATHFILE --dependency=afterok:"%varname)
+        pipe.write("%s=$(sbatch --export=ALL,GDFILE=$GDFILE --dependency=afterok:"%varname)
         for i in range(len(jdep)):
             if not jdep[i] == jdep[-1]:
                 pipe.write('$'+jdep[i]+':')

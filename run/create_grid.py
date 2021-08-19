@@ -26,7 +26,7 @@ print("axis:%d"%AXIS)
 print("resolution:%d"%RESOLUTION)
 print("chunk (if not given, will be -1):%d"%CHUNK)
 
-gd = pickle.load(open(os.getenv('PATHFILE'),'rb'))
+gd = pickle.load(open(os.getenv('GDFILE'),'rb'))
 if CHUNK == -1:
     outfilepath = gd['grids']+gd[FIELDNAME]
 else:

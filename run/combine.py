@@ -14,7 +14,7 @@ IN_STOP = int(sys.argv[3])
 IN_STEP = int(sys.argv[4])
 OUT_GRID = sys.argv[5]
 
-gd = pickle.load(open(os.getenv('PATHFILE'),'rb'))
+gd = pickle.load(open(os.getenv('GDFILE'),'rb'))
 inpath = gd['grids'] + gd[IN_GRID]
 infiles = [inpath%i for i in range(IN_START, IN_STOP, IN_STEP)]
 

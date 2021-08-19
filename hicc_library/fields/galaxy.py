@@ -11,10 +11,12 @@ import numpy as np
 
 class galaxy(Field):
 
-    def __init__(self, gd, simname, snapshot, axis, resolution, outfile):
+    def __init__(self, gd, simname, snapshot, axis, resolution, 
+            outfile, fieldname='galaxy'):
+        
         super().__init__(gd, simname, snapshot, axis, resolution, outfile)
 
-        self.fieldname = 'galaxy'
+        self.fieldname = fieldname
         self.gridnames = ['blue','red', 'all']
         # we use blue/red/all for every color definition
 
@@ -154,8 +156,9 @@ class galaxy(Field):
 
 class galaxy_dust(galaxy):
     def __init__(self, gd, simname, snapshot, axis, resolution, outfile):
-        super().__init__(gd, simname, snapshot, axis, resolution, outfile)
-        self.fieldname = 'galaxy_dust'
+        super().__init__(gd, simname, snapshot, axis, resolution, 
+                outfile, 'galaxy_dust')
+        
         dustfile = hp.File(gd['dust'], 'r')
         photo = dustfile['Subhalo_StellarPhot_p07c_cf00dust_res_conv_ns1_rad30pkpc']
 
@@ -177,5 +180,56 @@ class galaxy_dust(galaxy):
         dct = dat.attrs
         dct['used_dust'] = True
         return dat
+    
+
+from hydrotools.interface import interface as iface_run
+
+class galaxy_ptl(galaxy):
+
+    def __init__(self, gd, simname, snapshot, axis, resolution, outfile):
+        super().__init__(gd, simname, snapshot, axis, resolution,
+                outfile, 'galaxy_ptl')
+        
+        self.verbose = gd['']
+        if gd['use_ht']:
+            self._use_hydrotools(gd)
+        
+        self.ht_file = hp.File(gd['ht_path'], 'r')
+
+        return
+    
+    def _use_hydrotools(self, gd):
+        ht_suf = gd['ht_suf']
+
+        xtf = ['gr_dust']
+        shf = ['gr_normal']
+        ptf = ['Coordinates', 'Velocities', 'ParticleIDs', 'Masses']
+        sim = self._get_simname_as_ht_input(self.simname)
+        if self.use_stmass:
+
+            
+            iface_run.extractGalaxyData(sim=sim, snap_idx=self.snapshot, verbose = bool(self.v),
+                    file_suffix=ht_suf, output_compression='gzip', catxt_get=True, catxt_fields=xtf,
+                    catsh_get=True, catsh_fields=shf, ptlstr_get=True, ptlstr_fields=ptf)
+            
+
+        return
+    @staticmethod
+    def _get_simname_as_ht_input(simname):
+        # since ht uses different keywords for simnames, include this
+        # dictionary to traverse between the two
+        ht_sim = {'tng100':'tng75', 'tng300':'tng205', 'tng50':'tng35'}
+
+        return ht_sim[simname]
+    def computeGrids(self):
+        for g in self.gridnames:
+            self._computeHI(g)
+        
+        self._toRedshiftSpace()
+        for g in self.gridnames:
+            self._computeHI(g) # add the redshift moniker later, else get keyerror
+        self.outfile.close()
+        self.hih2file.close()
+        return
 
         

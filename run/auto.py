@@ -9,7 +9,7 @@ import pickle
 from hicc_library.results.auto import Auto
 
 
-gd = pickle.load(open(os.getenv('PATHFILE'),'rb'))
+gd = pickle.load(open(os.getenv('GDFILE'),'rb'))
 
 INGRIDKEY = sys.argv[1]
 OUTFILEKEY = sys.argv[2]

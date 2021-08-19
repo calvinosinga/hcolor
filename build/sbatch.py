@@ -203,7 +203,7 @@ class Sbatch():
     def _add_global(self, gd):
         fn = self.fieldname
 
-        if "galaxy" in self.fieldname:
+        if "galaxy" in fn:
             
             galaxy_min_resolution = galaxy.getResolutionDefinitions(self.simname)
 
@@ -223,9 +223,21 @@ class Sbatch():
             gd['%s_use_res'%fn] = use_res
 
 
-        if "hisubhalo" in self.fieldname:
+        if "hisubhalo" in fn:
             use_cicw = int(input("should %s use CICW? (etc)"%fn))
             gd['%s_use_cicw'%fn] = use_cicw
+        
+        if "galaxy_ptl" in fn:
+            use_ht = int(input('for %s, does hydrotools need to be run? (1=y,0=n)'))
+            if use_ht == 0:
+                ht_path = input("if not, what is the path to the ht_file?")
+            else:
+                ht_suf = input("if yes, what file suffix should be used?")
+                ht_path = gd['results'] + \
+                        'galaxies_%s_%s_%03d.hdf5'%(ht_suf, self.simname, self.snapshot)
+                gd['ht_suffix'] = ht_suf
+            gd['use_ht'] = use_ht
+            gd['ht_path'] = ht_path
         return
 
     def _name_savefiles(self, step_names):
