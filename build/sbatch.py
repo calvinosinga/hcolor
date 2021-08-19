@@ -4,8 +4,6 @@ up the pipeline.
 """
 import os
 import h5py as hp
-from numpy.core.fromnumeric import var
-from numpy.lib.utils import deprecate
 from hicc_library.fields.galaxy import galaxy
 import copy
 
@@ -238,6 +236,12 @@ class Sbatch():
                 gd['ht_suffix'] = ht_suf
             gd['use_ht'] = use_ht
             gd['ht_path'] = ht_path
+
+            col_defs = list(galaxy.getColorDefinitions().keys())
+            col = input("which color definition should be used for %s? Implemented:"%fn+str(col_defs))
+            gd["%s_use_col"%fn] = col
+
+
         return
 
     def _name_savefiles(self, step_names):

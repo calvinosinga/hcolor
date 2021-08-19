@@ -189,13 +189,32 @@ class galaxy_ptl(galaxy):
     def __init__(self, gd, simname, snapshot, axis, resolution, outfile):
         super().__init__(gd, simname, snapshot, axis, resolution,
                 outfile, 'galaxy_ptl')
+        self.gridnames = ['blue','red','blue_dust', 'red_dust']
         
-        self.verbose = gd['']
         if gd['use_ht']:
             self._use_hydrotools(gd)
         
         self.ht_file = hp.File(gd['ht_path'], 'r')
+        self.gr = self.ht_file['gr_normal']
+        self.gr_dust = self.ht_file['gr_dust']
 
+        self.col = gd['%s_col_def'%self.fieldname]
+
+        self._loadHydro()
+        return
+    # ['catgrp_GroupNsubs', 'catgrp_Group_M_Crit200', 'catgrp_id', 'catgrp_is_primary', 'catsh_gr_normal',
+    #  'catsh_id', 'catxt_gr_dust', 'config', 'ptldm_Coordinates', 'ptldm_ParticleIDs', 'ptldm_Velocities',
+    #   'ptldm_first', 'ptldm_n', 'ptlgas_Coordinates', 'ptlgas_ParticleIDs', 'ptlgas_Velocities', 
+    #   'ptlgas_first', 'ptlgas_n', 'ptlstr_Coordinates', 'ptlstr_ParticleIDs', 'ptlstr_Velocities', 
+    #   'ptlstr_first', 'ptlstr_n']
+    def _loadHydro(self):
+        # check coordinates
+        ht = self.ht_file
+        self.ptlpos = ht['ptlstr_Coordinates']
+        self.ptlmass = ht['ptlstr_Masses']
+        self.ptlvel = ht['ptlstr_Velocities']
+        
+        
         return
     
     def _use_hydrotools(self, gd):
@@ -206,14 +225,20 @@ class galaxy_ptl(galaxy):
         ptf = ['Coordinates', 'Velocities', 'ParticleIDs', 'Masses']
         sim = self._get_simname_as_ht_input(self.simname)
         if self.use_stmass:
-
-            
             iface_run.extractGalaxyData(sim=sim, snap_idx=self.snapshot, verbose = bool(self.v),
                     file_suffix=ht_suf, output_compression='gzip', catxt_get=True, catxt_fields=xtf,
-                    catsh_get=True, catsh_fields=shf, ptlstr_get=True, ptlstr_fields=ptf)
-            
-
+                    catsh_get=True, catsh_fields=shf, ptlstr_get=True, ptlstr_fields=ptf,
+                    output_path=gd['results'], catgrp_get = False)
+        else:
+            iface_run.extractGalaxyData(sim=sim, snap_idx=self.snapshot, verbose = bool(self.v),
+                    file_suffix=ht_suf, output_compression='gzip', catxt_get=True, catxt_fields=xtf,
+                    catsh_get=True, catsh_fields=shf, ptlstr_get=True, ptlstr_fields=ptf,
+                    ptldm_get=True, ptldm_fields=ptf, ptlgas_get=True, ptlgas_fields=ptf,
+                    output_path=gd['results'], catgrp_get = False)
+    
         return
+    
+    
     @staticmethod
     def _get_simname_as_ht_input(simname):
         # since ht uses different keywords for simnames, include this
@@ -221,15 +246,45 @@ class galaxy_ptl(galaxy):
         ht_sim = {'tng100':'tng75', 'tng300':'tng205', 'tng50':'tng35'}
 
         return ht_sim[simname]
+    
+    def _getMasks(self):
+        masks = []
+        resolved_mask = self.isResolved(self.mass, self.r, self.res_dict)
+        col_def = self.getColorDefinitions()[self.col]
+        for g in self.gridnames:
+            if 'dust' in g:
+                gr = self.gr_dust
+            else:
+                gr = self.gr
+            
+            if 'red' in g:
+                mask = self.isRed(gr, self.mass, col_def)
+            else:
+                mask = np.invert(self.isRed(gr, self.mass, col_def))
+            
+            mask *= resolved_mask
+            masks.append(mask)
+            
+
+        return masks
+    
     def computeGrids(self):
-        for g in self.gridnames:
-            self._computeHI(g)
-        
-        self._toRedshiftSpace()
-        for g in self.gridnames:
-            self._computeHI(g) # add the redshift moniker later, else get keyerror
-        self.outfile.close()
-        self.hih2file.close()
+        # figure out which subhalos are red/blue
+        masks = self._getMasks()
+
+        # for each grid, get the slices for the particles for each subhalo
+        # labelled as such and then CICW it into the grid
+        for i in range(len(self.gridnames)):
+            mask = masks[i]
+            gn = self.gridnames[i]
+
+
+            self._computeGal(gn,mask)
+
+        # save the grid
         return
 
+
+    def _computeGal(self, gridname, mask):
+        return super()._computeGal(gridname, mask)
         
