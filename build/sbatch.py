@@ -54,7 +54,7 @@ class Sbatch():
         return varnames, sbatches, dependencies, savefiles
     
     @staticmethod
-    def makeCrossSbatch(first_sbatch, second_sbatch, plotpath):
+    def makeCrossSbatch(first_sbatch, second_sbatch, plotkey):
         fn1 = first_sbatch.fieldname
         fn2 = second_sbatch.fieldname
 
@@ -62,7 +62,7 @@ class Sbatch():
         cross_var_name = ["%sX%s"%(fn1, fn2)]
         cross_savefile = {}
         cross_savefile[cross_var_name[0]] = \
-                [first_sbatch._get_base_name("%sX%s"%(fn1, fn2))]
+                first_sbatch._get_base_name("%sX%s"%(fn1, fn2))+'.hdf5'
 
         # the cross results depend on the last job from each field
         last_jobs = [second_sbatch.varnames[-2], first_sbatch.varnames[-2]]
@@ -76,7 +76,7 @@ class Sbatch():
         first_sbatch._sbatch_lines(crossjob, crossdir)
 
         cmd_args = [first_sbatch.cross_path, last_jobs[0], last_jobs[1], 
-                cross_savefile[cross_var_name[0]], plotpath]
+                cross_var_name[0], plotkey]
         
         first_sbatch._write_python_line(crossjob, cmd_args)
 
@@ -180,7 +180,7 @@ class Sbatch():
     def _makeAutoResultsSbatch(self, varnames, sbatches, dependencies, savefiles):
         auto_sbatch_file = "%s_auto.sbatch"%self.fieldname
         auto_var_name = "%s_auto"%self.fieldname
-        auto_savefile = self._get_base_name("%s_auto"%self.fieldname)
+        auto_savefile = self._get_base_name("%s_auto"%self.fieldname) + '.hdf5'
 
         dependencies[auto_var_name] = [varnames[-1]]
         sbatches.append(auto_sbatch_file)
@@ -194,7 +194,7 @@ class Sbatch():
         resdir['mem-per-cpu'] = self._compute_pk_memory()
         self._sbatch_lines(resjob, resdir)
 
-        cmd_args = [self.auto_results_path, dependencies[auto_var_name], auto_savefile, self.plot_path]
+        cmd_args = [self.auto_results_path, dependencies[auto_var_name][0], auto_var_name, self.plots_key]
         self._write_python_line(resjob, cmd_args)
 
         resjob.close()
@@ -202,7 +202,7 @@ class Sbatch():
 
     def _add_global(self, gd):
         fn = self.fieldname
-
+        gd[self.plots_key]=self.plot_path
         if "galaxy" in fn:
             
             galaxy_min_resolution = galaxy.getResolutionDefinitions(self.simname)
@@ -301,6 +301,7 @@ class Sbatch():
         self.simpath = gd["load_header"]
         self.auto_results_path = gd["auto_result"]
         self.plot_path = gd['plots'] + self.fieldname+'/'
+        self.plots_key = self.fieldname + '_plots'
         return
     
     def _default_cmd_line(self, name):
