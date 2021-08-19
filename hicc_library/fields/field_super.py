@@ -17,7 +17,6 @@ class Field():
         self.gd = gd
         self.v = gd['verbose']
         self.outfile = hp.File(outfilepath, 'w')
-
         if self.v:
             print("\n\ninputs given to superclass constructor:")
             print("the simulation name: %s"%self.simname)
@@ -65,7 +64,6 @@ class Field():
         dct['simname'] = self.simname
         dct['snapshot'] = self.snapshot
         dct['axis'] = self.axis
-        dct['priority'] = self.priority
         return dat
     
     def _loadSnapshotData(self):
