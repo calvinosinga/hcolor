@@ -58,11 +58,11 @@ class Sbatch():
         fn1 = first_sbatch.fieldname
         fn2 = second_sbatch.fieldname
 
-        cross_sbatch_file = ["%s-%s_cross.sbatch"%(fn1, fn2)]
-        cross_var_name = ["%s-%s_cross"%(fn1, fn2)]
+        cross_sbatch_file = ["%sX%s.sbatch"%(fn1, fn2)]
+        cross_var_name = ["%sX%s"%(fn1, fn2)]
         cross_savefile = {}
         cross_savefile[cross_var_name[0]] = \
-                [first_sbatch._get_base_name("%s-%s"%(fn1, fn2))]
+                [first_sbatch._get_base_name("%sX%s"%(fn1, fn2))]
 
         # the cross results depend on the last job from each field
         last_jobs = [second_sbatch.varnames[-2], first_sbatch.varnames[-2]]
@@ -146,7 +146,7 @@ class Sbatch():
         self._sbatch_lines(combine2_job, combine2_dir)
         numcombine = int(self.numfiles/20) + 1
         cmd_args = (self.combine_path, varnames[1], 0, numcombine,
-                1, varnames[2])
+                20, varnames[2])
         self._write_python_line(combine2_job, cmd_args)
 
         combine2_job.close()
