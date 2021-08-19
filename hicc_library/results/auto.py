@@ -24,12 +24,14 @@ class Auto():
         for g in gridnames:
             grid = self.gridfile[g][:]
             dct = self.gridfile[g].attrs
-            is_priority = dct["is_priority"]
+            ignore_grid = dct["ignore"]
             grid = self._toOverdensity(grid, dct)
             self._computePk(grid, dct, g+"_pk")
-            if is_priority:
+            if not ignore_grid:
                 self._computeXi(grid, dct, g+"_xi")
                 self._makeSlice(grid, dct, g+"_slc")
+        self.outfile.close()
+        self.gridfile.close()
         return
     
     def _toOverdensity(self, grid, dct):
@@ -47,7 +49,7 @@ class Auto():
         
         # save attributes
         if dct["is_rss"]:
-            self.outfile.create_dataset(savename+"_2D", data=pk.Pk2D[:])
+            self.outfile.create_dataset(savename+"2D", data=pk.Pk2D[:])
             if not self.saved_k2D:
                 self.outfile.create_dataset("kper", data=pk.kper)
                 self.outfile.create_dataset("kpar", data=pk.kpar)
