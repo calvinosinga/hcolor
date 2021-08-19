@@ -51,7 +51,7 @@ gd['create_grid'] = HCOLOR + 'run/create_grid.py'
 gd['combine'] = HCOLOR + 'run/combine.py'
 gd['hih2ptl'] = HIH2 + "hih2_particles_%03d"%SNAPSHOT + ".%d.hdf5"
 gd['post'] = gd[SIMNAME]+'postprocessing/'
-gd['dust'] = gd['post']+'/stellar_light/'+ \
+gd['dust'] = gd['post']+'stellar_light/'+ \
         'Subhalo_StellarPhot_p07c_cf00dust_res_conv_ns1_rad30pkpc_%03d.hdf5'%SNAPSHOT
 gd['auto_result'] = HCOLOR+'run/auto.py'
 gd['cross_result'] = HCOLOR+'run/cross.py'
@@ -118,9 +118,11 @@ for i in range(len(fields)):
         fn1 = fields[i].fieldname
         fn2 = fields[j].fieldname
         if fn1 in HI_fields and fn2 in matter_fields:
-            xplotpath = gd['plots'] + '%s-%s/'%(fn1,fn2)
+            xplotpath = gd['plots'] + '%sX%s/'%(fn1,fn2)
             os.mkdir(xplotpath)
-            cvar, csb, cdep, csave = Sbatch.makeCrossSbatch(fields[i], fields[j], xplotpath)
+            xplotkey = '%sX%s_plots'%(fn1,fn2)
+            gd[xplotkey]=xplotpath
+            cvar, csb, cdep, csave = Sbatch.makeCrossSbatch(fields[i], fields[j], xplotkey)
             jobnames.extend(csb)
             dependencies.update(cdep)
             varnames.extend(cvar)
