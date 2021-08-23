@@ -64,6 +64,8 @@ class Field():
         dct['simname'] = self.simname
         dct['snapshot'] = self.snapshot
         dct['axis'] = self.axis
+        dct['BoxSize'] = self.header['BoxSize']
+        dct['HubbleParam'] = self.header['HubbleParam']
         return dat
     
     def _loadSnapshotData(self):

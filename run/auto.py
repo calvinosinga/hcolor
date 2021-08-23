@@ -20,7 +20,7 @@ if gd['verbose']:
 
 INGRIDPATH = gd['grids'] + gd[INGRIDKEY]
 OUTFILEPATH = gd['results']+ gd[OUTFILEKEY]
-PLOTDIR = gd['plots']+gd[PLOTDIRKEY]
+PLOTDIR = gd[PLOTDIRKEY]
 
 if gd['verbose']:
     print('The ingrid path:%s'%INGRIDPATH)
