@@ -79,8 +79,11 @@ class Field():
         return il.groupcat.loadSubhalos(self.gd[self.simname],
                 self.snapshot, fields=fields)
     
-    def _toRedshiftSpace(self):
-        if self.pos is None or self.vel is None:
+    def _toRedshiftSpace(self, pos = None, vel = None):
+        if pos is None or vel is None:
+            pos = self.pos
+            vel = self.vel
+        if pos is None or vel is None:
             raise ValueError("position or velocity have not been defined yet")
         if self.in_rss:
             raise ValueError("already in redshift-space!")
@@ -89,11 +92,11 @@ class Field():
         redshift = self.header['Redshift']
 
         factor = (1+redshift)/hubble
-        self.pos[:,self.axis] += self.vel[:,self.axis]*factor
+        pos[:,self.axis] += vel[:,self.axis]*factor
 
         # handle periodic boundary conditions
-        self.pos[:, self.axis] = np.where((self.pos[:,self.axis]>boxsize) | (self.pos[:,self.axis]<0), 
-                (self.pos[:,self.axis]+boxsize)%boxsize, self.pos[:,self.axis])
+        pos[:, self.axis] = np.where((pos[:,self.axis]>boxsize) | (pos[:,self.axis]<0), 
+                (pos[:,self.axis]+boxsize)%boxsize, pos[:,self.axis])
         
         self.in_rss = True
         return

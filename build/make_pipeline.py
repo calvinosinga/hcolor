@@ -55,6 +55,7 @@ gd['dust'] = gd['post']+'stellar_light/'+ \
         'Subhalo_StellarPhot_p07c_cf00dust_res_conv_ns1_rad30pkpc_%03d.hdf5'%SNAPSHOT
 gd['auto_result'] = HCOLOR+'run/auto.py'
 gd['cross_result'] = HCOLOR+'run/cross.py'
+gd['runnames'] = RUNNAMES
 
 # prompting user for other needed input
 isptl = {}
@@ -81,7 +82,6 @@ def create_subdirectory(subdir, savepath=True):
     return
 
 create_subdirectory("grids")
-create_subdirectory("slices")
 create_subdirectory("sbatch")
 create_subdirectory("sbatch/logs")
 create_subdirectory("results")
@@ -89,7 +89,6 @@ create_subdirectory("results/plots")
 
 for i in RUNNAMES:
     create_subdirectory("results/plots/"+i,False)
-    create_subdirectory("slices/"+i, False)
     create_subdirectory("sbatch/logs/"+i, False)
 
 # getting the properties of the runs given

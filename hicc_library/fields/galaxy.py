@@ -192,7 +192,7 @@ class galaxy_ptl(galaxy):
         self.gridnames = ['blue','red','blue_dust', 'red_dust']
         
         if gd['use_ht']:
-            self._use_hydrotools(gd)
+            self._useHydrotools(gd)
         
         self.ht_file = hp.File(gd['ht_path'], 'r')
         self.gr = self.ht_file['gr_normal']
@@ -200,28 +200,40 @@ class galaxy_ptl(galaxy):
 
         self.col = gd['%s_col_def'%self.fieldname]
 
-        self._loadHydro()
+        if self.use_stmass:
+            self.ptl_names = ['ptlstr']
+            self.mass = self.ht_file['catsh_SubhaloMassType'][:,4]
+        else:
+            self.ptl_names = ['ptlstr','ptlgas','ptldm']
+            self.mass = np.sum(self.ht_file['catsh_SubhaloMassType'][:], axis=1)
+            # if black holes are implemented use the following definition
+            # self.ptl_names = ['ptlstr','ptlgas','ptldm', 'ptlbh']
+        
+        self.pos = self.ht_file['catsh_SubhaloPos'] * self.header['Time'] # given ckpc, moved to kpc
+        self.vel = self.ht_file['catsh_SubhaloVel']
+        
+        self.use_cicw = 1 # this should always use CICW
         return
     # ['catgrp_GroupNsubs', 'catgrp_Group_M_Crit200', 'catgrp_id', 'catgrp_is_primary', 'catsh_gr_normal',
     #  'catsh_id', 'catxt_gr_dust', 'config', 'ptldm_Coordinates', 'ptldm_ParticleIDs', 'ptldm_Velocities',
     #   'ptldm_first', 'ptldm_n', 'ptlgas_Coordinates', 'ptlgas_ParticleIDs', 'ptlgas_Velocities', 
     #   'ptlgas_first', 'ptlgas_n', 'ptlstr_Coordinates', 'ptlstr_ParticleIDs', 'ptlstr_Velocities', 
     #   'ptlstr_first', 'ptlstr_n']
-    def _loadHydro(self):
-        # check coordinates
-        ht = self.ht_file
-        self.ptlpos = ht['ptlstr_Coordinates']
-        self.ptlmass = ht['ptlstr_Masses']
-        self.ptlvel = ht['ptlstr_Velocities']
-        
-        
-        return
+
     
-    def _use_hydrotools(self, gd):
+    def _loadSlices(self, fptl):
+        
+        shslc = []
+        for i in range(len(fptl-1)):
+            shslc.append(slice(fptl[i],fptl[i+1]))
+        shslc.append(slice(fptl[-1], -1))
+        return shslc
+    
+    def _useHydrotools(self, gd):
         ht_suf = gd['ht_suf']
 
         xtf = ['gr_dust']
-        shf = ['gr_normal']
+        shf = ['gr_normal', 'SubhaloPos', 'SubhaloVel', 'SubhaloMassType']
         ptf = ['Coordinates', 'Velocities', 'ParticleIDs', 'Masses']
         sim = self._get_simname_as_ht_input(self.simname)
         if self.use_stmass:
@@ -270,21 +282,71 @@ class galaxy_ptl(galaxy):
     
     def computeGrids(self):
         # figure out which subhalos are red/blue
+        # need to do this first to avoid having multiple grid arrays which take a lot of memory
         masks = self._getMasks()
-
-        # for each grid, get the slices for the particles for each subhalo
-        # labelled as such and then CICW it into the grid
+        ht = self.ht_file
+        # iterate over each grid, use the mask to figure out
+        # which data that you want to add to the grid 
         for i in range(len(self.gridnames)):
             mask = masks[i]
             gn = self.gridnames[i]
+            
+            self.grid = Grid(gn, self.resolution)
+            # mask off the subhalos not included in this color definition
+            shpos = self.pos[mask, :]
+            # for each particle type
+            for p in self.ptl_names:
+                # load the data for this particle type
+                ptlpos = ht['%s_Coordinates'%p]
+                ptlmass = ht['%s_Masses'%p]
 
+                ptlslc = self._loadSlices(ht['%s_first'])
+                # iterate over each subhalo, placing the particles into the grid
+                for s in range(len(shpos)):
+                    # the positions are relative to the subhalos position
+                    pos_for_grid = ptlpos[ptlslc[s], :] + shpos[s, :]
+                    mass_for_grid = ptlmass[ptlslc[s]]
+                    self.grid.CICW(pos_for_grid, self.header['BoxSize'], mass_for_grid)
+            self.saveData(gn)
+                
+        
+        # now do the same in redshift space
+        for i in range(len(self.gridnames)):
+            mask = masks[i]
+            gn = self.gridnames[i]
+            
+            self.grid = Grid(gn, self.resolution)
+            self.grid.toRSS()
+            # mask off the subhalos not included in this color definition
+            shpos = self.pos[mask, :]
+            shvel = self.vel[mask, :]
+            # for each particle type
+            for p in self.ptl_names:
+                # load the data for this particle type
+                ptlpos = ht['%s_Coordinates'%p]
+                ptlmass = ht['%s_Masses'%p]
+                ptlvel = ht['%s_Velocities'%p]
 
-            self._computeGal(gn,mask)
-
-        # save the grid
+                ptlslc = self._loadSlices(ht['%s_first'])
+                # iterate over each subhalo, placing the particles into the grid
+                for s in range(len(shpos)):
+                    # the positions are relative to the subhalos position
+                    pos_for_grid = ptlpos[ptlslc[s], :] + shpos[s, :]
+                    vel_for_grid = ptlvel[ptlslc[s], :] + shvel[s, :]
+                    mass_for_grid = ptlmass[ptlslc[s]]
+                    self._toRedshiftSpace(pos_for_grid, vel_for_grid)
+                    self.grid.CICW(pos_for_grid, self.header['BoxSize'], mass_for_grid)
+            self.saveData(gn)
         return
 
-
-    def _computeGal(self, gridname, mask):
-        return super()._computeGal(gridname, mask)
-        
+    def saveData(self, gridname):
+        dat = super().saveData(self.col)
+        dct = dat.attrs
+        dct['use_res'] = self.use_res
+        dct['is_stmass'] = self.use_stmass
+        if 'dust' in gridname:
+            dct['used_dust'] = True
+        else:
+            dct['used_dust'] = False
+        dct['is_massden'] = 1
+        return 

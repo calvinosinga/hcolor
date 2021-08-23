@@ -15,10 +15,17 @@ INGRIDKEY = sys.argv[1]
 OUTFILEKEY = sys.argv[2]
 PLOTDIRKEY = sys.argv[3]
 
-INGRIDPATH = gd[INGRIDKEY]
-OUTFILEPATH = gd[OUTFILEKEY]
-PLOTDIR = gd[PLOTDIRKEY]
+if gd['verbose']:
+    print("auto.py called, given the command-line arguments" + str(sys.argv))
 
+INGRIDPATH = gd['grids'] + gd[INGRIDKEY]
+OUTFILEPATH = gd['results']+ gd[OUTFILEKEY]
+PLOTDIR = gd['plots']+gd[PLOTDIRKEY]
+
+if gd['verbose']:
+    print('The ingrid path:%s'%INGRIDPATH)
+    print('The outfile path:%s'%OUTFILEPATH)
+    print('The plots path:%s'%PLOTDIR)
 res = Auto(INGRIDPATH, OUTFILEPATH, PLOTDIR)
 
 res.computeResults()

@@ -18,7 +18,7 @@ gd = pickle.load(open(os.getenv('GDFILE'),'rb'))
 inpath = gd['grids'] + gd[IN_GRID]
 infiles = [inpath%i for i in range(IN_START, IN_STOP, IN_STEP)]
 
-if '%s' in gd[OUT_GRID]:
+if '%d' in gd[OUT_GRID]:
     outpath = gd['grids']+gd[OUT_GRID]%IN_START
 else:
     outpath = gd['grids']+gd[OUT_GRID]
