@@ -13,7 +13,7 @@ class hiptl(Field):
         self.chunk = chunk
         self.gridnames = self.getMolFracModelsPtl()
 
-        self.hih2file = hp.File(gd['hih2ptl']%chunk, 'r')
+        self.hih2filepath = gd['hih2ptl']%chunk
         
         self.loadsnap = gd['snapshot']%(chunk)
         self._loadSnapshotData()

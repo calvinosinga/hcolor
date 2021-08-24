@@ -6,7 +6,6 @@ import os
 import h5py as hp
 from hicc_library.fields.galaxy import galaxy
 import copy
-from hicc_library.fields_dev.hisubhalo import Hisubhalo
 class Sbatch():
 
     def __init__(self, gd, fieldname, simname, snapshot, axis, resolution):

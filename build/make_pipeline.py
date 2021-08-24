@@ -8,7 +8,6 @@ import numpy as np
 import h5py as hp
 from sbatch import Sbatch
 import pickle as pkl
-from hicc_library.fields.hisubhalo import Hisubhalo
 
 PREFIX = sys.argv.pop(1)
 SIMNAME = sys.argv.pop(1)
@@ -147,19 +146,23 @@ if gd["verbose"]:
 
 print("the global dictionary:")
 print(gd)
+gdpath = gd['output'] + 'gd.pkl'
+w_path = open(gdpath, 'wb')
+pkl.dump(gd, w_path, pkl.HIGHEST_PROTOCOL)
+w_path.close()
 
 # add hih2 hiptl, tng snapshot, postprocessing files to path,
 # creating the pipeline
 pipe = open(gd['output']+'sbatch/pipeline.bash', 'w')
 
 pipe.write("#!/bin/bash\n")
-
+pipe.write('GDFILE=%s\n'%gdpath)
 # helper method to write jobs and their dependencies
 def write_line(varname, sname, jdep=None):
     if jdep is None:
-        pipe.write("%s=$(sbatch %s)\n"%(varname, sname))
+        pipe.write("%s=$(sbatch --export=ALL,GDFILE=$GDFILE %s)\n"%(varname, sname))
     else:
-        pipe.write("%s=$(sbatch --dependency=afterok:"%varname)
+        pipe.write("%s=$(sbatch --export=ALL,GDFILE=$GDFILE --dependency=afterok:"%varname)
         for i in range(len(jdep)):
             if not jdep[i] == jdep[-1]:
                 pipe.write('$'+jdep[i]+':')
@@ -175,13 +178,4 @@ for i in range(len(jobnames)):
     except KeyError:
         write_line(varnames[i], jobnames[i])
 
-# make the pickle files
-# for r in RUNNAMES:
-#     if r == 'hisubhalo':
-#         field = Hisubhalo(...)
-    
-#     # use gd to set paths in field
-#     field.setPaths(gd)
 
-#     # save the field as a pickle
-#     field.savePkl()

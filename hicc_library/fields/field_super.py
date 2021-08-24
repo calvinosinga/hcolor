@@ -14,9 +14,9 @@ class Field():
         self.snapshot = snapshot
         self.resolution = resolution
         self.axis = axis
-        self.gd = gd
         self.v = gd['verbose']
         self.outfile = hp.File(outfilepath, 'w')
+        self.simpath = gd[simname]
         if self.v:
             print("\n\ninputs given to superclass constructor:")
             print("the simulation name: %s"%self.simname)
@@ -39,12 +39,8 @@ class Field():
         self.header['BoxSize'] = self._convertPos(self.header['BoxSize'])
         self.header['MassTable'] = self._convertMass(self.header['MassTable'])
 
-        # other variables expected to be assigned values later in analysis
-        self.grid = None
+        # other variables expected to be assigned values in subclasses
         self.fieldname = ''
-        self.pos = None
-        self.vel = None
-        self.mass = None
         self.gridnames = []
         return
     
@@ -57,15 +53,11 @@ class Field():
         """
         return
     
-    def saveData(self):
+    def saveData(self, pickle_path):
         # saves grid. resolution, rss (combine info if chunk) -> attrs
         dat = self.grid.saveGrid(self.outfile)
-        dct = dat.attrs
-        dct['simname'] = self.simname
-        dct['snapshot'] = self.snapshot
-        dct['axis'] = self.axis
-        dct['BoxSize'] = self.header['BoxSize']
-        dct['HubbleParam'] = self.header['HubbleParam']
+        pickle_file = self.outfile.create_dataset('pickle')
+        pickle_file.attrs['path'] = pickle_path
         return dat
     
     def _loadSnapshotData(self):
@@ -78,18 +70,11 @@ class Field():
         pass
     
     def _loadGalaxyData(self, fields):
-        return il.groupcat.loadSubhalos(self.gd[self.simname],
+        return il.groupcat.loadSubhalos(self.simpath,
                 self.snapshot, fields=fields)
     
-    def _toRedshiftSpace(self, pos = None, vel = None):
-        if pos is None or vel is None:
-            pos = self.pos
-            vel = self.vel
-        if pos is None or vel is None:
-            raise ValueError("position or velocity have not been defined yet")
-        if self.in_rss:
-            raise ValueError("already in redshift-space!")
-        boxsize = self._convertPos(self.header["BoxSize"])
+    def _toRedshiftSpace(self, pos, vel):
+        boxsize = self.header["BoxSize"]
         hubble = self.header["HubbleParam"]*100 # defined using big H
         redshift = self.header['Redshift']
 
@@ -101,39 +86,27 @@ class Field():
                 (pos[:,self.axis]+boxsize)%boxsize, pos[:,self.axis])
         
         self.in_rss = True
-        return
+        return pos
 
-    def _convertMass(self, mass=None):
+    def _convertMass(self, mass):
         """
         Converts mass units from 1e10 M_sun/h to M_sun
         """
-        if mass is None:
-            self.mass *= 1e10/self.header['HubbleParam']
-            return
-        else:
-            mass *= 1e10/self.header['HubbleParam']
-            return mass
+        mass *= 1e10/self.header['HubbleParam']
+        return mass
     
     def _convertPos(self, pos=None):
         """
         Converts position units from ckpc/h to Mpc
         """
-        if pos is None:
-            self.pos *= self.header["Time"]/1e3
-            return
-        else:
-            pos *= self.header["Time"]/1e3
-            return pos
+        pos *= self.header["Time"]/1e3
+        return pos
     
     def _convertVel(self, vel=None):
         """
         Multiplies velocities by scale factor^0.5
         """
-        if vel is None:
-            self.vel *= np.sqrt(self.header["Time"])
-            return
-        else:
-            vel *= np.sqrt(self.header["Time"])
-            return vel
+        vel *= np.sqrt(self.header["Time"])
+        return vel
     
 
