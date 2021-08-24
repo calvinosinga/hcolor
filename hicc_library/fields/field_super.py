@@ -17,6 +17,10 @@ class Field():
         self.v = gd['verbose']
         self.outfile = hp.File(outfilepath, 'w')
         self.simpath = gd[simname]
+
+        self.pickle_path = gd['pickle_path']
+        dat = self.outfile.create_dataset('pickle')
+        dat.attrs['path'] = self.pickle_path
         if self.v:
             print("\n\ninputs given to superclass constructor:")
             print("the simulation name: %s"%self.simname)
@@ -53,11 +57,9 @@ class Field():
         """
         return
     
-    def saveData(self, pickle_path):
+    def saveData(self):
         # saves grid. resolution, rss (combine info if chunk) -> attrs
         dat = self.grid.saveGrid(self.outfile)
-        pickle_file = self.outfile.create_dataset('pickle')
-        pickle_file.attrs['path'] = pickle_path
         return dat
     
     def _loadSnapshotData(self):

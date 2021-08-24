@@ -34,11 +34,25 @@ if CHUNK == -1:
     outfilepath = gd['grids']+gd[FIELDNAME]
 else:
     outfilepath = gd['grids']+gd[FIELDNAME]%CHUNK
-outfile = hp.File(outfilepath,'r')
-picklepath = outfile['pickle'].attrs['path']
-field = pickle.load(open(picklepath, 'rb'))
-#####################################
 
+pickle_path = outfilepath+'.pkl'
+gd['pickle_path'] = pickle_path # this doesn't go in gd permanantly
+#####################################
+if FIELDNAME == 'hiptlgrid':
+    field = hiptl(gd, SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, outfilepath)
+elif FIELDNAME == 'hisubhalogrid':
+    field = hisubhalo(gd, SIMNAME, SNAPSHOT, AXIS, RESOLUTION, outfilepath)
+elif FIELDNAME == 'galaxygrid':
+    field = galaxy(gd, SIMNAME, SNAPSHOT, AXIS, RESOLUTION, outfilepath)
+elif FIELDNAME == 'galaxy_dustgrid':
+    field = galaxy_dust(gd, SIMNAME, SNAPSHOT, AXIS, RESOLUTION, outfilepath)
+elif FIELDNAME == 'vngrid':
+    field = vn(gd, SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, outfilepath)
+elif FIELDNAME == 'galaxy_ptlgrid':
+    field = galaxy_ptl(gd, SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, outfilepath)
+else:
+    raise NotImplementedError("there is no field named %s"%FIELDNAME)
 
 field.computeGrids()
 field.computeAux()
+pickle.dump(field, open(pickle_path, 'wb'), pickle.HIGHEST_PROTOCOL)

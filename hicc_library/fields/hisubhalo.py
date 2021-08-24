@@ -56,9 +56,9 @@ class hisubhalo(Field):
             grid.in_rss = self.in_rss
             mass = hih2file[gridname][:] #already in solar masses
             if self.use_cicw:
-                self.grid.CICW(pos, self.header['BoxSize'], mass)
+                grid.CICW(pos, self.header['BoxSize'], mass)
             else:
-                self.grid.CIC(pos, self.header['BoxSize'])
+                grid.CIC(pos, self.header['BoxSize'])
             self.saveData()
             return
         ###############################################################
