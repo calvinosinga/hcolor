@@ -6,7 +6,7 @@ import os
 import h5py as hp
 from hicc_library.fields.galaxy import galaxy
 import copy
-
+from hicc_library.fields_dev.hisubhalo import Hisubhalo
 class Sbatch():
 
     def __init__(self, gd, fieldname, simname, snapshot, axis, resolution):
@@ -33,6 +33,7 @@ class Sbatch():
         # some fields, like galaxy, have additional elements that they
         # would like to add to the global dictionary, this method handles that
         self._add_global(gd)
+
         return
     
     def isCat(self):
@@ -321,4 +322,3 @@ class Sbatch():
     def _compute_xpk_memory(self):
         return int(self._compute_pk_memory() * 2.25)
 
-    

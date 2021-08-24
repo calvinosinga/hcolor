@@ -77,7 +77,9 @@ class galaxy(Field):
         galaxy_min_resolution['papa'] = {'r':-17, 'stmass':0}
         # resolution to match hisubhalo
         galaxy_min_resolution['diemer'] = {'r':None, 'stmass':mean_baryon_cell[simname]*200}
-        # wolz definition?
+        # wigglez
+        galaxy_min_resolution['wiggleZ'] = {'r':20}
+        
         return galaxy_min_resolution
     
     @staticmethod
