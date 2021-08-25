@@ -1,5 +1,5 @@
 
-from hicc_library.fields.galaxy import galaxy, galaxy_dust, galaxy_ptl
+from hicc_library.fields.galaxy import galaxy, galaxy_dust
 import sys
 import os
 import pickle

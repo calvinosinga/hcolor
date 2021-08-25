@@ -37,7 +37,7 @@ class hisubhalo(Field):
     
     def computeGrids(self):
         hih2file = hp.File(self.hih2filepath, 'r')
-
+        
         ids = hih2file['id_subhalo'][:] # used to idx into the subhalo catalog
         ids = ids.astype(np.int32)
 
@@ -51,7 +51,7 @@ class hisubhalo(Field):
         vel = self._convertVel(vel)
 
         ############### HELPER METHOD ###############################
-        def _computeHI(gridname):
+        def computeHI(gridname):
             grid = Grid(gridname, self.resolution)
             grid.in_rss = self.in_rss
             mass = hih2file[gridname][:] #already in solar masses
@@ -59,17 +59,18 @@ class hisubhalo(Field):
                 grid.CICW(pos, self.header['BoxSize'], mass)
             else:
                 grid.CIC(pos, self.header['BoxSize'])
-            self.saveData()
+            self.saveData(grid)
             return
         ###############################################################
 
         for g in self.gridnames:
-            self._computeHI(g)
+            computeHI(g)
         
         pos = self._toRedshiftSpace(pos, vel)
         for g in self.gridnames:
-            self._computeHI(g)
+            computeHI(g)
         
         self.outfile.close()
+        del self.outfile
         return
 
