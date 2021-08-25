@@ -44,16 +44,16 @@ class hisubhalo(Field):
         fields = ['SubhaloPos', 'SubhaloVel']
 
         data = self._loadGalaxyData(fields) # implemented in superclass
-        pos = data['SubhaloPos'][ids]
-        vel = data['SubhaloVel'][ids]
+        pos = data['SubhaloPos'][ids] # ckpc/h
+        vel = data['SubhaloVel'][ids] # km/s
 
         pos = self._convertPos(pos)
-        vel = self._convertVel(vel)
 
+        in_rss = False
         ############### HELPER METHOD ###############################
         def computeHI(gridname):
             grid = Grid(gridname, self.resolution)
-            grid.in_rss = self.in_rss
+            grid.in_rss = in_rss
             mass = hih2file[gridname][:] #already in solar masses
             if self.use_cicw:
                 grid.CICW(pos, self.header['BoxSize'], mass)
@@ -67,10 +67,12 @@ class hisubhalo(Field):
             computeHI(g)
         
         pos = self._toRedshiftSpace(pos, vel)
+        in_rss = True
         for g in self.gridnames:
             computeHI(g)
         
         self.outfile.close()
+        # h5py files cannot be pickled, this file is not needed after this
         del self.outfile
         return
 

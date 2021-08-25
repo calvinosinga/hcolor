@@ -73,7 +73,7 @@ class Grid():
             self.grid[index_u[0],index_u[1],index_d[2]] += u[0]*u[1]*d[2]
             self.grid[index_u[0],index_u[1],index_u[2]] += u[0]*u[1]*u[2]
         self.is_computed = True
-        self.cic_time = time.time() - start
+        self.mas_runtime = time.time() - start
         return
 
     def CICW(self, pos, boxsize, mass):
@@ -102,7 +102,7 @@ class Grid():
             self.grid[index_u[0],index_u[1],index_d[2]] += u[0]*u[1]*d[2]*mass[i]
             self.grid[index_u[0],index_u[1],index_u[2]] += u[0]*u[1]*u[2]*mass[i]
         self.is_computed = True
-        self.cicw_runtime = time.time() - start
+        self.mas_runtime = time.time() - start
         return
     
     def ignoreGrid(self):
@@ -124,10 +124,19 @@ class Grid():
         dct["gridname"] = self.gridname
         dct["ignore"] = self.ignore
         if self.is_computed:
-            dct["cicw_runtime"] = self.cicw_runtime
+            dct["mas_runtime"] = self.mas_runtime
         return dat
-
-
+    
+    @classmethod
+    def loadGrid(dataset):
+        dct = dict(dataset.attrs)
+        grid = Grid(dct['gridname'], dct['resolution'], dataset[:])
+        grid.mas_runtime = dct['mas_runtime']
+        grid.ignore = dct['ignore']
+        grid.in_rss = dct['in_rss']
+        grid.is_computed = True
+        return grid
+    
 class Chunk(Grid):
     def __init__(self, gridname, res, chunk_num, grid=None, combine=1, cicw_runtime=0):
         super().__init__(gridname, res, grid)
