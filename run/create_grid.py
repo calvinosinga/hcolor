@@ -33,11 +33,10 @@ if gd['verbose']:
 
 if CHUNK == -1:
     outfilepath = gd['grids']+gd[FIELDNAME]
-    pickle_path = gd['results']+gd[FIELDNAME]+'.pkl'
 else:
     outfilepath = gd['grids']+gd[FIELDNAME]%CHUNK
-    pickle_path = gd['results']+gd[FIELDNAME]%CHUNK+'.pkl'
 
+pickle_path = gd['results']+gd[FIELDNAME]+'.pkl'
 outfile = hp.File(outfilepath, 'w')
 #####################################
 if FIELDNAME == 'hiptlgrid':
@@ -78,5 +77,9 @@ else:
 field.loadHeader(gd['load_header'])
 field.computeGrids(outfile)
 field.computeAux()
-pickle.dump(field, open(pickle_path, 'wb'), pickle.HIGHEST_PROTOCOL)
+# for fields with chunks, there will already be a pickle file with
+# the needed information so we don't need to create a new one with
+# each chunk.
+if not os.path.isfile(pickle_path):
+    pickle.dump(field, open(pickle_path, 'wb'), pickle.HIGHEST_PROTOCOL)
 outfile.close()
