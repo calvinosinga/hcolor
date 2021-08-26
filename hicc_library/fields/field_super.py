@@ -105,11 +105,12 @@ class Field():
     def makeSlice(self, grid, perc=0.1, mid=None):
         if not grid.ignore:
             # cmap.set_under('w')
-            dim = grid.shape[0]
+            arr = grid.getGrid()
+            dim = arr.shape[0]
             slcidx = int(perc*dim) # the percentage of the volume that should be binned
             if mid is None:
                 mid = int(dim/2)
-            slc = np.log10(np.sum(grid[:, mid-slcidx:mid+slcidx, :], axis=1))
+            slc = np.log10(np.sum(arr[:, mid-slcidx:mid+slcidx, :], axis=1))
             self.slices[grid.gridname] = slc
         return
     

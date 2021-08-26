@@ -17,7 +17,9 @@ class hisubhalo(Field):
  
         self.use_cicw = gd['%s_use_cicw'%self.fieldname]
         self.hih2filepath = gd['post']+'hih2_galaxy_%03d.hdf5'%snapshot
-
+        if self.v:
+            print('\nhisubhalo object created, object dictionary:')
+            print(self.__dict__)
         return
     
     @staticmethod
@@ -36,6 +38,8 @@ class hisubhalo(Field):
         return gridnames
     
     def computeGrids(self):
+        if self.v:
+            print("now computing the grids for hisubhalo...")
         hih2file = hp.File(self.hih2filepath, 'r')
         
         ids = hih2file['id_subhalo'][:] # used to idx into the subhalo catalog
@@ -60,6 +64,9 @@ class hisubhalo(Field):
             else:
                 grid.CIC(pos, self.header['BoxSize'])
             self.saveData(grid)
+            if self.v:
+                print('\nhisubhalo %s')
+                print(grid.print())
             return
         ###############################################################
 
@@ -74,5 +81,6 @@ class hisubhalo(Field):
         self.outfile.close()
         # h5py files cannot be pickled, this file is not needed after this
         del self.outfile
+
         return
 
