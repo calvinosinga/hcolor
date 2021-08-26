@@ -2,7 +2,6 @@
 
 import sys
 import os
-from h5py._hl import attrs
 import numpy as np
 import h5py as hp
 import pickle
