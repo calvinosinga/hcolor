@@ -99,7 +99,7 @@ class Field():
             if not self.saved_r:
                 self.xi["r"]=xi.r3D
                 self.saved_r = True
-            xi[grid.gridname] = xi.xi[:,0]
+            self.xi[grid.gridname] = xi.xi[:,0]
         return
 
     def makeSlice(self, grid, perc=0.1, mid=None):
