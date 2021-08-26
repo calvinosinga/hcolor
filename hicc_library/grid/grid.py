@@ -128,7 +128,7 @@ class Grid():
         return dat
     
     @classmethod
-    def loadGrid(dataset):
+    def loadGrid(cls, dataset):
         dct = dict(dataset.attrs)
         grid = Grid(dct['gridname'], dct['resolution'], dataset[:])
         grid.mas_runtime = dct['mas_runtime']
