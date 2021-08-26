@@ -60,7 +60,7 @@ class Sbatch():
         cross_var_name = ["%sX%s"%(fn1, fn2)]
         cross_savefile = {}
         cross_savefile[cross_var_name[0]] = \
-                first_sbatch._get_base_name("%sX%s"%(fn1, fn2))+'.hdf5'
+                first_sbatch._get_base_name("%sX%s"%(fn1, fn2))+'.pkl'
 
         # the cross results depend on the last job from each field
         last_jobs = [second_sbatch.varnames[-2], first_sbatch.varnames[-2]]
