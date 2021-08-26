@@ -56,6 +56,7 @@ gd['dust'] = gd['post']+'stellar_light/'+ \
 gd['auto_result'] = HCOLOR+'run/auto.py'
 gd['cross_result'] = HCOLOR+'run/cross.py'
 gd['runnames'] = RUNNAMES
+gd['hih2catsh'] = gd['post']+'hih2_galaxy_%03d_.hdf5'%SNAPSHOT
 
 # prompting user for other needed input
 isptl = {}

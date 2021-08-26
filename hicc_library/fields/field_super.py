@@ -13,14 +13,14 @@ import copy
 
 class Field():
 
-    def __init__(self, gd, simname, snapshot, axis, resolution, outfilepath):
+    def __init__(self, simname, snapshot, axis, resolution, pkl_path, verbose):
         # getting default class variables
         self.simname = simname
         self.snapshot = snapshot
         self.resolution = resolution
         self.axis = axis
-        self.v = gd['verbose']
-        self.simpath = gd[simname]
+        self.pkl_path = pkl_path
+        self.v = verbose
 
         # class variables for results
         self.saved_k = False
@@ -33,31 +33,16 @@ class Field():
         self.slices = {}
         self.tdpks = {}
 
-        # getting the outfile for the grids - this will need to be deleted
-        # after computing the grids, since h5py objs cannot be pickled
-        self.outfile = hp.File(outfilepath, 'w')
-        self.pickle_path = gd['pickle_path']
-        dat = self.outfile.create_dataset('pickle', data=[0])
-        dat.attrs['path'] = self.pickle_path
         if self.v:
             print("\n\ninputs given to superclass constructor:")
             print("the simulation name: %s"%self.simname)
             print("the snapshot: %d"%self.snapshot)
             print("the axis: %d"%self.axis)
             print("the resolution: %d"%self.resolution)
-            print("saving to filepath %s"%outfilepath)
+        
+        self.header = None # dictionary that stores basic sim info
         
 
-        # getting basic simulation information
-        
-        f = hp.File(gd['load_header'], 'r')
-        self.header = dict(f['Header'].attrs)
-        temp = dict(f['Parameters'].attrs)
-        paramparams = ['BoxSize', 'HubbleParam']
-        for p in paramparams:
-            self.header[p] = temp[p]
-        self.header['BoxSize'] = self._convertPos(self.header['BoxSize'])
-        self.header['MassTable'] = self._convertMass(self.header['MassTable'])
 
         # other variables expected to be assigned values in subclasses
         self.fieldname = ''
@@ -65,7 +50,22 @@ class Field():
         self.isHI = True
         return
     
-    def computeGrids(self):
+    def loadHeader(self, snappath):
+        f = hp.File(snappath, 'r')
+        self.header = dict(f['Header'].attrs)
+        temp = dict(f['Parameters'].attrs)
+        paramparams = ['BoxSize', 'HubbleParam']
+        for p in paramparams:
+            self.header[p] = temp[p]
+        self.header['BoxSize'] = self._convertPos(self.header['BoxSize'])
+        self.header['MassTable'] = self._convertMass(self.header['MassTable'])
+        return
+    
+    def computeGrids(self, outfile):
+        if self.header is None:
+            raise ValueError("header needs to be loaded before computing grids")
+        dat = outfile.create_dataset('pickle', data=[0])
+        dat.attrs['path'] = self.pkl_path
         return
     
     def computeAux(self):
@@ -114,9 +114,9 @@ class Field():
             self.slices[grid.gridname] = slc
         return
     
-    def saveData(self, grid):
+    def saveData(self, outfile, grid):
         # saves grid. resolution, rss (combine info if chunk) -> attrs
-        dat = grid.saveGrid(self.outfile)
+        dat = grid.saveGrid(outfile)
         return dat
     
     def _loadSnapshotData(self):
@@ -128,9 +128,8 @@ class Field():
         """
         pass
     
-    def _loadGalaxyData(self, fields):
-        return il.groupcat.loadSubhalos(self.simpath,
-                self.snapshot, fields=fields)
+    def _loadGalaxyData(self, simpath, fields):
+        return il.groupcat.loadSubhalos(simpath, self.snapshot, fields=fields)
     
     def _toRedshiftSpace(self, pos, vel):
         boxsize = self.header["BoxSize"]
@@ -203,7 +202,7 @@ class Cross():
         return
     
     def _xpk(self, grid1, grid2):
-        if not grid1.ignore and not grid2.ignore:
+        if not grid1.ignore and not grid2.ignore and grid1.in_rss == grid2.in_rss:
             kname = '%sX%s'%(grid1.gridname, grid2.gridname)
             arrs = (self._toOverdensity(grid1.getGrid()), 
                     self._toOverdensity(grid2.getGrid()))
@@ -231,7 +230,7 @@ class Cross():
         return
     
     def _xxi(self, grid1, grid2):
-        if not grid1.ignore and not grid2.ignore:
+        if not grid1.ignore and not grid2.ignore and grid1.in_rss == grid2.in_rss:
             kname = '%sX%s'%(grid1.gridname, grid2.gridname)
             arrs = (self._toOverdensity(grid1.getGrid()), 
                     self._toOverdensity(grid2.getGrid()))

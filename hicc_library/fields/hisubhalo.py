@@ -3,6 +3,7 @@
 
 """
 
+from numpy.lib.utils import info
 from hicc_library.grid.grid import Grid
 from hicc_library.fields.field_super import Field
 import h5py as hp
@@ -10,18 +11,32 @@ import numpy as np
 
 class hisubhalo(Field):
 
-    def __init__(self, gd, simname, snapshot, axis, resolution, outfilepath):
-        super().__init__(gd, simname, snapshot, axis, resolution, outfilepath)
+    def __init__(self, simname, snapshot, axis, resolution, pkl_path, verbose,
+                shcatpath, hih2filepath):
+        super().__init__(simname, snapshot, axis, resolution, pkl_path, verbose)
         self.fieldname = 'hisubhalo'
         self.gridnames = self.getMolFracModelsGal()
  
-        self.use_cicw = gd['%s_use_cicw'%self.fieldname]
-        self.hih2filepath = gd['post']+'hih2_galaxy_%03d.hdf5'%snapshot
+        self.use_cicw = True
+        self.hih2filepath = hih2filepath
+        self.loadpath = shcatpath
         if self.v:
             print('\nhisubhalo object created, object dictionary:')
             print(self.__dict__)
         return
     
+    @staticmethod
+    def getResolutionDefinitions():
+        # taken from Pillepich et al 2018, table 1 (in solar masses)
+        mean_baryon_cell = {'tng100':1.4e6, 'tng100-2':11.2e6, 'tng100-3':89.2e6,
+                'tng300':11e6, 'tng300-2':88e6, 'tng300-3':703e6}
+        res_defs = {}
+        res_defs['papa'] = {'HI':(10**7.5, np.inf)}
+
+        # wolz is intensity map so no minimum threshold
+        return
+        
+
     @staticmethod
     def getMolFracModelsGal():
         """
@@ -37,17 +52,23 @@ class hisubhalo(Field):
         gridnames.append('m_hi_L08_map')
         return gridnames
     
-    def computeGrids(self):
+    def useCIC(self):
+        self.use_cicw = False
+        return
+    
+    def computeGrids(self, outfile):
+        super().computeGrids(self, outfile)
+
         if self.v:
             print("now computing the grids for hisubhalo...")
-        hih2file = hp.File(self.hih2filepath, 'r')
         
+        hih2file = hp.File(self.hih2filepath, 'r')
         ids = hih2file['id_subhalo'][:] # used to idx into the subhalo catalog
         ids = ids.astype(np.int32)
 
         fields = ['SubhaloPos', 'SubhaloVel']
 
-        data = self._loadGalaxyData(fields) # implemented in superclass
+        data = self._loadGalaxyData(self.loadpath, fields) # implemented in superclass
         pos = data['SubhaloPos'][ids] # ckpc/h
         vel = data['SubhaloVel'][ids] # km/s
 
@@ -63,9 +84,9 @@ class hisubhalo(Field):
                 grid.CICW(pos, self.header['BoxSize'], mass)
             else:
                 grid.CIC(pos, self.header['BoxSize'])
-            self.saveData(grid)
+            self.saveData(outfile, grid)
             if self.v:
-                print('\nhisubhalo %s')
+                print('\nfinished computing a grid, printing its properties...')
                 print(grid.print())
             return
         ###############################################################
@@ -78,9 +99,8 @@ class hisubhalo(Field):
         for g in self.gridnames:
             computeHI(g)
         
-        self.outfile.close()
-        # h5py files cannot be pickled, this file is not needed after this
-        del self.outfile
-
         return
 
+    def _convertVel(self, vel):
+        # subhalos' velocities are already in km/s
+        return vel

@@ -9,70 +9,66 @@ from HI_library import HI_mass_from_Illustris_snap as vnhi
 
 class vn(Field):
 
-    def __init__(self, gd, simname, snapshot, axis, resolution, chunk, outfile):
-        super().__init__(gd, simname, snapshot, axis, resolution, outfile)
+    def __init__(self, simname, snapshot, axis, resolution, chunk, pkl_path, 
+            verbose, snappath, treecoolpath):
+        super().__init__(simname, snapshot, axis, resolution, pkl_path, verbose)
         self.fieldname = 'vn'
         self.chunk = chunk
         self.gridnames = ['vn']
-        self.TREECOOL = gd['TREECOOL']
+        self.TREECOOL = treecoolpath
         
-        self.loadsnap = gd['snapshot']%(chunk)
-        
-        if gd['verbose']:
-            print("finished constructor for %s, chunknum = %d"%(self.fieldname,chunk))
-        self._loadSnapshotData()
-        return
-    
-
-    def computeGrids(self):
-        for g in self.gridnames:
-            self._computeHI(g)
-        
-        self._toRedshiftSpace()
-        for g in self.gridnames:
-            self._computeHI(g+'rs')
-        self.outfile.close()
-        return
-    
-    
-    def _computeHI(self, gridname):
-        
-        self.grid = Chunk(gridname, self.resolution, self.chunk)
-        self.grid.in_rss = self.in_rss
+        self.loadpath = snappath%(chunk)
         
         if self.v:
-            self.grid.print()
-        
-        # place particles into grid
-        self.grid.CICW(self.pos, self.header['BoxSize'], self.mass)
-
-        # save them to file
-        self.saveData()
+            print("finished constructor for %s, chunknum = %d"%(self.fieldname,chunk))
         return
     
+
+    def computeGrids(self, outfile):
+        pos, vel, mass = self._loadSnapshotData()
+        in_rss = False
+
+        ############# HELPER METHOD ##################################
+        def computeHI(gridname):
+        
+            grid = Chunk(gridname, self.resolution, self.chunk)
+            grid.in_rss = in_rss
+            
+            if self.v:
+                self.grid.print()
+            
+            # place particles into grid
+            self.grid.CICW(pos, self.header['BoxSize'], mass)
+
+            # save them to file
+            self.saveData(outfile, grid)
+            return
+        for g in self.gridnames:
+            computeHI(g)
+        
+        pos = self._toRedshiftSpace(pos, vel)
+        in_rss = True
+        for g in self.gridnames:
+            computeHI(g)
+        return
+    
+    
     def _loadSnapshotData(self):
-        self.pos, self.mass = vnhi(self.loadsnap, self.TREECOOL)
-        self._convertPos()
-        self._convertMass()
-        snap = hp.File(self.loadsnap, 'r')
-        self.vel = snap['PartType0']['Velocities']
+        pos, mass = vnhi(self.loadpath, self.TREECOOL)
+        pos = self._convertPos(pos)
+        mass = self._convertMass(mass)
+        snap = hp.File(self.loadpath, 'r')
+        vel = snap['PartType0']['Velocities']
         snap.close()
-        self._convertVel()
+        vel = self._convertVel(vel)
         return
     # these have to be redefined since Paco uses solar/h for mass and
     # cMpc for position
     def _convertPos(self, pos=None):
-        if pos is None:
-            self.pos *= self.header['Time']
-            return
-        else:
-            pos *= self.header['Time']
-            return pos
+ 
+        pos *= self.header['Time']
+        return pos
     
     def _convertMass(self, mass=None):
-        if mass is None:
-            self.mass *= 1/self.header['HubbleParam']
-            return
-        else:
-            mass *= 1/self.header['HubbleParam']
-            return mass
+        mass *= 1/self.header['HubbleParam']
+        return mass

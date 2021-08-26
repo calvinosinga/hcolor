@@ -1,4 +1,5 @@
 
+from hicc_library.fields.ptl import ptl
 from hicc_library.fields.galaxy import galaxy, galaxy_dust
 import sys
 import os
@@ -32,27 +33,50 @@ if gd['verbose']:
 
 if CHUNK == -1:
     outfilepath = gd['grids']+gd[FIELDNAME]
+    pickle_path = gd['results']+gd[FIELDNAME]+'.pkl'
 else:
     outfilepath = gd['grids']+gd[FIELDNAME]%CHUNK
+    pickle_path = gd['results']+gd[FIELDNAME]%CHUNK+'.pkl'
 
-pickle_path = outfilepath+'.pkl'
-gd['pickle_path'] = pickle_path # this doesn't go in gd permanantly
+outfile = hp.File(outfilepath, 'w')
 #####################################
 if FIELDNAME == 'hiptlgrid':
-    field = hiptl(gd, SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, outfilepath)
+    field = hiptl(gd, SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, pickle_path,
+            gd['verbose'], gd['snapshot'], gd['hih2ptl'])
 elif FIELDNAME == 'hisubhalogrid':
-    field = hisubhalo(gd, SIMNAME, SNAPSHOT, AXIS, RESOLUTION, outfilepath)
+    field = hisubhalo(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, pickle_path, 
+            gd['verbose'], gd[SIMNAME], gd['hih2catsh'])
+    if not gd['hisubhalo_use_cicw']:
+        field.useCIC()
 elif FIELDNAME == 'galaxygrid':
-    field = galaxy(gd, SIMNAME, SNAPSHOT, AXIS, RESOLUTION, outfilepath)
+    field = galaxy(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, pickle_path, 
+            gd['verbose'], gd[SIMNAME])
+    if not gd['galaxy_use_cicw']:
+        field.useCIC()
+    if not gd['galaxy_use_stmass']:
+        field.useAllMass()
+    field.useResolution(gd['galaxy_use_res'])
 elif FIELDNAME == 'galaxy_dustgrid':
-    field = galaxy_dust(gd, SIMNAME, SNAPSHOT, AXIS, RESOLUTION, outfilepath)
+    field = galaxy_dust(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, pickle_path, 
+            gd['verbose'], gd[SIMNAME], gd['dust'])
+    if not gd['galaxy_dust_use_cicw']:
+        field.useCIC()
+    if not gd['galaxy_dust_use_stmass']:
+        field.useAllMass()
+    field.useResolution(gd['galaxy_dust_use_res'])
 elif FIELDNAME == 'vngrid':
-    field = vn(gd, SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, outfilepath)
+    field = vn(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, pickle_path,
+            gd['verbose'], gd['snapshot'], gd['TREECOOL'])
+elif FIELDNAME == 'ptlgrid':
+    field = ptl(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, pickle_path,
+            gd['verbose'], gd['snapshot'])
 elif FIELDNAME == 'galaxy_ptlgrid':
     field = galaxy_ptl(gd, SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, outfilepath)
 else:
     raise NotImplementedError("there is no field named %s"%FIELDNAME)
 
-field.computeGrids()
+field.loadHeader(gd['load_header'])
+field.computeGrids(outfile)
 field.computeAux()
 pickle.dump(field, open(pickle_path, 'wb'), pickle.HIGHEST_PROTOCOL)
+outfile.close()
