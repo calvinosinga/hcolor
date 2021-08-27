@@ -63,23 +63,23 @@ class galaxy(Field):
             mn = -0.068*photo['rz']+0.457
             mx = 0.112*photo['rz']+1.901
 
-            return photo['gr'] > mn & photo['gr'] < mx
+            return (photo['gr'] > mn) & (photo['gr'] < mx)
         
         def rz_elg():
             mn = 0.218*photo['gr'] + 0.571
             mx = -0.555*photo['gr']+1.901
 
-            return photo['rz'] > mn & photo['rz'] < mx
+            return (photo['rz'] > mn) & (photo['rz'] < mx)
         
         ##############################################################
 
 
-        resolved = np.ones_like(stmass)
+        resolved = np.ones_like(stmass, dtype=bool)
 
         for r in res_dict:
             if r == 'stmass':
                 t = res_dict[r]
-                stmass_resolved = stmass > t[0] & stmass < t[1]
+                stmass_resolved = (stmass > t[0]) & (stmass < t[1])
                 resolved *= stmass_resolved
             else:
                 t = res_dict[r]
@@ -88,7 +88,7 @@ class galaxy(Field):
                 elif t == 'rz_elg':
                     photo_resolved = rz_elg()
                 else:
-                    photo_resolved = photo[r] > t[0] & photo[r] < t[1]
+                    photo_resolved = (photo[r] > t[0]) & (photo[r] < t[1])
                 resolved *= photo_resolved
         
         return resolved
@@ -223,7 +223,7 @@ class galaxy(Field):
             
             for g in self.gridnames:     
                 mask = mask_dict[g]           
-                grid = computeGal(pos[mask], mass[mask], g+'_'+col)
+                grid = computeGal(pos[mask, :], mass[mask], g+'_'+col)
                 self.saveData(col, outfile, grid)
                 del grid
 

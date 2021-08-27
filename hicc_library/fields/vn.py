@@ -58,10 +58,10 @@ class vn(Field):
         pos = self._convertPos(pos)
         mass = self._convertMass(mass)
         snap = hp.File(self.loadpath, 'r')
-        vel = snap['PartType0']['Velocities']
+        vel = snap['PartType0']['Velocities'][:]
         snap.close()
         vel = self._convertVel(vel)
-        return
+        return pos, vel, mass
     # these have to be redefined since Paco uses solar/h for mass and
     # cMpc for position
     def _convertPos(self, pos=None):

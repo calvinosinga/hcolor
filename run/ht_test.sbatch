@@ -4,7 +4,7 @@
 #SBATCH --job-name=ht_test
 #SBATCH --time=10:00:00
 #SBATCH --ntasks=1
-#SBATCH --mem-per-cpu=60000
+#SBATCH --mem-per-cpu=120000
 #SBATCH --account=astronomy
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=cosinga@umd.edu

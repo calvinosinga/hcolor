@@ -34,12 +34,12 @@ class hiptl(Field):
 
 
         ############ HELPER FUNCTION ############################################
-        def computeHI(gridname):
+        def computeHI(gridname, mass):
             grid = Chunk(gridname, self.resolution, self.chunk)
             grid.in_rss = in_rss
             
             if self.v:
-                self.grid.print()
+                grid.print()
 
             # getting data from hih2 files
             neutfrac = hih2file['PartType0']['f_neutral_H'][:]
@@ -54,7 +54,7 @@ class hiptl(Field):
                     np.zeros(mass.shape, dtype=np.float32))
 
             # place particles into grid
-            self.grid.CICW(pos, self.header['BoxSize'], mass)
+            grid.CICW(pos, self.header['BoxSize'], mass)
 
             # save them to file
             self.saveData(outfile, grid)
@@ -63,13 +63,13 @@ class hiptl(Field):
         #############################################################################
 
         for g in self.gridnames:
-            computeHI(g)
+            computeHI(g, mass)
         
         pos = self._toRedshiftSpace(pos, vel)
         in_rss = True
         
         for g in self.gridnames:
-            computeHI(g)
+            computeHI(g, mass)
         hih2file.close()
         return
     
