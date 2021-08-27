@@ -27,6 +27,7 @@ class hiptl(Field):
         return ['GD14', 'GK11', 'S14', 'K13']
     
     def computeGrids(self, outfile):
+        super().computeGrids(outfile)
         hih2file = hp.File(self.hih2filepath, 'r')
         pos, vel, mass = self._loadSnapshotData()
         in_rss = False

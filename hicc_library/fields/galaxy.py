@@ -141,8 +141,8 @@ class galaxy(Field):
         # trying it with a straight gr cut as well
         galaxy_red_definition['straight'] = {'b':0.55, 'm':0, 'mb':0}
 
-        galaxy_red_definition['eBOSS_ELG'] = False
-        galaxy_red_definition['eBOSS_LRG'] = True
+        # galaxy_red_definition['eBOSS_ELG'] = False
+        # galaxy_red_definition['eBOSS_LRG'] = True
         return galaxy_red_definition
     
     def useAllMass(self):
@@ -200,7 +200,7 @@ class galaxy(Field):
             return grid
         ###########################################################################
 
-        super().computeGrids(self, outfile)
+        super().computeGrids(outfile)
         fields = ['SubhaloStellarPhotometrics','SubhaloPos','SubhaloMassType',
                 'SubhaloVel']
                 

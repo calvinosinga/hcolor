@@ -35,7 +35,7 @@ def getKeys():
 def setChunk(dataset):
     att = dict(dataset.attrs)
     ch = Chunk(att.pop('gridname'), att.pop('resolution'), att.pop('chunks'), 
-            dataset[:], att.pop("combine"), att.pop("cicw_runtime"))
+            dataset[:], att.pop("combine"), att.pop("mas_runtime"))
     return ch, att
 
 keylist = getKeys()

@@ -40,7 +40,7 @@ pickle_path = gd['results']+gd[FIELDNAME]+'.pkl'
 outfile = hp.File(outfilepath, 'w')
 #####################################
 if FIELDNAME == 'hiptlgrid':
-    field = hiptl(gd, SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, pickle_path,
+    field = hiptl(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, pickle_path,
             gd['verbose'], gd['snapshot'], gd['hih2ptl'])
 elif FIELDNAME == 'hisubhalogrid':
     field = hisubhalo(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, pickle_path, 

@@ -27,7 +27,7 @@ class vn(Field):
     def computeGrids(self, outfile):
         pos, vel, mass = self._loadSnapshotData()
         in_rss = False
-
+        super().computeGrids(outfile)
         ############# HELPER METHOD ##################################
         def computeHI(gridname):
         

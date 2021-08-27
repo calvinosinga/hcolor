@@ -57,7 +57,7 @@ gd['auto_result'] = HCOLOR+'run/auto.py'
 gd['cross_result'] = HCOLOR+'run/cross.py'
 gd['runnames'] = RUNNAMES
 gd['hih2catsh'] = gd['post']+'hih2_galaxy_%03d_.hdf5'%SNAPSHOT
-
+gd['TREECOOL'] = gd[SIMNAME]+'TREECOOL_fg_dec11'
 # prompting user for other needed input
 isptl = {}
 for r in RUNNAMES:

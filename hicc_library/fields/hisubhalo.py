@@ -57,7 +57,7 @@ class hisubhalo(Field):
         return
     
     def computeGrids(self, outfile):
-        super().computeGrids(self, outfile)
+        super().computeGrids(outfile)
 
         if self.v:
             print("now computing the grids for hisubhalo...")
