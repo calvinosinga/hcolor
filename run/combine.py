@@ -31,7 +31,10 @@ if gd['verbose']:
 def getKeys():
     f = hp.File(infiles[0],'r')
     klist = list(f.keys())
-    klist.remove('pickle')
+    try:
+        klist.remove('pickle')
+    except ValueError:
+        pass
     return klist
 
 
