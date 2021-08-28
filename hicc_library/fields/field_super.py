@@ -240,8 +240,8 @@ class Cross():
         keylist2 = self._getKeys(gf2)
         for k1 in keylist1:
             for k2 in keylist2:
-                grid1 = Grid.loadGrid(self.gf1[k1])
-                grid2 = Grid.loadGrid(self.gf2[k2])
+                grid1 = Grid.loadGrid(gf1[k1])
+                grid2 = Grid.loadGrid(gf2[k2])
                 self._xxi(grid1, grid2)
         return
     
