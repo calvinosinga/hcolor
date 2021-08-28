@@ -301,8 +301,8 @@ class galaxy_dust(galaxy):
         return pos, vel, mass, photo_dict
         
 
-    def saveData(self, color_def):
-        dat = super().saveData(color_def)
+    def saveData(self, outfile, grid, color_def):
+        dat = super().saveData(outfile, grid, color_def)
         dct = dat.attrs
         dct['used_dust'] = True
         return dat
