@@ -32,7 +32,7 @@ def getKeys():
     f = hp.File(infiles[0],'r')
     klist = list(f.keys())
     klist.remove('pickle')
-    return
+    return klist
 
 
 keylist = getKeys()
