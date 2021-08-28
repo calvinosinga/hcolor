@@ -218,7 +218,7 @@ class Cross():
             if not self.saved_xk:
                 self.addXpk('k',xpk.k3D)
                 self.saved_xk = True
-            self.addXpk(kname, xpk.Xpk[:,0,0])
+            self.addXpk(kname, xpk.XPk[:,0,0])
 
             if grid1.in_rss and grid2.in_rss:
                 if not self.saved_xk2D:
@@ -252,7 +252,7 @@ class Cross():
                     self._toOverdensity(grid2.getGrid()))
             xxi = XXi(arrs[0], arrs[1], self.box, self.axis, MAS=['CIC','CIC'])
             if not self.saved_xr:
-                self.addXpk('r',xxi.r3D)
+                self.addXxi('r',xxi.r3D)
                 self.saved_xr = True
             self.addXxi(kname, xxi.xi[:,0])
 
