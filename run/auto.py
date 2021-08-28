@@ -13,7 +13,7 @@ import h5py as hp
 gd = pickle.load(open(os.getenv('GDFILE'),'rb'))
 
 INGRIDKEY = sys.argv[1]
-PLOTDIRKEY = sys.argv[3]
+PLOTDIRKEY = sys.argv[2]
 
 if gd['verbose']:
     print("auto.py called, given the command-line arguments" + str(sys.argv))
