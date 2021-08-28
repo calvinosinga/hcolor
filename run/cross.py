@@ -28,7 +28,7 @@ keylists = []
 gridfiles = []
 for g in (INGRIDPATH1, INGRIDPATH2):
     gridfile = hp.File(g, 'r')
-    pkl_paths = gridfile['pickle'].attrs['path']
+    pkl_paths.append(gridfile['pickle'].attrs['path'])
     keylists.append(list(gridfile.keys()))
     gridfiles.append(gridfile)
 

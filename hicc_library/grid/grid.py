@@ -22,6 +22,7 @@ class Grid():
         self.gridname = gridname
         self.ignore = False
         self.resolution = res
+        self.mas_runtime = 0
         return
     
     def print(self):       
@@ -142,7 +143,7 @@ class Chunk(Grid):
     def __init__(self, gridname, res, chunk_num, grid=None):
         super().__init__(gridname, res, grid)
         self.combine = 1
-        self.cicw_runtime = 0
+        self.mas_runtime = 0
         self.chunk_nums = [chunk_num]
         return
     
@@ -156,10 +157,14 @@ class Chunk(Grid):
         return dat
         
     def combineChunks(self, other_chunk):
+        print("self chunk:")
+        self.print()
+        print("other chunk:")
+        other_chunk.print()
         self.grid += other_chunk.getGrid()
         self.combine += 1
-        self.chunk_nums.extend(other_chunk.chunk_nums)
-        self.cicw_runtime += other_chunk.cicw_runtime
+        self.chunk_nums.extend(list(other_chunk.chunk_nums))
+        self.mas_runtime += other_chunk.mas_runtime
         return
 
     @classmethod
@@ -171,5 +176,5 @@ class Chunk(Grid):
         grid.is_computed = True
         grid.mas_runtime = dct['mas_runtime']
         grid.combine = dct['combine']
-        grid.chunk_nums = dct['chunks']
+        grid.chunk_nums = list(dct['chunks'])
         return grid
