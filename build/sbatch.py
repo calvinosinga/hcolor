@@ -178,12 +178,10 @@ class Sbatch():
     def _makeAutoResultsSbatch(self, varnames, sbatches, dependencies, savefiles):
         auto_sbatch_file = "%s_auto.sbatch"%self.fieldname
         auto_var_name = "%s_auto"%self.fieldname
-        auto_savefile = self._get_base_name("%s_auto"%self.fieldname) + '.hdf5'
 
         dependencies[auto_var_name] = [varnames[-1]]
         sbatches.append(auto_sbatch_file)
         varnames.append(auto_var_name)
-        savefiles[auto_var_name] = auto_savefile
  
 
         resjob = open(self.sbatch_path + auto_sbatch_file, 'w')
@@ -192,7 +190,7 @@ class Sbatch():
         resdir['mem-per-cpu'] = self._compute_pk_memory()
         self._sbatch_lines(resjob, resdir)
 
-        cmd_args = [self.auto_results_path, dependencies[auto_var_name][0], auto_var_name, self.plots_key]
+        cmd_args = [self.auto_results_path, dependencies[auto_var_name][0], self.plots_key]
         self._write_python_line(resjob, cmd_args)
 
         resjob.close()

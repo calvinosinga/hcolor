@@ -13,14 +13,12 @@ import h5py as hp
 gd = pickle.load(open(os.getenv('GDFILE'),'rb'))
 
 INGRIDKEY = sys.argv[1]
-OUTFILEKEY = sys.argv[2]
 PLOTDIRKEY = sys.argv[3]
 
 if gd['verbose']:
     print("auto.py called, given the command-line arguments" + str(sys.argv))
 
 INGRIDPATH = gd['grids'] + gd[INGRIDKEY]
-OUTFILEPATH = gd['results']+ gd[OUTFILEKEY]
 PLOTDIR = gd[PLOTDIRKEY]
 
 gridfile = hp.File(INGRIDPATH, 'r')
@@ -29,7 +27,7 @@ field = pickle.load(open(pkl_path, 'rb'))
 
 if gd['verbose']:
     print('The ingrid path:%s'%INGRIDPATH)
-    print('The outfile path:%s'%OUTFILEPATH)
+    print('The outfile path:%s'%pkl_path)
     print('The plots path:%s'%PLOTDIR)
 
 klist = list(gridfile.keys())
@@ -40,5 +38,5 @@ for key in klist:
     field.computeXi(grid)
     field.makeSlice(grid)
 
-pickle.dump(field, open(OUTFILEPATH, 'wb'), pickle.HIGHEST_PROTOCOL)
+pickle.dump(field, open(pkl_path, 'wb'), pickle.HIGHEST_PROTOCOL)
 gridfile.close()
