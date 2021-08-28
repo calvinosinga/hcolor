@@ -139,14 +139,11 @@ class Grid():
     
         
 class Chunk(Grid):
-    def __init__(self, gridname, res, chunk_num, grid=None, combine=1, cicw_runtime=0):
+    def __init__(self, gridname, res, chunk_num, grid=None):
         super().__init__(gridname, res, grid)
-        self.combine = combine
-        self.cicw_runtime = cicw_runtime
-        if isinstance(chunk_num, list):
-            self.chunk_nums = chunk_num
-        else:
-            self.chunk_nums = [chunk_num]
+        self.combine = 1
+        self.cicw_runtime = 0
+        self.chunk_nums = [chunk_num]
         return
     
     def isChunk(self):
@@ -164,4 +161,15 @@ class Chunk(Grid):
         self.chunk_nums.extend(other_chunk.chunk_nums)
         self.cicw_runtime += other_chunk.cicw_runtime
         return
-    
+
+    @classmethod
+    def loadGrid(cls, dataset):
+        dct = dict(dataset.attrs)
+        grid = Chunk(dct['gridname'], dct['resolution'], dataset[:])
+        grid.in_rss = dct['in_rss']
+        grid.ignore = dct['ignore']
+        grid.is_computed = True
+        grid.mas_runtime = dct['mas_runtime']
+        grid.combine = dct['combine']
+        grid.chunk_nums = dct['chunks']
+        return grid

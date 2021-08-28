@@ -194,8 +194,10 @@ class Cross():
         return
     
     def computeXpks(self):
-        for k1 in list(self.gf1.keys()):
-            for k2 in list(self.gf2.keys()):
+        keylist1 = self._getKeys(self.gf1)
+        keylist2 = self._getKeys(self.gf2)
+        for k1 in keylist1:
+            for k2 in keylist2:
                 grid1 = Grid.loadGrid(self.gf1[k1])
                 grid2 = Grid.loadGrid(self.gf2[k2])
                 self._xpk(grid1, grid2)
@@ -220,7 +222,12 @@ class Cross():
                 self.add2DXpk(kname, xpk.PkX2D[:,0])
 
         return
-    
+
+    def _getKeys(self, gfile):
+        klist = list(gfile.keys())
+        klist.remove('pickle')
+        return klist
+
     def computeXxis(self):
         for k1 in list(self.gf1.keys()):
             for k2 in list(self.gf2.keys()):

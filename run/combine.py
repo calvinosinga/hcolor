@@ -30,13 +30,10 @@ if gd['verbose']:
 
 def getKeys():
     f = hp.File(infiles[0],'r')
-    return list(f.keys())
+    klist = list(f.keys())
+    klist.remove('pickle')
+    return
 
-def setChunk(dataset):
-    att = dict(dataset.attrs)
-    ch = Chunk(att.pop('gridname'), att.pop('resolution'), att.pop('chunks'), 
-            dataset[:], att.pop("combine"), att.pop("mas_runtime"))
-    return ch, att
 
 keylist = getKeys()
 if gd['verbose']:
@@ -49,16 +46,15 @@ for k in range(len(keylist)):
     if gd['verbose']:
         print("\ncombining chunks for %s"%keylist[k])
     f1 = hp.File(infiles[0], 'r')
-    chunk1, other_attrs = setChunk(f1[keylist[k]])
+    chunk1 = Chunk.loadGrid(f1[keylist[k]])
     for i in range(1,len(infiles)):
         try:
             f2 = hp.File(infiles[i],'r')
         except OSError:
             print("did not find file %s"%infiles[i])
         else:
-            chunk2, att = setChunk(f2[keylist[k]])
+            chunk2 = Chunk.loadGrid(f2[keylist[k]])
             chunk1.combineChunks(chunk2)
     dat = chunk1.saveGrid(w)
-    dat.attrs.update(other_attrs)
 w.close()
 # TODO: delete other grids, track combine_time

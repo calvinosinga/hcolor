@@ -186,7 +186,7 @@ class galaxy(Field):
 
     def computeGrids(self, outfile):
         ########################## HELPER FUNCTION ###############################
-        def computeGal(self, pos, mass, gridname):
+        def computeGal(pos, mass, gridname):
             grid = Grid(gridname, self.resolution)
             grid.in_rss = in_rss
 
@@ -224,7 +224,7 @@ class galaxy(Field):
             for g in self.gridnames:     
                 mask = mask_dict[g]           
                 grid = computeGal(pos[mask, :], mass[mask], g+'_'+col)
-                self.saveData(col, outfile, grid)
+                self.saveData(outfile, grid, col)
                 del grid
 
         
@@ -244,7 +244,7 @@ class galaxy(Field):
             for g in self.gridnames:
                 mask = mask_dict[g]
                 grid = computeGal(pos[mask], mass[mask], g+'_'+col) # rs added in grid's save method
-                self.saveData(col, outfile, grid)
+                self.saveData(outfile, grid, col)
                 del grid
 
         return

@@ -35,14 +35,15 @@ class vn(Field):
             grid.in_rss = in_rss
             
             if self.v:
-                self.grid.print()
+                grid.print()
             
             # place particles into grid
-            self.grid.CICW(pos, self.header['BoxSize'], mass)
+            grid.CICW(pos, self.header['BoxSize'], mass)
 
             # save them to file
             self.saveData(outfile, grid)
             return
+
         for g in self.gridnames:
             computeHI(g)
         
