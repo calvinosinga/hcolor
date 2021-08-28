@@ -176,11 +176,11 @@ class Field():
 
 from hicc_library.grid.grid import Grid
 class Cross():
-    def __init__(self, field1, field2, gridfile1, gridfile2):
+    def __init__(self, field1, field2, gridfilepath1, gridfilepath2):
         self.field1 = field1
         self.field2 = field2
-        self.gf1 = gridfile1
-        self.gf2 = gridfile2
+        self.gfpath1 = gridfilepath1
+        self.gfpath2 = gridfilepath2
 
         self.saved_xk = False
         self.saved_xr = False
@@ -193,13 +193,19 @@ class Cross():
         self.axis = self.field2.axis
         return
     
+    def _loadHdf5(self):
+        gf1 = hp.File(self.gfpath1, 'r')
+        gf2 = hp.File(self.gfpath2, 'r')
+        return gf1, gf2
+    
     def computeXpks(self):
-        keylist1 = self._getKeys(self.gf1)
-        keylist2 = self._getKeys(self.gf2)
+        gf1, gf2 = self._loadHdf5()
+        keylist1 = self._getKeys(gf1)
+        keylist2 = self._getKeys(gf2)
         for k1 in keylist1:
             for k2 in keylist2:
-                grid1 = Grid.loadGrid(self.gf1[k1])
-                grid2 = Grid.loadGrid(self.gf2[k2])
+                grid1 = Grid.loadGrid(gf1[k1])
+                grid2 = Grid.loadGrid(gf2[k2])
                 self._xpk(grid1, grid2)
         return
     
@@ -229,8 +235,11 @@ class Cross():
         return klist
 
     def computeXxis(self):
-        for k1 in list(self.gf1.keys()):
-            for k2 in list(self.gf2.keys()):
+        gf1, gf2 = self._loadHdf5()
+        keylist1 = self._getKeys(gf1)
+        keylist2 = self._getKeys(gf2)
+        for k1 in keylist1:
+            for k2 in keylist2:
                 grid1 = Grid.loadGrid(self.gf1[k1])
                 grid2 = Grid.loadGrid(self.gf2[k2])
                 self._xxi(grid1, grid2)

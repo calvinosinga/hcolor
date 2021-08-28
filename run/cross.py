@@ -24,13 +24,11 @@ OUTFILEPATH = gd['results'] + gd[OUTFILEKEY]
 PLOTDIR = gd['plots'] + gd[PLOTDIRKEY]
 
 pkl_paths = []
-keylists = []
-gridfiles = []
+gridpaths = []
 for g in (INGRIDPATH1, INGRIDPATH2):
     gridfile = hp.File(g, 'r')
     pkl_paths.append(gridfile['pickle'].attrs['path'])
-    keylists.append(list(gridfile.keys()))
-    gridfiles.append(gridfile)
+    gridpaths.append(g)
 
 field1 = pickle.load(open(pkl_paths[0], 'rb'))
 field2 = pickle.load(open(pkl_paths[1], 'rb'))
@@ -42,9 +40,6 @@ if gd['verbose']:
     print('The outfile path:%s'%OUTFILEPATH)
     print('The plots path:%s'%PLOTDIR)
 
-res = Cross(field1, field2, gridfiles[0], gridfiles[1])
+res = Cross(field1, field2, gridpaths[0], gridpaths[1])
 
 pickle.dump(res, open(OUTFILEPATH, 'wb'), pickle.HIGHEST_PROTOCOL)
-
-for i in gridfiles:
-    i.close()
