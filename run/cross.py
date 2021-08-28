@@ -41,5 +41,6 @@ if gd['verbose']:
     print('The plots path:%s'%PLOTDIR)
 
 res = Cross(field1, field2, gridpaths[0], gridpaths[1])
-
+res.computeXpks()
+res.computeXxis()
 pickle.dump(res, open(OUTFILEPATH, 'wb'), pickle.HIGHEST_PROTOCOL)

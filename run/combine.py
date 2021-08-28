@@ -37,6 +37,12 @@ def getKeys():
         pass
     return klist
 
+def addPickle(w):
+    f=hp.File(infiles[0],'r')
+    dat = w.create_dataset('pickle', data=[0])
+    dat.attrs['path'] = f['pickle'].attrs['path']
+    return
+
 
 keylist = getKeys()
 if gd['verbose']:
@@ -44,7 +50,7 @@ if gd['verbose']:
     print(keylist)
 
 w = hp.File(outpath, 'w')
-
+addPickle(w)
 for k in range(len(keylist)):
     if gd['verbose']:
         print("\ncombining chunks for %s"%keylist[k])
@@ -60,4 +66,7 @@ for k in range(len(keylist)):
             chunk1.combineChunks(chunk2)
     dat = chunk1.saveGrid(w)
 w.close()
-# TODO: delete other grids, track combine_time
+
+for i in infiles:
+    if os.path.exists(i):
+        os.remove(i)
