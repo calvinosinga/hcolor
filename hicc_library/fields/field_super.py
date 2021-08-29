@@ -250,7 +250,7 @@ class Cross():
             kname = '%sX%s'%(grid1.gridname, grid2.gridname)
             arrs = (self._toOverdensity(grid1.getGrid()), 
                     self._toOverdensity(grid2.getGrid()))
-            xxi = XXi(arrs[0], arrs[1], self.box, self.axis, MAS=['CIC','CIC'])
+            xxi = XXi(arrs[0], arrs[1], self.box, MAS=['CIC','CIC'], axis=self.axis)
             if not self.saved_xr:
                 self.addXxi('r',xxi.r3D)
                 self.saved_xr = True
