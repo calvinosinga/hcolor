@@ -14,7 +14,7 @@ class ptl(Field):
         super().__init__(simname, snapshot, axis, resolution, pkl_path, verbose)
         self.fieldname = 'ptl'
         self.chunk = chunk
-        self.gridnames = ['ptl']
+        self.gridnames = ['stmass', 'dm', 'ptl']
         
         self.loadpath = snappath%(chunk)
         
@@ -24,11 +24,11 @@ class ptl(Field):
     
 
     def computeGrids(self, outfile):
-        pos, vel, mass = self._loadSnapshotData()
+        pos, vel, mass, slices = self._loadSnapshotData()
         in_rss = False
         super().computeGrids(outfile)
         ############# HELPER METHOD ##################################
-        def computePtl(gridname):
+        def computePtl(gridname, slc):
         
             grid = Chunk(gridname, self.resolution, self.chunk, verbose=self.v)
             grid.in_rss = in_rss
@@ -37,14 +37,20 @@ class ptl(Field):
                 grid.print()
             
             # place particles into grid
-            grid.CICW(pos, self.header['BoxSize'], mass)
+            grid.CICW(pos[slc, :], self.header['BoxSize'], mass[slc, :])
 
             # save them to file
             self.saveData(outfile, grid)
             return
         
         for g in self.gridnames:
-            computePtl(g)
+            if g == 'stmass':
+                slc = slices[2]
+            elif g == 'dm':
+                slc = slices[1]
+            else:
+                slc = slice(None)
+            computePtl(g, slc)
         
         pos = self._toRedshiftSpace(pos, vel)
         in_rss = True
@@ -66,7 +72,9 @@ class ptl(Field):
         vel = np.zeros((totptl, 3), dtype=np.float32)
         mass = np.zeros((totptl), dtype=np.float32)
         idx = 0
+        slices = []
         for p in ptltypes:
+            slices.append(slice(idx, idx + nptl[p]))
             pos[idx:idx+nptl[p]] = snap['PartType%d'%p]['Coordinates'][:]
             vel[idx:idx+nptl[p]] = snap['PartType%d'%p]['Velocities'][:]
             if p == 1:
@@ -76,5 +84,5 @@ class ptl(Field):
         pos = self._convertPos(pos)
         mass = self._convertMass(mass)
         vel = self._convertVel(vel)
-        return pos, vel, mass
+        return pos, vel, mass, slices
 

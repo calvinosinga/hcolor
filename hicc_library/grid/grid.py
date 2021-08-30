@@ -189,7 +189,7 @@ class Chunk(Grid):
     @classmethod
     def loadGrid(cls, dataset, verbose=False):
         dct = dict(dataset.attrs)
-        grid = Chunk(dct['gridname'], dct['resolution'], dataset[:], verbose=verbose)
+        grid = Chunk(dct['gridname'], dct['resolution'], 0, dataset[:], verbose=verbose)
         grid.in_rss = dct['in_rss']
         grid.ignore = dct['ignore']
         grid.is_computed = True

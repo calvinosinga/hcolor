@@ -250,7 +250,8 @@ class galaxy(Field):
         return
     
     def computeAux(self):
-        return super().computeAux()
+        
+        return
     
     def saveData(self, outfile, grid, color_def):
         dat = super().saveData(outfile, grid)
