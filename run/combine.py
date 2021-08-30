@@ -35,12 +35,14 @@ def getKeys():
         klist.remove('pickle')
     except ValueError:
         pass
+    f.close()
     return klist
 
 def addPickle(w):
     f=hp.File(infiles[0],'r')
     dat = w.create_dataset('pickle', data=[0])
     dat.attrs['path'] = f['pickle'].attrs['path']
+    f.close()
     return
 
 
@@ -54,15 +56,25 @@ addPickle(w)
 for k in range(len(keylist)):
     if gd['verbose']:
         print("\ncombining chunks for %s"%keylist[k])
+    
     f1 = hp.File(infiles[0], 'r')
-    chunk1 = Chunk.loadGrid(f1[keylist[k]])
+    chunk1 = Chunk.loadGrid(f1[keylist[k]], gd['verbose'])
+
+    if gd['verbose']:
+        print("first chunk loaded, has properties")
+        chunk1.print()
+    
     for i in range(1,len(infiles)):
         try:
             f2 = hp.File(infiles[i],'r')
         except OSError:
             print("did not find file %s"%infiles[i])
         else:
-            chunk2 = Chunk.loadGrid(f2[keylist[k]])
+            chunk2 = Chunk.loadGrid(f2[keylist[k]], gd['verbose'])
+
+            if gd['verbose']:
+                print("loaded next chunk:")
+                chunk2.print()
             chunk1.combineChunks(chunk2)
     dat = chunk1.saveGrid(w)
 w.close()

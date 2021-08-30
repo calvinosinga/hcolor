@@ -2,3 +2,4 @@
 output/*
 *.dat
 *.pyc
+*__pycache__*

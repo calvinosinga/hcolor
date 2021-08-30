@@ -39,6 +39,7 @@ class Field():
             print("the snapshot: %d"%self.snapshot)
             print("the axis: %d"%self.axis)
             print("the resolution: %d"%self.resolution)
+            print("the pickle path: %s"%self.pkl_path)
         
         self.header = None # dictionary that stores basic sim info
         
@@ -59,13 +60,21 @@ class Field():
             self.header[p] = temp[p]
         self.header['BoxSize'] = self._convertPos(self.header['BoxSize'])
         self.header['MassTable'] = self._convertMass(self.header['MassTable'])
+
+        if self.v:
+            print("finished loading header...")
+            print(self.header)
         return
     
     def computeGrids(self, outfile):
+        if self.v:
+            print("starting to compute grids...")
         if self.header is None:
             raise ValueError("header needs to be loaded before computing grids")
         dat = outfile.create_dataset('pickle', data=[0])
         dat.attrs['path'] = self.pkl_path
+        if self.v:
+            print("the saved pickle path: %s"%self.pkl_path)
         return
     
     def computeAux(self):
@@ -132,7 +141,7 @@ class Field():
         return il.groupcat.loadSubhalos(simpath, self.snapshot, fields=fields)
     
     def _toRedshiftSpace(self, pos, vel):
-        boxsize = self.header["BoxSize"]
+        boxsize = self.header["BoxSize"] # Mpc/h
         hubble = self.header["HubbleParam"]*100 # defined using big H
         redshift = self.header['Redshift']
 
@@ -154,7 +163,7 @@ class Field():
     
     def _convertPos(self, pos=None):
         """
-        Converts position units from ckpc/h to Mpc
+        Converts position units from ckpc/h to Mpc/h
         """
         pos *= self.header["Time"]/1e3
         return pos
@@ -189,6 +198,7 @@ class Cross():
         self.xxis = {}
         self.tdxpks = {}
 
+        self.v = field1.v
         self.box = self.field1.header['BoxSize']
         self.axis = self.field2.axis
         return
@@ -199,6 +209,8 @@ class Cross():
         return gf1, gf2
     
     def computeXpks(self):
+        if self.v:
+            print("starting process of computing xpks...")
         gf1, gf2 = self._loadHdf5()
         keylist1 = self._getKeys(gf1)
         keylist2 = self._getKeys(gf2)
@@ -207,11 +219,18 @@ class Cross():
                 grid1 = Grid.loadGrid(gf1[k1])
                 grid2 = Grid.loadGrid(gf2[k2])
                 self._xpk(grid1, grid2)
+        
+        if self.v:
+            print("xpks finished computing, results look like:")
+            print(self.xpks)
         return
     
     def _xpk(self, grid1, grid2):
         if not grid1.ignore and not grid2.ignore and grid1.in_rss == grid2.in_rss:
+
             kname = '%sX%s'%(grid1.gridname, grid2.gridname)
+            if self.v:
+                print("computing xpk for %s"%kname)
             arrs = (self._toOverdensity(grid1.getGrid()), 
                     self._toOverdensity(grid2.getGrid()))
             xpk = XPk(arrs, self.box, self.axis, MAS=['CIC','CIC'])
@@ -235,6 +254,8 @@ class Cross():
         return klist
 
     def computeXxis(self):
+        if self.v:
+            print("starting process of computing x-corrs...")
         gf1, gf2 = self._loadHdf5()
         keylist1 = self._getKeys(gf1)
         keylist2 = self._getKeys(gf2)
@@ -243,11 +264,18 @@ class Cross():
                 grid1 = Grid.loadGrid(gf1[k1])
                 grid2 = Grid.loadGrid(gf2[k2])
                 self._xxi(grid1, grid2)
+        if self.v:
+            print("x-corrs finished computing, results look like:")
+            print(self.xxis)
         return
     
     def _xxi(self, grid1, grid2):
         if not grid1.ignore and not grid2.ignore and grid1.in_rss == grid2.in_rss:
             kname = '%sX%s'%(grid1.gridname, grid2.gridname)
+
+            if self.v:
+                print("computing xpk for %s"%kname)
+            
             arrs = (self._toOverdensity(grid1.getGrid()), 
                     self._toOverdensity(grid2.getGrid()))
             xxi = XXi(arrs[0], arrs[1], self.box, MAS=['CIC','CIC'], axis=self.axis)

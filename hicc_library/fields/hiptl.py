@@ -35,7 +35,7 @@ class hiptl(Field):
 
         ############ HELPER FUNCTION ############################################
         def computeHI(gridname, mass):
-            grid = Chunk(gridname, self.resolution, self.chunk)
+            grid = Chunk(gridname, self.resolution, self.chunk, verbose=self.v)
             grid.in_rss = in_rss
             
             if self.v:

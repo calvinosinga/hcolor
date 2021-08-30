@@ -77,7 +77,7 @@ class hisubhalo(Field):
         in_rss = False
         ############### HELPER METHOD ###############################
         def computeHI(gridname):
-            grid = Grid(gridname, self.resolution)
+            grid = Grid(gridname, self.resolution, verbose=self.v)
             grid.in_rss = in_rss
             mass = hih2file[gridname][:] #already in solar masses
             if self.use_cicw:

@@ -30,7 +30,7 @@ class ptl(Field):
         ############# HELPER METHOD ##################################
         def computePtl(gridname):
         
-            grid = Chunk(gridname, self.resolution, self.chunk)
+            grid = Chunk(gridname, self.resolution, self.chunk, verbose=self.v)
             grid.in_rss = in_rss
             
             if self.v:

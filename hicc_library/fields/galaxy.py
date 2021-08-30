@@ -187,7 +187,7 @@ class galaxy(Field):
     def computeGrids(self, outfile):
         ########################## HELPER FUNCTION ###############################
         def computeGal(pos, mass, gridname):
-            grid = Grid(gridname, self.resolution)
+            grid = Grid(gridname, self.resolution, verbose=self.v)
             grid.in_rss = in_rss
 
             if self.use_cicw:
