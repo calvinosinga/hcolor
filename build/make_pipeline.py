@@ -20,7 +20,7 @@ sys.argv.pop(0) # removing unneeded script name
 RUNNAMES = sys.argv
 
 VERBOSE = int(input("how verbose should the logs be? (0 for limited, 1 for detailed)"))
-implemented_fields = ['hiptl', 'hisubhalo', 'galaxy', 'galaxy_dust', 'vn', 'galaxy_ptl']
+implemented_fields = ['hiptl', 'hisubhalo', 'galaxy', 'galaxy_dust', 'vn', 'galaxy_ptl', 'ptl']
 HI_fields = ['hiptl', 'hisubhalo', 'vn']
 matter_fields = ['galaxy','galaxy_dust', 'galaxy_ptl']
 
@@ -55,18 +55,19 @@ gd['dust'] = gd['post']+'stellar_light/'+ \
         'Subhalo_StellarPhot_p07c_cf00dust_res_conv_ns1_rad30pkpc_%03d.hdf5'%SNAPSHOT
 gd['auto_result'] = HCOLOR+'run/auto.py'
 gd['cross_result'] = HCOLOR+'run/cross.py'
-gd['runnames'] = RUNNAMES
 gd['hih2catsh'] = gd['post']+'hih2_galaxy_%03d.hdf5'%SNAPSHOT
 gd['TREECOOL'] = gd[SIMNAME]+'TREECOOL_fg_dec11'
 # prompting user for other needed input
 isptl = {}
+constr = {}
 for r in RUNNAMES:
+    constr[r] = input("which constructor does %s use? Implemented: "%r + str(implemented_fields))
     usrval = int(input("does %s use the particle catalog? (1=yes,0=no)"%r))
     if not usrval in (0,1):
         raise ValueError("invalid input, must be 1 or 0")
     isptl[r] = usrval
 
-
+gd['constructors'] = constr
 # create output directory
 if not os.path.isdir(gd['output']+'/'):
     os.mkdir(gd['output']+'/')
