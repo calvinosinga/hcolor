@@ -4,12 +4,28 @@ import matplotlib as mpl
 import matplotlib.gridspec as gspec
 import sys
 import os
+import copy
 
 # Helper method
-def fetchKeys():
-    return
+def _fetchKeys(keyword, keylist, exclude = False):
+    res = []
+    for k in keylist:
+        if keyword in k and not exclude:
+            res.append(k)
+        elif not keyword in k and exclude:
+            res.append(k)
+    return res
 
-def HI_auto_pk(fields, outdir, panel_length = 3, panel_bt = 0.1):
+def _rmKeys(keywords, keylist):
+    klist = copy.copy(keylist)
+    for word in keywords:
+        for k in klist:
+            if word in k:
+                klist.remove(k)
+    return klist
+
+
+def HI_auto_pk(fields, outpath, panel_length = 3, panel_bt = 0.1, yrange = (1, 1e4)):
     """
     Makes two HI-auto power spectra plots, for real space and redshift space.
     Each panel represents another redshift.
@@ -22,13 +38,14 @@ def HI_auto_pk(fields, outdir, panel_length = 3, panel_bt = 0.1):
     
     # get info from the fields to prepare plot
     snapshots = []
-    fields_for_panel = {} # organizes which fields go in which panel 
+    fields_for_panel = {} # organizes which fields go in which panel
     for f in fields:
         if not f.snapshot in snapshots:
             snapshots.append(f.snapshot)
             fields_for_panel[f.shapshot] = [f]
         else:
             fields_for_panel[f.snapshot].append(f)
+        
 
     # put snapshots in increasing order
     snapshots.sort()
@@ -48,19 +65,36 @@ def HI_auto_pk(fields, outdir, panel_length = 3, panel_bt = 0.1):
     # now creating panels in order of increasing redshift
     panels = []
     for i in range(npanels):
-        panels.append(fig.add_subplot(gs[i])
+        panels.append(fig.add_subplot(gs[i]))
 
     # now making each panel
     for i in range(npanels):
         plt.sca(panels[i])
         panelf = fields_for_panel[snapshots[i]]
         for pf in panelf:
+            # plotting the pk
+            keylist = list(pf.pks.keys())
             box = pf.header['BoxSize']
             if pf.fieldname == 'vn':
                 plib.plotpks(pf.pks['k'], pf.pks, box, pf.axis, pf.resolution,
-                        keylist = ['vn'], colors = ['green'])
-            else:
-                
+                        keylist = ['vn'], colors = ['green'],
+                        labels = ['V-N18'])
+            if pf.fieldname == 'hiptl':
+                pkeys = _rmKeys(['rs','k'], keylist)
+                plib.fillpks(pf.pks['k'], pf.pks, box, pf.axis, pf.resolution,
+                        keylist = pkeys, color = 'blue', label = 'D18-particle')
+            if pf.fieldname == 'hisubhalo':
+                pkeys = _rmKeys(['rs','k'], keylist)
+                plib.fillpks(pf.pks['k'], pf.pks, box, pf.axis, pf.resolution,
+                        keylist = pkeys, color = 'orange', label = 'D18-subhalo')
+            
+            # cosmetic tasks
+            if not i == 0:
+                ax = plt.gca()
+                ax.set_yticklabels([])
+                plt.ylabel('')
+            plt.ylim(yrange[0], yrange[1])                
+    plt.savefig(outpath)
     return
 
 def HI_galaxy_Xpk_methodology():

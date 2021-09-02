@@ -40,17 +40,16 @@ pickle_path = gd['results']+gd[FIELDNAME]+'.pkl'
 pickle_path.replace('%d', '')
 outfile = hp.File(outfilepath, 'w')
 
-constr = gd['constructors'][FIELDNAME]
 #####################################
-if constr == 'hiptlgrid':
+if FIELDNAME == 'hiptlgrid':
     field = hiptl(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, pickle_path,
             gd['verbose'], gd['snapshot'], gd['hih2ptl'])
-elif constr == 'hisubhalogrid':
+elif FIELDNAME == 'hisubhalogrid':
     field = hisubhalo(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, pickle_path, 
             gd['verbose'], gd[SIMNAME], gd['hih2catsh'])
     if not gd['hisubhalo_use_cicw']:
         field.useCIC()
-elif constr == 'galaxygrid':
+elif FIELDNAME == 'galaxygrid':
     field = galaxy(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, pickle_path, 
             gd['verbose'], gd[SIMNAME])
     if not gd['galaxy_use_cicw']:
@@ -58,7 +57,7 @@ elif constr == 'galaxygrid':
     if not gd['galaxy_use_stmass']:
         field.useAllMass()
     field.useResolution(gd['galaxy_use_res'])
-elif constr == 'galaxy_dustgrid':
+elif FIELDNAME == 'galaxy_dustgrid':
     field = galaxy_dust(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, pickle_path, 
             gd['verbose'], gd[SIMNAME], gd['dust'])
     if not gd['galaxy_dust_use_cicw']:
@@ -66,13 +65,13 @@ elif constr == 'galaxy_dustgrid':
     if not gd['galaxy_dust_use_stmass']:
         field.useAllMass()
     field.useResolution(gd['galaxy_dust_use_res'])
-elif constr == 'vngrid':
+elif FIELDNAME == 'vngrid':
     field = vn(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, pickle_path,
             gd['verbose'], gd['snapshot'], gd['TREECOOL'])
-elif constr == 'ptlgrid':
+elif FIELDNAME == 'ptlgrid':
     field = ptl(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, pickle_path,
             gd['verbose'], gd['snapshot'])
-elif constr == 'galaxy_ptlgrid':
+elif FIELDNAME == 'galaxy_ptlgrid':
     field = galaxy_ptl(gd, SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, outfilepath)
 else:
     raise NotImplementedError("there is no field named %s"%FIELDNAME)

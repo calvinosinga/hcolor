@@ -59,15 +59,12 @@ gd['hih2catsh'] = gd['post']+'hih2_galaxy_%03d.hdf5'%SNAPSHOT
 gd['TREECOOL'] = gd[SIMNAME]+'TREECOOL_fg_dec11'
 # prompting user for other needed input
 isptl = {}
-constr = {}
 for r in RUNNAMES:
-    constr[r] = input("which constructor does %s use? Implemented: "%r + str(implemented_fields))
     usrval = int(input("does %s use the particle catalog? (1=yes,0=no)"%r))
     if not usrval in (0,1):
         raise ValueError("invalid input, must be 1 or 0")
     isptl[r] = usrval
 
-gd['constructors'] = constr
 # create output directory
 if not os.path.isdir(gd['output']+'/'):
     os.mkdir(gd['output']+'/')
