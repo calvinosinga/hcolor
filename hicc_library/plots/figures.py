@@ -25,7 +25,8 @@ def _rmKeys(keywords, keylist):
     return klist
 
 
-def HI_auto_pk(fields, outpath, panel_length = 3, panel_bt = 0.1, yrange = (1, 1e4)):
+def HI_auto_pk(fields, outpath, panel_length = 3, panel_bt = 0.1, yrange = (1, 1e4),
+        text_space=0.1):
     """
     Makes two HI-auto power spectra plots, for real space and redshift space.
     Each panel represents another redshift.
@@ -93,9 +94,24 @@ def HI_auto_pk(fields, outpath, panel_length = 3, panel_bt = 0.1, yrange = (1, 1
                 ax = plt.gca()
                 ax.set_yticklabels([])
                 plt.ylabel('')
+                ax.get_legend().remove()
             plt.ylim(yrange[0], yrange[1])
-                
-    plt.savefig(outpath+'HI_auto_')
+        
+        # output textbox onto the plot with redshift
+        plt.text(panelf[0].pks['k'] + text_space, yrange[0] + text_space,
+                'z=%.1f'%snapshots[i], fontsize = 20, ha = 'left', va = 'bottom',
+                fontweight = 'bold', 
+
+    # save the plot
+    f = fields[0]
+    plotname = 'HI_auto_real_%sB_%03dS_%dA_%dR'%(f.simname, f.snapshot, f.axis,
+            f.resolution)
+    plt.savefig(outpath+plotname+'.png')
+    plt.clf()
+
+    # now do the same for the redshift space plot
+
+    # now split them into different panels according to methodology
     return
 
 def HI_galaxy_Xpk_methodology(fields, outpath, panel_length = 3, panel_bt = 0.1, yrange =()):
