@@ -21,13 +21,14 @@ class Grid():
         self.in_rss = False
         self.gridname = gridname
         self.ignore = False
+        self.combine = -1 # not intended for combination (see chunk)
         self.resolution = res
         self.mas_runtime = 0
         self.v = verbose
         return
     
     def print(self):       
-        print("\nprinting the properties of a grid")
+        print("printing the properties of a grid")
         not_print = ["grid"]
         for key,val in self.__dict__.items():
             if key not in not_print:
@@ -136,6 +137,7 @@ class Grid():
         dct["in_rss"] = self.in_rss
         dct["gridname"] = self.gridname
         dct["ignore"] = self.ignore
+        dct["combine"] = self.combine
         if self.is_computed:
             dct["mas_runtime"] = self.mas_runtime
         return dat
@@ -165,25 +167,24 @@ class Chunk(Grid):
     def saveGrid(self, outfile):
         dat = super().saveGrid(outfile)
         dat.attrs['chunks'] = self.chunk_nums
-        dat.attrs['combine'] = self.combine
         return dat
         
     def combineChunks(self, other_chunk):
         if self.v:
-            print("starting combine procedure...")
+            print("\n\nstarting combine procedure...")
             print("self chunk:")
             self.print()
             print("other chunk:")
             other_chunk.print()
-
-            print("sum for this grid:"+str(np.sum(self.grid)))
-            print("sum for other grid:" + str(np.sum(other_chunk.getGrid())))
+        
         self.grid += other_chunk.getGrid()
         self.combine += 1
         self.chunk_nums.extend(list(other_chunk.chunk_nums))
         self.mas_runtime += other_chunk.mas_runtime
         if self.v:
-            print("finished combine. Resulting grid\'s sum:" + str(np.sum(self.grid)))
+            print("finished combine. Resulting grid\'s properties:")
+            self.print()
+
         return
 
     @classmethod

@@ -75,6 +75,14 @@ def plot2Dpk(kpar, kper, pk):
     plt.colorbar()
     return
 
+def plotxis(r, xis, boxsize, resolution, keylist = None, colors = None,
+        labels = None, linestyles = None, linewidths = None, nyq = False):
+    plotpks(r, xis, boxsize, resolution, keylist, colors, labels,
+            linestyles, linewidths, nyq)
+    plt.ylabel(r'$\xi$(r) (Mpc/h)$^{3}$')
+    plt.xlabel(r'r (Mpc/h)')
+    return
+
 def fillpks(k, pks, boxsize, resolution, keylist = None, label = '', 
         color = 'blue', dark_edges = False, linestyle = '-', nyq = False):
     

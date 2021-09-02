@@ -10,6 +10,8 @@ import matplotlib.pyplot as plt
 from Pk_library import Pk, Xi, XPk, XXi
 import matplotlib as mpl
 import copy
+from hicc_library.plots import plot_lib as plib
+
 
 class Field():
 
@@ -128,6 +130,31 @@ class Field():
         dat = grid.saveGrid(outfile)
         return dat
     
+    def plotPks(self, plotdir):
+        box = self.header['BoxSize']
+        for pk in self.pks:
+            plib.plotpks(self.pks['k'], self.pks, box, self.axis, 
+                    self.resolution, keylist=[pk])
+            
+            plt.savefig(plotdir+pk+'_1Dpk.png')
+            plt.clf()
+        
+        for pk in self.tdpks:
+            plib.plot2Dpk(self.tdpks['kpar'], self.tdpks['kper'], self.tdpks[pk])
+            plt.savefig(plotdir+pk+'_2Dpk.png')
+            plt.clf()
+        return
+
+    def plotXis(self, plotdir):
+        box = self.header['BoxSize']
+        for x in self.xi:
+            plib.plotxis(self.xi['r'], self.xi, box, self.axis, 
+                    self.resolution, keylist=[x])
+            plt.savefig(plotdir+x+'_1Dxi.png')
+            plt.clf()
+        return
+
+
     def _loadSnapshotData(self):
         """
         The fields that use snapshot data vary in what they need too much,

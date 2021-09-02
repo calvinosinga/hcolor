@@ -17,7 +17,7 @@ class galaxy(Field):
         super().__init__(simname, snapshot, axis, resolution, pkl_path, verbose)
 
         self.fieldname = fieldname
-        self.gridnames = ['blue','red', 'resolved', 'all']
+        self.gridnames = self.getGridnames()
         # we use blue/red/all for every color definition
 
         # each run will do each color definition provided, but will need a different run to
@@ -33,6 +33,7 @@ class galaxy(Field):
         self.has_resolved = False
 
         self.loadpath = catshpath
+        self.counts = {}
         if self.v:
             print('%s class variables:'%self.fieldname)
             print('Resolution definition: %s'%self.use_res)
@@ -42,6 +43,15 @@ class galaxy(Field):
             print('Color definitions:')
             print(self.col_defs)
         return
+    
+    def getGridnames(self):
+        gridnames = ['resolved', 'all']
+        colors = ['blue', 'red']
+        coldefs = list(self.getColorDefinitions().keys())
+        for cdef in coldefs:
+            for c in colors:
+                gridnames.append(c+'_'+cdef)
+        return gridnames
     
     @staticmethod
     def isRed(gr, stmass, color_dict): #maybe leave gd out?
@@ -200,53 +210,73 @@ class galaxy(Field):
             return grid
         ###########################################################################
 
+        # saves the associated pickle filepath to the hdf5 output
         super().computeGrids(outfile)
-        fields = ['SubhaloStellarPhotometrics','SubhaloPos','SubhaloMassType',
-                'SubhaloVel']
-                
-        pos, vel, mass, photo = self._loadGalaxyData(self.loadpath, fields)
 
+        # getting the galaxy data
+        fields = ['SubhaloStellarPhotometrics','SubhaloPos','SubhaloMassType',
+                'SubhaloVel']   
+        pos, vel, mass, photo = self._loadGalaxyData(self.loadpath, fields)
         gr = photo['gr']
 
+        
         resolved_mask = self.isResolved(mass, photo, self.res_dict)
         in_rss = False
-        for col in self.col_defs:
-            color_dict = self.getColorDefinitions()[col]
-            red_mask = self.isRed(gr, mass, color_dict)
-            blue_mask = np.invert(red_mask)
-            all_mask = np.ones_like(blue_mask)
-            mask_dict = {'red':red_mask*resolved_mask, 
-                    'blue':blue_mask*resolved_mask, 
-                    'resolved':resolved_mask,
-                    'all':all_mask}
-
+        for g in self.gridnames:
+            # the gridname contains the color and the color definition
+            splt = g.split('_',1)
+            color = splt[0]
+            # for 'resolved' + 'all' grids, they have no color definition
+            # so the split will return a list of length one
+            if len(splt) == 2:
+                col_key = splt[1]
+                color_dict = self.getColorDefinitions()[col_key]
+            else:
+                col_key = ''
+            # create the appropriate mask for the color
+            if color == 'red':
+                mask = self.isRed(gr, mass, color_dict) * resolved_mask
+            elif color == 'blue':
+                mask = np.invert(self.isRed(gr, mass, color_dict)) * resolved_mask
+            elif color == 'resolved':
+                mask = resolved_mask
+            elif color == 'all':
+                mask = np.ones_like(resolved_mask)
             
-            for g in self.gridnames:     
-                mask = mask_dict[g]           
-                grid = computeGal(pos[mask, :], mass[mask], g+'_'+col)
-                self.saveData(outfile, grid, col)
-                del grid
-
+            # count the number of galaxies used for this grid
+            self.counts[g] = np.sum(mask)
+            grid = computeGal(pos[mask, :], mass[mask], g)
+            self.saveData(outfile, grid, col_key)
+            del grid
         
         # now doing redshift-space grids
         pos = self._toRedshiftSpace(pos, vel)
         in_rss = True
-        for col in self.col_defs:
-            color_dict = self.getColorDefinitions()[col]
-            red_mask = self.isRed(gr, mass, color_dict)
-            blue_mask = np.invert(red_mask)
-            all_mask = np.ones_like(blue_mask)
-            mask_dict = {'red':red_mask*resolved_mask, 
-                    'blue':blue_mask*resolved_mask,
-                    'resolved':resolved_mask, 
-                    'all':all_mask}
-            
-            for g in self.gridnames:
-                mask = mask_dict[g]
-                grid = computeGal(pos[mask], mass[mask], g+'_'+col) # rs added in grid's save method
-                self.saveData(outfile, grid, col)
-                del grid
 
+        for g in self.gridnames:
+            # the gridname contains the color and the color definition
+            splt = g.split('_',1)
+            color = splt[0]
+            # for 'resolved' + 'all' grids, they have no color definition
+            # so the split will return a list of length one
+            if len(splt) == 2:
+                col_key = splt[1]
+                color_dict = self.getColorDefinitions()[col_key]
+            else:
+                col_key = ''
+            # create the appropriate mask for the color
+            if color == 'red':
+                mask = self.isRed(gr, mass, color_dict) * resolved_mask
+            elif color == 'blue':
+                mask = np.invert(self.isRed(gr, mass, color_dict)) * resolved_mask
+            elif color == 'resolved':
+                mask = resolved_mask
+            elif color == 'all':
+                mask = np.ones_like(resolved_mask)
+            
+            grid = computeGal(pos[mask, :], mass[mask], g)
+            self.saveData(outfile, grid, col_key)
+            del grid
         return
     
     def computeAux(self):

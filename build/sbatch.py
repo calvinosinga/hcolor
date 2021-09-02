@@ -142,8 +142,7 @@ class Sbatch():
         combine2_dir['mem-per-cpu']='%d'%(grid_mem*2)
 
         self._sbatch_lines(combine2_job, combine2_dir)
-        numcombine = int(self.numfiles/20) + 1
-        cmd_args = (self.combine_path, varnames[1], 0, numcombine,
+        cmd_args = (self.combine_path, varnames[1], 0, self.numfiles,
                 20, varnames[2])
         self._write_python_line(combine2_job, cmd_args)
 

@@ -85,10 +85,19 @@ class hiptl(Field):
         vel = self._convertVel(vel)
         f.close()
         return pos, vel, mass
-    
+
+
+
+
+
+
 class hiptl_nH(hiptl):
-    def __init__(self, simname, snapshot, axis, resolution, chunk, pkl_path, verbose, snappath, hih2filepath):
-        super().__init__(simname, snapshot, axis, resolution, chunk, pkl_path, verbose, snappath, hih2filepath)
+
+    def __init__(self, simname, snapshot, axis, resolution, chunk, pkl_path, verbose, 
+            snappath, hih2filepath):
+        super().__init__(simname, snapshot, axis, resolution, chunk, pkl_path, verbose, 
+                snappath, hih2filepath)
+
         mods = self.getMolFracModelsPtl()
         mods.append('all_neut')
         nh_bins = self._getnHBins()
@@ -96,6 +105,7 @@ class hiptl_nH(hiptl):
         for m in mods:
             for n in range(len(nh_bins)+1):
                 self.gridnames.append(m+str(n))
+        
         return
     
     def computeGrids(self, outfile):
@@ -171,18 +181,17 @@ class hiptl_nH(hiptl):
         
         pos = self._toRedshiftSpace(pos, vel)
         in_rss = True
+
         for g in self.gridnames:
             computeHI(g, mass)
+        hih2file.close()
+
+        # want to plot vel-mass dist for each nH bin later, so save those here
+        for n in nHbins:
+            outfile.create_dataset()
         return
 
 
-    def computeAux(self):
-        """
-        Intended to help visualize the distribution of velocities among
-        the different nH bins.
-        """
-
-        return 
     def saveData(self, outfile, grid, lo, hi):
         dat = super().saveData(outfile, grid)
         dat.attrs["nH_range"] = (lo, hi)

@@ -28,15 +28,44 @@ if gd['verbose']:
 
     print("\n\noutput going to %s"%outpath)
 
+
 def getKeys():
+    # tells how the dataset should be combined
+    operations = {}
+    implemented_ops = ['sum', 'extend']
     f = hp.File(infiles[0],'r')
     klist = list(f.keys())
+    if gd['verbose']:
+        print("keylist from %s"%infiles[0])
+        print(klist)
+    
     try:
         klist.remove('pickle')
+        if gd['verbose']:
+            print("removed pickle dataset...")
     except ValueError:
         pass
+    
+    # for each key, figure out which operation needs to be done.
+    for k in klist:
+        # by default, we sum. If this is -1, then check what operation is needed
+        if f[k].attrs["combine"] == -1:
+            try:
+                operations[k] = f[k].attrs['operation']
+            except KeyError:
+                print('%s did not want combine, nor was an operation given'%k)
+                operations[k] = None
+            
+            # now check that the given operation is implemented
+            if not operations[k] in implemented_ops:
+                raise NotImplementedError("%s that combine"%operations[k] + \
+                        "operation is not implemented")
+        else: # default operation
+            operations[k] = 'sum'
+
+
     f.close()
-    return klist
+    return klist, operations
 
 def addPickle(w):
     f=hp.File(infiles[0],'r')
@@ -46,39 +75,45 @@ def addPickle(w):
     return
 
 
-keylist = getKeys()
+keylist, ops = getKeys()
 if gd['verbose']:
-    print("\nThe grids in the first file: ")
+    print("\nThe datasets to be combined in the first file: ")
     print(keylist)
+
 
 w = hp.File(outpath, 'w')
 addPickle(w)
+
 for k in range(len(keylist)):
-    if gd['verbose']:
-        print("\ncombining chunks for %s"%keylist[k])
-    
-    f1 = hp.File(infiles[0], 'r')
-    chunk1 = Chunk.loadGrid(f1[keylist[k]], gd['verbose'])
 
-    if gd['verbose']:
-        print("first chunk loaded, has properties")
-        chunk1.print()
-    
-    for i in range(1,len(infiles)):
-        try:
-            f2 = hp.File(infiles[i],'r')
-        except OSError:
-            print("did not find file %s"%infiles[i])
-        else:
-            chunk2 = Chunk.loadGrid(f2[keylist[k]], gd['verbose'])
+    # sum the datasets
+    if ops[keylist[k]] == 'sum':
 
-            if gd['verbose']:
-                print("loaded next chunk:")
-                chunk2.print()
-            chunk1.combineChunks(chunk2)
-    dat = chunk1.saveGrid(w)
+        if gd['verbose']:
+            print("summing datasets for %s"%keylist[k])
+        
+        f1 = hp.File(infiles[0], 'r')
+        chunk1 = Chunk.loadGrid(f1[keylist[k]], gd['verbose'])
+        
+        for i in range(1,len(infiles)):
+            try:
+                f2 = hp.File(infiles[i],'r')
+            except OSError:
+                print("did not find file %s"%infiles[i])
+            else:
+                chunk2 = Chunk.loadGrid(f2[keylist[k]], gd['verbose'])
+                chunk1.combineChunks(chunk2)
+        dat = chunk1.saveGrid(w)
+    
+    # extend the datasets
+    if ops[keylist[k]] == 'extend':
+        #TODO:
+        continue
+
+    
 w.close()
 
+# deleting the combine files to save space
 for i in infiles:
     if os.path.exists(i):
         os.remove(i)
