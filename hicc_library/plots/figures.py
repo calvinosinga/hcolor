@@ -93,11 +93,12 @@ def HI_auto_pk(fields, outpath, panel_length = 3, panel_bt = 0.1, yrange = (1, 1
                 ax = plt.gca()
                 ax.set_yticklabels([])
                 plt.ylabel('')
-            plt.ylim(yrange[0], yrange[1])                
-    plt.savefig(outpath)
+            plt.ylim(yrange[0], yrange[1])
+                
+    plt.savefig(outpath+'HI_auto_')
     return
 
-def HI_galaxy_Xpk_methodology():
+def HI_galaxy_Xpk_methodology(fields, outpath, panel_length = 3, panel_bt = 0.1, yrange =()):
     """
     HI-galaxy cross powers separated into different panels by their methodologies.
     This plot is designed to go into the results section of the paper.
