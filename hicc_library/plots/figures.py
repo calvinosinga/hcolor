@@ -320,11 +320,11 @@ def HI_galaxy_Xpk_methodology(hiptls, hisubs, vns, in_rss, panel_length = 3,
 
     for f in fields:
         if f.fieldname == 'hiptl':
-            keys = hiptlkeys
+            keys = hiptlkeys['red']
         if f.fieldname == 'hisubhalo':
-            keys = hisubkeys
+            keys = hisubkeys['red']
         if f.fieldname == 'vn':
-            keys = vnkeys
+            keys = vnkeys['red']
 
         for k in keys:
             pkmax = np.max(f.pks[k])
@@ -450,7 +450,7 @@ def HI_galaxy_Xpk_color(hiptls, hisubs, vns, in_rss, panel_length = 3,
     """
     # TODO need to change from paste from methodology
     # get the desired keys for each field
-    colors = ['red', 'blue']
+    colors = ['red', 'blue', 'resolved']
     vnkeys = {}
     hiptlkeys = {}
     hisubkeys = {}
@@ -476,11 +476,11 @@ def HI_galaxy_Xpk_color(hiptls, hisubs, vns, in_rss, panel_length = 3,
 
     for f in fields:
         if f.fieldname == 'hiptl':
-            keys = hiptlkeys
+            keys = hiptlkeys['red']
         if f.fieldname == 'hisubhalo':
-            keys = hisubkeys
+            keys = hisubkeys['red']
         if f.fieldname == 'vn':
-            keys = vnkeys
+            keys = vnkeys['red']
 
         for k in keys:
             pkmax = np.max(f.pks[k])
@@ -503,7 +503,7 @@ def HI_galaxy_Xpk_color(hiptls, hisubs, vns, in_rss, panel_length = 3,
     
     # creating figure
     nrows = len(snapshots)
-    ncols = 3 # for each methodology
+    ncols = len(colors)
     figwidth = panel_length * ncols + panel_bt * (ncols - 1)
     figheight = panel_length * nrows + panel_bt * (nrows - 1)
     fig = plt.figure(figsize = (figwidth, figheight))
@@ -523,14 +523,16 @@ def HI_galaxy_Xpk_color(hiptls, hisubs, vns, in_rss, panel_length = 3,
         panels.append(fig.add_subplot(gs[i]))
     
     for i in range(nrows):
-        # make the hisubhalo plot for this redshift
+        # make the blue plot for this redshift
         plt.sca(panels[i][0])
         plib.fillpks(hisubs[i].pks['k'], hisubs[i].pks, box, hisubs[i].resolution,
-                keylist = hisubkeys['blue'], color = 'blue', label = 'Blue Galaxies')
+                keylist = hisubkeys['blue'], color = 'blue', label = 'D18-Subhalo')
 
-        plib.fillpks(hisubs[i].pks['k'], hisubs[i].pks, box, hisubs[i].resolution,
-                keylist = hisubkeys['red'], color = 'red', label = 'Red Galaxies')
+        plib.fillpks(hiptls[i].pks['k'], hiptls[i].pks, box, hiptls[i].resolution,
+                keylist = hiptlkeys['blue'], color = 'teal', label = 'D18-Particle')
         
+        plib.plotpks(vns[i].pks['k'], vns[r].pks, box, vns[i].resolution,
+                keylist = vnkeys['blue'], colors = ['purple'], label = ['VN18-Particle'])
         plt.ylim(yrange[0], yrange[1])
         
         # cosmetic tasks
@@ -542,19 +544,22 @@ def HI_galaxy_Xpk_color(hiptls, hisubs, vns, in_rss, panel_length = 3,
         plt.ylabel('')
         if i == 0:
             ax.xaxis.set_label_position('top')
-            plt.xlabel('D18-Subhalo', fontsize=16)
+            plt.xlabel('HI-Blue Cross-Power', fontsize=12)
             plt.legend(loc = 'upper right')
         else:
             plt.xlabel('')
             ax.get_legend().remove()
 
-        # make the hiptl plot
+        # make the red plot
         plt.sca(panels[i][1])
         plib.fillpks(hiptls[i].pks['k'], hiptls[i].pks, box, hiptls[i].resolution,
-                keylist = hiptlkeys['blue'], color = 'blue', label = 'Blue Galaxies')
+                keylist = hiptlkeys['red'], color = 'lightcoral', label = 'D18-Particle')
 
-        plib.fillpks(hiptls[i].pks['k'], hiptls[i].pks, box, hiptls[i].resolution,
-                keylist = hiptlkeys['red'], color = 'red', label = 'Red Galaxies')
+        plib.fillpks(hisubs[i].pks['k'], hisubs[i].pks, box, hisubs[i].resolution,
+                keylist = hisubkeys['red'], color = 'red', label = 'D18-Subhalo')
+
+        plib.plotpks(vns[i].pks['k'], vns[r].pks, box, vns[i].resolution,
+                keylist = vnkeys['red'], colors = ['darkred'], label = ['VN18-Particle'])
         plt.ylim(yrange[0], yrange[1])
         
         # cosmetic tasks
@@ -564,17 +569,21 @@ def HI_galaxy_Xpk_color(hiptls, hisubs, vns, in_rss, panel_length = 3,
         ax.get_legend().remove()
         if i == 0:
             ax.xaxis.set_label_position('top')
-            plt.xlabel('D18-Particle', fontsize=16)
+            plt.xlabel('HI-Red Cross-Power', fontsize=16)
             plt.legend(loc = 'upper right')
         else:
             plt.xlabel('')
-        # make the vn plot
+        # make the resolved plot
         plt.sca(panels[i][2])
         plib.plotpks(vns[i].pks['k'], vns[i].pks, box, vns[i].resolution,
-                keylist = vnkeys['blue'], colors = ['blue'], labels = ['Blue Galaxies'])
+                keylist = vnkeys['resolved'], colors = ['darkgreen'], labels = ['VN18-Particle'])
 
-        plib.plotpks(vns[i].pks['k'], vns[i].pks, box, vns[i].resolution,
-                keylist = vnkeys['red'], colors = ['red'], labels = ['Red Galaxies'])
+        plib.fillpks(hiptls[i].pks['k'], hiptls[i].pks, box, hiptls[i].resolution,
+                keylist = hiptlkeys['resolved'], color = 'palegreen', label = 'D18-Particle')
+
+        plib.fillpks(hisubs[i].pks['k'], hisubs[i].pks, box, hisubs[i].resolution,
+                keylist = hisubkeys['resolved'], color = 'green', label = 'D18-Subhalo')
+        
         plt.ylim(yrange[0], yrange[1])
 
         # cosmetic tasks
