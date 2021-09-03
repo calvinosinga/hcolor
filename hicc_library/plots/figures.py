@@ -1,19 +1,21 @@
+from hicc_library.fields.hiptl import hiptl
 from hicc_library.plots import plot_lib as plib
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.gridspec as gspec
-import sys
-import os
 import copy
+import numpy as np
 
 # Helper method
-def _fetchKeys(keyword, keylist, exclude = False):
+def _fetchKeys(substrings, keylist):
     res = []
-    for k in keylist:
-        if keyword in k and not exclude:
-            res.append(k)
-        elif not keyword in k and exclude:
-            res.append(k)
+    for sub in substrings:
+        for k in keylist:
+            if sub in k and not k in res:
+                res.append(k)
+    
+    if 'k' in res:
+        res.remove('k')
     return res
 
 def _rmKeys(keywords, keylist):
@@ -22,32 +24,60 @@ def _rmKeys(keywords, keylist):
         for k in klist:
             if word in k:
                 klist.remove(k)
+    klist.remove('k')
     return klist
 
 
-def HI_auto_pk(fields, outpath, panel_length = 3, panel_bt = 0.1, yrange = (1, 1e4),
+def HI_auto_pk(hiptls, hisubs, vns, in_rss, panel_length = 3, panel_bt = 0.1,
         text_space=0.1):
     """
-    Makes two HI-auto power spectra plots, for real space and redshift space.
+    Makes HI-auto power spectra plots, for real space or redshift space.
     Each panel represents another redshift.
 
-    fields: list of field objects
-    outdir: output directory for plots
-
-    Dependencies: hiptl, hisubhalo, vn
+    hiptls: list of hiptl objects
+    hisubs: list of hisubhalo objects
+    vns: list of vn objects
     """
-    
-    # get info from the fields to prepare plot
-    snapshots = []
-    fields_for_panel = {} # organizes which fields go in which panel
+    # get the desired keys for each field
+    if in_rss:
+        vnkeys = ['vn']
+        hiptlkeys = _rmKeys(['rs'], list(hiptls[0].pks.keys()))
+        hisubkeys = _rmKeys(['rs'], list(hisubs[0].pks.keys()))
+    else:
+        vnkeys = ['vnrs']
+        hiptlkeys = _fetchKeys(['rs'], list(hiptls[0].pks.keys()))
+        hisubkeys = _fetchKeys(['rs'], list(hisubs[0].pks.keys()))        
+    # get the yrange
+    yrange = [np.inf, 0]
+    fields = []
+    fields.extend(hiptls)
+    fields.extend(hisubs)
+    fields.extend(vns)
+
     for f in fields:
+        if f.fieldname == 'hiptl':
+            keys = hiptlkeys
+        if f.fieldname == 'hisubhalo':
+            keys = hisubkeys
+        if f.fieldname == 'vn':
+            keys = vnkeys
+
+        for k in keys:
+            pkmax = np.max(f.pks[k])
+            pkmin = np.min(f.pks[k])
+            if pkmax > yrange[1]:
+                yrange[1] = pkmax
+            if pkmin < yrange[0]:
+                yrange[0] = pkmin
+    del fields
+
+    # get info from the fields to prepare plot
+    box = hiptls[0].header['BoxSize']
+    snapshots = []
+    for f in hiptls:
         if not f.snapshot in snapshots:
             snapshots.append(f.snapshot)
-            fields_for_panel[f.shapshot] = [f]
-        else:
-            fields_for_panel[f.snapshot].append(f)
-        
-
+    
     # put snapshots in increasing order
     snapshots.sort()
     
@@ -71,49 +101,122 @@ def HI_auto_pk(fields, outpath, panel_length = 3, panel_bt = 0.1, yrange = (1, 1
     # now making each panel
     for i in range(npanels):
         plt.sca(panels[i])
-        panelf = fields_for_panel[snapshots[i]]
-        for pf in panelf:
-            # plotting the pk
-            keylist = list(pf.pks.keys())
-            box = pf.header['BoxSize']
-            if pf.fieldname == 'vn':
+        panel_snap = snapshots[i]
+
+        # plot the VN18 that matches the panel's redshift
+        for pf in vns:
+            if pf.snapshot == panel_snap:
                 plib.plotpks(pf.pks['k'], pf.pks, box, pf.axis, pf.resolution,
-                        keylist = ['vn'], colors = ['green'],
+                        keylist = vnkeys, colors = ['green'],
                         labels = ['V-N18'])
-            if pf.fieldname == 'hiptl':
-                pkeys = _rmKeys(['rs','k'], keylist)
+        
+        # plot the D18-Subhalo that matches the panel's redshift
+        for pf in hisubs:
+            if pf.snapshot == panel_snap:
                 plib.fillpks(pf.pks['k'], pf.pks, box, pf.axis, pf.resolution,
-                        keylist = pkeys, color = 'blue', label = 'D18-particle')
-            if pf.fieldname == 'hisubhalo':
-                pkeys = _rmKeys(['rs','k'], keylist)
+                        keylist = hisubkeys, color = 'orange',
+                        label = 'D18-Subhalo')
+        
+        # plot the D18-Particle that matches the panel's redshift
+        for pf in hisubs:
+            if pf.snapshot == panel_snap:
                 plib.fillpks(pf.pks['k'], pf.pks, box, pf.axis, pf.resolution,
-                        keylist = pkeys, color = 'orange', label = 'D18-subhalo')
+                        keylist = hiptlkeys, color = 'blue',
+                        label = 'D18-Particle')
+
             
-            # cosmetic tasks
-            if not i == 0:
-                ax = plt.gca()
-                ax.set_yticklabels([])
-                plt.ylabel('')
-                ax.get_legend().remove()
-            plt.ylim(yrange[0], yrange[1])
+        # cosmetic tasks
+        if not i == 0:
+            ax = plt.gca()
+            ax.set_yticklabels([])
+            plt.ylabel('')
+            ax.get_legend().remove()
+        else:
+            plt.legend(loc = 'upper right')
+        plt.ylim(yrange[0], yrange[1])
         
         # output textbox onto the plot with redshift
-        plt.text(panelf[0].pks['k'] + text_space, yrange[0] + text_space,
+        plt.text(hiptls[0].pks['k'] + text_space, yrange[0] + text_space,
                 'z=%.1f'%snapshots[i], fontsize = 20, ha = 'left', va = 'bottom',
-                fontweight = 'bold', 
+                fontweight = 'bold') 
 
-    # save the plot
-    f = fields[0]
-    plotname = 'HI_auto_real_%sB_%03dS_%dA_%dR'%(f.simname, f.snapshot, f.axis,
-            f.resolution)
-    plt.savefig(outpath+plotname+'.png')
-    plt.clf()
-
-    # now do the same for the redshift space plot
-
-    # now split them into different panels according to methodology
     return
 
+
+
+def HI_auto_redshift_vs_real(hiptls, hisubs, vns, panel_length = 3, panel_bt = 0.1,
+        text_space=0.1):
+    """
+    Makes HI auto power spectra plots, but separates them by methodology to compare
+    redshift-space and real-space plots.
+    """
+    # get the desired keys for each field
+    vnkeys = ['vn']
+    hiptlkeys = _rmKeys(['rs'], list(hiptls[0].pks.keys()))
+    hisubkeys = _rmKeys(['rs'], list(hisubs[0].pks.keys()))
+    
+    vnrskeys = ['vnrs']
+    hiptlrskeys = _fetchKeys(['rs'], list(hiptls[0].pks.keys()))
+    hisubrskeys = _fetchKeys(['rs'], list(hisubs[0].pks.keys()))        
+    # get the yrange
+    yrange = [np.inf, 0]
+    fields = []
+    fields.extend(hiptls)
+    fields.extend(hisubs)
+    fields.extend(vns)
+
+    for f in fields:
+        if f.fieldname == 'hiptl':
+            keys = hiptlkeys
+        if f.fieldname == 'hisubhalo':
+            keys = hisubkeys
+        if f.fieldname == 'vn':
+            keys = vnkeys
+
+        for k in keys:
+            pkmax = np.max(f.pks[k])
+            pkmin = np.min(f.pks[k])
+            if pkmax > yrange[1]:
+                yrange[1] = pkmax
+            if pkmin < yrange[0]:
+                yrange[0] = pkmin
+    del fields
+
+    # get info from the fields to prepare plot
+    box = hiptls[0].header['BoxSize']
+    snapshots = []
+    for f in hiptls:
+        if not f.snapshot in snapshots:
+            snapshots.append(f.snapshot)
+    
+    # put snapshots in increasing order
+    snapshots.sort()
+    
+    # creating figure
+    nrows = len(snapshots)
+    ncols = 3 # for each methodology
+    figwidth = panel_length * ncols + panel_bt * (ncols - 1)
+    figheight = panel_length * nrows + panel_bt * (nrows - 1)
+    fig = plt.figure(figsize = (figwidth, figheight))
+
+    # creating gridspec
+    gs = gspec.GridSpec(nrows, ncols)
+    plt.subplots_adjust(left = panel_bt / figwidth,
+            right = 1 - panel_bt / figwidth, top = 1 - panel_bt / figwidth,
+            bottom = panel_bt/figwidth, wspace = panel_bt, hspace = panel_bt)
+
+    # now creating panels in order of increasing redshift
+    panels = []
+    for i in range(nrows):
+        col_panels = []
+        for j in range(ncols):
+            col_panels.append(fig.add_subplot(gs[i,j]))
+        panels.append(fig.add_subplot(gs[i]))
+    
+    for i in range(nrows):
+        
+
+    return
 def HI_galaxy_Xpk_methodology(fields, outpath, panel_length = 3, panel_bt = 0.1, yrange =()):
     """
     HI-galaxy cross powers separated into different panels by their methodologies.
