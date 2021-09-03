@@ -214,8 +214,70 @@ def HI_auto_redshift_vs_real(hiptls, hisubs, vns, panel_length = 3, panel_bt = 0
         panels.append(fig.add_subplot(gs[i]))
     
     for i in range(nrows):
-        
+        # make the hisubhalo plot for this redshift
+        plt.sca(panels[i][0])
+        plib.fillpks(hisubs[i].pks['k'], hisubs[i].pks, box, hisubs[i].resolution,
+                keylist = hisubkeys, color = 'blue', label = 'real-space')
 
+        plib.fillpks(hisubs[i].pks['k'], hisubs[i].pks, box, hisubs[i].resolution,
+                keylist = hisubrskeys, color = 'red', label = 'redshift-space')
+        plt.ylim(yrange[0], yrange[1])
+        
+        # cosmetic tasks
+        plt.text(hisubs[i].pks['k'][0]+text_space, ymin + text_space, 'z=%.1f'%snapshots[i],
+                fontsize = 20, ha = 'left', va = 'bottom', fontweight = 'bold')
+
+
+        ax = plt.gca()
+        plt.ylabel('')
+        if i == 0:
+            ax.xaxis.set_label_position('top')
+            plt.xlabel('D18-Subhalo', fontsize=16)
+            plt.legend(loc = 'upper right')
+        else:
+            plt.xlabel('')
+            ax.get_legend().remove()
+
+        # make the hiptl plot
+        plt.sca(panels[i][1])
+        plib.fillpks(hiptls[i].pks['k'], hiptls[i].pks, box, hiptls[i].resolution,
+                keylist = hiptlkeys, color = 'blue', label = 'real-space')
+
+        plib.fillpks(hiptls[i].pks['k'], hiptls[i].pks, box, hiptls[i].resolution,
+                keylist = hiptlrskeys, color = 'red', label = 'redshift-space')
+        plt.ylim(yrange[0], yrange[1])
+        
+        # cosmetic tasks
+        ax = plt.gca()
+        plt.ylabel('')
+        ax.set_yticklabels([])
+        ax.get_legend().remove()
+        if i == 0:
+            ax.xaxis.set_label_position('top')
+            plt.xlabel('D18-Particle', fontsize=16)
+            plt.legend(loc = 'upper right')
+        else:
+            plt.xlabel('')
+        # make the vn plot
+        plt.sca(panels[i][2])
+        plib.plotpks(vns[i].pks['k'], vns[i].pks, box, vns[i].resolution,
+                keylist = vnkeys, colors = ['blue'], labels = ['real-space'])
+
+        plib.plotpks(vns[i].pks['k'], vns[i].pks, box, vns[i].resolution,
+                keylist = vnrskeys, colors = ['red'], labels = ['redshift-space'])
+        plt.ylim(yrange[0], yrange[1])
+
+        # cosmetic tasks
+        ax = plt.gca()
+        plt.ylabel('')
+        ax.set_yticklabels([])
+        ax.get_legend().remove()
+        if i == 0:
+            ax.xaxis.set_label_position('top')
+            plt.xlabel('VN18', fontsize=16)
+            plt.legend(loc = 'upper right')
+        else:
+            plt.xlabel('')
     return
 def HI_galaxy_Xpk_methodology(fields, outpath, panel_length = 3, panel_bt = 0.1, yrange =()):
     """
