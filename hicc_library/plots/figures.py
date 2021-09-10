@@ -7,7 +7,7 @@ import copy
 import numpy as np
 
 mpl.rcParams['text.usetex'] = True
-# Helper method
+# Helper methods
 def _fetchKeys(substrings, keylist):
     res = []
     for sub in substrings:
@@ -27,7 +27,6 @@ def _rmKeys(keywords, keylist):
                 klist.remove(k)
     klist.remove('k')
     return klist
-
 
 def HI_auto_pk(hiptls, hisubs, vns, in_rss, panel_length = 3, panel_bt = 0.1,
         text_space=0.1):
@@ -618,6 +617,7 @@ def dust_sensitivity():
     return
 
 def gr_stmass():
+    # can't actually do this one here; galaxies don't save the gr or stmass info, the plot is made elsewhere.
     return
 
 def galaxy_auto_pk():

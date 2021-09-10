@@ -28,7 +28,8 @@ class Field():
         self.saved_k = False
         self.saved_k2D = False
         self.saved_r = False
-
+        self.saved_Nmodes1D = False
+        self.saved_Nmodes2D = False
 
         self.pks = {}
         self.xi = {}
@@ -92,12 +93,19 @@ class Field():
         if not self.saved_k:
             self.pks['k'] = pk.k3D
             self.saved_k = True
+        if not self.saved_Nmodes1D:
+            self.pks['Nmodes']=pk.Nmodes1D
+            self.saved_Nmodes1D = True
+
         self.pks[grid.gridname] = pk.Pk[:,0]
 
         if grid.in_rss:
             if not self.saved_k2D:
                 self.tdpks['kper'] = pk.kper
                 self.tdpks['kpar'] = pk.kpar
+            if not self.saved_Nmodes2D:
+                self.tdpks['Nmodes'] = pk.Nmodes2D
+                self.saved_Nmodes2D = True
             self.tdpks[grid.gridname] = pk.Pk[:,0]
         
         return
@@ -221,6 +229,8 @@ class Cross():
         self.saved_xk = False
         self.saved_xr = False
         self.saved_xk2D = False
+        self.saved_Nmodes1D = False
+        self.saved_Nmodes2D = False
         self.xpks = {}
         self.xxis = {}
         self.tdxpks = {}
@@ -264,6 +274,9 @@ class Cross():
             if not self.saved_xk:
                 self.addXpk('k',xpk.k3D)
                 self.saved_xk = True
+            if not self.saved_Nmodes1D:
+                self.addXpk('Nmodes',xpk.Nmodes1D)
+                self.saved_Nmodes1D = True
             self.addXpk(kname, xpk.XPk[:,0,0])
 
             if grid1.in_rss and grid2.in_rss:
@@ -271,6 +284,9 @@ class Cross():
                     self.add2DXpk('kper', xpk.kper)
                     self.add2DXpk('kpar', xpk.kpar)
                     self.saved_xk2D = True
+                if not self.saved_Nmodes2D:
+                    self.add2DXpk('Nmodes', xpk.Nmodes2D)
+                    self.saved_Nmodes2D = True
                 self.add2DXpk(kname, xpk.PkX2D[:,0])
 
         return

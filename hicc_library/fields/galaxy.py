@@ -85,7 +85,11 @@ class galaxy(Field):
 
 
         resolved = np.ones_like(stmass, dtype=bool)
+        print('galaxy resolution definition dictionary:')
+        print(res_dict)
 
+        print('average mass of objects:')
+        print(np.mean(stmass))
         for r in res_dict:
             if r == 'stmass':
                 t = res_dict[r]
@@ -179,7 +183,7 @@ class galaxy(Field):
         if self.use_stmass:
             mass = data['SubhaloMassType'][:,4] # only using stellar mass here
         else:
-            mass = np.sum(data['SubhaloMassType'][:], axis=1)
+            mass = data['SubhaloMassType'][:]
         
         photo_dict = {}
         photo_dict['gr'] = photo[:, 4] - photo[:, 5]
@@ -218,9 +222,15 @@ class galaxy(Field):
                 'SubhaloVel']   
         pos, vel, mass, photo = self._loadGalaxyData(self.loadpath, fields)
         gr = photo['gr']
-
         
-        resolved_mask = self.isResolved(mass, photo, self.res_dict)
+        # resolution definitions use stmass not all of the mass
+        if not self.use_stmass:
+            mass = np.sum(mass, axis = 1)
+            stmass = mass[:,4]
+        else:
+            stmass = mass
+
+        resolved_mask = self.isResolved(stmass, photo, self.res_dict)
         in_rss = False
         for g in self.gridnames:
             # the gridname contains the color and the color definition
@@ -277,10 +287,11 @@ class galaxy(Field):
             grid = computeGal(pos[mask, :], mass[mask], g)
             self.saveData(outfile, grid, col_key)
             del grid
+        self.make_gr_stmass(gr,stmass)
         return
     
-    def computeAux(self):
-        
+    def make_gr_stmass(self, gr, stmass):
+        self.gr_stmass = np.histogram(np.log10(stmass), gr, bins=50)
         return
     
     def saveData(self, outfile, grid, color_def):
