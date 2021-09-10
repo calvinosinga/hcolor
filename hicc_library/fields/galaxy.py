@@ -225,8 +225,9 @@ class galaxy(Field):
         
         # resolution definitions use stmass not all of the mass
         if not self.use_stmass:
-            mass = np.sum(mass, axis = 1)
             stmass = mass[:,4]
+            mass = np.sum(mass, axis = 1)
+            
         else:
             stmass = mass
 
