@@ -82,7 +82,7 @@ class Grid():
 
     def CICW(self, pos, boxsize, mass):
         if self.v:
-            print("\n\tstarting CICW in grid.py...")
+            print("\tstarting CICW in grid.py...")
             print("\tposition example:" + str(pos[0]))
             print("\tcumulative mass: "+ str(np.sum(mass)))
             print("\tboxsize given: "+str(boxsize))

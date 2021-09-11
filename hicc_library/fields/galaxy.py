@@ -291,7 +291,7 @@ class galaxy(Field):
             self.saveData(outfile, grid, col_key)
             del grid
         
-        self.make_gr_stmass(gr,stmass[resolved_mask])
+        self.make_gr_stmass(gr[resolved_mask],stmass[resolved_mask])
         return
     
     def make_gr_stmass(self, gr, stmass):
