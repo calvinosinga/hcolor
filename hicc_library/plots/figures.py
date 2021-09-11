@@ -447,8 +447,6 @@ def HI_galaxy_Xpk_color(hiptls, hisubs, vns, in_rss, panel_length = 3,
 
     Dependencies: hiptl, hisubhalo, vn, galaxy
     """
-    # TODO need to change from paste from methodology
-    # get the desired keys for each field
     colors = ['red', 'blue', 'resolved']
     vnkeys = {}
     hiptlkeys = {}
@@ -610,14 +608,156 @@ def HI_galaxy_Xpk_color(hiptls, hisubs, vns, in_rss, panel_length = 3,
 def color_def_sensitivity():
     return
 
+def galaxy_galaxy_xpk():
+    return
+
+def cicw_vs_cic():
+    return
+
 def HI_ptl_Xpk():
     return
 
 def dust_sensitivity():
     return
 
-def gr_stmass():
-    # can't actually do this one here; galaxies don't save the gr or stmass info, the plot is made elsewhere.
+def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width = 1):
+    nrows = 1
+    ncols = 2
+
+    # create the figure with the right dimensions
+    figwidth = panel_length * ncols + panel_bt * (ncols - 1) + cbar_width
+    figheight = panel_length * nrows + panel_bt * (nrows - 1)
+    fig = plt.figure(figsize = (figwidth, figheight))
+
+    # creating gridspec
+    gs = gspec.GridSpec(nrows, ncols)
+    plt.subplots_adjust(left = panel_bt / figwidth,
+            right = 1 - panel_bt / figwidth, top = 1 - panel_bt / figwidth,
+            bottom = panel_bt/figwidth, wspace = panel_bt, hspace = panel_bt)
+    
+    panels = []
+    panels.append(fig.add_subplot(gs[:panel_length]))
+    panels.append(fig.add_subplot(gs[panel_length:panel_length*2]))
+    panels.append(fig.add_subplot(gs[panel_length*2:panel_length*2+cbar_width]))
+
+    # for the color cut lines
+    xmin = min(np.min(galaxy.gr[1]), np.min(galaxy_dust.gr[1]))
+    xmax = max(np.max(galaxy.gr[1]), np.max(galaxy_dust.gr[1]))
+    ymin = min(np.min(galaxy.gr[2]), np.min(galaxy_dust.gr[2]))
+    ymax = max(np.max(galaxy.gr[2]), np.max(galaxy_dust.gr[2]))
+    x = np.linspace(xmin, xmax)
+
+    # functions for the color cuts
+    col_defs = galaxy.getColorDefinitions()
+    funcs = {}
+    for k,v in col_defs.items():
+        funcs[k] = lambda x: v['b'] + (v['m'] * x + v['mb'])
+    
+    plt.sca(panels[0])
+
+    plt.imshow(np.rot90(galaxy.gr[0]), norm=mpl.colors.LogNorm(), 
+            extent=(xmin, xmax, ymin, ymax))
+    
+    for k,v in funcs.items():
+        plt.plot(x, v(x), label=k)
+    
+    plt.ylabel('g-r (magnitude)')
+    ax = plt.gca()
+    ax.xaxis.set_label_position('top')
+    plt.xlabel('No Dust', fontsize = 16)
+    plt.legend()
+    plt.sca(panels[1])
+    plt.imshow(np.rot90(galaxy_dust.gr[0]), norm=mpl.colors.LogNorm(), 
+            extent=(xmin, xmax, ymin, ymax))
+    
+    ax = plt.gca()
+    ax.xaxis.set_label_position('top')
+    plt.xlabel('Dust-Attenuated', fontsize = 16)
+    ax.set_yticklabels([])
+    for k,v in funcs.items():
+        plt.plot(x, v(x), label=k)
+
+    plt.sca(panels[2])
+    ax = plt.gca()
+    plt.colorbar(cax=ax)
+    fig.text(0.45, -.075, r'log($M_{*}$)', va = 'center', fontsize=16)
+
+    plt.title("Color-Stellar Mass for z=%.1f"%galaxy.snapshot)
+    return
+
+def gr_hist(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1):
+    ################## HELPER FUNCTION #####################
+    def get_hist(gr):
+        mid = []
+        for i in range(len(gr[2])-1):
+            mid.append((gr[2][i] + gr[2][i+1]) / 2)
+        hist = np.sum(gr[0], axis=0)
+        return np.array(mid), hist
+    ########################################################
+
+    nrows = 1
+    ncols = 2
+
+    # create the figure with the right dimensions
+    figwidth = panel_length * ncols + panel_bt * (ncols - 1)
+    figheight = panel_length * nrows + panel_bt * (nrows - 1)
+    fig = plt.figure(figsize = (figwidth, figheight))
+
+    # creating gridspec
+    gs = gspec.GridSpec(nrows, ncols)
+    plt.subplots_adjust(left = panel_bt / figwidth,
+            right = 1 - panel_bt / figwidth, top = 1 - panel_bt / figwidth,
+            bottom = panel_bt/figwidth, wspace = panel_bt, hspace = panel_bt)
+    
+    panels = []
+    panels.append(fig.add_subplot(gs[:panel_length]))
+    panels.append(fig.add_subplot(gs[panel_length:panel_length*2]))
+
+    # getting the lines
+    col_defs = galaxy.getColorDefinitions()
+    vals = {}
+    for k,v in col_defs.items():
+        if v['m'] == 0:
+            vals[k] = v['b']
+    
+    # getting the histograms
+    dustx, dusthist = get_hist(galaxy_dust.gr)
+    x, hist = get_hist(galaxy.gr)
+    ymin = 0
+    ymax = max(np.max(dusthist), np.max(hist))
+
+    # getting the bar colors
+    threshold = vals['straight']
+    rgb = np.zeros([x.shape[0], 3])
+    rgb[:,0] = 1/(x[-1] - threshold) * (x - threshold)
+    rgb[:,2] = 1/(x[0] - threshold) * (x - threshold)
+    rgb[:,1] = (0.5-rgb[:,0]-rgb[:,2]) * 0.75
+    # making the first panel
+    plt.sca(panels[0])
+    plt.bar(x, hist, width=x[1] - x[0], color=rgb)
+    plt.ylim(ymin, ymax)
+    plt.ylabel(r'N$_{\rm gal}$')
+    ax = plt.gca()
+    ax.xaxis.set_label_position('top')
+    plt.xlabel('No Dust', fontsize = 16)
+
+    for k,v in vals.items():
+        plt.plot((v,v),(ymin, ymax), label = '%.2f'%v, linestyle='--')
+    
+    plt.legend()
+    # making the second panel
+    plt.sca(panels[1])
+    plt.bar(dustx, dusthist, width=x[1] - x[0], color=rgb)
+    plt.ylim(ymin, ymax)
+    ax = plt.gca()
+    ax.xaxis.set_label_position('top')
+    plt.xlabel('Dust-Attenuated', fontsize = 16)
+    ax.set_yticklabels([])
+    for k,v in vals.items():
+        plt.plot((v,v),(ymin, ymax), label = '%.2f'%v, linestyle='--')
+    fig.text(0.45, -.075, r'g-r (magnitude)', va = 'center', fontsize=16)
+
+    plt.title("Color Histogram for z=%.1f"%galaxy.snapshot)
     return
 
 def galaxy_auto_pk():

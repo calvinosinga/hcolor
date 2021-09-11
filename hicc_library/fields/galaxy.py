@@ -54,7 +54,7 @@ class galaxy(Field):
         return gridnames
     
     @staticmethod
-    def isRed(gr, stmass, color_dict): #maybe leave gd out?
+    def isRed(gr, stmass, color_dict):
         if isinstance(color_dict, dict):
             b = color_dict['b']
             m = color_dict['m']
@@ -234,6 +234,8 @@ class galaxy(Field):
         resolved_mask = self.isResolved(stmass, photo, self.res_dict)
         in_rss = False
         for g in self.gridnames:
+            if self.v:
+                print("now making grids for %s"%g)
             # the gridname contains the color and the color definition
             splt = g.split('_',1)
             color = splt[0]
@@ -288,10 +290,13 @@ class galaxy(Field):
             grid = computeGal(pos[mask, :], mass[mask], g)
             self.saveData(outfile, grid, col_key)
             del grid
-        self.make_gr_stmass(gr,stmass)
+        
+        self.make_gr_stmass(gr,stmass[resolved_mask])
         return
     
     def make_gr_stmass(self, gr, stmass):
+        print(np.any(stmass) == 0)
+        stmass = np.ma.masked_equal(stmass, 0)
         self.gr_stmass = np.histogram2d(np.log10(stmass), gr, bins=50)
         return
     

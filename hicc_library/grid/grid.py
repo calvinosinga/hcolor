@@ -82,11 +82,11 @@ class Grid():
 
     def CICW(self, pos, boxsize, mass):
         if self.v:
-            print("starting CICW...")
-            print("position example:" + str(pos[0]))
-            print("cumulative mass: "+ str(np.sum(mass)))
-            print("boxsize given: "+str(boxsize))
-            print("boxsize must be Mpc/h")
+            print("\n\tstarting CICW in grid.py...")
+            print("\tposition example:" + str(pos[0]))
+            print("\tcumulative mass: "+ str(np.sum(mass)))
+            print("\tboxsize given: "+str(boxsize))
+            print("\tboxsize must be Mpc/h")
 
         start = time.time()
         ptls = pos.shape[0]; coord = pos.shape[1]; dims = self.grid.shape[0]
