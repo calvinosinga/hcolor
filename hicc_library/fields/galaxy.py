@@ -292,7 +292,7 @@ class galaxy(Field):
         return
     
     def make_gr_stmass(self, gr, stmass):
-        self.gr_stmass = np.histogram(np.log10(stmass), gr, bins=50)
+        self.gr_stmass = np.histogram2d(np.log10(stmass), gr, bins=50)
         return
     
     def saveData(self, outfile, grid, color_def):
