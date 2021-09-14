@@ -163,7 +163,7 @@ class Field():
         return
 
     def equals(self, other_field):
-        fntest = self.fieldname = other_field.fieldname
+        fntest = self.fieldname == other_field.fieldname
         sstest = self.snapshot == other_field.snapshot
         axtest = self.axis == other_field.axis
         voltest = self.header['BoxSize'] == other_field.header['BoxSize']
