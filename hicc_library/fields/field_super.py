@@ -162,7 +162,14 @@ class Field():
             plt.clf()
         return
 
-
+    def equals(self, other_field):
+        fntest = self.fieldname = other_field.fieldname
+        sstest = self.snapshot == other_field.snapshot
+        axtest = self.axis == other_field.axis
+        voltest = self.header['BoxSize'] == other_field.header['BoxSize']
+        restest = self.resolution == other_field.resolution
+        return fntest and sstest and axtest and voltest and restest
+    
     def _loadSnapshotData(self):
         """
         The fields that use snapshot data vary in what they need too much,
@@ -221,6 +228,13 @@ class Field():
 from hicc_library.grid.grid import Grid
 class Cross():
     def __init__(self, field1, field2, gridfilepath1, gridfilepath2):
+        # the fieldname for this cross-power
+        if field1.isHI:
+            self.fieldname = field1.fieldname + 'X' + field2.fieldname
+        elif field2.isHI:
+            self.fieldname = field2.fieldname + 'X' + field1.fieldname
+        else:
+            self.fieldname = field1
         self.field1 = field1
         self.field2 = field2
         self.gfpath1 = gridfilepath1
@@ -245,6 +259,13 @@ class Cross():
         gf2 = hp.File(self.gfpath2, 'r')
         return gf1, gf2
     
+    def equals(self, other_cross):
+        f11test = self.field1.equals(other_cross.field1)
+        f22test = self.field2.equals(other_cross.field2)
+        f12test = self.field1.equals(other_cross.field2)
+        f21test = self.field2.equals(other_cross.field1)
+        return (f11test and f22test) or (f12test and f21test)
+
     def computeXpks(self):
         if self.v:
             print("starting process of computing xpks...")

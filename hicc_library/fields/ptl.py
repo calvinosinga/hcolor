@@ -18,6 +18,8 @@ class ptl(Field):
         
         self.loadpath = snappath%(chunk)
         
+        self.isHI = False
+        
         if self.v:
             print("finished constructor for %s, chunknum = %d"%(self.fieldname,chunk))
         return
