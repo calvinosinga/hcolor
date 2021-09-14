@@ -19,6 +19,8 @@ class Figs():
                 in_results = True
         if not in_results:
             self.results.append(result)
+        else:
+            raise ValueError("result is already in Figs object")
         return
     
     def removeResult(self, result):
@@ -32,7 +34,6 @@ class Figs():
         return
             
     
-    # Helper methods
     def _fetchResults(self, fieldname, snapshot = -1):
         field_results = []
         for r in self.results:
@@ -182,7 +183,6 @@ class Figs():
 
         return
 
-
     def HI_auto_redshift_vs_real(self, panel_length = 3, panel_bt = 0.1, text_space=0.1):
         """
         Makes HI auto power spectra plots, but separates them by methodology to compare
@@ -326,7 +326,6 @@ class Figs():
 
         fig.text(0.45, -.075, r'k (Mpc/h)$^{-1}$', va = 'center', fontsize=16)
         return
-
 
     def HI_galaxy_Xpk_methodology(self, in_rss = False, panel_length = 3, panel_bt = 0.1, text_space = 0.1):
         """
@@ -484,7 +483,6 @@ class Figs():
 
         fig.text(0.45, -.075, r'k (Mpc/h)$^{-1}$', va = 'center', fontsize=16)
         return
-
 
     def HI_galaxy_Xpk_color(self, in_rss = False, panel_length = 3, panel_bt = 0.1, text_space = 0.1):
         """
@@ -772,7 +770,7 @@ class Figs():
         rgb = np.zeros([x.shape[0], 3])
         rgb[:,0] = 1/(x[-1] - threshold) * (x - threshold)
         rgb[:,2] = 1/(x[0] - threshold) * (x - threshold)
-        rgb[:,1] = (0.5-rgb[:,0]-rgb[:,2]) * 0.75
+        # rgb[:,1] = (0.5-rgb[:,0]-rgb[:,2]) * 0.75
         # making the first panel
         plt.sca(panels[0])
         plt.bar(x, hist, width=x[1] - x[0], color=rgb)
