@@ -659,10 +659,10 @@ class Figs():
         galaxy = self._fetchResults('galaxy', snapshot)
         galaxy_dust = self._fetchResults('galaxy_dust', snapshot)
         nrows = 1
-        ncols = 2
-
+        nhist = 2
+        ncols = panel_length*nhist + cbar_width
         # create the figure with the right dimensions
-        figwidth = panel_length * ncols + panel_bt * (ncols - 1) + cbar_width
+        figwidth = panel_length * nhist + panel_bt * (nhist - 1) + cbar_width
         figheight = panel_length * nrows + panel_bt * (nrows - 1)
         fig = plt.figure(figsize = (figwidth, figheight))
 
