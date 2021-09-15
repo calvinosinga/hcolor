@@ -42,7 +42,7 @@ class Figs():
                     field_results.append(r)
                 elif r.snapshot == snapshot:
                     field_results.append(r)
-                    
+
         return field_results
         
     def _fetchKeys(self, substrings, keylist):
@@ -79,15 +79,35 @@ class Figs():
         hisubs = self._fetchResults('hisubhalo')
         vns = self._fetchResults('vn')
 
-        # get the desired keys for each field
+        # get the desired keys for each field - if the fields are not
+        # in the results, then make the keys an empty list
         if in_rss:
-            vnkeys = ['vn']
-            hiptlkeys = self._rmKeys(['rs'], list(hiptls[0].pks.keys()))
-            hisubkeys = self._rmKeys(['rs'], list(hisubs[0].pks.keys()))
+            if vns:
+                vnkeys = ['vn']
+            else:
+                vnkeys = []
+            if hiptls:
+                hiptlkeys = self._rmKeys(['rs'], list(hiptls[0].pks.keys()))
+            else:
+                hiptlkeys = []
+            if hisubs:
+                hisubkeys = self._rmKeys(['rs'], list(hisubs[0].pks.keys()))
+            else:
+                hisubkeys = []
         else:
-            vnkeys = ['vnrs']
-            hiptlkeys = self._fetchKeys(['rs'], list(hiptls[0].pks.keys()))
-            hisubkeys = self._fetchKeys(['rs'], list(hisubs[0].pks.keys()))        
+            if vns:
+                vnkeys = ['vnrs']
+            else:
+                vnkeys = []
+            if hiptls:
+                hiptlkeys = self._fetchKeys(['rs'], list(hiptls[0].pks.keys()))
+            else:
+                hiptlkeys = []
+            if hisubs:
+                hisubkeys = self._fetchKeys(['rs'], list(hisubs[0].pks.keys()))
+            else:
+                hisubkeys = []
+        
         # get the yrange
         yrange = [np.inf, 0]
         fields = []
@@ -113,7 +133,7 @@ class Figs():
         del fields
 
         # get info from the fields to prepare plot
-        box = hiptls[0].header['BoxSize']
+
         snapshots = []
         for f in hiptls:
             if not f.snapshot in snapshots:
@@ -147,6 +167,7 @@ class Figs():
             # plot the VN18 that matches the panel's redshift
             for pf in vns:
                 if pf.snapshot == panel_snap:
+                    box = pf.header['BoxSize']
                     plib.plotpks(pf.pks['k'], pf.pks, box, pf.axis, pf.resolution,
                             keylist = vnkeys, colors = ['green'],
                             labels = ['V-N18'])
@@ -154,6 +175,7 @@ class Figs():
             # plot the D18-Subhalo that matches the panel's redshift
             for pf in hisubs:
                 if pf.snapshot == panel_snap:
+                    box = pf.header['BoxSize']
                     plib.fillpks(pf.pks['k'], pf.pks, box, pf.axis, pf.resolution,
                             keylist = hisubkeys, color = 'orange',
                             label = 'D18-Subhalo')
@@ -161,6 +183,7 @@ class Figs():
             # plot the D18-Particle that matches the panel's redshift
             for pf in hisubs:
                 if pf.snapshot == panel_snap:
+                    box = pf.header['BoxSize']
                     plib.fillpks(pf.pks['k'], pf.pks, box, pf.axis, pf.resolution,
                             keylist = hiptlkeys, color = 'blue',
                             label = 'D18-Particle')
@@ -658,8 +681,21 @@ class Figs():
     def gr_stmass(self, snapshot = 99, panel_length = 8, panel_bt = 0.1, cbar_width = 1):
         galaxy = self._fetchResults('galaxy', snapshot)
         galaxy_dust = self._fetchResults('galaxy_dust', snapshot)
+
+        nhist = 0
+        
+        # if both are missing, return without making the plot
+        if not galaxy or galaxy_dust:
+            return
+        
+        # if only one is missing, plot the other one
+        if galaxy:
+            nhist += 1
+        if galaxy_dust:
+            nhist += 1
+        
         nrows = 1
-        nhist = 2
+        
         ncols = panel_length*nhist + cbar_width
         # create the figure with the right dimensions
         figwidth = panel_length * nhist + panel_bt * (nhist - 1) + cbar_width
@@ -734,8 +770,17 @@ class Figs():
 
         galaxy = self._fetchResults('galaxy', snapshot)
         galaxy_dust = self._fetchResults('galaxy_dust', snapshot)
+
+        ncols = 0
+        # if both are missing, return without making plot
+        if not galaxy or galaxy_dust:
+            return
+        # if one is missing, make the plot of just one histogram
+        if galaxy:
+            ncols += 1
+        if galaxy_dust:
+            ncols += 1
         nrows = 1
-        ncols = 2
 
         # create the figure with the right dimensions
         figwidth = panel_length * ncols + panel_bt * (ncols - 1)
@@ -768,9 +813,8 @@ class Figs():
         # getting the bar colors
         threshold = vals['straight']
         rgb = np.zeros([x.shape[0], 3])
-        rgb[:,0] = 1/(x[-1] - threshold) * (x - threshold)
-        rgb[:,2] = 1/(x[0] - threshold) * (x - threshold)
-        # rgb[:,1] = (0.5-rgb[:,0]-rgb[:,2]) * 0.75
+        rgb[:,0] = 1.1/(x[-1] - threshold) * (x - threshold)
+        rgb[:,2] = 0.85/(x[0] - threshold) * (x - threshold)
         # making the first panel
         plt.sca(panels[0])
         plt.bar(x, hist, width=x[1] - x[0], color=rgb)
