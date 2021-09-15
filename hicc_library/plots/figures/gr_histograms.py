@@ -31,7 +31,7 @@ def main():
     # now make just gr histogram
     return
 
-def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width = 1):
+def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width = 1, text_space = 0.1):
     ############ HELPER METHOD ##########################################
     def get_snap_lims(fields):
         
@@ -40,8 +40,10 @@ def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width 
                 snapshots.append(f.snapshot)
             xlim[0] = min(np.min(f.gr_stmass[1]), xlim[0])
             xlim[1] = max(np.max(f.gr_stmass[1]), xlim[1])
-            ylim[0] = min(np.min(f.gr_stmass[1]), ylim[0])
-            ylim[1] = max(np.max(f.gr_stmass[1]), ylim[1])
+            ylim[0] = min(np.min(f.gr_stmass[2]), ylim[0])
+            ylim[1] = max(np.max(f.gr_stmass[2]), ylim[1])
+            nlim[0] = min(np.min(f.gr_stmass[0]), nlim[0])
+            nlim[1] = max(np.max(f.gr_stmass[0]), nlim[1])
         return
     
     def make_panel(fields, row_idx):
@@ -59,7 +61,7 @@ def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width 
         
         plt.sca(panels[row_idx][col_idx])
         
-        plt.imshow(np.rot90(plot_field.gr[0]), norm=mpl.colors.LogNorm(), 
+        plt.imshow(np.rot90(plot_field.gr[0]), norm=mpl.colors.LogNorm(vmin=nlim[0], vmax=nlim[1]), 
                 extent=(xlim[0], xlim[1], ylim[0], ylim[1]))
 
         for k,v in funcs.items():
@@ -71,14 +73,14 @@ def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width 
         plt.ylim(ylim[0], ylim[1])
         plt.xlim(xlim[0], xlim[1])
 
-        plt.legend()
+        plt.legend(loc = 'upper right')
         return
     ########################################################################
     
     snapshots = []
     xlim = [np.inf, 0]
     ylim = [np.inf, 0]
-
+    nlim = [np.inf, 0]
     get_snap_lims(galaxy)
     get_snap_lims(galaxy_dust)
     snapshots.sort()
@@ -119,21 +121,30 @@ def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width 
     for i in range(nrows):
 
         make_panel(galaxy, i)
-        plt.xlabel('No Dust', fontsize = 16)
+        ax = plt.gca()
+        if i==0:
+            plt.xlabel('No Dust', fontsize = 16)
+        else:
+            ax.get_legend().remove()
 
+        plt.text(xlim[1]-text_space, ylim[0]+text_space, 'z=%.1f'%snapshots[i], fontsize=16,
+                ha = 'right', va = 'bottom', fontweight = 'bold')
         make_panel(galaxy_dust, i)
-
-        plt.xlabel('Dust-Attenuated', fontsize = 16)
+        ax = plt.gca()
+        if i == 0:
+            plt.xlabel('Dust-Attenuated', fontsize = 16)
+        else:
+            ax.get_legend().remove()
         ax.set_yticklabels([])
-        for k,v in funcs.items():
-            plt.plot(x, v(x), label=k)
 
-        plt.sca(panels[2])
+
+        plt.sca(panels[i][2])
         ax = plt.gca()
         plt.colorbar(cax=ax)
-        fig.text(0.45, -.075, r'log($M_{*}$)', va = 'center', fontsize=16)
-        fig.text(-0.'g-r (magnitude)')
-        plt.title("Color-Stellar Mass for z=%.1f"%galaxy.snapshot)
+    fig.text(0.45, -.075, r'log($M_{*}$)', va = 'center', fontsize=16)
+    fig.text(-0.075, 0.45, 'g-r (magnitude)', ha = 'center', rotation = 'vertical',
+                fontsize = 16)
+    plt.title("Color-Stellar Mass")
 
 if __name__ == '__main__':
     main()
