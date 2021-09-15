@@ -27,8 +27,12 @@ def main():
     gr_stmass(galaxy, galaxy_dust)
 
     # save the plot
+    plt.savefig("/lustre/cosinga/gr_stmass.png")
 
     # now make just gr histogram
+
+    gr_hist(galaxy, galaxy_dust)
+    plt.savefig("/lustre/cosinga/gr_hist.png")
     return
 
 def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width = 1, text_space = 0.1):
@@ -145,6 +149,73 @@ def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width 
     fig.text(-0.075, 0.45, 'g-r (magnitude)', ha = 'center', rotation = 'vertical',
                 fontsize = 16)
     plt.title("Color-Stellar Mass")
+
+def gr_hist(galaxy, galaxy_dust, panel_length = 3, panel_bt = 0.1, text_space = 0.1, color_thresh = 0.65)
+    ######################### HELPER METHOD ###############################################################
+    def get_plot_lims(fields):
+        
+        for f in fields:
+            if f.snapshot not in snapshots:
+                snapshots.append(f.snapshot)
+            mid, hist = get_hist(f.gr_stmass)
+            xlim[0] = min(np.min(mid), xlim[0])
+            xlim[1] = max(np.max(mid), xlim[1])
+            ylim[0] = min(np.min(hist), ylim[0])
+            ylim[1] = max(np.max(hist), ylim[1])
+        return
+            
+    def get_hist(gr):
+        mid = []
+        for i in range(len(gr[2])-1):
+            mid.append((gr[2][i] + gr[2][i+1]) / 2)
+        hist = np.sum(gr[0], axis=0)
+        return np.array(mid), hist
+
+    def make_panel(fields, row_idx):
+        if fields[0].fieldname == 'galaxy':
+            col_idx = 0
+        else:
+            col_idx = 1
+        plot_field = None
+        for f in fields:
+            if f.snapshot == snapshots[row_idx]:
+                plot_field = f
+
+        if plot_field is None:
+            return
+        
+        x, hist = get_hist(plot_field.gr_stmass)
+        
+        rgb = np.zeros((x.shape[0],3))
+        rgb[:, 0] = 1.1 / (x[-1] - color_thresh) * (x - color_thresh)
+        rgb[:, 2] = 0.85 / (x[0] - color_thresh) * (x - color_thresh)
+
+
+
+        plt.sca(panels[row_idx][col_idx])
+        
+        plt.bar(x, hist, width = x[1] - x[0], color=rgb)
+        plt.ylim(ylim[0], ylim[1])
+        plt.xlim(xlim[0], xlim[1])
+        return
+
+    #########################################################################################################
+
+        
+    xlim = [np.inf, 0]
+    ylim = [np.inf, 0]
+    snapshots = []
+
+    get_plot_lims(galaxy)
+    get_plot_lims(galaxy_dust)
+    ncols = 2
+
+    figwidth = panel_length * ncols + panel_bt * (ncols - 1)
+    figheight = panel_length * nrows + panel_bt * (nrows - 1)
+    fig = plt.figure(figsize = (figwidth, figheight))
+
+    gs = gspec.GridSpec(nrows, ncols)
+
 
 if __name__ == '__main__':
     main()
