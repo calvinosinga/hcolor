@@ -20,8 +20,8 @@ sys.argv.pop(0) # removing unneeded script name
 RUNNAMES = sys.argv
 
 VERBOSE = int(input("how verbose should the logs be? (0 for limited, 1 for detailed)"))
-implemented_fields = ['hiptl', 'hisubhalo', 'galaxy', 'galaxy_dust', 'vn', 'galaxy_ptl', 'ptl']
-HI_fields = ['hiptl', 'hisubhalo', 'vn']
+implemented_fields = ['hiptl', 'hisubhalo', 'galaxy', 'galaxy_dust', 'vn', 'galaxy_ptl', 'ptl', 'hiptl_nH']
+HI_fields = ['hiptl', 'hisubhalo', 'vn', 'hiptl_nH']
 matter_fields = ['galaxy','galaxy_dust', 'galaxy_ptl']
 
 print("output directory prefix:%s"%PREFIX)

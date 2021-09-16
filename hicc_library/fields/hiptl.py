@@ -97,7 +97,8 @@ class hiptl_nH(hiptl):
             snappath, hih2filepath):
         super().__init__(simname, snapshot, axis, resolution, chunk, pkl_path, verbose, 
                 snappath, hih2filepath)
-
+        self.fieldname = 'hiptl_nH'
+        
         mods = self.getMolFracModelsPtl()
         mods.append('all_neut')
         nh_bins = self._getnHBins()
@@ -106,6 +107,7 @@ class hiptl_nH(hiptl):
             for n in range(len(nh_bins)+1):
                 self.gridnames.append(m+str(n))
         
+        self.vel_mass = {}
         return
     
     def computeGrids(self, outfile):
@@ -172,6 +174,10 @@ class hiptl_nH(hiptl):
             # save them to file
             self.saveData(outfile, grid, lo, hi)
             # if we are in redshift space, the grid handles saving with 'rs'
+
+            # want to plot velocity vs mass for each nH bin
+            self.vel_mass_hist(vel[mask, :], mass[mask], [lo, hi])
+
             return
         #############################################################################
 
@@ -186,10 +192,19 @@ class hiptl_nH(hiptl):
             computeHI(g, mass)
         hih2file.close()
 
-        # want to plot vel-mass dist for each nH bin later, so save those here
-        for n in nHbins:
-            outfile.create_dataset()
         return
+
+    def vel_mass_hist(self, vel, mass, nhlim):
+        vel_bins = np.logspace(-2, 6, 9)
+        m_bins = np.logspace(-2, 8, 11)
+        speed = np.sum(vel**2, axis=0)
+        speed = speed**0.5
+        self.vel_mass[str(nhlim)] = np.histogram2d(mass, speed, bins=[m_bins, vel_bins])
+        return
+
+
+
+
 
 
     def saveData(self, outfile, grid, lo, hi):
