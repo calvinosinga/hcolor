@@ -111,7 +111,16 @@ class hiptl_nH(hiptl):
         return
     
     def computeGrids(self, outfile):
-        super().super().computeGrids(outfile)
+        ################## FROM FIELD_SUPER BECAUSE PYTHON IS DUMB ################################
+        if self.v:
+            print("starting to compute grids...")
+        if self.header is None:
+            raise ValueError("header needs to be loaded before computing grids")
+        dat = outfile.create_dataset('pickle', data=[0])
+        dat.attrs['path'] = self.pkl_path
+        if self.v:
+            print("the saved pickle path: %s"%self.pkl_path)
+        #########################################################################################
         hih2file = hp.File(self.hih2filepath, 'r')
         pos, vel, mass, density = self._loadSnapshotData()
         in_rss = False
@@ -201,11 +210,6 @@ class hiptl_nH(hiptl):
         speed = speed**0.5
         self.vel_mass[str(nhlim)] = np.histogram2d(mass, speed, bins=[m_bins, vel_bins])
         return
-
-
-
-
-
 
     def saveData(self, outfile, grid, lo, hi):
         dat = super().saveData(outfile, grid)
