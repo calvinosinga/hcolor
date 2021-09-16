@@ -51,6 +51,7 @@ def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width 
         return
     
     def make_panel(fields, row_idx):
+        
         if fields[0].fieldname == 'galaxy':
             col_idx = 0
         else:
@@ -63,6 +64,13 @@ def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width 
         if plot_field is None:
             return
         
+        # functions for the color cuts
+        col_defs = plot_field.getColorDefinitions()
+        funcs = {}
+        x = np.linspace(xlim[0], xlim[1])
+        for k,v in col_defs.items():
+            funcs[k] = lambda x: v['b'] + (v['m'] * x + v['mb'])
+
         plt.sca(panels[row_idx][col_idx])
         
         plt.imshow(np.rot90(plot_field.gr[0]), norm=mpl.colors.LogNorm(vmin=nlim[0], vmax=nlim[1]), 
@@ -115,12 +123,7 @@ def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width 
         col_panels.append(fig.add_subplot(gs[i, panel_length*2:panel_length*2+cbar_width]))
         panels.append(col_panels)
 
-    # functions for the color cuts
-    col_defs = galaxy.getColorDefinitions()
-    funcs = {}
-    x = np.linspace(xlim[0], xlim[1])
-    for k,v in col_defs.items():
-        funcs[k] = lambda x: v['b'] + (v['m'] * x + v['mb'])
+
 
     for i in range(nrows):
 
@@ -150,7 +153,7 @@ def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width 
                 fontsize = 16)
     plt.title("Color-Stellar Mass")
 
-def gr_hist(galaxy, galaxy_dust, panel_length = 3, panel_bt = 0.1, text_space = 0.1, color_thresh = 0.65)
+def gr_hist(galaxy, galaxy_dust, panel_length = 3, panel_bt = 0.1, text_space = 0.1, color_thresh = 0.65):
     ######################### HELPER METHOD ###############################################################
     def get_plot_lims(fields):
         
@@ -172,6 +175,7 @@ def gr_hist(galaxy, galaxy_dust, panel_length = 3, panel_bt = 0.1, text_space = 
         return np.array(mid), hist
 
     def make_panel(fields, row_idx):
+        
         if fields[0].fieldname == 'galaxy':
             col_idx = 0
         else:
