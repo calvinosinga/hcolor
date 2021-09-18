@@ -55,6 +55,8 @@ class galaxy(Field):
     
     @staticmethod
     def isRed(gr, stmass, color_dict):
+        print("gr as input to isRed...")
+        print(gr)
         if isinstance(color_dict, dict):
             b = color_dict['b']
             m = color_dict['m']
@@ -179,12 +181,13 @@ class galaxy(Field):
         vel = data['SubhaloVel'][:]
 
         photo = data['SubhaloStellarPhotometrics'][:]
-
+        print("getting gr from loadSubhalo - ")
+        print(photo[:,4]-photo[:,5])
         if self.use_stmass:
             mass = data['SubhaloMassType'][:,4] # only using stellar mass here
         else:
             mass = data['SubhaloMassType'][:]
-        
+
         photo_dict = {}
         photo_dict['gr'] = photo[:, 4] - photo[:, 5]
         photo_dict['r'] = photo[:, 5]
@@ -193,9 +196,16 @@ class galaxy(Field):
         photo_dict['g'] = photo[:, 4]
         photo_dict['ri'] = photo_dict['r'] - photo_dict['i']
         photo_dict['rz'] = photo_dict['r'] - photo_dict['z']
+        print("after putting into photo dictionary")
+        print(photo_dict['gr'])
         mass = self._convertMass(mass)
         pos = self._convertPos(pos)
         vel = self._convertVel(vel)
+        res_dict = self.getResolutionDefinitions()[self.use_res]
+        resolved_mask = self.isResolved(mass[:, 4], photo_dict, res_dict)
+        print("resolved sum:")
+        print(np.sum(resolved_mask))
+        red_mask = self.isRed(photo_dict['gr'], mass[:, 4], self.getColorDefinitions()['nelson'])
         return pos, vel, mass, photo_dict
 
     def computeGrids(self, outfile):

@@ -229,12 +229,8 @@ from hicc_library.grid.grid import Grid
 class Cross():
     def __init__(self, field1, field2, gridfilepath1, gridfilepath2):
         # the fieldname for this cross-power
-        if field1.isHI:
-            self.fieldname = field1.fieldname + 'X' + field2.fieldname
-        elif field2.isHI:
-            self.fieldname = field2.fieldname + 'X' + field1.fieldname
-        else:
-            self.fieldname = field1
+        
+        self.fieldname = field1.fieldname + 'X' + field2.fieldname
         self.field1 = field1
         self.field2 = field2
         self.gfpath1 = gridfilepath1
