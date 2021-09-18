@@ -67,9 +67,11 @@ def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width 
         # functions for the color cuts
         col_defs = plot_field.getColorDefinitions()
         funcs = {}
+        
         x = np.linspace(xlim[0], xlim[1])
         for k,v in col_defs.items():
-            funcs[k] = lambda st_mass: v['b'] + (v['m'] * st_mass + v['mb'])
+            label = "$%.2f + %.2f(log(M_*)+%.2f$"%(v['b'], v['m'], v['mb'])
+            funcs[label] = lambda st_mass: v['b'] + (v['m'] * st_mass + v['mb'])
 
         plt.sca(panels[row_idx][col_idx])
         print(xlim, ylim, nlim)
