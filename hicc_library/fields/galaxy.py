@@ -3,6 +3,7 @@
 
 """
 
+from warnings import simplefilter
 from hicc_library.grid.grid import Grid
 from hicc_library.fields.field_super import Field
 import h5py as hp
@@ -201,7 +202,7 @@ class galaxy(Field):
         mass = self._convertMass(mass)
         pos = self._convertPos(pos)
         vel = self._convertVel(vel)
-        res_dict = self.getResolutionDefinitions()[self.use_res]
+        res_dict = self.getResolutionDefinitions(self.simname)[self.use_res]
         resolved_mask = self.isResolved(mass[:, 4], photo_dict, res_dict)
         print("resolved sum:")
         print(np.sum(resolved_mask))
