@@ -206,7 +206,10 @@ class galaxy(Field):
         resolved_mask = self.isResolved(mass[:, 4], photo_dict, res_dict)
         print("resolved sum:")
         print(np.sum(resolved_mask))
+
         red_mask = self.isRed(photo_dict['gr'], mass[:, 4], self.getColorDefinitions()['nelson'])
+        print("red sum:")
+        print(np.sum(resolved_mask*red_mask))
         return pos, vel, mass, photo_dict
 
     def computeGrids(self, outfile):
