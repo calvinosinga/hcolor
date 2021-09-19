@@ -266,7 +266,7 @@ class galaxy(Field):
                 print("\tsplit: " + str(splt))
                 print("\tcolor: " + color)
                 if not color_dict is None:
-                    print("\tcolor_dict: "+ color_dict)
+                    print("\tcolor_dict: "+ str(color_dict))
 
             if color == 'red':
                 mask = self.isRed(gr, mass, color_dict) * resolved_mask
