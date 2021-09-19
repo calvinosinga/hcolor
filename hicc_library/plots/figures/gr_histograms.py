@@ -130,7 +130,7 @@ def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width 
         col_panels = []
         for j in range(nhist):
             col_panels.append(fig.add_subplot(gs[i, panel_length*j:panel_length*(j+1)]))
-        col_panels.append(fig.add_subplot(gs[i, panel_length*2:panel_length*2+cbar_width]))
+        col_panels.append(fig.add_subplot(gs[i, panel_length*nhist:panel_length*nhist+cbar_width]))
         panels.append(col_panels)
 
 
