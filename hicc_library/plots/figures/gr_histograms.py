@@ -52,7 +52,7 @@ def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width 
     
     def make_panel(fields, row_idx):
         
-        if fields[row_idx].fieldname == 'galaxy':
+        if fields[row_idx].fieldname == 'galaxy' or nhist == 1:
             col_idx = 0
         else:
             col_idx = 1
@@ -70,11 +70,13 @@ def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width 
         
         x = np.linspace(xlim[0], xlim[1])
         for k,v in col_defs.items():
-            label = "$%.2f + %.2f(log(M_*)+%.2f$"%(v['b'], v['m'], v['mb'])
+            if v['m'] == 0:
+                label = "$%.2f$"%v['b']
+            else:
+                label = "$%.2f + %.2f(log(M_*) - %.2f)$"%(v['b'], v['m'], v['mb'])
             funcs[label] = lambda st_mass: v['b'] + (v['m'] * st_mass + v['mb'])
 
         plt.sca(panels[row_idx][col_idx])
-        print(xlim, ylim, nlim)
         if nlim[0] <= 0:
             nlim[0] = 1e-4
         plt.imshow(np.rot90(plot_field.gr_stmass[0]), norm=mpl.colors.LogNorm(vmin=nlim[0], vmax=nlim[1]), 
@@ -89,6 +91,9 @@ def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width 
         
 
         plt.legend(loc = 'upper right')
+        if col_idx == 0:
+            plt.text(xlim[1]-text_space, ylim[0]+text_space, 'z=%.1f'%plot_field.header['Redshift'], 
+                    fontsize=16, ha = 'right', va = 'bottom', fontweight = 'bold')
         return
     ########################################################################
     snapshots = []
@@ -98,9 +103,12 @@ def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width 
     get_snap_lims(galaxy)
     get_snap_lims(galaxy_dust)
     snapshots.sort()
-    
-    
-    nhist = 2
+
+    nhist = 0
+    if galaxy:
+        nhist += 1
+    if galaxy_dust:
+        nhist += 1
     nrows = len(snapshots)
 
     # making the gr-stellar mass plot
@@ -130,27 +138,31 @@ def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width 
     for i in range(nrows):
         if galaxy:
             make_panel(galaxy, i)
-        ax = plt.gca()
-        if i==0:
-            plt.xlabel('No Dust', fontsize = 16)
-        else:
-            ax.get_legend().remove()
+            ax = plt.gca()
+            ax.tick_params(axis="both", direction="in")
+            if i==0:
+                plt.xlabel('No Dust', fontsize = 16)
+            else:
+                ax.get_legend().remove()
+            
 
-        plt.text(xlim[1]-text_space, ylim[0]+text_space, 'z=%.1f'%snapshots[i], fontsize=16,
-                ha = 'right', va = 'bottom', fontweight = 'bold')
+        
         if galaxy_dust:
             make_panel(galaxy_dust, i)
-        ax = plt.gca()
-        if i == 0:
-            plt.xlabel('Dust-Attenuated', fontsize = 16)
-        else:
-            ax.get_legend().remove()
-        ax.set_yticklabels([])
+            ax = plt.gca()
+            if i == 0:
+                plt.xlabel('Dust-Attenuated', fontsize = 16)
+            else:
+                ax.get_legend().remove()
+            ax.set_yticklabels([])
+            ax.tick_params(axis="both", direction="in")
+        
 
 
-        plt.sca(panels[i][2])
+        plt.sca(panels[i][nhist+1])
         ax = plt.gca()
         plt.colorbar(cax=ax)
+        plt.ylabel("$N_g (count)$")
     fig.text(0.45, -.075, r'log($M_{*}$)', va = 'center', fontsize=16)
     fig.text(-0.075, 0.45, 'g-r (magnitude)', ha = 'center', rotation = 'vertical',
                 fontsize = 16)
