@@ -2,7 +2,6 @@ from hicc_library.plots import plot_lib as plib
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.gridspec as gspec
-import copy
 import numpy as np
 import sys
 import pickle as pkl
@@ -27,12 +26,12 @@ def main():
     gr_stmass(galaxy, galaxy_dust)
 
     # save the plot
-    plt.savefig("/lustre/cosinga/gr_stmass.png")
-
+    plt.savefig("/lustre/cosinga/figures/gr_stmass.png")
+    plt.clf()
     # now make just gr histogram
+    gr_hist(galaxy, galaxy_dust)
+    plt.savefig("/lustre/cosinga/figures/gr_hist.png")
 
-    #gr_hist(galaxy, galaxy_dust)
-    #plt.savefig("/lustre/cosinga/gr_hist.png")
     return
 
 def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width = 1, text_space = 0.1):
@@ -68,31 +67,45 @@ def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width 
         col_defs = plot_field.getColorDefinitions()
         funcs = {}
         
+        red_colors = ['darkred', 'firebrick', 'red', 'salmon', 'lightsalmon', 'mistyrose']
+
         x = np.linspace(xlim[0], xlim[1])
+
+        # we want the higher lines to be more red
+        vbs = []
+        for k,v in col_defs.items():
+            vbs.append(v['b'])
+        vbs.sort()
         for k,v in col_defs.items():
             if v['m'] == 0:
-                label = "gr=$%.2f$"%v['b']
+                label = "%.2f"%v['b']
             else:
-                label = "gr=$%.2f + %.2f(log(M_*) - %.2f)$"%(v['b'], v['m'], abs(v['mb']))
-            funcs[label] = lambda st_mass: v['b'] + (v['m'] * st_mass + v['mb'])
+                label = "%.2f + %.2f(log($M_*$) - %.2f)"%(v['b'], v['m'], abs(v['mb']))
+            idx = vbs.index(v['b'])
+            v['color'] = red_colors[idx]
+            funcs[label] = v
+
 
         plt.sca(panels[row_idx][col_idx])
         if nlim[0] <= 0:
-            nlim[0] = 1e-4
+            nlim[0] = 1
         plt.imshow(np.rot90(plot_field.gr_stmass[0]), norm=mpl.colors.LogNorm(vmin=nlim[0], vmax=nlim[1]), 
                 extent=(xlim[0], xlim[1], ylim[0], ylim[1]))
         
-        for k, fntn in funcs.items():
-            plt.plot(x, fntn(x), label=k)
+        def gr_lines(x, b, m, mb):
+            return b + m*(x+mb)
+        
+        for fkey, ft in funcs.items():
+            plt.plot(x, gr_lines(x, ft['b'], ft['m'], ft['mb']), label=fkey, color=ft['color'])
 
         
         ax = plt.gca()
         ax.xaxis.set_label_position('top')
-        
+        ax.set_aspect('auto')
 
-        plt.legend(loc = 'upper right')
+        plt.legend(loc = 'lower right')
         if col_idx == 0:
-            plt.text(xlim[1]-text_space, ylim[0]+text_space, 'z=%.1f'%plot_field.header['Redshift'], 
+            plt.text(xlim[1]-text_space*2, ylim[0]+text_space*2, '$z$=%.1f'%plot_field.header['Redshift'], 
                     fontsize=16, ha = 'right', va = 'bottom', fontweight = 'bold')
         return
     ########################################################################
@@ -144,6 +157,7 @@ def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width 
                 plt.xlabel('No Dust', fontsize = 16)
             else:
                 ax.get_legend().remove()
+                ax.set_xticklabels([])
             
 
         
@@ -154,19 +168,20 @@ def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width 
                 plt.xlabel('Dust-Attenuated', fontsize = 16)
             else:
                 ax.get_legend().remove()
+                ax.set_xticklabels([])
             ax.set_yticklabels([])
             ax.tick_params(axis="both", direction="in")
         
 
 
-    #    plt.sca(panels[i][nhist])
-    #    ax = plt.gca()
-    #    plt.colorbar(cax=ax)
-    #    plt.ylabel("$N_g (count)$")
-    #fig.text(0.45, -.075, r'log($M_{*}$)', va = 'center', fontsize=16)
-    #fig.text(-0.075, 0.45, 'g-r (magnitude)', ha = 'center', rotation = 'vertical',
-    #            fontsize = 16)
-    #plt.title("Color-Stellar Mass")
+        plt.sca(panels[i][nhist])
+        ax = plt.gca()
+        plt.colorbar(cax=ax)
+        plt.ylabel("$N_g$ (count)")
+    fig.text(0.45, .05, r'log($M_{*}$)', va = 'center', fontsize=16)
+    fig.text(0.05, 0.45, 'g-r (magnitude)', ha = 'center', rotation = 'vertical',
+               fontsize = 16)
+    return
 
 def gr_hist(galaxy, galaxy_dust, panel_length = 3, panel_bt = 0.1, text_space = 0.1, color_thresh = 0.65):
     ######################### HELPER METHOD ###############################################################
@@ -191,7 +206,7 @@ def gr_hist(galaxy, galaxy_dust, panel_length = 3, panel_bt = 0.1, text_space = 
 
     def make_panel(fields, row_idx):
         
-        if fields[0].fieldname == 'galaxy':
+        if fields[0].fieldname == 'galaxy' or ncols == 1:
             col_idx = 0
         else:
             col_idx = 1
@@ -216,6 +231,17 @@ def gr_hist(galaxy, galaxy_dust, panel_length = 3, panel_bt = 0.1, text_space = 
         plt.bar(x, hist, width = x[1] - x[0], color=rgb)
         plt.ylim(ylim[0], ylim[1])
         plt.xlim(xlim[0], xlim[1])
+
+        ax = plt.gca()
+        ax.tick_params(axis = 'both', direction = 'in')
+
+
+
+        if col_idx == 0:
+            plt.text(xlim[1]-text_space, ylim[1]-text_space, '$z$=%.1f'%plot_field.header['Redshift'], 
+                fontsize=16, ha = 'right', va = 'bottom', fontweight = 'bold')
+        
+
         return
 
     #########################################################################################################
@@ -227,13 +253,50 @@ def gr_hist(galaxy, galaxy_dust, panel_length = 3, panel_bt = 0.1, text_space = 
 
     get_plot_lims(galaxy)
     get_plot_lims(galaxy_dust)
-    ncols = 2
+    
+    snapshots.sort()
+
+    nrows = len(snapshots)
+    ncols = 0
+    if galaxy:
+        ncols += 1
+    if galaxy_dust:
+        ncols += 1
 
     figwidth = panel_length * ncols + panel_bt * (ncols - 1)
     figheight = panel_length * nrows + panel_bt * (nrows - 1)
     fig = plt.figure(figsize = (figwidth, figheight))
 
+    # creating gridspec
     gs = gspec.GridSpec(nrows, ncols)
+    plt.subplots_adjust(left = panel_bt / figwidth,
+            right = 1 - panel_bt / figwidth, top = 1 - panel_bt / figwidth,
+            bottom = panel_bt/figwidth, wspace = panel_bt, hspace = panel_bt)
+
+    panels = []
+    for i in range(nrows):
+        col_panels = []
+        for j in range(ncols):
+            col_panels.append(fig.add_subplot(gs[i, panel_length*j:panel_length*(j+1)]))
+        panels.append(col_panels)
+    
+    for i in range(nrows):
+        if galaxy:
+            make_panel(galaxy, i)
+            ax = plt.gca()
+            ax.xaxis.set_label_position('top')
+            plt.xlabel("No Dust")
+
+        if galaxy_dust:
+            make_panel(galaxy_dust, i)
+            ax = plt.gca()
+            ax.xaxis.set_label_position('top')
+            plt.xlabel("Dust-Attenuated")
+    
+    fig.text(0.45, .05, 'g-r (magnitude)', va = 'center', fontsize=16)
+    fig.text(0.05, 0.45, '$N_g$ (count)', ha = 'center', rotation = 'vertical',
+               fontsize = 16)
+    return
 
 
 if __name__ == '__main__':
