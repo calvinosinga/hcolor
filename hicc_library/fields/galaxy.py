@@ -261,8 +261,14 @@ class galaxy(Field):
             else:
                 col_key = ''
             # create the appropriate mask for the color
+            if self.v:
+                print("\tsplit: " + str(splt))
+                print("\tcolor: " + color)
+                print("\tcolor_dict: "+ color_dict)
+
             if color == 'red':
                 mask = self.isRed(gr, mass, color_dict) * resolved_mask
+                print("\tsum of red: "+ str(np.sum(mask)))
             elif color == 'blue':
                 mask = np.invert(self.isRed(gr, mass, color_dict)) * resolved_mask
             elif color == 'resolved':
