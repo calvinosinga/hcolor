@@ -71,9 +71,9 @@ def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width 
         x = np.linspace(xlim[0], xlim[1])
         for k,v in col_defs.items():
             if v['m'] == 0:
-                label = "$%.2f$"%v['b']
+                label = "gr=$%.2f$"%v['b']
             else:
-                label = "$%.2f + %.2f(log(M_*) - %.2f)$"%(v['b'], v['m'], v['mb'])
+                label = "gr=$%.2f + %.2f(log(M_*) - %.2f)$"%(v['b'], v['m'], abs(v['mb']))
             funcs[label] = lambda st_mass: v['b'] + (v['m'] * st_mass + v['mb'])
 
         plt.sca(panels[row_idx][col_idx])
@@ -159,14 +159,14 @@ def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width 
         
 
 
-        plt.sca(panels[i][nhist+1])
-        ax = plt.gca()
-        plt.colorbar(cax=ax)
-        plt.ylabel("$N_g (count)$")
-    fig.text(0.45, -.075, r'log($M_{*}$)', va = 'center', fontsize=16)
-    fig.text(-0.075, 0.45, 'g-r (magnitude)', ha = 'center', rotation = 'vertical',
-                fontsize = 16)
-    plt.title("Color-Stellar Mass")
+    #    plt.sca(panels[i][nhist])
+    #    ax = plt.gca()
+    #    plt.colorbar(cax=ax)
+    #    plt.ylabel("$N_g (count)$")
+    #fig.text(0.45, -.075, r'log($M_{*}$)', va = 'center', fontsize=16)
+    #fig.text(-0.075, 0.45, 'g-r (magnitude)', ha = 'center', rotation = 'vertical',
+    #            fontsize = 16)
+    #plt.title("Color-Stellar Mass")
 
 def gr_hist(galaxy, galaxy_dust, panel_length = 3, panel_bt = 0.1, text_space = 0.1, color_thresh = 0.65):
     ######################### HELPER METHOD ###############################################################
