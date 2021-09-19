@@ -255,6 +255,7 @@ class galaxy(Field):
             color = splt[0]
             # for 'resolved' + 'all' grids, they have no color definition
             # so the split will return a list of length one
+            color_dict = None
             if len(splt) == 2:
                 col_key = splt[1]
                 color_dict = self.getColorDefinitions()[col_key]
@@ -264,7 +265,8 @@ class galaxy(Field):
             if self.v:
                 print("\tsplit: " + str(splt))
                 print("\tcolor: " + color)
-                print("\tcolor_dict: "+ color_dict)
+                if not color_dict is None:
+                    print("\tcolor_dict: "+ color_dict)
 
             if color == 'red':
                 mask = self.isRed(gr, mass, color_dict) * resolved_mask
