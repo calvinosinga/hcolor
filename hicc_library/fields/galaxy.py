@@ -246,6 +246,8 @@ class galaxy(Field):
             stmass = mass
 
         resolved_mask = self.isResolved(stmass, photo, self.res_dict)
+        red_mask = self.isRed(gr, stmass, self.getColorDefinitions()['nelson'])
+        print()
         in_rss = False
         for g in self.gridnames:
             if self.v:
@@ -269,10 +271,11 @@ class galaxy(Field):
                     print("\tcolor_dict: "+ str(color_dict))
 
             if color == 'red':
-                mask = self.isRed(gr, mass, color_dict) * resolved_mask
+                mask = self.isRed(gr, stmass, color_dict)
+                mask = mask * resolved_mask
                 print("\tsum of red: "+ str(np.sum(mask)))
             elif color == 'blue':
-                mask = np.invert(self.isRed(gr, mass, color_dict)) * resolved_mask
+                mask = np.invert(self.isRed(gr, stmass, color_dict)) * resolved_mask
             elif color == 'resolved':
                 mask = resolved_mask
             elif color == 'all':
