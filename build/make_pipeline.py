@@ -112,7 +112,8 @@ for f in range(len(fields)):
     varnames.extend(svars)
     savefiles.update(ssave)
     key = fields[f].fieldname+'grid'
-    gd['pickles'][key] = gd['results'] + savefiles[key] + '.pkl'
+    
+    gd['pickles'][key] = gd['results'] + fields[f]._get_base_name(key) + '.pkl'
 
 for i in range(len(fields)):
     for j in range(len(fields)):
