@@ -252,6 +252,7 @@ class galaxy(Field):
         for g in self.gridnames:
             if self.v:
                 print("now making grids for %s"%g)
+                print(self.counts)
             # the gridname contains the color and the color definition
             splt = g.split('_',1)
             color = splt[0]
@@ -283,6 +284,7 @@ class galaxy(Field):
             
             # count the number of galaxies used for this grid
             self.counts[g] = np.sum(mask)
+            print(self.counts)
             grid = computeGal(pos[mask, :], mass[mask], g)
             self.saveData(outfile, grid, col_key)
             del grid
