@@ -111,7 +111,8 @@ for f in range(len(fields)):
     dependencies.update(sdeps)
     varnames.extend(svars)
     savefiles.update(ssave)
-    gd['pickles'][fields[f].fieldname] = gd['results'] + savefiles[fields[f].fieldname+'grid'] + '.pkl'
+    key = fields[f].fieldname+'grid'
+    gd['pickles'][key] = gd['results'] + savefiles[key] + '.pkl'
 
 for i in range(len(fields)):
     for j in range(len(fields)):
