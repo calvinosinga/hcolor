@@ -3,12 +3,11 @@
 
 """
 
-from warnings import simplefilter
 from hicc_library.grid.grid import Grid
 from hicc_library.fields.field_super import Field
 import h5py as hp
 import numpy as np
-
+from Pk_library import XPk, XXi
 
 class galaxy(Field):
 
@@ -35,6 +34,11 @@ class galaxy(Field):
 
         self.loadpath = catshpath
         self.counts = {}
+
+        self.xxis = {}
+        self.xpks = {}
+        self.tdxpks = {}
+
         if self.v:
             print('%s class variables:'%self.fieldname)
             print('Resolution definition: %s'%self.use_res)
@@ -56,8 +60,6 @@ class galaxy(Field):
     
     @staticmethod
     def isRed(gr, stmass, color_dict):
-        print("gr as input to isRed...")
-        print(gr)
         if isinstance(color_dict, dict):
             b = color_dict['b']
             m = color_dict['m']
@@ -88,11 +90,6 @@ class galaxy(Field):
 
 
         resolved = np.ones_like(stmass, dtype=bool)
-        print('galaxy resolution definition dictionary:')
-        print(res_dict)
-
-        print('average mass of objects:')
-        print(np.mean(stmass))
         for r in res_dict:
             if r == 'stmass':
                 t = res_dict[r]
@@ -182,8 +179,6 @@ class galaxy(Field):
         vel = data['SubhaloVel'][:]
 
         photo = data['SubhaloStellarPhotometrics'][:]
-        print("getting gr from loadSubhalo - ")
-        print(photo[:,4]-photo[:,5])
         if self.use_stmass:
             mass = data['SubhaloMassType'][:,4] # only using stellar mass here
         else:
@@ -197,19 +192,13 @@ class galaxy(Field):
         photo_dict['g'] = photo[:, 4]
         photo_dict['ri'] = photo_dict['r'] - photo_dict['i']
         photo_dict['rz'] = photo_dict['r'] - photo_dict['z']
-        print("after putting into photo dictionary")
-        print(photo_dict['gr'])
         mass = self._convertMass(mass)
         pos = self._convertPos(pos)
         vel = self._convertVel(vel)
         res_dict = self.getResolutionDefinitions(self.simname)[self.use_res]
         resolved_mask = self.isResolved(mass[:, 4], photo_dict, res_dict)
-        print("resolved sum:")
-        print(np.sum(resolved_mask))
 
         red_mask = self.isRed(photo_dict['gr'], mass[:, 4], self.getColorDefinitions()['nelson'])
-        print("red sum:")
-        print(np.sum(resolved_mask*red_mask))
         return pos, vel, mass, photo_dict
 
     def computeGrids(self, outfile):
@@ -246,13 +235,10 @@ class galaxy(Field):
             stmass = mass
 
         resolved_mask = self.isResolved(stmass, photo, self.res_dict)
-        red_mask = self.isRed(gr, stmass, self.getColorDefinitions()['nelson'])
-        print()
         in_rss = False
         for g in self.gridnames:
             if self.v:
                 print("now making grids for %s"%g)
-                print(self.counts)
             # the gridname contains the color and the color definition
             splt = g.split('_',1)
             color = splt[0]
@@ -265,16 +251,11 @@ class galaxy(Field):
             else:
                 col_key = ''
             # create the appropriate mask for the color
-            if self.v:
-                print("\tsplit: " + str(splt))
-                print("\tcolor: " + color)
-                if not color_dict is None:
-                    print("\tcolor_dict: "+ str(color_dict))
+
 
             if color == 'red':
                 mask = self.isRed(gr, stmass, color_dict)
                 mask = mask * resolved_mask
-                print("\tsum of red: "+ str(np.sum(mask)))
             elif color == 'blue':
                 mask = np.invert(self.isRed(gr, stmass, color_dict)) * resolved_mask
             elif color == 'resolved':
@@ -284,7 +265,6 @@ class galaxy(Field):
             
             # count the number of galaxies used for this grid
             self.counts[g] = np.sum(mask)
-            print(self.counts)
             grid = computeGal(pos[mask, :], mass[mask], g)
             self.saveData(outfile, grid, col_key)
             del grid
@@ -322,7 +302,6 @@ class galaxy(Field):
         return
     
     def make_gr_stmass(self, gr, stmass):
-        print(np.any(stmass) == 0)
         stmass = np.ma.masked_equal(stmass, 0)
         self.gr_stmass = np.histogram2d(np.log10(stmass), gr, bins=50)
         return
@@ -338,6 +317,7 @@ class galaxy(Field):
     def _convertVel(self, vel):
         # subhalos' velocities are already in km/s
         return vel
+    
     
 
     
@@ -383,164 +363,3 @@ class galaxy_dust(galaxy):
         return dat
     
 
-# from hydrotools.interface import interface as iface_run
-
-# class galaxy_ptl(galaxy):
-
-#     def __init__(self, simname, snapshot, axis, resolution, pkl_path, verbose):
-#         super().__init__(simname, snapshot, axis, resolution,
-#                 pkl_path, verbose, 'galaxy_ptl')
-#         self.gridnames = ['blue','red','blue_dust', 'red_dust']
-        
-        
-
-#         if self.use_stmass:
-#             self.ptl_names = ['ptlstr']
-#             self.mass = self.ht_file['catsh_SubhaloMassType'][:,4]
-#         else:
-#             self.ptl_names = ['ptlstr','ptlgas','ptldm']
-#             self.mass = np.sum(self.ht_file['catsh_SubhaloMassType'][:], axis=1)
-#             # if black holes are implemented use the following definition
-#             # self.ptl_names = ['ptlstr','ptlgas','ptldm', 'ptlbh']
-        
-#         self.pos = self.ht_file['catsh_SubhaloPos'] * self.header['Time'] # given ckpc, moved to kpc
-#         self.vel = self.ht_file['catsh_SubhaloVel']
-        
-#         self.use_cicw = 1 # this should always use CICW
-#         return
-#     # ['catgrp_GroupNsubs', 'catgrp_Group_M_Crit200', 'catgrp_id', 'catgrp_is_primary', 'catsh_gr_normal',
-#     #  'catsh_id', 'catxt_gr_dust', 'config', 'ptldm_Coordinates', 'ptldm_ParticleIDs', 'ptldm_Velocities',
-#     #   'ptldm_first', 'ptldm_n', 'ptlgas_Coordinates', 'ptlgas_ParticleIDs', 'ptlgas_Velocities', 
-#     #   'ptlgas_first', 'ptlgas_n', 'ptlstr_Coordinates', 'ptlstr_ParticleIDs', 'ptlstr_Velocities', 
-#     #   'ptlstr_first', 'ptlstr_n']
-
-    
-#     def _loadSlices(self, fptl):
-        
-#         shslc = []
-#         for i in range(len(fptl-1)):
-#             shslc.append(slice(fptl[i],fptl[i+1]))
-#         shslc.append(slice(fptl[-1], -1))
-#         return shslc
-    
-#     def _useHydrotools(self, gd):
-#         ht_suf = gd['ht_suf']
-
-#         xtf = ['gr_dust']
-#         shf = ['gr_normal', 'SubhaloPos', 'SubhaloVel', 'SubhaloMassType']
-#         ptf = ['Coordinates', 'Velocities', 'ParticleIDs', 'Masses']
-#         sim = self._get_simname_as_ht_input(self.simname)
-#         if self.use_stmass:
-#             iface_run.extractGalaxyData(sim=sim, snap_idx=self.snapshot, verbose = bool(self.v),
-#                     file_suffix=ht_suf, output_compression='gzip', catxt_get=True, catxt_fields=xtf,
-#                     catsh_get=True, catsh_fields=shf, ptlstr_get=True, ptlstr_fields=ptf,
-#                     output_path=gd['results'], catgrp_get = False)
-#         else:
-#             iface_run.extractGalaxyData(sim=sim, snap_idx=self.snapshot, verbose = bool(self.v),
-#                     file_suffix=ht_suf, output_compression='gzip', catxt_get=True, catxt_fields=xtf,
-#                     catsh_get=True, catsh_fields=shf, ptlstr_get=True, ptlstr_fields=ptf,
-#                     ptldm_get=True, ptldm_fields=ptf, ptlgas_get=True, ptlgas_fields=ptf,
-#                     output_path=gd['results'], catgrp_get = False)
-    
-#         return
-    
-    
-#     @staticmethod
-#     def _get_simname_as_ht_input(simname):
-#         # since ht uses different keywords for simnames, include this
-#         # dictionary to traverse between the two
-#         ht_sim = {'tng100':'tng75', 'tng300':'tng205', 'tng50':'tng35'}
-
-#         return ht_sim[simname]
-    
-#     def _getMasks(self):
-#         masks = []
-#         resolved_mask = self.isResolved(self.mass, self.r, self.res_dict)
-#         col_def = self.getColorDefinitions()[self.col]
-#         for g in self.gridnames:
-#             if 'dust' in g:
-#                 gr = self.gr_dust
-#             else:
-#                 gr = self.gr
-            
-#             if 'red' in g:
-#                 mask = self.isRed(gr, self.mass, col_def)
-#             else:
-#                 mask = np.invert(self.isRed(gr, self.mass, col_def))
-            
-#             mask *= resolved_mask
-#             masks.append(mask)
-            
-
-#         return masks
-    
-#     def computeGrids(self):
-#         # figure out which subhalos are red/blue
-#         # need to do this first to avoid having multiple grid arrays which take a lot of memory
-#         masks = self._getMasks()
-#         ht = self.ht_file
-#         # iterate over each grid, use the mask to figure out
-#         # which data that you want to add to the grid 
-#         for i in range(len(self.gridnames)):
-#             mask = masks[i]
-#             gn = self.gridnames[i]
-            
-#             self.grid = Grid(gn, self.resolution)
-#             # mask off the subhalos not included in this color definition
-#             shpos = self.pos[mask, :]
-#             # for each particle type
-#             for p in self.ptl_names:
-#                 # load the data for this particle type
-#                 ptlpos = ht['%s_Coordinates'%p]
-#                 ptlmass = ht['%s_Masses'%p]
-
-#                 ptlslc = self._loadSlices(ht['%s_first'])
-#                 # iterate over each subhalo, placing the particles into the grid
-#                 for s in range(len(shpos)):
-#                     # the positions are relative to the subhalos position
-#                     pos_for_grid = ptlpos[ptlslc[s], :] + shpos[s, :]
-#                     mass_for_grid = ptlmass[ptlslc[s]]
-#                     self.grid.CICW(pos_for_grid, self.header['BoxSize'], mass_for_grid)
-#             self.saveData(gn)
-                
-        
-#         # now do the same in redshift space
-#         for i in range(len(self.gridnames)):
-#             mask = masks[i]
-#             gn = self.gridnames[i]
-            
-#             self.grid = Grid(gn, self.resolution)
-#             self.grid.toRSS()
-#             # mask off the subhalos not included in this color definition
-#             shpos = self.pos[mask, :]
-#             shvel = self.vel[mask, :]
-#             # for each particle type
-#             for p in self.ptl_names:
-#                 # load the data for this particle type
-#                 ptlpos = ht['%s_Coordinates'%p]
-#                 ptlmass = ht['%s_Masses'%p]
-#                 ptlvel = ht['%s_Velocities'%p]
-
-#                 ptlslc = self._loadSlices(ht['%s_first'])
-#                 # iterate over each subhalo, placing the particles into the grid
-#                 for s in range(len(shpos)):
-#                     # the positions are relative to the subhalos position
-#                     pos_for_grid = ptlpos[ptlslc[s], :] + shpos[s, :]
-#                     vel_for_grid = ptlvel[ptlslc[s], :] + shvel[s, :]
-#                     mass_for_grid = ptlmass[ptlslc[s]]
-#                     self._toRedshiftSpace(pos_for_grid, vel_for_grid)
-#                     self.grid.CICW(pos_for_grid, self.header['BoxSize'], mass_for_grid)
-#             self.saveData(gn)
-#         return
-
-#     def saveData(self, gridname):
-#         dat = super().saveData(self.col)
-#         dct = dat.attrs
-#         dct['use_res'] = self.use_res
-#         dct['is_stmass'] = self.use_stmass
-#         if 'dust' in gridname:
-#             dct['used_dust'] = True
-#         else:
-#             dct['used_dust'] = False
-#         dct['is_massden'] = 1
-#         return 

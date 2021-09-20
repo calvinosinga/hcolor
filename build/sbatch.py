@@ -73,8 +73,7 @@ class Sbatch():
         crossdir['mem-per-cpu'] = first_sbatch._compute_xpk_memory()
         first_sbatch._sbatch_lines(crossjob, crossdir)
 
-        cmd_args = [first_sbatch.cross_path, last_jobs[0], last_jobs[1], 
-                cross_var_name[0], plotkey]
+        cmd_args = [first_sbatch.cross_path, last_jobs[0], last_jobs[1], plotkey]
         
         first_sbatch._write_python_line(crossjob, cmd_args)
 
@@ -198,6 +197,7 @@ class Sbatch():
     def _add_global(self, gd):
         fn = self.fieldname
         gd[self.plots_key]=self.plot_path
+
         if "galaxy" in fn:
             
             galaxy_min_resolution = galaxy.getResolutionDefinitions(self.simname)

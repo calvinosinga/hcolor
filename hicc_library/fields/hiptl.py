@@ -206,7 +206,7 @@ class hiptl_nH(hiptl):
     def vel_mass_hist(self, vel, mass, nhlim):
         vel_bins = np.logspace(-2, 6, 9)
         m_bins = np.logspace(-2, 8, 11)
-        speed = np.sum(vel**2, axis=0)
+        speed = np.sum(vel**2, axis=1)
         speed = speed**0.5
         self.vel_mass[str(nhlim)] = np.histogram2d(mass, speed, bins=[m_bins, vel_bins])
         return

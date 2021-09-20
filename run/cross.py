@@ -15,12 +15,10 @@ if gd['verbose']:
 
 INGRIDKEY1 = sys.argv[1]
 INGRIDKEY2 = sys.argv[2]
-OUTFILEKEY = sys.argv[3]
-PLOTDIRKEY = sys.argv[4]
+PLOTDIRKEY = sys.argv[3]
 
 INGRIDPATH1 = gd['grids'] + gd[INGRIDKEY1]
 INGRIDPATH2 = gd['grids']+ gd[INGRIDKEY2]
-OUTFILEPATH = gd['results'] + gd[OUTFILEKEY]
 PLOTDIR = gd['plots'] + gd[PLOTDIRKEY]
 
 pkl_paths = []
@@ -33,7 +31,12 @@ for g in (INGRIDPATH1, INGRIDPATH2):
 field1 = pickle.load(open(pkl_paths[0], 'rb'))
 field2 = pickle.load(open(pkl_paths[1], 'rb'))
 
-
+try:
+    OUTFILEPATH = gd['pickles'][field1.fieldname + 'X' + field2.fieldname]
+except KeyError:
+    print("didn't find key: %s"%(field1.fieldname + 'X' + field2.fieldname))
+    OUTFILEPATH = gd['pickles'][field2.fieldname + 'X' + field1.fieldname]
+    
 if gd['verbose']:
     print('The first ingrid path:%s'%INGRIDPATH1)
     print('The second ingrid path:%s'%INGRIDPATH2)

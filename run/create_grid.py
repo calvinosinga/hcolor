@@ -36,8 +36,7 @@ if CHUNK == -1:
 else:
     outfilepath = gd['grids']+gd[FIELDNAME]%CHUNK
 
-pickle_path = gd['results']+gd[FIELDNAME]+'.pkl'
-pickle_path.replace('%d', '')
+pickle_path = gd['pickles'][FIELDNAME]
 outfile = hp.File(outfilepath, 'w')
 
 #####################################

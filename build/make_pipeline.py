@@ -57,6 +57,7 @@ gd['auto_result'] = HCOLOR+'run/auto.py'
 gd['cross_result'] = HCOLOR+'run/cross.py'
 gd['hih2catsh'] = gd['post']+'hih2_galaxy_%03d.hdf5'%SNAPSHOT
 gd['TREECOOL'] = gd[SIMNAME]+'TREECOOL_fg_dec11'
+gd['pickles'] = {}
 # prompting user for other needed input
 isptl = {}
 for r in RUNNAMES:
@@ -110,12 +111,15 @@ for f in range(len(fields)):
     dependencies.update(sdeps)
     varnames.extend(svars)
     savefiles.update(ssave)
+    gd['pickles'][fields[f].fieldname] = gd['results'] + gd[fields[f].fieldname] + '.pkl'
 
 for i in range(len(fields)):
     for j in range(len(fields)):
         fn1 = fields[i].fieldname
         fn2 = fields[j].fieldname
-        if fn1 in HI_fields and fn2 in matter_fields:
+        galXgal = (fn1 == 'galaxy' and fn2 == 'galaxy') or (fn1 == 'galaxy_dust' \
+                and fn2 == 'galaxy_dust')
+        if (fn1 in HI_fields and fn2 in matter_fields) or galXgal:
             xplotpath = gd['plots'] + '%sX%s/'%(fn1,fn2)
             os.mkdir(xplotpath)
             xplotkey = '%sX%s_plots'%(fn1,fn2)
@@ -125,6 +129,10 @@ for i in range(len(fields)):
             dependencies.update(cdep)
             varnames.extend(cvar)
             savefiles.update(csave)
+            gd['pickles'][fn1 + 'X' + fn2] = gd['results'] + fn1 + 'X' + fn2 + \
+                    "_%sB_%03dS_%dA_%dR.pkl"%(SIMNAME, SNAPSHOT, AXIS, RESOLUTION)
+            
+
 
 gd.update(savefiles)
 
@@ -176,5 +184,7 @@ for i in range(len(jobnames)):
         write_line(varnames[i], jobnames[i], dependencies[varnames[i]])
     except KeyError:
         write_line(varnames[i], jobnames[i])
+
+# make a figures bash file:
 
 
