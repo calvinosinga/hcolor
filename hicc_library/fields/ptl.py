@@ -39,7 +39,7 @@ class ptl(Field):
                 grid.print()
             
             # place particles into grid
-            grid.CICW(pos[slc, :], self.header['BoxSize'], mass[slc, :])
+            grid.CICW(pos[slc, :], self.header['BoxSize'], mass[slc])
 
             # save them to file
             self.saveData(outfile, grid)

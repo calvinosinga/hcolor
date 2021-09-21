@@ -107,7 +107,6 @@ class hiptl_nH(hiptl):
             for n in range(len(nh_bins)+1):
                 self.gridnames.append(m+str(n))
         
-        self.vel_mass = {}
         return
     
     def computeGrids(self, outfile):
@@ -185,7 +184,7 @@ class hiptl_nH(hiptl):
             # if we are in redshift space, the grid handles saving with 'rs'
 
             # want to plot velocity vs mass for each nH bin
-            self.vel_mass_hist(vel[mask, :], mass[mask], [lo, hi])
+            self.vel_mass_hist(vel[mask, :], mass[mask], [lo, hi], outfile)
 
             return
         #############################################################################
@@ -203,12 +202,12 @@ class hiptl_nH(hiptl):
 
         return
 
-    def vel_mass_hist(self, vel, mass, nhlim):
+    def vel_mass_hist(self, vel, mass, nhlim, outfile):
         vel_bins = np.logspace(-2, 6, 9)
         m_bins = np.logspace(-2, 8, 11)
         speed = np.sum(vel**2, axis=1)
         speed = speed**0.5
-        self.vel_mass[str(nhlim)] = np.histogram2d(mass, speed, bins=[m_bins, vel_bins])
+        outfile[str(nhlim)] = np.histogram2d(mass, speed, bins=[m_bins, vel_bins])
         return
 
     def saveData(self, outfile, grid, lo, hi):

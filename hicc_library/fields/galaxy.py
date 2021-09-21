@@ -196,9 +196,6 @@ class galaxy(Field):
         pos = self._convertPos(pos)
         vel = self._convertVel(vel)
         res_dict = self.getResolutionDefinitions(self.simname)[self.use_res]
-        resolved_mask = self.isResolved(mass[:, 4], photo_dict, res_dict)
-
-        red_mask = self.isRed(photo_dict['gr'], mass[:, 4], self.getColorDefinitions()['nelson'])
         return pos, vel, mass, photo_dict
 
     def computeGrids(self, outfile):

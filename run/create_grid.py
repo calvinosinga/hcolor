@@ -88,6 +88,6 @@ field.computeAux()
 # for fields with chunks, there will already be a pickle file with
 # the needed information so we don't need to create a new one with
 # each chunk.
-if not os.path.isfile(pickle_path):
+if CHUNK == 0 or CHUNK == -1:
     pickle.dump(field, open(pickle_path, 'wb'), pickle.HIGHEST_PROTOCOL)
 outfile.close()
