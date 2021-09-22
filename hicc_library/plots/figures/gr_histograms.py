@@ -13,10 +13,11 @@ def main():
     sys.argv.pop(0)
 
     # the infiles are given through the command-line
-    INPKLS = sys.argv
+    INFILE = sys.argv[0]
+    f = open(INFILE, 'r')
     galaxy = []
     galaxy_dust = []
-    for p in INPKLS:
+    for p in list(f):
         f = pkl.load(open(p, 'rb'))
         if f.fieldname == 'galaxy':
             galaxy.append(f)
@@ -26,11 +27,11 @@ def main():
     gr_stmass(galaxy, galaxy_dust)
 
     # save the plot
-    plt.savefig("/lustre/cosinga/figures/gr_stmass.png")
+    plt.savefig("/lustre/cosinga/hcolor/figures/gr_stmass.png")
     plt.clf()
     # now make just gr histogram
     gr_hist(galaxy, galaxy_dust)
-    plt.savefig("/lustre/cosinga/figures/gr_hist.png")
+    plt.savefig("/lustre/cosinga/hcolor/figures/gr_hist.png")
 
     return
 
