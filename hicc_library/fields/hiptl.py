@@ -207,7 +207,7 @@ class hiptl_nH(hiptl):
         m_bins = np.logspace(-2, 8, 11)
         speed = np.sum(vel**2, axis=1)
         speed = speed**0.5
-        outfile.create_dataset(str(nhlim), data = np.histogram2d(mass, speed, bins=[m_bins, vel_bins]))
+        outfile.create_dataset(str(nhlim), data = np.histogram2d(mass, speed, bins=[m_bins, vel_bins])[0])
         return
 
     def saveData(self, outfile, grid, lo, hi):
