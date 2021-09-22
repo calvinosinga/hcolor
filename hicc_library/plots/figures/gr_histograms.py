@@ -110,7 +110,7 @@ def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.25,
         if col_idx == 0:
             xts = (xlim[1]-xlim[0]) * text_space
             yts = (ylim[1]-ylim[0]) * text_space
-            plt.text(xlim[1]-xts, ylim[0]+yts, '$z$=%.1f'%plot_field.header['Redshift'], 
+            plt.text(xlim[1]-xts, ylim[1]-yts, '$z$=%.1f'%plot_field.header['Redshift'], 
                     fontsize=fsize, ha = 'center', va = 'center', fontweight = 'bold')
         return
     ########################################################################
