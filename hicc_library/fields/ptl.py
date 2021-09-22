@@ -57,7 +57,14 @@ class ptl(Field):
         pos = self._toRedshiftSpace(pos, vel)
         in_rss = True
         for g in self.gridnames:
-            computePtl(g)
+            if g == 'stmass':
+                slc = slices[2]
+            elif g == 'dm':
+                slc = slices[1]
+            else:
+                slc = slice(None)
+
+            computePtl(g, slc)
         return
     
     
