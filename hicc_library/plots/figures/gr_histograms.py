@@ -18,10 +18,11 @@ def main():
     galaxy = []
     galaxy_dust = []
     for p in list(f):
+        p = p.replace('\n', '')
         f = pkl.load(open(p, 'rb'))
         if f.fieldname == 'galaxy':
             galaxy.append(f)
-        elif f.fielname == 'galaxy_dust':
+        elif f.fieldname == 'galaxy_dust':
             galaxy_dust.append(f)
     
     gr_stmass(galaxy, galaxy_dust)
@@ -35,7 +36,8 @@ def main():
 
     return
 
-def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width = 1, text_space = 0.1):
+def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.25, 
+            border = 1, cbar_width = 1, text_space = 0.1, fsize = 24):
     ############ HELPER METHOD ##########################################
     def get_snap_lims(fields):
         
@@ -83,7 +85,7 @@ def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width 
             else:
                 label = "%.2f + %.2f(log($M_*$) - %.2f)"%(v['b'], v['m'], abs(v['mb']))
             idx = vbs.index(v['b'])
-            v['color'] = red_colors[idx]
+            v['color'] = red_colors[-1*idx]
             funcs[label] = v
 
 
@@ -104,10 +106,12 @@ def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width 
         ax.xaxis.set_label_position('top')
         ax.set_aspect('auto')
 
-        plt.legend(loc = 'lower right')
+        plt.legend(loc = 'lower right', prop = {'size':fsize/2})
         if col_idx == 0:
-            plt.text(xlim[1]-text_space*2, ylim[0]+text_space*2, '$z$=%.1f'%plot_field.header['Redshift'], 
-                    fontsize=16, ha = 'right', va = 'bottom', fontweight = 'bold')
+            xts = (xlim[1]-xlim[0]) * text_space
+            yts = (ylim[1]-ylim[0]) * text_space
+            plt.text(xlim[1]-xts, ylim[0]+yts, '$z$=%.1f'%plot_field.header['Redshift'], 
+                    fontsize=fsize, ha = 'center', va = 'center', fontweight = 'bold')
         return
     ########################################################################
     snapshots = []
@@ -126,18 +130,20 @@ def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width 
     nrows = len(snapshots)
 
     # making the gr-stellar mass plot
+    lab_border = border*1.5 # borders with labels and ticks need extra space
 
     ncols = panel_length*nhist + cbar_width
     # create the figure with the right dimensions
-    figwidth = panel_length * nhist + panel_bt * (nhist - 1) + cbar_width
-    figheight = panel_length * nrows + panel_bt * (nrows - 1)
+    figwidth = panel_length * nhist + panel_bt * (nhist - 1) + cbar_width + lab_border*2
+    # one label border for y-axis, another for colorbar
+    figheight = panel_length * nrows + panel_bt * (nrows - 1) + lab_border + border
     fig = plt.figure(figsize = (figwidth, figheight))
 
     # creating gridspec
     gs = gspec.GridSpec(nrows, ncols)
-    plt.subplots_adjust(left = panel_bt / figwidth,
-            right = 1 - panel_bt / figwidth, top = 1 - panel_bt / figwidth,
-            bottom = panel_bt/figwidth, wspace = panel_bt, hspace = panel_bt)
+    plt.subplots_adjust(left = lab_border / figwidth,
+            right = 1 - border / figwidth, top = 1 - border / figwidth,
+            bottom = lab_border/figwidth, wspace = panel_bt, hspace = panel_bt)
 
     panels = []
     for i in range(nrows):
@@ -148,29 +154,32 @@ def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width 
         panels.append(col_panels)
 
 
-
+    tick_font_size = 0.75*fsize
     for i in range(nrows):
         if galaxy:
             make_panel(galaxy, i)
             ax = plt.gca()
             ax.tick_params(axis="both", direction="in")
+            plt.yticks(fontsize=tick_font_size)
             if i==0:
-                plt.xlabel('No Dust', fontsize = 16)
+                plt.xlabel('No Dust', fontsize = fsize)
+                plt.xticks(fontsize=tick_font_size)
             else:
                 ax.get_legend().remove()
                 ax.set_xticklabels([])
-            
+                
 
         
         if galaxy_dust:
             make_panel(galaxy_dust, i)
             ax = plt.gca()
             if i == 0:
-                plt.xlabel('Dust-Attenuated', fontsize = 16)
+                plt.xlabel('Dust-Attenuated', fontsize = fsize)
+                plt.xticks(fontsize=tick_font_size)
             else:
-                ax.get_legend().remove()
                 ax.set_xticklabels([])
             ax.set_yticklabels([])
+            ax.get_legend().remove()
             ax.tick_params(axis="both", direction="in")
         
 
@@ -178,13 +187,15 @@ def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.1, cbar_width 
         plt.sca(panels[i][nhist])
         ax = plt.gca()
         plt.colorbar(cax=ax)
-        plt.ylabel("$N_g$ (count)")
-    fig.text(0.45, .05, r'log($M_{*}$)', va = 'center', fontsize=16)
-    fig.text(0.05, 0.45, 'g-r (magnitude)', ha = 'center', rotation = 'vertical',
-               fontsize = 16)
+        plt.ylabel("$N_g$ (count)", fontsize = fsize)
+        plt.yticks(fontsize=tick_font_size)
+    fig.text(0.5, lab_border/2/figheight, r'log($M_{*}$)', ha = 'center', va = 'center', fontsize=fsize)
+    fig.text(lab_border/2/figwidth, 0.5, 'g-r (magnitude)', va='center', ha = 'center', rotation = 'vertical',
+               fontsize = fsize)
     return
 
-def gr_hist(galaxy, galaxy_dust, panel_length = 3, panel_bt = 0.1, text_space = 0.1, color_thresh = 0.65):
+def gr_hist(galaxy, galaxy_dust, panel_length = 3, panel_bt = 0.1, text_space = 0.1, border = 0.5, 
+                color_thresh = 0.65):
     ######################### HELPER METHOD ###############################################################
     def get_plot_lims(fields):
         
@@ -222,10 +233,11 @@ def gr_hist(galaxy, galaxy_dust, panel_length = 3, panel_bt = 0.1, text_space = 
         x, hist = get_hist(plot_field.gr_stmass)
         
         rgb = np.zeros((x.shape[0],3))
-        rgb[:, 0] = 1.1 / (x[-1] - color_thresh) * (x - color_thresh)
+        rgb[:, 0] = 1.25 / (x[-1] - color_thresh) * (x - color_thresh) + 0.35
         rgb[:, 2] = 0.85 / (x[0] - color_thresh) * (x - color_thresh)
-
-
+        
+        rgb = np.where(rgb < 1, rgb, np.ones(rgb.shape))
+        rgb = np.where(rgb > 0, rgb, np.zeros(rgb.shape))
 
         plt.sca(panels[row_idx][col_idx])
         
@@ -236,12 +248,13 @@ def gr_hist(galaxy, galaxy_dust, panel_length = 3, panel_bt = 0.1, text_space = 
         ax = plt.gca()
         ax.tick_params(axis = 'both', direction = 'in')
 
-
-
         if col_idx == 0:
-            plt.text(xlim[1]-text_space, ylim[1]-text_space, '$z$=%.1f'%plot_field.header['Redshift'], 
-                fontsize=16, ha = 'right', va = 'bottom', fontweight = 'bold')
-        
+            xts = (xlim[1]-xlim[0])*text_space
+            yts = (ylim[1]-ylim[0])*text_space
+            plt.text(xlim[0]+xts, ylim[1]-yts, '$z$=%.1f'%plot_field.header['Redshift'], 
+                fontsize=16, ha = 'left', va = 'top', fontweight = 'bold')
+        else:
+            ax.set_yticklabels([])
 
         return
 
@@ -263,22 +276,23 @@ def gr_hist(galaxy, galaxy_dust, panel_length = 3, panel_bt = 0.1, text_space = 
         ncols += 1
     if galaxy_dust:
         ncols += 1
-
-    figwidth = panel_length * ncols + panel_bt * (ncols - 1)
-    figheight = panel_length * nrows + panel_bt * (nrows - 1)
+    top_border = border
+    bot_border = border*2
+    figwidth = panel_length * ncols + panel_bt * (ncols - 1) + border*2
+    figheight = panel_length * nrows + panel_bt * (nrows - 1) + bot_border + top_border
     fig = plt.figure(figsize = (figwidth, figheight))
 
     # creating gridspec
     gs = gspec.GridSpec(nrows, ncols)
-    plt.subplots_adjust(left = panel_bt / figwidth,
-            right = 1 - panel_bt / figwidth, top = 1 - panel_bt / figwidth,
-            bottom = panel_bt/figwidth, wspace = panel_bt, hspace = panel_bt)
+    plt.subplots_adjust(left = border / figwidth,
+            right = 1 - border / figwidth, top = 1 - top_border / figwidth,
+            bottom = bot_border/figwidth, wspace = panel_bt, hspace = panel_bt)
 
     panels = []
     for i in range(nrows):
         col_panels = []
         for j in range(ncols):
-            col_panels.append(fig.add_subplot(gs[i, panel_length*j:panel_length*(j+1)]))
+            col_panels.append(fig.add_subplot(gs[i, j]))
         panels.append(col_panels)
     
     for i in range(nrows):
@@ -286,17 +300,18 @@ def gr_hist(galaxy, galaxy_dust, panel_length = 3, panel_bt = 0.1, text_space = 
             make_panel(galaxy, i)
             ax = plt.gca()
             ax.xaxis.set_label_position('top')
-            plt.xlabel("No Dust")
+            plt.xlabel("No Dust", fontsize=16)
 
         if galaxy_dust:
             make_panel(galaxy_dust, i)
             ax = plt.gca()
             ax.xaxis.set_label_position('top')
-            plt.xlabel("Dust-Attenuated")
+            plt.xlabel("Dust-Attenuated", fontsize=16)
     
-    fig.text(0.45, .05, 'g-r (magnitude)', va = 'center', fontsize=16)
-    fig.text(0.05, 0.45, '$N_g$ (count)', ha = 'center', rotation = 'vertical',
-               fontsize = 16)
+    fig.text(0.5, border/2/figheight, 'g-r (magnitude)', va = 'center', 
+                ha = 'center', fontsize=16)
+    fig.text(1-border/2/figwidth, 0.5, '$N_g$ (count)', va = 'center', 
+                ha = 'center', rotation = 'vertical', fontsize = 16)
     return
 
 

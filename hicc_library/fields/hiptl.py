@@ -103,6 +103,8 @@ class hiptl_nH(hiptl):
         mods.append('all_neut')
         nh_bins = self._getnHBins()
         self.gridnames = []
+        self.vel_mass_xbins = None
+        self.vel_mass_ybins = None
         for m in mods:
             for n in range(len(nh_bins)+1):
                 self.gridnames.append(m+str(n))
@@ -124,7 +126,7 @@ class hiptl_nH(hiptl):
         pos, vel, mass, density = self._loadSnapshotData()
         in_rss = False
         nHbins = self._getnHBins()
-
+        saved_hists = [] # vel-mass histograms saved to the outfile
         ############ HELPER FUNCTION ############################################
         def computeHI(gridname, mass):
             grid = Chunk(gridname, self.resolution, self.chunk, verbose=self.v)
@@ -140,7 +142,7 @@ class hiptl_nH(hiptl):
                 lo = 0
                 hi = nHbins[idx]
             elif idx == len(nHbins):
-                lo = nHbins[idx]
+                lo = nHbins[-1]
                 hi = np.inf
             else:
                 lo=nHbins[idx-1]
@@ -184,7 +186,11 @@ class hiptl_nH(hiptl):
             # if we are in redshift space, the grid handles saving with 'rs'
 
             # want to plot velocity vs mass for each nH bin
-            self.vel_mass_hist(vel[mask, :], mass[mask], [lo, hi], outfile)
+            # only need to do it for the first model, otherwise will just be a repeat.
+            dsetname = str([lo, hi])
+            if dsetname not in saved_hists:
+                self.vel_mass_hist(vel[mask, :], mass[mask], dsetname, outfile)
+                saved_hists.append(dsetname)
 
             return
         #############################################################################
@@ -202,12 +208,14 @@ class hiptl_nH(hiptl):
 
         return
 
-    def vel_mass_hist(self, vel, mass, nhlim, outfile):
+    def vel_mass_hist(self, vel, mass, dsetname, outfile):
         vel_bins = np.logspace(-2, 6, 9)
         m_bins = np.logspace(-2, 8, 11)
         speed = np.sum(vel**2, axis=1)
         speed = speed**0.5
-        outfile.create_dataset(str(nhlim), data = np.histogram2d(mass, speed, bins=[m_bins, vel_bins])[0])
+        outfile.create_dataset(dsetname, data = np.histogram2d(mass, speed, bins=[m_bins, vel_bins])[0])
+        self.vel_bins = vel_bins
+        self.m_bins = m_bins
         return
 
     def saveData(self, outfile, grid, lo, hi):
