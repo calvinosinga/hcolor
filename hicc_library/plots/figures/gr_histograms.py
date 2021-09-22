@@ -36,8 +36,8 @@ def main():
 
     return
 
-def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.25, 
-            border = 1, cbar_width = 1, text_space = 0.1, fsize = 24):
+def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.5, 
+            border = 1, cbar_width = 1, text_space = 0.2, fsize = 24):
     ############ HELPER METHOD ##########################################
     def get_snap_lims(fields):
         
@@ -106,12 +106,12 @@ def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.25,
         ax.xaxis.set_label_position('top')
         ax.set_aspect('auto')
 
-        plt.legend(loc = 'lower right', prop = {'size':fsize/2})
+        plt.legend(loc = 'lower right', prop = {'size':fsize*0.75})
         if col_idx == 0:
             xts = (xlim[1]-xlim[0]) * text_space
             yts = (ylim[1]-ylim[0]) * text_space
-            plt.text(xlim[1]-xts, ylim[1]-yts, '$z$=%.1f'%plot_field.header['Redshift'], 
-                    fontsize=fsize, ha = 'center', va = 'center', fontweight = 'bold')
+            plt.text(xlim[1]-xts, ylim[0]+yts, '$z$=%.1f'%plot_field.header['Redshift'], 
+                    fontsize=fsize, ha = 'center', va = 'center', fontweight = 'bold', color = 'magenta')
         return
     ########################################################################
     snapshots = []
@@ -142,8 +142,8 @@ def gr_stmass(galaxy, galaxy_dust, panel_length = 8, panel_bt = 0.25,
     # creating gridspec
     gs = gspec.GridSpec(nrows, ncols)
     plt.subplots_adjust(left = lab_border / figwidth,
-            right = 1 - border / figwidth, top = 1 - border / figwidth,
-            bottom = lab_border/figwidth, wspace = panel_bt, hspace = panel_bt)
+            right = 1 - border / figwidth, top = 1 - border / figheight,
+            bottom = lab_border/figheight, wspace = panel_bt, hspace = panel_bt)
 
     panels = []
     for i in range(nrows):
