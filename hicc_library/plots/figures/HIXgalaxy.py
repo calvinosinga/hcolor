@@ -125,11 +125,11 @@ def HI_galaxy_Xpk_methodology(hiptls, hisubs, vns, in_rss = False, panel_length 
     del fields
 
     # get info from the fields to prepare plot
-    box = hiptls[0].header['BoxSize']
+    box = hiptls[0].box
     snapshots = []
     for f in hiptls:
-        if not f.snapshot in snapshots:
-            snapshots.append(f.snapshot)
+        if not f.field1.snapshot in snapshots:
+            snapshots.append(f.field1.snapshot)
     
     # put snapshots in increasing order
     snapshots.sort()
@@ -153,7 +153,8 @@ def HI_galaxy_Xpk_methodology(hiptls, hisubs, vns, in_rss = False, panel_length 
         col_panels = []
         for j in range(ncols):
             col_panels.append(fig.add_subplot(gs[i,j]))
-        panels.append(fig.add_subplot(gs[i]))
+        panels.append(col_panels)
+        
     
     for i in range(nrows):
         # make the hisubhalo plot for this redshift
@@ -284,11 +285,11 @@ def HI_galaxy_Xpk_color(hiptls, hisubs, vns, in_rss = False, panel_length = 3, p
     del fields
 
     # get info from the fields to prepare plot
-    box = hiptls[0].header['BoxSize']
+    box = hiptls[0].box
     snapshots = []
     for f in hiptls:
-        if not f.snapshot in snapshots:
-            snapshots.append(f.snapshot)
+        if not f.field1.snapshot in snapshots:
+            snapshots.append(f.field1.snapshot)
     
     # put snapshots in increasing order
     snapshots.sort()
@@ -312,7 +313,7 @@ def HI_galaxy_Xpk_color(hiptls, hisubs, vns, in_rss = False, panel_length = 3, p
         col_panels = []
         for j in range(ncols):
             col_panels.append(fig.add_subplot(gs[i,j]))
-        panels.append(fig.add_subplot(gs[i]))
+        panels.append(col_panels)
     
     for i in range(nrows):
 
