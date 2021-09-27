@@ -257,7 +257,12 @@ def HI_galaxy_Xpk_color(hiptls, hisubs, vns, in_rss = False, panel_length = 3, p
             vnkeys[c] = fetchKeys(['rs', c], list(vns[0].xpks.keys()))
             hiptlkeys[c] = fetchKeys(['rs', c], list(hiptls[0].xpks.keys()))
             hisubkeys[c] = fetchKeys(['rs', c], list(hisubs[0].xpks.keys()))
-    
+    print("VN keys:")
+    print(vnkeys)
+    print("hiptl keys:")
+    print(hiptlkeys)
+    print("hisubhalo keys:")
+    print(hisubkeys)
     # get the yrange
     yrange = [np.inf, 0]
     fields = []
@@ -270,9 +275,9 @@ def HI_galaxy_Xpk_color(hiptls, hisubs, vns, in_rss = False, panel_length = 3, p
     for f in fields:
         if contains(f.fieldname, "hiptl"):
             keys = hiptlkeys['red']
-        if contains(f.fieldname, "hiptl"):
+        if contains(f.fieldname, "hisubhalo"):
             keys = hisubkeys['red']
-        if contains(f.fieldname, "hiptl"):
+        if contains(f.fieldname, "vn"):
             keys = vnkeys['red']
 
         for k in keys:
@@ -328,7 +333,7 @@ def HI_galaxy_Xpk_color(hiptls, hisubs, vns, in_rss = False, panel_length = 3, p
         
         
         plib.plotpks(vns[i].xpks['k'], vns[i].xpks, box, vns[i].field1.resolution,
-                keylist = vnkeys['blue'], colors = ['darkred'], label = ['VN18-Particle'])
+                keylist = vnkeys['red'], colors = ['darkred'], labels = ['VN18-Particle'])
         
         plt.ylim(yrange[0], yrange[1])
         
@@ -355,11 +360,11 @@ def HI_galaxy_Xpk_color(hiptls, hisubs, vns, in_rss = False, panel_length = 3, p
                 keylist = hisubkeys['blue'], color = 'blue', label = 'D18-Subhalo')
         
         plib.fillpks(hiptls[i].xpks['k'], hiptls[i].xpks, box, hiptls[i].field1.resolution,
-                keylist = hiptlkeys['red'], color = 'teal', label = 'D18-Particle')
+                keylist = hiptlkeys['blue'], color = 'teal', label = 'D18-Particle')
 
 
         plib.plotpks(vns[i].xpks['k'], vns[i].xpks, box, vns[i].field1.resolution,
-                keylist = vnkeys['red'], colors = ['purple'], label = ['VN18-Particle'])
+                keylist = vnkeys['blue'], colors = ['purple'], labels = ['VN18-Particle'])
         plt.ylim(yrange[0], yrange[1])
         
         # cosmetic tasks
