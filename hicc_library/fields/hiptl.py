@@ -224,8 +224,8 @@ class hiptl_nH(hiptl):
 
     def saveHist(self, outfile, hist, dsetname):
         dat = outfile.create_dataset(dsetname, data=hist)
-        dat['combine'] = -1
-        dat['operation'] = 'hist'
+        dat.attrs['combine'] = -1
+        dat.attrs['operation'] = 'hist'
         return
 
     @staticmethod
