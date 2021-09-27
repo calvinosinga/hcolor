@@ -103,8 +103,9 @@ class hiptl_nH(hiptl):
         mods.append('all_neut')
         nh_bins = self._getnHBins()
         self.gridnames = []
-        self.vel_mass_xbins = None
-        self.vel_mass_ybins = None
+
+        self.vel_bins = np.logspace(-2, 6, 9)
+        self.m_bins = np.logspace(-2, 8, 11)
         for m in mods:
             for n in range(len(nh_bins)+1):
                 self.gridnames.append(m+str(n))
@@ -209,18 +210,22 @@ class hiptl_nH(hiptl):
         return
 
     def vel_mass_hist(self, vel, mass, dsetname, outfile):
-        vel_bins = np.logspace(-2, 6, 9)
-        m_bins = np.logspace(-2, 8, 11)
         speed = np.sum(vel**2, axis=1)
         speed = speed**0.5
-        outfile.create_dataset(dsetname, data = np.histogram2d(mass, speed, bins=[m_bins, vel_bins])[0])
-        self.vel_bins = vel_bins
-        self.m_bins = m_bins
+        
+        hist = np.histogram2d(mass, speed, bins=[self.m_bins, self.vel_bins])[0]
+        self.saveHist(outfile, hist, dsetname)
         return
 
     def saveData(self, outfile, grid, lo, hi):
         dat = super().saveData(outfile, grid)
-        dat.attrs["nH_range"] = (lo, hi)
+        dat.attrs["nH_range"] = [lo, hi]
+        return
+
+    def saveHist(self, outfile, hist, dsetname):
+        dat = outfile.create_dataset(dsetname, data=hist)
+        dat['combine'] = -1
+        dat['operation'] = 'hist'
         return
 
     @staticmethod

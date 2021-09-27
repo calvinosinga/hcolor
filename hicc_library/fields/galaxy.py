@@ -150,11 +150,12 @@ class galaxy(Field):
         # from Nelson's definition
         galaxy_red_definition['nelson'] = {'b':0.65, 'm':0.02, 'mb':-10.28}
         # experiments with sensitivy to color definition - translate the above def. vertically
-        galaxy_red_definition['nelson_low'] = {'b':0.6, 'm':0.02, 'mb':-10.28}
-        galaxy_red_definition['nelson_high'] = {'b':0.7, 'm':0.02, 'mb':-10.28}
+        galaxy_red_definition['0.5'] = {'b':0.5, 'm':0, 'mb':0}
+        galaxy_red_definition['0.6'] = {'b':0.6, 'm':0, 'mb':0}
         # trying it with a straight gr cut as well
-        galaxy_red_definition['straight'] = {'b':0.55, 'm':0, 'mb':0}
-
+        galaxy_red_definition['0.55'] = {'b':0.55, 'm':0, 'mb':0}
+        galaxy_red_definition['0.65'] = {'b':0.65, 'm':0, 'mb':0}
+        galaxy_red_definition['0.45'] = {'b':0.45, 'm':0, 'mb':0}
         # galaxy_red_definition['eBOSS_ELG'] = False
         # galaxy_red_definition['eBOSS_LRG'] = True
         return galaxy_red_definition

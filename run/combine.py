@@ -32,7 +32,7 @@ if gd['verbose']:
 def getKeys():
     # tells how the dataset should be combined
     operations = {}
-    implemented_ops = ['sum', 'extend']
+    implemented_ops = ['sum', 'hist', 'extend']
     f = hp.File(infiles[0],'r')
     klist = list(f.keys())
     if gd['verbose']:
@@ -86,7 +86,7 @@ addPickle(w)
 
 for k in range(len(keylist)):
 
-    # sum the datasets
+    # sum the chunks
     if ops[keylist[k]] == 'sum':
 
         if gd['verbose']:
@@ -105,6 +105,27 @@ for k in range(len(keylist)):
                 chunk1.combineChunks(chunk2)
         dat = chunk1.saveGrid(w)
     
+    # sum the histograms
+    if ops[keylist[k]] == 'hist':
+
+        if gd['verbose']:
+            print("summing the histograms for %s"%keylist[k])
+        
+        f1 = hp.File(infiles[0], 'r')
+        tot_hist = np.zeros_like(f1[keylist[k]][:], dtype=np.float32)
+        tot_hist += f1[keylist[k]][:]
+        
+        for i in range(1, len(infiles)):
+            try:
+                f2 = hp.File(infiles[i], 'r')
+            except OSError:
+                print("did not find file %s"%infiles[i])
+            else:
+                tot_hist += f2[keylist[k]][:]
+                if gd['verbose']:
+                    print("running total for histogram:")
+                    print(tot_hist)
+        dat = w.create_dataset(keylist[k], data=tot_hist)
     # extend the datasets
     if ops[keylist[k]] == 'extend':
         #TODO:

@@ -216,46 +216,51 @@ def gr_hist(galaxy, galaxy_dust, panel_length = 3, panel_bt = 0.1, text_space = 
         hist = np.sum(gr[0], axis=0)
         return np.array(mid), hist
 
-    def make_panel(fields, row_idx):
-        
-        if fields[0].fieldname == 'galaxy' or ncols == 1:
-            col_idx = 0
-        else:
-            col_idx = 1
-        plot_field = None
-        for f in fields:
+    def make_panel(galaxy, galaxy_dust, row_idx):
+        plot_gal = None
+        for f in galaxy:
             if f.snapshot == snapshots[row_idx]:
-                plot_field = f
-
-        if plot_field is None:
+                plot_gal = f
+        
+        plot_dust = None
+        for f in galaxy_dust:
+            if f.snapshot == snapshots[row_idx]:
+                plot_dust = f
+        
+        plt.sca(panels[row_idx])
+        plotted = False
+        if not plot_gal is None:
+            x, hist = get_hist(plot_gal.gr_stmass)
+            plt.plot(x, hist, label = 'No Dust', color='mediumpurple')
+            redshift = plot_gal.header['Redshift']
+            col_defs = plot_gal.getColorDefinitions()
+            plotted = True
+        if not plot_dust is None:
+            x, hist = get_hist(plot_dust.gr_stmass)
+            plt.plot(x, hist, label = 'Dust-Attenuated', color='crimson')
+            redshift = plot_dust.header['Redshift']
+            col_defs = plot_dust.getColorDefinitions()
+            plotted = True
+        if not plotted:
             return
-        
-        x, hist = get_hist(plot_field.gr_stmass)
-        
-        rgb = np.zeros((x.shape[0],3))
-        rgb[:, 0] = 1.25 / (x[-1] - color_thresh) * (x - color_thresh) + 0.35
-        rgb[:, 2] = 0.85 / (x[0] - color_thresh) * (x - color_thresh)
-        
-        rgb = np.where(rgb < 1, rgb, np.ones(rgb.shape))
-        rgb = np.where(rgb > 0, rgb, np.zeros(rgb.shape))
 
-        plt.sca(panels[row_idx][col_idx])
-        
-        plt.bar(x, hist, width = x[1] - x[0], color=rgb)
-        plt.ylim(ylim[0], ylim[1])
-        plt.xlim(xlim[0], xlim[1])
+        # plot lines where the cuts occur
+        for ckey,cd in col_defs.items():
+            if cd['m'] == 0 and cd['mb'] == 0:
+                plt.plot([cd['b'], cd['b']], [ylim[0], ylim[-1]], label=ckey, linestyle = '--')
+
 
         ax = plt.gca()
         ax.tick_params(axis = 'both', direction = 'in')
+        plt.ylim(ylim[0], ylim[1])
+        plt.xlim(xlim[0], xlim[1])
+        xts = (xlim[1]-xlim[0])*text_space
+        yts = (ylim[1]-ylim[0])*text_space
+        plt.text(xlim[0]+xts, ylim[1]-yts, '$z$=%.1f'%redshift, 
+            fontsize=16, ha = 'left', va = 'top', fontweight = 'bold')
+        plt.legend()
 
-        if col_idx == 0:
-            xts = (xlim[1]-xlim[0])*text_space
-            yts = (ylim[1]-ylim[0])*text_space
-            plt.text(xlim[0]+xts, ylim[1]-yts, '$z$=%.1f'%plot_field.header['Redshift'], 
-                fontsize=16, ha = 'left', va = 'top', fontweight = 'bold')
-        else:
-            ax.set_yticklabels([])
-
+        
         return
 
     #########################################################################################################
@@ -271,11 +276,7 @@ def gr_hist(galaxy, galaxy_dust, panel_length = 3, panel_bt = 0.1, text_space = 
     snapshots.sort()
 
     nrows = len(snapshots)
-    ncols = 0
-    if galaxy:
-        ncols += 1
-    if galaxy_dust:
-        ncols += 1
+    ncols = 1
     top_border = border
     bot_border = border*2
     figwidth = panel_length * ncols + panel_bt * (ncols - 1) + border*2
@@ -290,23 +291,11 @@ def gr_hist(galaxy, galaxy_dust, panel_length = 3, panel_bt = 0.1, text_space = 
 
     panels = []
     for i in range(nrows):
-        col_panels = []
-        for j in range(ncols):
-            col_panels.append(fig.add_subplot(gs[i, j]))
-        panels.append(col_panels)
+        panels.append(fig.add_subplot(gs[i]))
     
     for i in range(nrows):
-        if galaxy:
-            make_panel(galaxy, i)
-            ax = plt.gca()
-            ax.xaxis.set_label_position('top')
-            plt.xlabel("No Dust", fontsize=16)
+        make_panel(galaxy, galaxy_dust, i)
 
-        if galaxy_dust:
-            make_panel(galaxy_dust, i)
-            ax = plt.gca()
-            ax.xaxis.set_label_position('top')
-            plt.xlabel("Dust-Attenuated", fontsize=16)
     
     fig.text(0.5, border/2/figheight, 'g-r (magnitude)', va = 'center', 
                 ha = 'center', fontsize=16)
