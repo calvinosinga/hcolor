@@ -196,7 +196,6 @@ class galaxy(Field):
         mass = self._convertMass(mass)
         pos = self._convertPos(pos)
         vel = self._convertVel(vel)
-        res_dict = self.getResolutionDefinitions(self.simname)[self.use_res]
         return pos, vel, mass, photo_dict
 
     def computeGrids(self, outfile):
@@ -210,7 +209,7 @@ class galaxy(Field):
             else:
                 grid.CIC(pos, self.header['BoxSize'])
             
-            if 'nelson' not in gridname:
+            if not ('0.65' in gridname or "resolved" == gridname):
                 grid.ignoreGrid()
             return grid
         ###########################################################################

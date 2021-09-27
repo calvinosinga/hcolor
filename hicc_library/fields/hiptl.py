@@ -3,7 +3,6 @@
 """
 import h5py as hp
 import numpy as np
-from numpy.core.defchararray import count
 from hicc_library.fields.field_super import Field
 from hicc_library.grid.grid import Chunk
 

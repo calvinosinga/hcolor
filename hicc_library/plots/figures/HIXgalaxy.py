@@ -31,7 +31,7 @@ def main():
             hiptlx.append(f)
         elif name_test("hisubhalo", f.fieldname):
             hisubx.append(f)
-    path = '/lustre/cosinga/hcolor/figures.'
+    path = '/lustre/cosinga/hcolor/figures/'
     # make the plot in real-space
     HI_galaxy_Xpk_methodology(hiptlx, hisubx, vnx)
     plt.savefig(path+"HIXgalaxy_methodology_real.png")
