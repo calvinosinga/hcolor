@@ -249,6 +249,7 @@ class Cross():
         self.box = self.field1.header['BoxSize']
         self.axis = self.field2.axis
         self.snapshot = self.field1.snapshot
+        self.resolution = self.field1.resolution
         return
     
     def _loadHdf5(self):
