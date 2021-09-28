@@ -74,7 +74,7 @@ def HI_auto_pk(hiptls, hisubs, vns, in_rss = False, panel_length = 3,
 
     # get the desired keys for each field - if the fields are not
     # in the results, then make the keys an empty list
-    if in_rss:
+    if not in_rss:
         if vns:
             vnkeys = ['vn']
         else:
