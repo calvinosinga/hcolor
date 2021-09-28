@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.gridspec as gspec
 import copy
+import pickle as pkl
 import numpy as np
 import sys
 
@@ -13,7 +14,32 @@ def main():
     sys.argv.pop(0)
 
     # the infiles are given through the command-line
-    INPKLS = sys.argv[0]
+    INFILE = sys.argv[0]
+    f = open(INFILE, 'r')
+    vn = []
+    hiptl = []
+    hisub = []
+    
+    def name_test(fn, test):
+        return test == fn
+    
+    for p in list(f):
+        p = p.replace('\n', '')
+        f = pkl.load(open(p, 'rb'))
+        if name_test("vn", f.fieldname):
+            vn.append(f)
+        elif name_test("hiptl", f.fieldname):
+            hiptl.append(f)
+        elif name_test("hisubhalo", f.fieldname):
+            hisub.append(f)
+    path = '/lustre/cosinga/hcolor/figures/'
+    HI_auto_pk(hiptl, hisub, vn)
+    plt.savefig(path+"HI_auto_real.png")
+    plt.clf()
+
+    HI_auto_pk(hiptl, hisub, vn, in_rss=True)
+    plt.savefig(path+"HI_auto_redshift.png")
+    plt.clf()
     return
 
 def fetchKeys(substrings, keylist):

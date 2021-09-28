@@ -220,7 +220,7 @@ def HI_galaxy_Xpk_methodology(hiptls, hisubs, vns, in_rss = False, panel_length 
         ax.get_legend().remove()
         if i == 0:
             ax.xaxis.set_label_position('top')
-            plt.xlabel('VN18', fontsize=16)
+            plt.xlabel('VN18-Particle', fontsize=16)
             plt.legend(loc = 'upper right')
         else:
             plt.xlabel('')
@@ -399,7 +399,7 @@ def HI_galaxy_Xpk_color(hiptls, hisubs, vns, in_rss = False, panel_length = 3, p
         ax.get_legend().remove()
         if i == 0:
             ax.xaxis.set_label_position('top')
-            plt.xlabel('VN18', fontsize=16)
+            plt.xlabel('All-HI Cross Power', fontsize=16)
             plt.legend(loc = 'upper right')
         else:
             plt.xlabel('')
