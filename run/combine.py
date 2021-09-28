@@ -114,7 +114,7 @@ for k in range(len(keylist)):
         f1 = hp.File(infiles[0], 'r')
         tot_hist = np.zeros_like(f1[keylist[k]][:], dtype=np.float32)
         tot_hist += f1[keylist[k]][:]
-        
+        tot_combine = f1[keylist[k]].attrs["combine"]
         for i in range(1, len(infiles)):
             try:
                 f2 = hp.File(infiles[i], 'r')
@@ -122,10 +122,13 @@ for k in range(len(keylist)):
                 print("did not find file %s"%infiles[i])
             else:
                 tot_hist += f2[keylist[k]][:]
+                tot_combine += f2[keylist[k]].attrs['combine']
                 if gd['verbose']:
                     print("running total for histogram:")
                     print(tot_hist)
         dat = w.create_dataset(keylist[k], data=tot_hist)
+        dat.attrs["combine"] = tot_combine
+        dat.attrs["operation"] = f1[keylist[k]].attrs['operation']
     # extend the datasets
     if ops[keylist[k]] == 'extend':
         #TODO:
