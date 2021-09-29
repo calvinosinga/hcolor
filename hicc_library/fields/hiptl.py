@@ -17,9 +17,6 @@ class hiptl(Field):
         self.fieldname = 'hiptl'
         self.hih2filepath = hih2filepath%self.chunk
         self.loadpath = snappath%self.chunk
-
-        if self.v:
-            print("finished constructor for %s, chunknum = %d"%(self.fieldname,chunk))
         return
     
     @staticmethod
@@ -87,10 +84,6 @@ class hiptl(Field):
         vel = self._convertVel(vel)
         f.close()
         return pos, vel, mass
-
-
-
-
 
 
 class hiptl_nH(hiptl):
@@ -253,3 +246,70 @@ class hiptl_nH(hiptl):
         return rho
 
 
+class h2ptl(hiptl):
+
+    def __init__(self, simname, snapshot, axis, resolution, chunk, pkl_path, 
+                verbose, snappath, hih2filepath):
+        super().__init__(self, simname, snapshot, axis, resolution, chunk, pkl_path, 
+                verbose, snappath, hih2filepath)
+        self.fieldname = 'h2ptl'
+        return
+    
+    def computeGrids(self, outfile):
+        ############### FROM FIELD_SUPER #################################################
+        if self.v:
+            print("starting to compute grids...")
+        if self.header is None:
+            raise ValueError("header needs to be loaded before computing grids")
+        dat = outfile.create_dataset('pickle', data=[0])
+        dat.attrs['path'] = self.pkl_path
+        if self.v:
+            print("the saved pickle path: %s"%self.pkl_path)
+        ####################################################################################
+        hih2file = hp.File(self.hih2filepath, 'r')
+        pos, vel, mass = self._loadSnapshotData()
+        in_rss = False
+
+
+        ############ HELPER FUNCTION ############################################
+        def computeH2(gridname, pos, mass, is_in_rss):
+            grid = Chunk(gridname, self.resolution, self.chunk, verbose=self.v)
+            grid.in_rss = is_in_rss
+            
+            if self.v:
+                hs = '#' * 20
+                print(hs+" COMPUTE H2 FOR %s "%(gridname.upper()) + hs)
+                print("is in redshift space?:%s"%str(is_in_rss))
+                print("does the grid agree?:%s"%str(is_in_rss))
+
+            # getting data from hih2 files
+            neutfrac = hih2file['PartType0']['f_neutral_H'][:]
+            molfrac = hih2file['PartType0']['f_mol_'+gridname][:]
+            
+            # converting the masses to HI mass
+            H2mass = mass*(molfrac)*neutfrac
+
+            # neutral fraction is -1 where models are not defined, 
+            # so replace those values with 0
+            H2mass = np.where(H2mass>=0, H2mass, 
+                    np.zeros(H2mass.shape, dtype=np.float32))
+
+            # place particles into grid
+            grid.CICW(pos, self.header['BoxSize'], H2mass)
+
+            # save them to file
+            self.saveData(outfile, grid)
+            # if we are in redshift space, the grid handles saving with 'rs'
+            return
+        #############################################################################
+
+        for g in self.gridnames:
+            computeH2(g, pos, mass, in_rss)
+        
+        pos = self._toRedshiftSpace(pos, vel)
+        in_rss = True
+        
+        for g in self.gridnames:
+            computeH2(g, pos, mass, in_rss)
+        hih2file.close()
+        return
