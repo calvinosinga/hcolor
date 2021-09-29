@@ -5,8 +5,8 @@ import sys
 import os
 import pickle
 import h5py as hp
-from hicc_library.fields.hiptl import hiptl, hiptl_nH
-from hicc_library.fields.hisubhalo import hisubhalo
+from hicc_library.fields.hiptl import hiptl, hiptl_nH, h2ptl
+from hicc_library.fields.hisubhalo import hisubhalo, h2subhalo
 from hicc_library.fields.vn import vn
 
 gd = pickle.load(open(os.getenv('GDFILE'),'rb'))
@@ -47,6 +47,7 @@ if FIELDNAME == 'hiptlgrid':
 elif FIELDNAME == 'hiptl_nHgrid':
     field = hiptl_nH(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, pickle_path,
             gd['verbose'], gd['snapshot'], gd['hih2ptl'])
+    
 elif FIELDNAME == 'hisubhalogrid':
     field = hisubhalo(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, pickle_path, 
             gd['verbose'], gd[SIMNAME], gd['hih2catsh'])
@@ -79,6 +80,15 @@ elif FIELDNAME == 'ptlgrid':
     field = ptl(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, pickle_path,
             gd['verbose'], gd['snapshot'])
 
+elif FIELDNAME == 'h2ptlgrid':
+    field = h2ptl(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, pickle_path,
+            gd['verbose'], gd['snapshot'], gd['hih2ptl'])
+
+elif FIELDNAME == 'h2subhalo':
+    field = h2subhalo(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, pickle_path, 
+            gd['verbose'], gd[SIMNAME], gd['hih2catsh'])
+    if not gd['h2subhalo_use_cicw']:
+        field.useCIC()
 else:
     raise NotImplementedError("there is no field named %s"%FIELDNAME)
 

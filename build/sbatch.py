@@ -218,7 +218,7 @@ class Sbatch():
             gd['%s_use_res'%fn] = use_res
 
 
-        if "hisubhalo" in fn:
+        if "hisubhalo" in fn or "h2subhalo" in fn:
             use_cicw = int(input("should %s use CICW? (etc)"%fn))
             gd['%s_use_cicw'%fn] = use_cicw
         
