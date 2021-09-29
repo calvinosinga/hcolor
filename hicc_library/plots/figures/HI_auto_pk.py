@@ -37,9 +37,9 @@ def main():
     plt.savefig(path+"HI_auto_real.png")
     plt.clf()
 
-    HI_auto_pk(hiptl, hisub, vn, in_rss=True)
-    plt.savefig(path+"HI_auto_redshift.png")
-    plt.clf()
+    #HI_auto_pk(hiptl, hisub, vn, in_rss=True)
+    #plt.savefig(path+"HI_auto_redshift.png")
+    #plt.clf()
     return
 
 def fetchKeys(substrings, keylist):
@@ -51,6 +51,8 @@ def fetchKeys(substrings, keylist):
     
     if 'k' in res:
         res.remove('k')
+    if 'Nmodes' in res:
+        res.remove("Nmodes")
     return res
 
 def rmKeys(keywords, keylist):
@@ -60,6 +62,7 @@ def rmKeys(keywords, keylist):
             if word in k:
                 klist.remove(k)
     klist.remove('k')
+    klist.remove("Nmodes")
     return klist
 def HI_auto_pk(hiptls, hisubs, vns, in_rss = False, panel_length = 3, 
             panel_bt = 0.1, text_space=0.1, border = 1):
@@ -100,14 +103,16 @@ def HI_auto_pk(hiptls, hisubs, vns, in_rss = False, panel_length = 3,
             hisubkeys = fetchKeys(['rs'], list(hisubs[0].pks.keys()))
         else:
             hisubkeys = []
-    
     # get the yrange
+    print(hiptlkeys)
+    print(hisubkeys)
+    print(vnkeys)
     yrange = [np.inf, 0]
     fields = []
     fields.extend(hiptls)
     fields.extend(hisubs)
     fields.extend(vns)
-
+    
     for f in fields:
         if f.fieldname == 'hiptl':
             keys = hiptlkeys
@@ -115,7 +120,7 @@ def HI_auto_pk(hiptls, hisubs, vns, in_rss = False, panel_length = 3,
             keys = hisubkeys
         if f.fieldname == 'vn':
             keys = vnkeys
-
+        pklen = len(f.pks['k'][:])
         for k in keys:
             pkmax = np.max(f.pks[k])
             pkmin = np.min(f.pks[k])
@@ -123,6 +128,8 @@ def HI_auto_pk(hiptls, hisubs, vns, in_rss = False, panel_length = 3,
                 yrange[1] = pkmax
             if pkmin < yrange[0]:
                 yrange[0] = pkmin
+            if not len(f.pks[k]) == pklen:
+                print(k)
     del fields
 
     # get info from the fields to prepare plot
@@ -161,7 +168,7 @@ def HI_auto_pk(hiptls, hisubs, vns, in_rss = False, panel_length = 3,
         for pf in vns:
             if pf.snapshot == panel_snap:
                 box = pf.header['BoxSize']
-                plib.plotpks(pf.pks['k'], pf.pks, box, pf.axis, pf.resolution,
+                plib.plotpks(pf.pks['k'], pf.pks, box, pf.resolution,
                         keylist = vnkeys, colors = ['green'],
                         labels = ['V-N18'])
         
@@ -169,15 +176,15 @@ def HI_auto_pk(hiptls, hisubs, vns, in_rss = False, panel_length = 3,
         for pf in hisubs:
             if pf.snapshot == panel_snap:
                 box = pf.header['BoxSize']
-                plib.fillpks(pf.pks['k'], pf.pks, box, pf.axis, pf.resolution,
+                plib.fillpks(pf.pks['k'], pf.pks, box, pf.resolution,
                         keylist = hisubkeys, color = 'orange',
                         label = 'D18-Subhalo')
         
         # plot the D18-Particle that matches the panel's redshift
-        for pf in hisubs:
+        for pf in hiptls:
             if pf.snapshot == panel_snap:
                 box = pf.header['BoxSize']
-                plib.fillpks(pf.pks['k'], pf.pks, box, pf.axis, pf.resolution,
+                plib.fillpks(pf.pks['k'], pf.pks, box, pf.resolution,
                         keylist = hiptlkeys, color = 'blue',
                         label = 'D18-Particle')
 
@@ -193,7 +200,7 @@ def HI_auto_pk(hiptls, hisubs, vns, in_rss = False, panel_length = 3,
         plt.ylim(yrange[0], yrange[1])
         
         # output textbox onto the plot with redshift
-        plt.text(hiptls[0].pks['k'] + text_space, yrange[0] + text_space,
+        plt.text(hiptls[0].pks['k'][0] + text_space, yrange[0] + text_space,
                 'z=%.1f'%snapshots[i], fontsize = 20, ha = 'center', va = 'center',
                 fontweight = 'bold') 
 
