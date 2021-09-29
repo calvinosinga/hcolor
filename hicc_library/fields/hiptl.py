@@ -131,9 +131,9 @@ class hiptl_nH(hiptl):
         nHbins = self._getnHBins()
         saved_hists = [] # vel-mass histograms saved to the outfile
         ############ HELPER FUNCTION ############################################
-        def computeHI(gridname, mass):
+        def computeHI(gridname, pos, mass, density, is_in_rss):
             grid = Chunk(gridname, self.resolution, self.chunk, verbose=self.v)
-            grid.in_rss = in_rss
+            grid.in_rss = is_in_rss
 
             if self.v:
                 grid.print()
@@ -174,15 +174,15 @@ class hiptl_nH(hiptl):
 
             
             # converting the masses to HI mass
-            mass *= (1-molfrac)*neutfrac
+            HImass = mass*(1-molfrac)*neutfrac
 
             # neutral fraction is -1 where models are not defined, 
             # so replace those values with 0
-            mass = np.where(mass>=0, mass, 
-                    np.zeros(mass.shape, dtype=np.float32))
+            HImass = np.where(HImass>=0, HImass, 
+                    np.zeros(HImass.shape, dtype=np.float32))
 
             # place particles into grid
-            grid.CICW(pos[mask, :], self.header['BoxSize'], mass[mask])
+            grid.CICW(pos[mask, :], self.header['BoxSize'], HImass[mask])
 
             # save them to file
             self.saveData(outfile, grid, lo, hi)
@@ -200,22 +200,21 @@ class hiptl_nH(hiptl):
 
 
         for g in self.gridnames:
-            computeHI(g, mass)
+            computeHI(g, pos, mass, density, in_rss)
         
         pos = self._toRedshiftSpace(pos, vel)
         in_rss = True
 
         for g in self.gridnames:
-            computeHI(g, mass)
+            computeHI(g, pos, mass, density, in_rss)
         hih2file.close()
 
         return
 
     def vel_mass_hist(self, vel, mass, dsetname, outfile):
-        speed = np.sum(vel**2, axis=1)
-        speed = speed**0.5
+        los_vel = vel[self.axis, :]
         
-        hist = np.histogram2d(mass, speed, bins=[self.m_bins, self.vel_bins])[0]
+        hist = np.histogram2d(mass, los_vel, bins=[self.m_bins, self.vel_bins])[0]
         self.saveHist(outfile, hist, dsetname)
         return
 

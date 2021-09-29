@@ -30,10 +30,10 @@ class ptl(Field):
         in_rss = False
         super().computeGrids(outfile)
         ############# HELPER METHOD ##################################
-        def computePtl(gridname, slc):
+        def computePtl(gridname, pos, mass, slc, is_in_rss):
         
             grid = Chunk(gridname, self.resolution, self.chunk, verbose=self.v)
-            grid.in_rss = in_rss
+            grid.in_rss = is_in_rss
             
             if self.v:
                 grid.print()
@@ -52,7 +52,7 @@ class ptl(Field):
                 slc = slices[1]
             else:
                 slc = slice(None)
-            computePtl(g, slc)
+            computePtl(g, pos, mass, slc, in_rss)
         
         pos = self._toRedshiftSpace(pos, vel)
         in_rss = True
@@ -64,7 +64,7 @@ class ptl(Field):
             else:
                 slc = slice(None)
 
-            computePtl(g, slc)
+            computePtl(g, pos, mass, slc, in_rss)
         return
     
     

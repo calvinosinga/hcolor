@@ -123,6 +123,7 @@ class Grid():
         if self.v:
             print("finished CICW...")
             print("grid sum: %.3e"%np.sum(self.grid))
+            print('#'*40)
         return
     
     def ignoreGrid(self):

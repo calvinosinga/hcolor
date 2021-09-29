@@ -61,8 +61,9 @@ class Field():
         paramparams = ['BoxSize', 'HubbleParam']
         for p in paramparams:
             self.header[p] = temp[p]
-        self.header['BoxSize'] = self._convertPos(self.header['BoxSize'])
-        self.header['MassTable'] = self._convertMass(self.header['MassTable'])
+        self.header['BoxSize'] *= self.header["Time"]/1e3
+        # don't want to use self._convertPos(..) because that might change in subclasses
+        self.header['MassTable'] *= 1e10/self.header['HubbleParam']
 
         if self.v:
             print("finished loading header...")
