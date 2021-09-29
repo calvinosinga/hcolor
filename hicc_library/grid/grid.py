@@ -69,6 +69,7 @@ class Grid():
                 index_d[axis] = (int(dist))%dims
                 index_u[axis] = index_d[axis] + 1
                 index_u[axis] = index_u[axis]%dims #seems this is faster
+            self.grid[index_d[0],index_d[1],index_d[2]] += d[0]*d[1]*d[2]
             self.grid[index_d[0],index_d[1],index_u[2]] += d[0]*d[1]*u[2]
             self.grid[index_d[0],index_u[1],index_d[2]] += d[0]*u[1]*d[2]
             self.grid[index_d[0],index_u[1],index_u[2]] += d[0]*u[1]*u[2]
@@ -98,6 +99,7 @@ class Grid():
         u = np.zeros(3)
 
         for i in range(ptls):
+            mass_added_check = 0
             for axis in range(coord):
                 dist = pos[i,axis] * inv_cell_size
                 u[axis] = dist - int(dist)
@@ -105,6 +107,7 @@ class Grid():
                 index_d[axis] = (int(dist))%dims
                 index_u[axis] = index_d[axis] + 1
                 index_u[axis] = index_u[axis]%dims #seems this is faster
+            self.grid[index_d[0],index_d[1],index_d[2]] += d[0]*d[1]*d[2]*mass[i]
             self.grid[index_d[0],index_d[1],index_u[2]] += d[0]*d[1]*u[2]*mass[i]
             self.grid[index_d[0],index_u[1],index_d[2]] += d[0]*u[1]*d[2]*mass[i]
             self.grid[index_d[0],index_u[1],index_u[2]] += d[0]*u[1]*u[2]*mass[i]
@@ -112,6 +115,9 @@ class Grid():
             self.grid[index_u[0],index_d[1],index_u[2]] += u[0]*d[1]*u[2]*mass[i]
             self.grid[index_u[0],index_u[1],index_d[2]] += u[0]*u[1]*d[2]*mass[i]
             self.grid[index_u[0],index_u[1],index_u[2]] += u[0]*u[1]*u[2]*mass[i]
+
+
+
         self.is_computed = True
         self.mas_runtime = time.time() - start
         if self.v:
