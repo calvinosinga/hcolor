@@ -33,7 +33,7 @@ class Grid():
         for key,val in self.__dict__.items():
             if key not in not_print:
                 print("%s:"%key+str(val))
-        print("grid_sum: %f"%np.sum(self.grid))
+        print("grid_sum: %.3e"%np.sum(self.grid))
         return
     
     def getGrid(self):
@@ -82,8 +82,9 @@ class Grid():
 
     def CICW(self, pos, boxsize, mass):
         if self.v:
+            print('#'*20 + "CICW"+'#'*20)
             print("\tstarting CICW in grid.py...")
-            print("\tcumulative mass: "+ str(np.sum(mass)))
+            print("\tcumulative mass from input: %.3e"%np.sum(mass))
             print("\tboxsize given: "+str(boxsize))
             print("\tboxsize must be Mpc/h")
 
@@ -114,8 +115,8 @@ class Grid():
         self.is_computed = True
         self.mas_runtime = time.time() - start
         if self.v:
-            print("finished CICW")
-            print("grid sum: "+str(np.sum(self.grid)))
+            print("finished CICW...")
+            print("grid sum: %.3e"%np.sum(self.grid))
         return
     
     def ignoreGrid(self):
@@ -139,6 +140,11 @@ class Grid():
         dct["combine"] = self.combine
         if self.is_computed:
             dct["mas_runtime"] = self.mas_runtime
+        if self.v:
+            hs = '#'*20
+            print(hs + "SAVING GRID" + hs)
+            self.print()
+
         return dat
     
     @classmethod
@@ -170,10 +176,12 @@ class Chunk(Grid):
         
     def combineChunks(self, other_chunk):
         if self.v:
-            print("\n\nstarting combine procedure...")
+            hs = '#'*20
+            print(hs + "COMBINE" + hs)
+            print("starting combine procedure...")
             print("self chunk:")
             self.print()
-            print("other chunk:")
+            print("\nother chunk:")
             other_chunk.print()
         
         self.grid += other_chunk.getGrid()

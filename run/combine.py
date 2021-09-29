@@ -48,8 +48,8 @@ def getKeys():
     
     # for each key, figure out which operation needs to be done.
     for k in klist:
-        # by default, we sum. If this is -1, then check what operation is needed
-        if f[k].attrs["combine"] == -1:
+        # by default, we sum. If this is a negative number, then check what operation is needed
+        if f[k].attrs["combine"] < 0:
             try:
                 operations[k] = f[k].attrs['operation']
             except KeyError:
@@ -122,12 +122,11 @@ for k in range(len(keylist)):
                 print("did not find file %s"%infiles[i])
             else:
                 tot_hist += f2[keylist[k]][:]
-                tot_combine += f2[keylist[k]].attrs['combine']
                 if gd['verbose']:
                     print("running total for histogram:")
                     print(tot_hist)
         dat = w.create_dataset(keylist[k], data=tot_hist)
-        dat.attrs["combine"] = tot_combine
+        dat.attrs["combine"] = f1[keylist[k]].attrs["combine"]
         dat.attrs["operation"] = f1[keylist[k]].attrs['operation']
     # extend the datasets
     if ops[keylist[k]] == 'extend':

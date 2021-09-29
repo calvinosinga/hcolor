@@ -29,10 +29,10 @@ class vn(Field):
         in_rss = False
         super().computeGrids(outfile)
         ############# HELPER METHOD ##################################
-        def computeHI(gridname):
+        def computeHI(gridname, pos, mass, is_in_rss):
         
             grid = Chunk(gridname, self.resolution, self.chunk, verbose = self.v)
-            grid.in_rss = in_rss
+            grid.in_rss = is_in_rss
             
             if self.v:
                 grid.print()
@@ -45,12 +45,12 @@ class vn(Field):
             return
 
         for g in self.gridnames:
-            computeHI(g)
+            computeHI(g, pos, mass, in_rss)
         
         pos = self._toRedshiftSpace(pos, vel)
         in_rss = True
         for g in self.gridnames:
-            computeHI(g)
+            computeHI(g, pos, mass, in_rss)
         return
     
     

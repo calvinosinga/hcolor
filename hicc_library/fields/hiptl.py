@@ -34,27 +34,30 @@ class hiptl(Field):
 
 
         ############ HELPER FUNCTION ############################################
-        def computeHI(gridname, mass):
+        def computeHI(gridname, pos, mass, is_in_rss):
             grid = Chunk(gridname, self.resolution, self.chunk, verbose=self.v)
-            grid.in_rss = in_rss
+            grid.in_rss = is_in_rss
             
             if self.v:
-                grid.print()
+                hs = '#' * 20
+                print(hs+" COMPUTE HI FOR %s "%(gridname.upper()) + hs)
+                print("is in redshift space?:%s"%str(is_in_rss))
+                print("does the grid agree?:%s"%str(is_in_rss))
 
             # getting data from hih2 files
             neutfrac = hih2file['PartType0']['f_neutral_H'][:]
             molfrac = hih2file['PartType0']['f_mol_'+gridname][:]
             
             # converting the masses to HI mass
-            mass *= (1-molfrac)*neutfrac
+            HImass = mass*(1-molfrac)*neutfrac
 
             # neutral fraction is -1 where models are not defined, 
             # so replace those values with 0
-            mass = np.where(mass>=0, mass, 
-                    np.zeros(mass.shape, dtype=np.float32))
+            HImass = np.where(HImass>=0, HImass, 
+                    np.zeros(HImass.shape, dtype=np.float32))
 
             # place particles into grid
-            grid.CICW(pos, self.header['BoxSize'], mass)
+            grid.CICW(pos, self.header['BoxSize'], HImass)
 
             # save them to file
             self.saveData(outfile, grid)
@@ -63,13 +66,13 @@ class hiptl(Field):
         #############################################################################
 
         for g in self.gridnames:
-            computeHI(g, mass)
+            computeHI(g, pos, mass, in_rss)
         
         pos = self._toRedshiftSpace(pos, vel)
         in_rss = True
         
         for g in self.gridnames:
-            computeHI(g, mass)
+            computeHI(g, pos, mass, in_rss)
         hih2file.close()
         return
     
