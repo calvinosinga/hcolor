@@ -37,33 +37,12 @@ def main():
     plt.savefig(path+"HI_auto_real.png")
     plt.clf()
 
-    #HI_auto_pk(hiptl, hisub, vn, in_rss=True)
-    #plt.savefig(path+"HI_auto_redshift.png")
-    #plt.clf()
+    HI_auto_pk(hiptl, hisub, vn, in_rss=True)
+    plt.savefig(path+"HI_auto_redshift.png")
+    plt.clf()
     return
 
-def fetchKeys(substrings, keylist):
-    res = []
-    for sub in substrings:
-        for k in keylist:
-            if sub in k and not k in res:
-                res.append(k)
-    
-    if 'k' in res:
-        res.remove('k')
-    if 'Nmodes' in res:
-        res.remove("Nmodes")
-    return res
 
-def rmKeys(keywords, keylist):
-    klist = copy.copy(keylist)
-    for word in keywords:
-        for k in klist:
-            if word in k:
-                klist.remove(k)
-    klist.remove('k')
-    klist.remove("Nmodes")
-    return klist
 def HI_auto_pk(hiptls, hisubs, vns, in_rss = False, panel_length = 3, 
             panel_bt = 0.1, text_space=0.1, border = 1):
     """
@@ -83,11 +62,11 @@ def HI_auto_pk(hiptls, hisubs, vns, in_rss = False, panel_length = 3,
         else:
             vnkeys = []
         if hiptls:
-            hiptlkeys = rmKeys(['rs'], list(hiptls[0].pks.keys()))
+            hiptlkeys = plib.rmKeys(['rs'], list(hiptls[0].pks.keys()))
         else:
             hiptlkeys = []
         if hisubs:
-            hisubkeys = rmKeys(['rs'], list(hisubs[0].pks.keys()))
+            hisubkeys = plib.rmKeys(['rs'], list(hisubs[0].pks.keys()))
         else:
             hisubkeys = []
     else:
@@ -96,11 +75,11 @@ def HI_auto_pk(hiptls, hisubs, vns, in_rss = False, panel_length = 3,
         else:
             vnkeys = []
         if hiptls:
-            hiptlkeys = fetchKeys(['rs'], list(hiptls[0].pks.keys()))
+            hiptlkeys = plib.fetchKeys(['rs'], list(hiptls[0].pks.keys()))
         else:
             hiptlkeys = []
         if hisubs:
-            hisubkeys = fetchKeys(['rs'], list(hisubs[0].pks.keys()))
+            hisubkeys = plib.fetchKeys(['rs'], list(hisubs[0].pks.keys()))
         else:
             hisubkeys = []
     # get the yrange

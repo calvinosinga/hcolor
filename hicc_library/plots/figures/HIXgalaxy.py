@@ -51,25 +51,6 @@ def main():
 
     return
 
-def fetchKeys(substrings, keylist):
-    res = []
-    for sub in substrings:
-        for k in keylist:
-            if sub in k and not k in res:
-                res.append(k)
-    
-    if 'k' in res:
-        res.remove('k')
-    return res
-
-def rmKeys(keywords, keylist):
-    klist = copy.copy(keylist)
-    for word in keywords:
-        for k in klist:
-            if word in k:
-                klist.remove(k)
-    klist.remove('k')
-    return klist
 
 def HI_galaxy_Xpk_methodology(hiptls, hisubs, vns, in_rss = False, panel_length = 3, panel_bt = 0.1, border = 1,
             text_space = 0.1, fsize = 16):
@@ -87,16 +68,16 @@ def HI_galaxy_Xpk_methodology(hiptls, hisubs, vns, in_rss = False, panel_length 
     hisubkeys = {}
     for c in colors:
         if not in_rss:
-            vnkeys[c] = rmKeys(['rs'], list(vns[0].xpks.keys()))
-            vnkeys[c] = fetchKeys([c], vnkeys[c])
-            hiptlkeys[c] = rmKeys(['rs'], list(hiptls[0].xpks.keys()))
-            hiptlkeys[c] = fetchKeys([c], hiptlkeys[c])            
-            hisubkeys[c] = rmKeys(['rs'], list(hisubs[0].xpks.keys()))
-            hisubkeys[c] = fetchKeys([c], hisubkeys[c])
+            vnkeys[c] = plib.rmKeys(['rs'], list(vns[0].xpks.keys()))
+            vnkeys[c] = plib.fetchKeys([c], vnkeys[c])
+            hiptlkeys[c] = plib.rmKeys(['rs'], list(hiptls[0].xpks.keys()))
+            hiptlkeys[c] = plib.fetchKeys([c], hiptlkeys[c])            
+            hisubkeys[c] = plib.rmKeys(['rs'], list(hisubs[0].xpks.keys()))
+            hisubkeys[c] = plib.fetchKeys([c], hisubkeys[c])
         else:
-            vnkeys[c] = fetchKeys(['rs', c], list(vns[0].xpks.keys()))
-            hiptlkeys[c] = fetchKeys(['rs', c], list(hiptls[0].xpks.keys()))
-            hisubkeys[c] = fetchKeys(['rs', c], list(hisubs[0].xpks.keys()))
+            vnkeys[c] = plib.fetchKeys(['rs', c], list(vns[0].xpks.keys()))
+            hiptlkeys[c] = plib.fetchKeys(['rs', c], list(hiptls[0].xpks.keys()))
+            hisubkeys[c] = plib.fetchKeys(['rs', c], list(hisubs[0].xpks.keys()))
     
     # get the yrange
     yrange = [np.inf, 0]
@@ -247,16 +228,16 @@ def HI_galaxy_Xpk_color(hiptls, hisubs, vns, in_rss = False, panel_length = 3, p
     hisubkeys = {}
     for c in colors:
         if not in_rss:
-            vnkeys[c] = rmKeys(['rs'], list(vns[0].xpks.keys()))
-            vnkeys[c] = fetchKeys([c], vnkeys[c])
-            hiptlkeys[c] = rmKeys(['rs'], list(hiptls[0].xpks.keys()))
-            hiptlkeys[c] = fetchKeys([c], hiptlkeys[c])            
-            hisubkeys[c] = rmKeys(['rs'], list(hisubs[0].xpks.keys()))
-            hisubkeys[c] = fetchKeys([c], hisubkeys[c])
+            vnkeys[c] = plib.rmKeys(['rs'], list(vns[0].xpks.keys()))
+            vnkeys[c] = plib.fetchKeys([c], vnkeys[c])
+            hiptlkeys[c] = plib.rmKeys(['rs'], list(hiptls[0].xpks.keys()))
+            hiptlkeys[c] = plib.fetchKeys([c], hiptlkeys[c])            
+            hisubkeys[c] = plib.rmKeys(['rs'], list(hisubs[0].xpks.keys()))
+            hisubkeys[c] = plib.fetchKeys([c], hisubkeys[c])
         else:
-            vnkeys[c] = fetchKeys(['rs', c], list(vns[0].xpks.keys()))
-            hiptlkeys[c] = fetchKeys(['rs', c], list(hiptls[0].xpks.keys()))
-            hisubkeys[c] = fetchKeys(['rs', c], list(hisubs[0].xpks.keys()))
+            vnkeys[c] = plib.fetchKeys(['rs', c], list(vns[0].xpks.keys()))
+            hiptlkeys[c] = plib.fetchKeys(['rs', c], list(hiptls[0].xpks.keys()))
+            hisubkeys[c] = plib.fetchKeys(['rs', c], list(hisubs[0].xpks.keys()))
     print("VN keys:")
     print(vnkeys)
     print("hiptl keys:")

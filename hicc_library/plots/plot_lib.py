@@ -11,6 +11,35 @@ home = 'C:/Users/calvi/AppData/Local/Packages/CanonicalGroupLimited' + \
         '.UbuntuonWindows_79rhkp1fndgsc/LocalState/rootfs/home/cosinga/'
 path = home + 'pks/pks/to_laptop/'
 
+def fetchKeys(substrings, keylist):
+    res = []
+    for sub in substrings:
+        for k in keylist:
+            if sub in k and not k in res:
+                res.append(k)
+    
+    if 'k' in res:
+        res.remove('k')
+    if 'Nmodes' in res:
+        res.remove('Nmodes')
+    if 'r' in res:
+        res.remove('r')
+    return res
+
+def rmKeys(keywords, keylist):
+    klist = copy.copy(keylist)
+    for word in keywords:
+        for k in klist:
+            if word in k:
+                klist.remove(k)
+    if 'k' in klist:
+        klist.remove('k')
+    if 'Nmodes' in klist:
+        klist.remove("Nmodes")
+    if 'r' in klist:
+        klist.remove('r')
+    return klist
+
 def getAuto(fn, box, snapshot, axis, resolution):
     s = path+'%sgrid_%sB_%03dS_%dA_%dR'%(fn,box,snapshot,axis,resolution)
     if os.path.exists(s+'.hdf5.pkl'):
