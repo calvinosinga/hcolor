@@ -106,7 +106,7 @@ for k in range(len(keylist)):
         dat = chunk1.saveGrid(w)
     
     # sum the histograms
-    if ops[keylist[k]] == 'hist':
+    elif ops[keylist[k]] == 'hist':
 
         if gd['verbose']:
             print("summing the histograms for %s"%keylist[k])
@@ -129,7 +129,7 @@ for k in range(len(keylist)):
         dat.attrs["combine"] = f1[keylist[k]].attrs["combine"]
         dat.attrs["operation"] = f1[keylist[k]].attrs['operation']
     # extend the datasets
-    if ops[keylist[k]] == 'extend':
+    elif ops[keylist[k]] == 'extend':
         #TODO:
         continue
 

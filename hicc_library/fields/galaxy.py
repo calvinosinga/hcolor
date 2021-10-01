@@ -17,7 +17,7 @@ class galaxy(Field):
         super().__init__(simname, snapshot, axis, resolution, pkl_path, verbose)
 
         self.fieldname = fieldname
-        self.gridnames = self.getGridnames()
+        self.gridnames, self.ignore = self.getGridnames()
         # we use blue/red/all for every color definition
 
         # each run will do each color definition provided, but will need a different run to
@@ -51,12 +51,18 @@ class galaxy(Field):
     
     def getGridnames(self):
         gridnames = ['resolved', 'all']
+        ignore = {} # which grids should not have xpk computed from them
         colors = ['blue', 'red']
         coldefs = list(self.getColorDefinitions().keys())
         for cdef in coldefs:
             for c in colors:
                 gridnames.append(c+'_'+cdef)
-        return gridnames
+                if cdef == '0.6' or cdef == 'nelson':
+                    ignore[c+'_'+cdef] = 0
+                else:
+                    ignore[c+'_'+cdef] = 1
+                
+        return gridnames, ignore
     
     @staticmethod
     def isRed(gr, stmass, color_dict):
@@ -155,7 +161,7 @@ class galaxy(Field):
         # trying it with a straight gr cut as well
         galaxy_red_definition['0.55'] = {'b':0.55, 'm':0, 'mb':0}
         galaxy_red_definition['0.65'] = {'b':0.65, 'm':0, 'mb':0}
-        galaxy_red_definition['0.45'] = {'b':0.45, 'm':0, 'mb':0}
+        galaxy_red_definition['0.7'] = {'b':0.7, 'm':0, 'mb':0}
         # galaxy_red_definition['eBOSS_ELG'] = False
         # galaxy_red_definition['eBOSS_LRG'] = True
         return galaxy_red_definition
@@ -209,7 +215,7 @@ class galaxy(Field):
             else:
                 grid.CIC(pos, self.header['BoxSize'])
             
-            if not ('0.65' in gridname or "resolved" == gridname):
+            if self.ignore[gridname]:
                 grid.ignoreGrid()
             return grid
         ###########################################################################

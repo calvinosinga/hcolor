@@ -201,6 +201,7 @@ def HI_galaxy_Xpk_color(hiptls, hisubs, vns, in_rss = False, panel_length = 3, p
             hiptlkeys[c] = plib.fetchKeys(['rs', c], list(hiptls[0].xpks.keys()))
             hisubkeys[c] = plib.fetchKeys(['rs', c], list(hisubs[0].xpks.keys()))
     # get the yrange
+    yrange = [np.inf, 0]
     fields = []
     fields.extend(hiptls)
     fields.extend(hisubs)
