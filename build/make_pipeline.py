@@ -173,11 +173,18 @@ def write_line(varname, sname, jdep=None):
         pipe.write("%s=$(sbatch --export=ALL,GDFILE=$GDFILE %s)\n"%(varname, sname))
     else:
         pipe.write("%s=$(sbatch --export=ALL,GDFILE=$GDFILE --dependency=afterok:"%varname)
+        written_deps = []
+        dep_str = ''
         for i in range(len(jdep)):
-            if not jdep[i] == jdep[-1]:
-                pipe.write('$'+jdep[i]+':')
-            else:
-                pipe.write('$'+jdep[i])
+            
+            if not jdep[i] in written_deps:
+                dep_str+='$'+jdep[i]+':'
+                written_deps.append(jdep[i])
+        
+        if dep_str[-1] == ':':
+            dep_str = dep_str[:-1]
+        
+        pipe.write(dep_str)
         pipe.write(" %s)\n"%sname)
     pipe.write("%s=\"${%s##* }\"\n\n"%(varname, varname))
     return

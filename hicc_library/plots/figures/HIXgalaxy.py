@@ -66,6 +66,8 @@ def HI_galaxy_Xpk_methodology(hiptls, hisubs, vns, in_rss = False, panel_length 
     vnkeys = {}
     hiptlkeys = {}
     hisubkeys = {}
+    keys_dict = {hiptls[0].fieldname:[], hisubs[0].fieldname:[], vns[0].fieldname:[]}
+
     for c in colors:
         if not in_rss:
             vnkeys[c] = plib.rmKeys(['rs'], list(vns[0].xpks.keys()))
@@ -78,68 +80,26 @@ def HI_galaxy_Xpk_methodology(hiptls, hisubs, vns, in_rss = False, panel_length 
             vnkeys[c] = plib.fetchKeys(['rs', c], list(vns[0].xpks.keys()))
             hiptlkeys[c] = plib.fetchKeys(['rs', c], list(hiptls[0].xpks.keys()))
             hisubkeys[c] = plib.fetchKeys(['rs', c], list(hisubs[0].xpks.keys()))
+        
+        keys_dict[hiptls[0].fieldname].extend(hiptlkeys[c])
+        keys_dict[hisubs[0].fieldname].extend(hisubkeys[c])
+        keys_dict[vns[0].fieldname].extend(vnkeys[c])
     
     # get the yrange
-    yrange = [np.inf, 0]
     fields = []
     fields.extend(hiptls)
     fields.extend(hisubs)
     fields.extend(vns)
 
-    def contains(fn, kw):
-        return kw in fn
-    for f in fields:
-        if contains(f.fieldname, 'hiptl'):
-            keys = hiptlkeys['red']
-        if contains(f.fieldname, 'hisubhalo'):
-            keys = hisubkeys['red']
-        if contains(f.fieldname, 'vn'):
-            keys = vnkeys['red']
-
-        for k in keys:
-            nyqval = f.resolution * np.pi / f.box
-            nyqidx = np.argmin(np.abs(f.xpks['k'] - nyqval))
-            pkmax = np.max(f.xpks[k][:nyqidx])
-            pkmin = np.min(f.xpks[k][:nyqidx])
-            if pkmax > yrange[1]:
-                yrange[1] = pkmax
-            if pkmin < yrange[0] and pkmin > 0:
-                yrange[0] = pkmin
-    del fields
-
-    # get info from the fields to prepare plot
-    box = hiptls[0].box
-    snapshots = []
-    for f in hiptls:
-        if not f.field1.snapshot in snapshots:
-            snapshots.append(f.field1.snapshot)
+    yrange = plib.getYrange(fields, keys_dict)
+    snapshots = plib.getSnaps(fields)
     
-    # put snapshots in increasing order
-    snapshots.sort()
-    
-    # creating figure
-    nrows = len(snapshots)
-    ncols = 3 # for each methodology
-    figwidth = panel_length * ncols + panel_bt * (ncols - 1) + border*2
-    figheight = panel_length * nrows + panel_bt * (nrows - 1) + border*2
-    fig = plt.figure(figsize = (figwidth, figheight))
+    fig, panels = plib.createFig(panel_length, nrows, ncols, panel_bt,
+            border, border)
 
-    # creating gridspec
-    gs = gspec.GridSpec(nrows, ncols)
-    plt.subplots_adjust(left = border / figwidth,
-            right = 1 - border / figwidth, top = 1 - border / figheight,
-            bottom = border/figheight, wspace = panel_bt, hspace = panel_bt)
-
-    # now creating panels in order of increasing redshift
-    panels = []
-    for i in range(nrows):
-        col_panels = []
-        for j in range(ncols):
-            col_panels.append(fig.add_subplot(gs[i,j]))
-        panels.append(col_panels)
-        
+    figsize = fig.get_size_inches()
     
-    for i in range(nrows):
+    for i in range(len(panels)):
         # make the hisubhalo plot for this redshift
         plt.sca(panels[i][0])
         plib.fillpks(hisubs[i].xpks['k'], hisubs[i].xpks, box, hisubs[i].resolution,
@@ -208,10 +168,10 @@ def HI_galaxy_Xpk_methodology(hiptls, hisubs, vns, in_rss = False, panel_length 
         else:
             plt.xlabel('')
     
-    fig.text(border/2/figwidth, 0.5, r'P(k)(Mpc/h)$^{-3}$', ha = 'center', va='center',
+    fig.text(border/2/figsize[0], 0.5, r'P(k)(Mpc/h)$^{-3}$', ha = 'center', va='center',
             rotation='vertical', fontsize=fsize)
 
-    fig.text(0.5, border/2/figheight, r'k (Mpc/h)$^{-1}$', ha = 'center',
+    fig.text(0.5, border/2/figsize[1], r'k (Mpc/h)$^{-1}$', ha = 'center',
             va = 'center', fontsize=fsize)
     return
 
@@ -240,14 +200,7 @@ def HI_galaxy_Xpk_color(hiptls, hisubs, vns, in_rss = False, panel_length = 3, p
             vnkeys[c] = plib.fetchKeys(['rs', c], list(vns[0].xpks.keys()))
             hiptlkeys[c] = plib.fetchKeys(['rs', c], list(hiptls[0].xpks.keys()))
             hisubkeys[c] = plib.fetchKeys(['rs', c], list(hisubs[0].xpks.keys()))
-    print("VN keys:")
-    print(vnkeys)
-    print("hiptl keys:")
-    print(hiptlkeys)
-    print("hisubhalo keys:")
-    print(hisubkeys)
     # get the yrange
-    yrange = [np.inf, 0]
     fields = []
     fields.extend(hiptls)
     fields.extend(hisubs)

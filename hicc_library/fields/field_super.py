@@ -64,7 +64,7 @@ class Field():
         self.header['BoxSize'] *= self.header["Time"]/1e3
         # don't want to use self._convertPos(..) because that might change in subclasses
         self.header['MassTable'] *= 1e10/self.header['HubbleParam']
-
+        self.box = self.header['BoxSize']
         if self.v:
             print("finished loading header...")
             print(self.header)

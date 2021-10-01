@@ -82,66 +82,21 @@ def HI_auto_pk(hiptls, hisubs, vns, in_rss = False, panel_length = 3,
             hisubkeys = plib.fetchKeys(['rs'], list(hisubs[0].pks.keys()))
         else:
             hisubkeys = []
-    # get the yrange
-    print(hiptlkeys)
-    print(hisubkeys)
-    print(vnkeys)
-    yrange = [np.inf, 0]
+    
     fields = []
     fields.extend(hiptls)
     fields.extend(hisubs)
     fields.extend(vns)
-    
-    for f in fields:
-        if f.fieldname == 'hiptl':
-            keys = hiptlkeys
-        if f.fieldname == 'hisubhalo':
-            keys = hisubkeys
-        if f.fieldname == 'vn':
-            keys = vnkeys
-        pklen = len(f.pks['k'][:])
-        nyq = f.resolution * np.pi / f.header["BoxSize"]
-        nyq_idx = np.argmin(np.abs(f.pks['k'] - nyq))
-        for k in keys:
-            pkmax = np.max(f.pks[k][:nyq_idx])
-            pkmin = np.min(f.pks[k][:nyq_idx])
-            if pkmax > yrange[1]:
-                yrange[1] = pkmax
-            if pkmin < yrange[0] and pkmin > 0:
-                yrange[0] = pkmin
-            if not len(f.pks[k]) == pklen:
-                print(k)
-    del fields
-    print(yrange)
-    # get info from the fields to prepare plot
 
-    snapshots = []
-    for f in hiptls:
-        if not f.snapshot in snapshots:
-            snapshots.append(f.snapshot)
-    
-    # put snapshots in increasing order
-    snapshots.sort()
-    
-    # creating figure
-    npanels = len(snapshots)
-    figwidth = panel_length * npanels + panel_bt * (npanels - 1) + border * 2
-    figheight = panel_length + border * 2
-    fig = plt.figure(figsize = (figwidth, figheight))
+    key_dict = {'hiptl':hiptlkeys, 'hisubhalo':hisubkeys, 'vn':vnkeys}
+    yrange = plib.getYrange(fields, key_dict)
+    snapshots = plib.getSnaps(fields)
 
-    # creating gridspec
-    gs = gspec.GridSpec(1, npanels)
-    plt.subplots_adjust(left = border / figwidth,
-            right = 1 - border / figwidth, top = 1 - border / figwidth,
-            bottom = border/figwidth, wspace = panel_bt, hspace = panel_bt)
-
-    # now creating panels in order of increasing redshift
-    panels = []
-    for i in range(npanels):
-        panels.append(fig.add_subplot(gs[i]))
+    fig, panels = plib.createFig(panel_length, 1, len(snapshots), panel_bt,
+            border, border)
 
     # now making each panel
-    for i in range(npanels):
+    for i in range(len(panels)):
         plt.sca(panels[i])
         panel_snap = snapshots[i]
 
@@ -174,19 +129,26 @@ def HI_auto_pk(hiptls, hisubs, vns, in_rss = False, panel_length = 3,
         if not i == 0:
             ax = plt.gca()
             ax.set_yticklabels([])
-            plt.ylabel('')
             ax.get_legend().remove()
         else:
             plt.legend(loc = 'upper right')
         plt.ylim(yrange[0], yrange[1])
-        
+        plt.xlabel('')
+        plt.ylabel('')
         # output textbox onto the plot with redshift
         xts = (hiptls[0].pks['k'][0]) / text_space
         yts = (yrange[0]) / text_space
+        
+        # needed in every panel
         plt.text(hiptls[0].pks['k'][0]+xts, yrange[0]+yts,
                 'z=%.1f'%snapshots[i], fontsize = fsize, ha = 'left', va = 'bottom',
                 fontweight = 'bold') 
 
+    figsize = fig.get_size_inches()
+    fig.text(border/2/figsize[0], 0.5, r'P(k) (Mpc/h)$^{-3}$',ha = 'center',
+            va = 'center', fontsize=fsize)
+    fig.text(0.5, border/2/figsize[1], r'k (Mpc/h)$^{-1}$', ha = 'center',
+            va = 'center', fontsize=fsize)
     return
 if __name__ == '__main__':
     main()

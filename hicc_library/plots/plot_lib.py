@@ -6,6 +6,8 @@ import matplotlib as mpl
 import matplotlib.gridspec as gspec
 import copy
 
+from numpy.lib.arraysetops import isin
+
 mpl.rcParams['text.usetex'] = True
 home = 'C:/Users/calvi/AppData/Local/Packages/CanonicalGroupLimited' + \
         '.UbuntuonWindows_79rhkp1fndgsc/LocalState/rootfs/home/cosinga/'
@@ -40,12 +42,59 @@ def rmKeys(keywords, keylist):
         klist.remove('r')
     return klist
 
-def getAuto(fn, box, snapshot, axis, resolution):
-    s = path+'%sgrid_%sB_%03dS_%dA_%dR'%(fn,box,snapshot,axis,resolution)
-    if os.path.exists(s+'.hdf5.pkl'):
-        return pkl.load(open(s+'.hdf5.pkl', 'rb'))
-    else:
-        return pkl.load(open(s+'.%d.hdf5.pkl', 'rb'))
+def getYrange(fields, keys_dict):
+    yrange = [np.inf, 0]
+    for f in fields:
+        keys = keys_dict[f.fieldname]
+        nyq = f.resolution * np.pi / f.box
+        nyq_idx = np.argmin(np.abs(f.pks['k'] - nyq))
+        for k in keys:
+            pkmax = np.max(f.pks[k][:nyq_idx])
+            pkmin = np.min(f.pks[k][:nyq_idx])
+            if pkmax > yrange[1]:
+                yrange[1] = pkmax
+            if pkmin < yrange[0] and pkmin > 0:
+                yrange[0] = pkmin
+    return yrange
+
+def getSnaps(fields):
+    snapshots = []
+    for f in fields:
+        if not f.snapshot in snapshots:
+            snapshots.append(f.snapshot)
+    snapshots.sort()
+    return snapshots
+
+def createFig(panel_length, nrows, ncols, panel_bt, xborder, yborder):
+    # border input can be either a list or single number
+    if isinstance(xborder, float) or isinstance(xborder, int):
+        xborder = [xborder, xborder]
+    if isinstance(yborder, float) or isinstance(yborder, int):
+        xborder = [yborder, yborder]
+    # creating Figure object
+
+    figwidth = panel_length * ncols + panel_bt * (ncols - 1) + \
+            xborder[0] + xborder[1]
+    figheight = panel_length * nrows + panel_bt * (nrows - 1) + \
+            yborder[0] + yborder[1]
+    
+    fig = plt.figure(figsize=(figwidth, figheight))
+
+    # creating gridspec
+    gs = gspec.GridSpec(nrows, ncols)
+    plt.subplots_adjust(left= xborder[0]/figwidth, right=1-xborder[1]/figwidth,
+            top=1-yborder[1]/figheight, bottom=yborder[0]/figheight,
+            wspace=panel_bt, hspace=panel_bt)
+    
+    # making panels list
+    panels = []
+    for i in range(nrows):
+        col_panels = []
+        for j in range(ncols):
+            col_panels.append(fig.add_subplot(gs[i,j]))
+        panels.append(col_panels)
+    
+    return fig, panels
         
 def plotpks(k, pks, boxsize, resolution, keylist = None, colors = None,
         labels = None, linestyles = None, linewidths = None, nyq = False,
