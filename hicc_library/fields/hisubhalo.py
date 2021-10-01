@@ -76,9 +76,10 @@ class hisubhalo(Field):
 
         in_rss = False
         ############### HELPER METHOD ###############################
-        def computeHI(gridname):
+        def computeHI(gridname, pos, is_in_rss):
             grid = Grid(gridname, self.resolution, verbose=self.v)
-            grid.in_rss = in_rss
+            if is_in_rss:
+                grid.toRSS()
             mass = hih2file[gridname][:] #already in solar masses
             if self.use_cicw:
                 grid.CICW(pos, self.header['BoxSize'], mass)
@@ -92,12 +93,12 @@ class hisubhalo(Field):
         ###############################################################
 
         for g in self.gridnames:
-            computeHI(g)
+            computeHI(g, pos, in_rss)
         
         pos = self._toRedshiftSpace(pos, vel)
         in_rss = True
         for g in self.gridnames:
-            computeHI(g)
+            computeHI(g, pos, in_rss)
         
         return
 
@@ -134,9 +135,10 @@ class h2subhalo(hisubhalo):
 
         in_rss = False
         ############### HELPER METHOD ###############################
-        def computeH2(gridname):
+        def computeH2(gridname, pos, is_in_rss):
             grid = Grid(gridname, self.resolution, verbose=self.v)
-            grid.in_rss = in_rss
+            if is_in_rss:
+                grid.toRSS()
             mass = hih2file[gridname][:] #already in solar masses
             if self.use_cicw:
                 grid.CICW(pos, self.header['BoxSize'], mass)
@@ -150,12 +152,12 @@ class h2subhalo(hisubhalo):
         ###############################################################
 
         for g in self.gridnames:
-            computeH2(g)
+            computeH2(g, pos, in_rss)
         
         pos = self._toRedshiftSpace(pos, vel)
         in_rss = True
         for g in self.gridnames:
-            computeH2(g)
+            computeH2(g, pos, in_rss)
         
         return
     

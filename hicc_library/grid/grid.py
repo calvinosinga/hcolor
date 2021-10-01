@@ -43,6 +43,7 @@ class Grid():
     
     def toRSS(self):
         self.in_rss = True
+        self.gridname = self.gridname + 'rs'
         return
     
     def isChunk(self):
@@ -99,7 +100,6 @@ class Grid():
         u = np.zeros(3)
 
         for i in range(ptls):
-            mass_added_check = 0
             for axis in range(coord):
                 dist = pos[i,axis] * inv_cell_size
                 u[axis] = dist - int(dist)
@@ -123,7 +123,7 @@ class Grid():
         if self.v:
             print("finished CICW...")
             print("grid sum: %.3e"%np.sum(self.grid))
-            print('#'*40)
+            print('#'*40 + '\n')
         return
     
     def ignoreGrid(self):
@@ -131,12 +131,8 @@ class Grid():
         return
     
     def saveGrid(self, outfile):
-        if self.in_rss:
-            grid_save_name = self.gridname+'rs'
-        else:
-            grid_save_name = self.gridname
         
-        dat = outfile.create_dataset(grid_save_name, data=self.grid, 
+        dat = outfile.create_dataset(self.gridname, data=self.grid, 
                 compression="gzip", compression_opts=9)
         
         dct = dat.attrs
