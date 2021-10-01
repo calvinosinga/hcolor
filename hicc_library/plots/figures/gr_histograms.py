@@ -243,11 +243,15 @@ def gr_hist(galaxy, galaxy_dust, panel_length = 3, panel_bt = 0.1, text_space = 
             plotted = True
         if not plotted:
             return
-
+        # colors for the cuts
+        gray_colors = np.linspace(0, 1, 10)
+        idx = 0
         # plot lines where the cuts occur
         for ckey,cd in col_defs.items():
             if cd['m'] == 0 and cd['mb'] == 0:
-                plt.plot([cd['b'], cd['b']], [ylim[0], ylim[-1]], label=ckey, linestyle = '--')
+                idx += 1
+                plt.plot([cd['b'], cd['b']], [ylim[0], ylim[-1]], label=ckey, 
+                        color = str(gray_colors[idx]), linestyle = '--')
 
 
         ax = plt.gca()
@@ -278,7 +282,7 @@ def gr_hist(galaxy, galaxy_dust, panel_length = 3, panel_bt = 0.1, text_space = 
     nrows = len(snapshots)
     ncols = 1
     top_border = border
-    bot_border = border*2
+    bot_border = border*1.5
     figwidth = panel_length * ncols + panel_bt * (ncols - 1) + border*2
     figheight = panel_length * nrows + panel_bt * (nrows - 1) + bot_border + top_border
     fig = plt.figure(figsize = (figwidth, figheight))
@@ -297,7 +301,7 @@ def gr_hist(galaxy, galaxy_dust, panel_length = 3, panel_bt = 0.1, text_space = 
         make_panel(galaxy, galaxy_dust, i)
 
     
-    fig.text(0.5, border/2/figheight, 'g-r (magnitude)', va = 'center', 
+    fig.text(0.5, bot_border/2/figheight, 'g-r (magnitude)', va = 'center', 
                 ha = 'center', fontsize=16)
     fig.text(1-border/2/figwidth, 0.5, '$N_g$ (count)', va = 'center', 
                 ha = 'center', rotation = 'vertical', fontsize = 16)
