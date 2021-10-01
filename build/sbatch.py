@@ -208,7 +208,8 @@ class Sbatch():
             use_cicw = int(input("should %s use CICW? (1=yes,0=no)"%fn))
             use_res = input("which resolution should %s use? Implemented: "%fn+ \
                     str(list(galaxy_min_resolution.keys())))
-            
+            use_col = input("which color cuts should %s use? Implemented: "%fn+ \
+                    str(galaxy.getColorDefinitions()))
             if use_res not in list(galaxy_min_resolution.keys()):
                 raise NotImplementedError("the resolution given is not implemented")
             
@@ -216,29 +217,13 @@ class Sbatch():
             gd['%s_use_stmass'%fn] = use_stmass
             gd['%s_use_cicw'%fn] = use_cicw
             gd['%s_use_res'%fn] = use_res
+            gd['%s_use_col'%fn] = use_col
 
 
         if "hisubhalo" in fn or "h2subhalo" in fn:
             use_cicw = int(input("should %s use CICW? (etc)"%fn))
             gd['%s_use_cicw'%fn] = use_cicw
         
-        if "galaxy_ptl" in fn:
-            use_ht = int(input('for %s, does hydrotools need to be run? (1=y,0=n)'))
-            if use_ht == 0:
-                ht_path = input("if not, what is the path to the ht_file?")
-            else:
-                ht_suf = input("if yes, what file suffix should be used?")
-                ht_path = gd['results'] + \
-                        'galaxies_%s_%s_%03d.hdf5'%(ht_suf, self.simname, self.snapshot)
-                gd['ht_suffix'] = ht_suf
-            gd['use_ht'] = use_ht
-            gd['ht_path'] = ht_path
-
-            col_defs = list(galaxy.getColorDefinitions().keys())
-            col = input("which color definition should be used for %s? Implemented:"%fn+str(col_defs))
-            gd["%s_use_col"%fn] = col
-
-
         return
 
     def _name_savefiles(self, step_names):

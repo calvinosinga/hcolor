@@ -17,17 +17,17 @@ class galaxy(Field):
         super().__init__(simname, snapshot, axis, resolution, pkl_path, verbose)
 
         self.fieldname = fieldname
-        self.gridnames, self.ignore = self.getGridnames()
+        self.gridnames = self.getGridnames()
         # we use blue/red/all for every color definition
 
         # each run will do each color definition provided, but will need a different run to
         # use a different resolution definition.
         self.use_res = 'diemer'
+        self.use_col = '0.6'
         self.res_dict = self.getResolutionDefinitions(self.simname)[self.use_res]
         self.use_cicw = True
         self.use_stmass = True
-        self.col_defs = list(self.getColorDefinitions().keys())
-
+        
         self.isHI = False
 
         self.has_resolved = False
@@ -43,39 +43,42 @@ class galaxy(Field):
             print('%s class variables:'%self.fieldname)
             print('Resolution definition: %s'%self.use_res)
             print('Resolution dictionary: %s'%str(self.res_dict))
+            print('Color Definition: %s'%self.use_col)
             print('Is it using CICW?: %d'%self.use_cicw)
             print('Is it using stellar mass?: %d'%self.use_stmass)
-            print('Color definitions:')
-            print(self.col_defs)
+
         return
     
     def getGridnames(self):
-        gridnames = ['resolved', 'all']
-        ignore = {} # which grids should not have xpk computed from them
-        colors = ['blue', 'red']
-        coldefs = list(self.getColorDefinitions().keys())
-        for cdef in coldefs:
-            for c in colors:
-                gridnames.append(c+'_'+cdef)
-                if cdef == '0.6' or cdef == 'nelson':
-                    ignore[c+'_'+cdef] = 0
-                else:
-                    ignore[c+'_'+cdef] = 1
+        gridnames = ['resolved', 'all', 'blue', 'red']
                 
-        return gridnames, ignore
+        return gridnames
     
     @staticmethod
-    def isRed(gr, stmass, color_dict):
-        if isinstance(color_dict, dict):
-            b = color_dict['b']
-            m = color_dict['m']
-            mb = color_dict['mb']
-            return gr > b + m * (np.log10(stmass) + mb)
+    def colorIndices(photo, stmass, col_def):
+        if col_def == 'nelson':
+            x = stmass
+            y = photo['gr']
+            red_mask = y > 0.65 + 0.02 * (np.log10(x) - 10.28)
+            blue_mask = np.invert(red_mask)
+        elif col_def == 'papa':
+            x = photo['r']
+            y = photo['gi']
+            red_mask = y > 0.0571 * (x + 24) + 1.25
+            blue_mask = y < 0.0571 * (x + 24) + 1.1
+        elif col_def == 'eBOSS_ELG':
+            blue_mask = np.ones_like(stmass)
+            red_mask = np.zeros_like(stmass)
+        elif col_def == 'eBOSS_LRG':
+            blue_mask = np.zeros_like(stmass)
+            red_mask = np.ones_like(stmass)
         else:
-            if color_dict:
-                return np.ones_like(gr)
-            else:
-                return np.zeros_like(gr)
+            y = photo['gr']
+            x = float(col_def)
+            red_mask = y > x
+            blue_mask = np.invert(red_mask)
+        return blue_mask, red_mask
+        
     
     @staticmethod
     def isResolved(stmass, photo, res_dict):
@@ -150,21 +153,11 @@ class galaxy(Field):
     
     @staticmethod
     def getColorDefinitions():
-        # these are what separates the blue/red population, given in the gr-stmass plane.
-        # the format is gr > b + m*(log(stmass)+mb)
-        galaxy_red_definition = {}
-        # from Nelson's definition
-        galaxy_red_definition['nelson'] = {'b':0.65, 'm':0.02, 'mb':-10.28}
-        # experiments with sensitivy to color definition - translate the above def. vertically
-        galaxy_red_definition['0.5'] = {'b':0.5, 'm':0, 'mb':0}
-        galaxy_red_definition['0.6'] = {'b':0.6, 'm':0, 'mb':0}
-        # trying it with a straight gr cut as well
-        galaxy_red_definition['0.55'] = {'b':0.55, 'm':0, 'mb':0}
-        galaxy_red_definition['0.65'] = {'b':0.65, 'm':0, 'mb':0}
-        galaxy_red_definition['0.7'] = {'b':0.7, 'm':0, 'mb':0}
-        # galaxy_red_definition['eBOSS_ELG'] = False
-        # galaxy_red_definition['eBOSS_LRG'] = True
-        return galaxy_red_definition
+
+        implemented_color_defs = ['papa', 'nelson', '0.5', '0.55', '0.6', '0.65', '0.7', 'eBOSS_ELG',
+                'eBOSS_LRG']
+        
+        return implemented_color_defs
     
     def useAllMass(self):
         self.use_stmass = False
@@ -179,6 +172,9 @@ class galaxy(Field):
         self.res_dict = self.getResolutionDefinitions(self.simname)[self.use_res]
         return
     
+    def useColorDef(self, col_def):
+        self.use_col = col_def
+        return
     
     def _loadGalaxyData(self, simpath, fields):
         data = super()._loadGalaxyData(simpath, fields)
@@ -199,6 +195,7 @@ class galaxy(Field):
         photo_dict['g'] = photo[:, 4]
         photo_dict['ri'] = photo_dict['r'] - photo_dict['i']
         photo_dict['rz'] = photo_dict['r'] - photo_dict['z']
+        photo_dict['gi'] = photo_dict['g'] - photo_dict['i']
         mass = self._convertMass(mass)
         pos = self._convertPos(pos)
         vel = self._convertVel(vel)
@@ -215,8 +212,6 @@ class galaxy(Field):
             else:
                 grid.CIC(pos, self.header['BoxSize'])
             
-            if self.ignore[gridname]:
-                grid.ignoreGrid()
             return grid
         ###########################################################################
 
@@ -227,7 +222,6 @@ class galaxy(Field):
         fields = ['SubhaloStellarPhotometrics','SubhaloPos','SubhaloMassType',
                 'SubhaloVel']   
         pos, vel, mass, photo = self._loadGalaxyData(self.loadpath, fields)
-        gr = photo['gr']
         
         # resolution definitions use stmass not all of the mass
         if not self.use_stmass:
@@ -242,34 +236,25 @@ class galaxy(Field):
         for g in self.gridnames:
             if self.v:
                 print("now making grids for %s"%g)
-            # the gridname contains the color and the color definition
-            splt = g.split('_',1)
-            color = splt[0]
-            # for 'resolved' + 'all' grids, they have no color definition
-            # so the split will return a list of length one
-            color_dict = None
-            if len(splt) == 2:
-                col_key = splt[1]
-                color_dict = self.getColorDefinitions()[col_key]
-            else:
-                col_key = ''
+
             # create the appropriate mask for the color
 
 
-            if color == 'red':
-                mask = self.isRed(gr, stmass, color_dict)
-                mask = mask * resolved_mask
-            elif color == 'blue':
-                mask = np.invert(self.isRed(gr, stmass, color_dict)) * resolved_mask
-            elif color == 'resolved':
+            if g == 'red':
+                blue_mask, red_mask = self.colorIndices(photo, mass, self.use_col)
+                mask = red_mask * resolved_mask
+            elif g == 'blue':
+                blue_mask, red_mask = self.colorIndices(photo, mass, self.use_col)
+                mask = blue_mask * resolved_mask
+            elif g == 'resolved':
                 mask = resolved_mask
-            elif color == 'all':
+            elif g == 'all':
                 mask = np.ones_like(resolved_mask)
             
             # count the number of galaxies used for this grid
             self.counts[g] = np.sum(mask)
             grid = computeGal(pos[mask, :], mass[mask], g)
-            self.saveData(outfile, grid, col_key)
+            self.saveData(outfile, grid)
             del grid
         
         # now doing redshift-space grids
@@ -277,31 +262,27 @@ class galaxy(Field):
         in_rss = True
 
         for g in self.gridnames:
-            # the gridname contains the color and the color definition
-            splt = g.split('_',1)
-            color = splt[0]
-            # for 'resolved' + 'all' grids, they have no color definition
-            # so the split will return a list of length one
-            if len(splt) == 2:
-                col_key = splt[1]
-                color_dict = self.getColorDefinitions()[col_key]
-            else:
-                col_key = ''
-            # create the appropriate mask for the color
-            if color == 'red':
-                mask = self.isRed(gr, mass, color_dict) * resolved_mask
-            elif color == 'blue':
-                mask = np.invert(self.isRed(gr, mass, color_dict)) * resolved_mask
-            elif color == 'resolved':
+
+            if g == 'red':
+                blue_mask, red_mask = self.colorIndices(photo, mass, self.use_col)
+                mask = red_mask * resolved_mask
+            elif g == 'blue':
+                blue_mask, red_mask = self.colorIndices(photo, mass, self.use_col)
+                mask = blue_mask * resolved_mask
+            elif g == 'resolved':
                 mask = resolved_mask
-            elif color == 'all':
+            elif g == 'all':
                 mask = np.ones_like(resolved_mask)
             
             grid = computeGal(pos[mask, :], mass[mask], g)
-            self.saveData(outfile, grid, col_key)
+            self.saveData(outfile, grid)
             del grid
         
-        self.make_gr_stmass(gr[resolved_mask],stmass[resolved_mask])
+        
+        if self.use_col == 'papa':
+            self.make_gi_r(photo['gi'][resolved_mask], photo['r'][resolved_mask])
+        else:
+            self.make_gr_stmass(photo['gr'][resolved_mask], stmass[resolved_mask])
         return
     
     def make_gr_stmass(self, gr, stmass):
@@ -309,12 +290,12 @@ class galaxy(Field):
         self.gr_stmass = np.histogram2d(np.log10(stmass), gr, bins=50)
         return
     
-    def saveData(self, outfile, grid, color_def):
+    def make_gi_r(self, gi, r):
+        self.gi_r = np.histogram2d(r, gi, bins=50)
+        return
+    
+    def saveData(self, outfile, grid):
         dat = super().saveData(outfile, grid)
-        dct = dat.attrs
-        # since the color_definition is on a grid-by-grid basis
-        # want to save it to the attrs of the grid itself
-        dct['color_definition'] = color_def
         return dat
     
     def _convertVel(self, vel):
@@ -355,6 +336,7 @@ class galaxy_dust(galaxy):
         photo_dict['g'] = photo[:, 4]
         photo_dict['ri'] = photo_dict['r'] - photo_dict['i']
         photo_dict['rz'] = photo_dict['r'] - photo_dict['z']
+        photo_dict['gi'] = photo_dict['g'] - photo_dict['i']
         dustfile.close()
         return pos, vel, mass, photo_dict
         

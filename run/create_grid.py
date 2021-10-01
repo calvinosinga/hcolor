@@ -61,6 +61,7 @@ elif FIELDNAME == 'galaxygrid':
         field.useCIC()
     if not gd['galaxy_use_stmass']:
         field.useAllMass()
+    field.useColorDef(gd['galaxy_use_col'])
     field.useResolution(gd['galaxy_use_res'])
 
 elif FIELDNAME == 'galaxy_dustgrid':
@@ -71,7 +72,7 @@ elif FIELDNAME == 'galaxy_dustgrid':
     if not gd['galaxy_dust_use_stmass']:
         field.useAllMass()
     field.useResolution(gd['galaxy_dust_use_res'])
-
+    field.useColorDef(gd['galaxy_dust_use_col'])
 elif FIELDNAME == 'vngrid':
     field = vn(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, pickle_path,
             gd['verbose'], gd['snapshot'], gd['TREECOOL'])
