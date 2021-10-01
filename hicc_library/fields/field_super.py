@@ -130,7 +130,7 @@ class Field():
             slcidx = int(perc*dim) # the percentage of the volume that should be binned
             if mid is None:
                 mid = int(dim/2)
-            slc = np.log10(np.sum(arr[:, mid-slcidx:mid+slcidx, :], axis=1))
+            slc = np.log10(np.sum(arr[:, mid-slcidx:mid+slcidx, :], axis=(self.axis+1)%3))
             self.slices[grid.gridname] = slc
         return
     
