@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.gridspec as gspec
 import copy
-from hicc_library.fields.field_super import Field, Cross
 
 mpl.rcParams['text.usetex'] = True
 home = 'C:/Users/calvi/AppData/Local/Packages/CanonicalGroupLimited' + \
@@ -41,12 +40,12 @@ def rmKeys(keywords, keylist):
         klist.remove('r')
     return klist
 
-def getYrange(fields, keys_dict):
+def getYrange(fields, keys_dict, is_X):
     yrange = [np.inf, 0]
     for f in fields:
-        if isinstance(f, Field):
+        if not is_X:
             pks = f.pks
-        elif isinstance(f, Cross):
+        else:
             pks = f.xpks
         keys = keys_dict[f.fieldname]
         nyq = f.resolution * np.pi / f.box
