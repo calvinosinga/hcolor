@@ -53,7 +53,7 @@ def main():
 
 
 def HI_galaxy_Xpk_methodology(hiptls, hisubs, vns, in_rss = False, panel_length = 3, panel_bt = 0.1, border = 1,
-            text_space = 0.1, fsize = 16):
+            text_space = 0.9, fsize = 16):
     """
     HI-galaxy cross powers separated into different panels by their methodologies.
     This plot is designed to go into the results section of the paper.
@@ -97,11 +97,13 @@ def HI_galaxy_Xpk_methodology(hiptls, hisubs, vns, in_rss = False, panel_length 
             keys = vnkeys['red']
 
         for k in keys:
-            pkmax = np.max(f.xpks[k])
-            pkmin = np.min(f.xpks[k])
+            nyqval = f.resolution * np.pi / f.box
+            nyqidx = np.argmin(np.abs(f.xpks['k'] - nyqval))
+            pkmax = np.max(f.xpks[k][:nyqidx])
+            pkmin = np.min(f.xpks[k][:nyqidx])
             if pkmax > yrange[1]:
                 yrange[1] = pkmax
-            if pkmin < yrange[0]:
+            if pkmin < yrange[0] and pkmin > 0:
                 yrange[0] = pkmin
     del fields
 
@@ -125,8 +127,8 @@ def HI_galaxy_Xpk_methodology(hiptls, hisubs, vns, in_rss = False, panel_length 
     # creating gridspec
     gs = gspec.GridSpec(nrows, ncols)
     plt.subplots_adjust(left = border / figwidth,
-            right = 1 - border / figwidth, top = 1 - border / figwidth,
-            bottom = border/figwidth, wspace = panel_bt, hspace = panel_bt)
+            right = 1 - border / figwidth, top = 1 - border / figheight,
+            bottom = border/figheight, wspace = panel_bt, hspace = panel_bt)
 
     # now creating panels in order of increasing redshift
     panels = []
@@ -140,19 +142,19 @@ def HI_galaxy_Xpk_methodology(hiptls, hisubs, vns, in_rss = False, panel_length 
     for i in range(nrows):
         # make the hisubhalo plot for this redshift
         plt.sca(panels[i][0])
-        plib.fillpks(hisubs[i].xpks['k'], hisubs[i].xpks, box, hisubs[i].field1.resolution,
+        plib.fillpks(hisubs[i].xpks['k'], hisubs[i].xpks, box, hisubs[i].resolution,
                 keylist = hisubkeys['blue'], color = 'blue', label = 'Blue Galaxies')
 
-        plib.fillpks(hisubs[i].xpks['k'], hisubs[i].xpks, box, hisubs[i].field1.resolution,
+        plib.fillpks(hisubs[i].xpks['k'], hisubs[i].xpks, box, hisubs[i].resolution,
                 keylist = hisubkeys['red'], color = 'red', label = 'Red Galaxies')
         
         plt.ylim(yrange[0], yrange[1])
         
         # cosmetic tasks
-        xts = (hisubs[i].xpks['k'][-1]-hisubs[i].xpks['k'][0])*text_space
-        yts = (yrange[-1]-yrange[0])*text_space
+        xts = (hisubs[i].xpks['k'][0]) / text_space
+        yts = (yrange[0]) / text_space
         plt.text(hisubs[i].xpks['k'][0]+xts, yrange[0] + yts, 'z=%.1f'%snapshots[i],
-                fontsize = fsize, ha = 'center', va = 'center', fontweight = 'bold')
+                fontsize = fsize, ha = 'left', va = 'bottom', fontweight = 'bold')
 
 
         ax = plt.gca()
@@ -213,7 +215,7 @@ def HI_galaxy_Xpk_methodology(hiptls, hisubs, vns, in_rss = False, panel_length 
             va = 'center', fontsize=fsize)
     return
 
-def HI_galaxy_Xpk_color(hiptls, hisubs, vns, in_rss = False, panel_length = 3, panel_bt = 0.1, text_space = 0.1,
+def HI_galaxy_Xpk_color(hiptls, hisubs, vns, in_rss = False, panel_length = 3, panel_bt = 0.1, text_space = 0.9,
             border = 1, fsize = 16):
     """
     HI-galaxy cross powers separated into different panels by their colors.
@@ -262,20 +264,22 @@ def HI_galaxy_Xpk_color(hiptls, hisubs, vns, in_rss = False, panel_length = 3, p
             keys = vnkeys['red']
 
         for k in keys:
-            pkmax = np.max(f.xpks[k])
-            pkmin = np.min(f.xpks[k])
+            nyqval = f.resolution * np.pi / f.box
+            nyqidx = np.argmin(np.abs(f.xpks['k'] - nyqval))
+            pkmax = np.max(f.xpks[k][:nyqidx])
+            pkmin = np.min(f.xpks[k][:nyqidx])
             if pkmax > yrange[1]:
                 yrange[1] = pkmax
-            if pkmin < yrange[0]:
+            if pkmin < yrange[0] and pkmin > 0:
                 yrange[0] = pkmin
     del fields
-
+    print(yrange)
     # get info from the fields to prepare plot
     box = hiptls[0].box
     snapshots = []
     for f in hiptls:
         if not f.field1.snapshot in snapshots:
-            snapshots.append(f.field1.snapshot)
+            snapshots.append(f.snapshot)
     
     # put snapshots in increasing order
     snapshots.sort()
@@ -290,8 +294,8 @@ def HI_galaxy_Xpk_color(hiptls, hisubs, vns, in_rss = False, panel_length = 3, p
     # creating gridspec
     gs = gspec.GridSpec(nrows, ncols)
     plt.subplots_adjust(left = border / figwidth,
-            right = 1 - border / figwidth, top = 1 - border / figwidth,
-            bottom = border/figwidth, wspace = panel_bt, hspace = panel_bt)
+            right = 1 - border / figwidth, top = 1 - border / figheight,
+            bottom = border/figheight, wspace = panel_bt, hspace = panel_bt)
 
     # now creating panels in order of increasing redshift
     panels = []
@@ -306,23 +310,23 @@ def HI_galaxy_Xpk_color(hiptls, hisubs, vns, in_rss = False, panel_length = 3, p
         # make the red plot for this redshift
         plt.sca(panels[i][0])
 
-        plib.fillpks(hisubs[i].xpks['k'], hisubs[i].xpks, box, hisubs[i].field1.resolution,
+        plib.fillpks(hisubs[i].xpks['k'], hisubs[i].xpks, box, hisubs[i].resolution,
                 keylist = hisubkeys['red'], color = 'red', label = 'D18-Subhalo')
         
-        plib.fillpks(hiptls[i].xpks['k'], hiptls[i].xpks, box, hiptls[i].field1.resolution,
+        plib.fillpks(hiptls[i].xpks['k'], hiptls[i].xpks, box, hiptls[i].resolution,
                 keylist = hiptlkeys['red'], color = 'lightcoral', label = 'D18-Particle')
         
         
-        plib.plotpks(vns[i].xpks['k'], vns[i].xpks, box, vns[i].field1.resolution,
+        plib.plotpks(vns[i].xpks['k'], vns[i].xpks, box, vns[i].resolution,
                 keylist = vnkeys['red'], colors = ['darkred'], labels = ['VN18-Particle'])
         
         plt.ylim(yrange[0], yrange[1])
         
         # cosmetic tasks
-        xts = (hisubs[i].xpks['k'][-1] - hisubs[i].xpks['k'][0]) * text_space
-        yts = (yrange[-1] - yrange[0]) * text_space
+        xts = (hisubs[i].xpks['k'][0]) / text_space
+        yts = (yrange[0]) / text_space
         plt.text(hisubs[i].xpks['k'][0]+xts, yrange[0] + yts, 'z=%.1f'%snapshots[i],
-                fontsize = fsize, ha = 'center', va = 'center', fontweight = 'bold')
+                fontsize = fsize, ha = 'left', va = 'bottom', fontweight = 'bold')
 
 
         ax = plt.gca()
@@ -337,14 +341,14 @@ def HI_galaxy_Xpk_color(hiptls, hisubs, vns, in_rss = False, panel_length = 3, p
 
         # make the blue plot
         plt.sca(panels[i][1])
-        plib.fillpks(hisubs[i].xpks['k'], hisubs[i].xpks, box, hisubs[i].field1.resolution,
+        plib.fillpks(hisubs[i].xpks['k'], hisubs[i].xpks, box, hisubs[i].resolution,
                 keylist = hisubkeys['blue'], color = 'blue', label = 'D18-Subhalo')
         
-        plib.fillpks(hiptls[i].xpks['k'], hiptls[i].xpks, box, hiptls[i].field1.resolution,
+        plib.fillpks(hiptls[i].xpks['k'], hiptls[i].xpks, box, hiptls[i].resolution,
                 keylist = hiptlkeys['blue'], color = 'teal', label = 'D18-Particle')
 
 
-        plib.plotpks(vns[i].xpks['k'], vns[i].xpks, box, vns[i].field1.resolution,
+        plib.plotpks(vns[i].xpks['k'], vns[i].xpks, box, vns[i].resolution,
                 keylist = vnkeys['blue'], colors = ['purple'], labels = ['VN18-Particle'])
         plt.ylim(yrange[0], yrange[1])
         
@@ -356,7 +360,6 @@ def HI_galaxy_Xpk_color(hiptls, hisubs, vns, in_rss = False, panel_length = 3, p
         if i == 0:
             ax.xaxis.set_label_position('top')
             plt.xlabel('HI-Blue Cross-Power', fontsize=16)
-            plt.legend(loc = 'upper right')
         else:
             plt.xlabel('')
 
@@ -380,8 +383,7 @@ def HI_galaxy_Xpk_color(hiptls, hisubs, vns, in_rss = False, panel_length = 3, p
         ax.get_legend().remove()
         if i == 0:
             ax.xaxis.set_label_position('top')
-            plt.xlabel('All-HI Cross Power', fontsize=16)
-            plt.legend(loc = 'upper right')
+            plt.xlabel('All-HI Cross Power', fontsize=fsize)
         else:
             plt.xlabel('')
     

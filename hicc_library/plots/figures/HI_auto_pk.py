@@ -44,7 +44,7 @@ def main():
 
 
 def HI_auto_pk(hiptls, hisubs, vns, in_rss = False, panel_length = 3, 
-            panel_bt = 0.1, text_space=0.1, border = 1):
+            panel_bt = 0.1, text_space=0.9, border = 0.5, fsize=16):
     """
     Makes HI-auto power spectra plots, for real space or redshift space.
     Each panel represents another redshift.
@@ -100,17 +100,19 @@ def HI_auto_pk(hiptls, hisubs, vns, in_rss = False, panel_length = 3,
         if f.fieldname == 'vn':
             keys = vnkeys
         pklen = len(f.pks['k'][:])
+        nyq = f.resolution * np.pi / f.header["BoxSize"]
+        nyq_idx = np.argmin(np.abs(f.pks['k'] - nyq))
         for k in keys:
-            pkmax = np.max(f.pks[k])
-            pkmin = np.min(f.pks[k])
+            pkmax = np.max(f.pks[k][:nyq_idx])
+            pkmin = np.min(f.pks[k][:nyq_idx])
             if pkmax > yrange[1]:
                 yrange[1] = pkmax
-            if pkmin < yrange[0]:
+            if pkmin < yrange[0] and pkmin > 0:
                 yrange[0] = pkmin
             if not len(f.pks[k]) == pklen:
                 print(k)
     del fields
-
+    print(yrange)
     # get info from the fields to prepare plot
 
     snapshots = []
@@ -179,8 +181,10 @@ def HI_auto_pk(hiptls, hisubs, vns, in_rss = False, panel_length = 3,
         plt.ylim(yrange[0], yrange[1])
         
         # output textbox onto the plot with redshift
-        plt.text(hiptls[0].pks['k'][0] + text_space, yrange[0] + text_space,
-                'z=%.1f'%snapshots[i], fontsize = 20, ha = 'center', va = 'center',
+        xts = (hiptls[0].pks['k'][0]) / text_space
+        yts = (yrange[0]) / text_space
+        plt.text(hiptls[0].pks['k'][0]+xts, yrange[0]+yts,
+                'z=%.1f'%snapshots[i], fontsize = fsize, ha = 'left', va = 'bottom',
                 fontweight = 'bold') 
 
     return

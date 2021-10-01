@@ -244,14 +244,23 @@ def gr_hist(galaxy, galaxy_dust, panel_length = 3, panel_bt = 0.1, text_space = 
         if not plotted:
             return
         # colors for the cuts
-        gray_colors = np.linspace(0, 1, 10)
-        idx = 0
+        gray_colors = ['lightgrey', 'black']
+        has_label = False
         # plot lines where the cuts occur
         for ckey,cd in col_defs.items():
             if cd['m'] == 0 and cd['mb'] == 0:
-                idx += 1
-                plt.plot([cd['b'], cd['b']], [ylim[0], ylim[-1]], label=ckey, 
-                        color = str(gray_colors[idx]), linestyle = '--')
+                if cd['b'] == 0.55:
+                    lab = 'main color cut'
+                    idx = 1
+                elif not has_label:
+                    lab = 'alternative cuts'
+                    idx = 0
+                    has_label = True
+                else:
+                    idx = 0
+                    lab = ''
+                plt.plot([cd['b'], cd['b']], [ylim[0], ylim[-1]], label=lab, 
+                        color = gray_colors[idx], linestyle = '--')
 
 
         ax = plt.gca()

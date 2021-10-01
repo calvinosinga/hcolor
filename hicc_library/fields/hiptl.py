@@ -205,7 +205,7 @@ class hiptl_nH(hiptl):
         return
 
     def vel_mass_hist(self, vel, mass, dsetname, outfile):
-        los_vel = vel[self.axis, :]
+        los_vel = vel[:, self.axis]
         
         hist = np.histogram2d(mass, los_vel, bins=[self.m_bins, self.vel_bins])[0]
         self.saveHist(outfile, hist, dsetname)

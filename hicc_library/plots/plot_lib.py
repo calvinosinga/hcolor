@@ -48,7 +48,8 @@ def getAuto(fn, box, snapshot, axis, resolution):
         return pkl.load(open(s+'.%d.hdf5.pkl', 'rb'))
         
 def plotpks(k, pks, boxsize, resolution, keylist = None, colors = None,
-        labels = None, linestyles = None, linewidths = None, nyq = False):
+        labels = None, linestyles = None, linewidths = None, nyq = False,
+        is_corr = False):
     # get default values
     if keylist is None:
         keylist = list(pks.keys())
@@ -67,27 +68,30 @@ def plotpks(k, pks, boxsize, resolution, keylist = None, colors = None,
         pltpk[i, :] = pks[keylist[i]][:]
     
     # if the nyquist fq is desired, plot it here
-    fq= resolution*np.pi/boxsize
+    nyqval= resolution*np.pi/boxsize
+    if is_corr:
+        nyqval = 2 * np.pi / nyqval
     if nyq:
         maxy = np.max(pltpk)
 
-        plt.plot((fq,fq),(0,maxy),'k:')
+        plt.plot((nyqval,nyqval),(0,maxy),'k:')
     
     # Now plotting the pks
     for p in range(pltpk.shape[0]):
         plt.plot(k, pltpk[p,:], color=colors[p], label=r''+labels[p], ls=linestyles[p], lw=linewidths[p])
     plt.xscale('log')
     plt.yscale('log')
+
     plt.ylabel(r'P(k) (Mpc/h)$^{-3}$')
     plt.xlabel(r'k (Mpc/h)$^{-1}$')
     plt.legend()
     if not nyq:
-        plt.xlim(np.min(k), fq)
+        plt.xlim(np.min(k), nyqval)
     ax = plt.gca()
     ax.tick_params(which='both',direction='in')
     return
     
-def plot2Dpk(kpar, kper, pk):
+def plot2Dpk(kpar, kper, pk, do_axes_labels = True):
     cmap = copy.copy(mpl.cm.get_cmap("plasma"))
     cmap.set_under('w')
     kpar = np.unique(kpar)
@@ -107,7 +111,7 @@ def plot2Dpk(kpar, kper, pk):
 def plotxis(r, xis, boxsize, resolution, keylist = None, colors = None,
         labels = None, linestyles = None, linewidths = None, nyq = False):
     plotpks(r, xis, boxsize, resolution, keylist, colors, labels,
-            linestyles, linewidths, nyq)
+            linestyles, linewidths, nyq, is_corr = True)
     plt.ylabel(r'$\xi$(r) (Mpc/h)$^{3}$')
     plt.xlabel(r'r (Mpc/h)')
     return
@@ -126,6 +130,7 @@ def fillpks(k, pks, boxsize, resolution, keylist = None, label = '',
     
     # make nyquist plot if desired
     fq= resolution*np.pi/boxsize
+    
     if nyq:
         maxy = np.max(pltpk)
         plt.plot((fq,fq),(0,maxy),'k:')
@@ -140,6 +145,7 @@ def fillpks(k, pks, boxsize, resolution, keylist = None, label = '',
     plt.legend()
     plt.xscale('log')
     plt.yscale('log')
+    
     plt.ylabel(r'P(k) (Mpc/h)$^{-3}$')
     plt.xlabel(r'k (Mpc/h)$^{-1}$')
     ax = plt.gca()
