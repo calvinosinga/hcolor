@@ -94,7 +94,8 @@ def HI_auto_pk(hiptls, hisubs, vns, in_rss = False, panel_length = 3,
 
     fig, panels = plib.createFig(panel_length, 1, len(snapshots), panel_bt,
             border, border)
-
+    
+    print(fig.get_size_inches())
     # now making each panel
     for i in range(len(panels)):
         plt.sca(panels[i])

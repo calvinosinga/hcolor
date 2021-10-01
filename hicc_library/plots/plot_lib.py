@@ -5,8 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.gridspec as gspec
 import copy
-
-from numpy.lib.arraysetops import isin
+from hicc_library.fields.field_super import Field, Cross
 
 mpl.rcParams['text.usetex'] = True
 home = 'C:/Users/calvi/AppData/Local/Packages/CanonicalGroupLimited' + \
@@ -45,12 +44,16 @@ def rmKeys(keywords, keylist):
 def getYrange(fields, keys_dict):
     yrange = [np.inf, 0]
     for f in fields:
+        if isinstance(f, Field):
+            pks = f.pks
+        elif isinstance(f, Cross):
+            pks = f.xpks
         keys = keys_dict[f.fieldname]
         nyq = f.resolution * np.pi / f.box
-        nyq_idx = np.argmin(np.abs(f.pks['k'] - nyq))
+        nyq_idx = np.argmin(np.abs(pks['k'] - nyq))
         for k in keys:
-            pkmax = np.max(f.pks[k][:nyq_idx])
-            pkmin = np.min(f.pks[k][:nyq_idx])
+            pkmax = np.max(pks[k][:nyq_idx])
+            pkmin = np.min(pks[k][:nyq_idx])
             if pkmax > yrange[1]:
                 yrange[1] = pkmax
             if pkmin < yrange[0] and pkmin > 0:
