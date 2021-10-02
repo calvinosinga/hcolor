@@ -203,9 +203,10 @@ class galaxy(Field):
 
     def computeGrids(self, outfile):
         ########################## HELPER FUNCTION ###############################
-        def computeGal(pos, mass, gridname):
+        def computeGal(pos, mass, gridname, is_in_rss):
             grid = Grid(gridname, self.resolution, verbose=self.v)
-            grid.in_rss = in_rss
+            if is_in_rss:
+                grid.toRSS()
 
             if self.use_cicw:
                 grid.CICW(pos, self.header['BoxSize'], mass)
@@ -253,7 +254,7 @@ class galaxy(Field):
             
             # count the number of galaxies used for this grid
             self.counts[g] = np.sum(mask)
-            grid = computeGal(pos[mask, :], mass[mask], g)
+            grid = computeGal(pos[mask, :], mass[mask], g, in_rss)
             self.saveData(outfile, grid)
             del grid
         
@@ -274,7 +275,7 @@ class galaxy(Field):
             elif g == 'all':
                 mask = np.ones_like(resolved_mask)
             
-            grid = computeGal(pos[mask, :], mass[mask], g)
+            grid = computeGal(pos[mask, :], mass[mask], g, in_rss)
             self.saveData(outfile, grid)
             del grid
         
