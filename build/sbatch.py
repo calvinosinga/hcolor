@@ -197,33 +197,6 @@ class Sbatch():
     def _add_global(self, gd):
         fn = self.fieldname
         gd[self.plots_key]=self.plot_path
-
-        if "galaxy" in fn:
-            
-            galaxy_min_resolution = galaxy.getResolutionDefinitions(self.simname)
-
-            # getting user input for HOW galaxies should be run
-
-            use_stmass = int(input('should %s use stmass?(1=yes,0=no)'%fn))
-            use_cicw = int(input("should %s use CICW? (1=yes,0=no)"%fn))
-            use_res = input("which resolution should %s use? Implemented: "%fn+ \
-                    str(list(galaxy_min_resolution.keys())))
-            use_col = input("which color cuts should %s use? Implemented: "%fn+ \
-                    str(galaxy.getColorDefinitions()))
-            if use_res not in list(galaxy_min_resolution.keys()):
-                raise NotImplementedError("the resolution given is not implemented")
-            
-
-            gd['%s_use_stmass'%fn] = use_stmass
-            gd['%s_use_cicw'%fn] = use_cicw
-            gd['%s_use_res'%fn] = use_res
-            gd['%s_use_col'%fn] = use_col
-
-
-        if "hisubhalo" in fn or "h2subhalo" in fn:
-            use_cicw = int(input("should %s use CICW? (etc)"%fn))
-            gd['%s_use_cicw'%fn] = use_cicw
-        
         return
 
     def _name_savefiles(self, step_names):

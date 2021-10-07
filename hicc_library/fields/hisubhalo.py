@@ -3,21 +3,49 @@
 
 """
 
-from numpy.lib.utils import info
 from hicc_library.grid.grid import Grid
-from hicc_library.fields.field_super import Field
+from hicc_library.fields.field_super import Field, grid_props
 import h5py as hp
 import numpy as np
 
+class hisubhalo_grid_props(grid_props):
+
+    def __init__(self, base, mas, field, resdef):
+        other = {}
+        self.model = base
+        
+        other['resdef'] = resdef
+        super().__init__(base, mas, field, other)
+    
+    def isIncluded(self):
+        def test(schts):
+            mastest = self.props['mas'] in schts
+            return mastest
+            
+        sp = self.props
+        if sp['resdef'] == 'papa':
+            mas = ['CIC']
+            return test(mas)
+
+        return True
+    
+    def isCompatible(self, other):
+        sp = self.props
+        op = other.props
+
+        if sp['resdef'] == 'papa':
+            papa_fields = ['galaxy', 'galaxy_dust']
+            return sp['resdef'] == op['resdef'] and op['field'] in papa_fields
+        
+        return super().isCompatible(other)
+    
 class hisubhalo(Field):
 
     def __init__(self, simname, snapshot, axis, resolution, pkl_path, verbose,
-                shcatpath, hih2filepath):
+                shcatpath, hih2filepath, fieldname = 'hisubhalo'):
         super().__init__(simname, snapshot, axis, resolution, pkl_path, verbose)
-        self.fieldname = 'hisubhalo'
-        self.gridnames = self.getMolFracModelsGal()
+        self.fieldname = fieldname
  
-        self.use_cicw = True
         self.hih2filepath = hih2filepath
         self.loadpath = shcatpath
         if self.v:
@@ -25,14 +53,28 @@ class hisubhalo(Field):
             print(self.__dict__)
         return
     
+    def getGridProps(self):
+        models = self.getMolFracModelsGal()
+        mas = ['CIC', 'CICW']
+        res = list(self.getResolutionDefinitions().keys())
+        grp = {}
+        for m in models:
+            for s in mas:
+                for r in res:
+                    gp = hisubhalo_grid_props(m, s, self.fieldname, r)
+                    if gp.isIncluded():
+                        grp[gp.getName()] = gp
+        return grp
     @staticmethod
     def getResolutionDefinitions():
         # taken from Pillepich et al 2018, table 1 (in solar masses)
         mean_baryon_cell = {'tng100':1.4e6, 'tng100-2':11.2e6, 'tng100-3':89.2e6,
                 'tng300':11e6, 'tng300-2':88e6, 'tng300-3':703e6}
         res_defs = {}
-        res_defs['papa'] = {'HI':(10**7.5, np.inf)}
-
+        res_defs['papa'] = {'HI':(10**7.5, np.inf)} 
+        res_defs['diemer'] = {'HI':(0, np.inf)} # by default, already implemented on data
+        
+        # there is a linewidths restriction, unsure how to approach that in papastergis
         # wolz is intensity map so no minimum threshold
         return
         
@@ -45,17 +87,14 @@ class hisubhalo(Field):
         """
         models = ['GD14','GK11','K13','S14']
         proj = ['map','vol']
-        gridnames = []
+        modelnames = []
         for m in models:
             for p in proj:
-                gridnames.append('m_hi_%s_%s'%(m,p))
-        gridnames.append('m_hi_L08_map')
-        return gridnames
+                modelnames.append('m_hi_%s_%s'%(m,p))
+        modelnames.append('m_hi_L08_map')
+        return modelnames
     
-    def useCIC(self):
-        self.use_cicw = False
-        return
-    
+
     def computeGrids(self, outfile):
         super().computeGrids(outfile)
 
@@ -76,31 +115,48 @@ class hisubhalo(Field):
 
         in_rss = False
         ############### HELPER METHOD ###############################
-        def computeHI(gridname, pos, is_in_rss):
-            grid = Grid(gridname, self.resolution, verbose=self.v)
+        def computeHI(gprop, pos, is_in_rss):
+            grid = Grid(gprop.getName(), self.resolution, verbose=self.v)
             if is_in_rss:
                 grid.toRSS()
-            mass = hih2file[gridname][:] #already in solar masses
-            if self.use_cicw:
-                grid.CICW(pos, self.header['BoxSize'], mass)
+
+            mass = hih2file[gprop.model][:] #already in solar masses
+            if gprop['resdef'] == 'papa':
+                mask = self.getResolvedSubhalos(mass, gprop['resdef'])
             else:
-                grid.CIC(pos, self.header['BoxSize'])
-            self.saveData(outfile, grid)
+                mask = np.ones_like(mass)
+            if gprop.props['mas'] == 'CICW':
+                grid.CICW(pos[mask, :], self.header['BoxSize'], mass[mask])
+            else:
+                grid.CIC(pos[mask, :], self.header['BoxSize'])
+            
+
+            self.saveData(outfile, grid, gprop)
             if self.v:
                 print('\nfinished computing a grid, printing its properties...')
                 print(grid.print())
             return
         ###############################################################
 
-        for g in self.gridnames:
+        for g in list(self.gridprops.values()):
             computeHI(g, pos, in_rss)
         
         pos = self._toRedshiftSpace(pos, vel)
         in_rss = True
-        for g in self.gridnames:
+        for g in list(self.gridprops.values()):
             computeHI(g, pos, in_rss)
         
         return
+
+    def getResolvedSubhalos(self, mass, resdef):
+        resdict = self.getResolutionDefinitions()
+        mask = np.ones_like(mass)
+        for k, v in resdict.items():
+            if k == 'HI':
+                mask *= (mass >= v[0]) & (mass < v[1])
+        return mask
+
+
 
     def _convertVel(self, vel):
         # subhalos' velocities are already in km/s
@@ -111,15 +167,14 @@ class h2subhalo(hisubhalo):
     def __init__(self, simname, snapshot, axis, resolution, pkl_path, verbose,
                 shcatpath, hih2filepath):
         super().__init__(self, simname, snapshot, axis, resolution, pkl_path, verbose,
-                shcatpath, hih2filepath)
-        self.fieldname = 'h2subhalo'
+                shcatpath, hih2filepath, 'h2subhalo')
         return
     
     def computeGrids(self, outfile):
         super().computeGrids(outfile)
 
         if self.v:
-            print("now computing the grids for hisubhalo...")
+            print("now computing the grids for h2subhalo...")
         
         hih2file = hp.File(self.hih2filepath, 'r')
         ids = hih2file['id_subhalo'][:] # used to idx into the subhalo catalog
@@ -135,28 +190,28 @@ class h2subhalo(hisubhalo):
 
         in_rss = False
         ############### HELPER METHOD ###############################
-        def computeH2(gridname, pos, is_in_rss):
-            grid = Grid(gridname, self.resolution, verbose=self.v)
+        def computeH2(gprop, pos, is_in_rss):
+            grid = Grid(gprop.getName(), self.resolution, verbose=self.v)
             if is_in_rss:
                 grid.toRSS()
-            mass = hih2file[gridname][:] #already in solar masses
-            if self.use_cicw:
+            mass = hih2file[gprop.model][:] #already in solar masses
+            if gprop.props['mas'] == 'CICW':
                 grid.CICW(pos, self.header['BoxSize'], mass)
             else:
                 grid.CIC(pos, self.header['BoxSize'])
-            self.saveData(outfile, grid)
+            self.saveData(outfile, grid, gprop)
             if self.v:
                 print('\nfinished computing a grid, printing its properties...')
                 print(grid.print())
             return
         ###############################################################
 
-        for g in self.gridnames:
+        for g in list(self.gridprops.values()):
             computeH2(g, pos, in_rss)
         
         pos = self._toRedshiftSpace(pos, vel)
         in_rss = True
-        for g in self.gridnames:
+        for g in list(self.gridprops.values()):
             computeH2(g, pos, in_rss)
         
         return

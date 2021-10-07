@@ -51,28 +51,14 @@ elif FIELDNAME == 'hiptl_nHgrid':
 elif FIELDNAME == 'hisubhalogrid':
     field = hisubhalo(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, pickle_path, 
             gd['verbose'], gd[SIMNAME], gd['hih2catsh'])
-    if not gd['hisubhalo_use_cicw']:
-        field.useCIC()
 
 elif FIELDNAME == 'galaxygrid':
     field = galaxy(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, pickle_path, 
             gd['verbose'], gd[SIMNAME])
-    if not gd['galaxy_use_cicw']:
-        field.useCIC()
-    if not gd['galaxy_use_stmass']:
-        field.useAllMass()
-    field.useColorDef(gd['galaxy_use_col'])
-    field.useResolution(gd['galaxy_use_res'])
 
 elif FIELDNAME == 'galaxy_dustgrid':
     field = galaxy_dust(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, pickle_path, 
             gd['verbose'], gd[SIMNAME], gd['dust'])
-    if not gd['galaxy_dust_use_cicw']:
-        field.useCIC()
-    if not gd['galaxy_dust_use_stmass']:
-        field.useAllMass()
-    field.useResolution(gd['galaxy_dust_use_res'])
-    field.useColorDef(gd['galaxy_dust_use_col'])
 elif FIELDNAME == 'vngrid':
     field = vn(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, pickle_path,
             gd['verbose'], gd['snapshot'], gd['TREECOOL'])
@@ -88,8 +74,6 @@ elif FIELDNAME == 'h2ptlgrid':
 elif FIELDNAME == 'h2subhalo':
     field = h2subhalo(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, pickle_path, 
             gd['verbose'], gd[SIMNAME], gd['hih2catsh'])
-    if not gd['h2subhalo_use_cicw']:
-        field.useCIC()
 else:
     raise NotImplementedError("there is no field named %s"%FIELDNAME)
 

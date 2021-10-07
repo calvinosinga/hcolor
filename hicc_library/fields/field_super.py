@@ -12,7 +12,49 @@ import matplotlib as mpl
 import copy
 from hicc_library.plots import plot_lib as plib
 
+class grid_props():
+    
+    def __init__(self, base, mas, field, other_props):
+        self.props = {}
+        self.props['base'] = base
+        self.props['mas'] = mas
+        self.props['field'] = field
+        self.props.update(other_props)
+        return
+    
+    def getName(self):
+        out = ''
+        for k, v in self.props.items():
+            if not v is None and not k == 'field':
+                out += "%s_"%v
+        out = out[:-1]
 
+        return out
+    
+    def isIncluded(self):
+        """
+        Determines if the grid with the given properties should be included
+        in the analysis.
+        """
+        return True
+
+    def saveProps(self, h5set):
+        for k,v in self.props.items():
+            h5set.attrs[k] = v
+        return
+    
+    @classmethod
+    def loadProps(cls, dct):
+        return grid_props(dct.pop('base'), dct.pop('mas'), 
+                dct.pop("field"), dct)
+    
+    def isCompatible(self, other):
+        """
+        Reports if two grids are compatible for cross-correlation
+        """
+        return self.props['mas'] == other.props['mas']
+
+    
 class Field():
 
     def __init__(self, simname, snapshot, axis, resolution, pkl_path, verbose):
@@ -50,9 +92,12 @@ class Field():
 
         # other variables expected to be assigned values in subclasses
         self.fieldname = ''
-        self.gridnames = []
+        self.gridprops = self.getGridProps()
         self.isHI = True
         return
+    
+    def getGridProps(self):
+        return {}
     
     def loadHeader(self, snappath):
         f = hp.File(snappath, 'r')
@@ -134,9 +179,10 @@ class Field():
             self.slices[grid.gridname] = slc
         return
     
-    def saveData(self, outfile, grid):
+    def saveData(self, outfile, grid, gp):
         # saves grid. resolution, rss (combine info if chunk) -> attrs
         dat = grid.saveGrid(outfile)
+        gp.saveProps(dat)
         return dat
     
     def plotPks(self, plotdir):
@@ -171,6 +217,12 @@ class Field():
         restest = self.resolution == other_field.resolution
         return fntest and sstest and axtest and voltest and restest
     
+    def getGridsForX(self, other):
+        xgrids = {}
+        for g in self.gridnames:
+            xgrids[g] = other.gridnames
+        return xgrids
+    
     def _loadSnapshotData(self):
         """
         The fields that use snapshot data vary in what they need too much,
@@ -204,20 +256,26 @@ class Field():
         mass *= 1e10/self.header['HubbleParam']
         return mass
     
-    def _convertPos(self, pos=None):
+    def _convertPos(self, pos):
         """
         Converts position units from ckpc/h to Mpc/h
         """
         pos *= self.header["Time"]/1e3
         return pos
     
-    def _convertVel(self, vel=None):
+    def _convertVel(self, vel):
         """
         Multiplies velocities by scale factor^0.5
         """
         vel *= np.sqrt(self.header["Time"])
         return vel
     
+    def _convertDensity(self, density):
+        # assuming that the density is given in 10^10 sm/h / (ckpc/h)**3
+        density *= (self.header['Time']/1e3)**3
+        density *= 1e10/self.header["HubbleParam"]
+        return density
+
     def _toOverdensity(self, arr):
         arr = arr/self.header['BoxSize']**3
         arr = arr/np.mean(arr).astype(np.float32)
@@ -271,11 +329,18 @@ class Cross():
         gf1, gf2 = self._loadHdf5()
         keylist1 = self._getKeys(gf1)
         keylist2 = self._getKeys(gf2)
+        gprops1 = self.field1.gridprops
+        gprops2 = self.field2.gridprops
         for k1 in keylist1:
             for k2 in keylist2:
-                grid1 = Grid.loadGrid(gf1[k1])
-                grid2 = Grid.loadGrid(gf2[k2])
-                self._xpk(grid1, grid2)
+                gp1 = gprops1[k1]
+                gp2 = gprops2[k2]
+
+                if gp1.isCompatible(gp2) and gp2.isCompatible(gp1):
+                    grid1 = Grid.loadGrid(gf1[k1])
+                    grid2 = Grid.loadGrid(gf2[k2])
+
+                    self._xpk(grid1, grid2)
         
         if self.v:
             print("xpks finished computing, results look like:")
@@ -322,11 +387,16 @@ class Cross():
         gf1, gf2 = self._loadHdf5()
         keylist1 = self._getKeys(gf1)
         keylist2 = self._getKeys(gf2)
+        gprops1 = self.field1.gridprops
+        gprops2 = self.field2.gridprops
         for k1 in keylist1:
             for k2 in keylist2:
-                grid1 = Grid.loadGrid(gf1[k1])
-                grid2 = Grid.loadGrid(gf2[k2])
-                self._xxi(grid1, grid2)
+                gp1 = gprops1[k1]
+                gp2 = gprops2[k2]
+                if gp1.isCompatible(gp1) and gp2.isCompatible(gp2):
+                    grid1 = Grid.loadGrid(gf1[k1])
+                    grid2 = Grid.loadGrid(gf2[k2])
+                    self._xxi(grid1, grid2)
         if self.v:
             print("x-corrs finished computing, results look like:")
             print(self.xxis)

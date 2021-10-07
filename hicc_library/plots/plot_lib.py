@@ -7,9 +7,15 @@ import matplotlib.gridspec as gspec
 import copy
 
 mpl.rcParams['text.usetex'] = True
-home = 'C:/Users/calvi/AppData/Local/Packages/CanonicalGroupLimited' + \
-        '.UbuntuonWindows_79rhkp1fndgsc/LocalState/rootfs/home/cosinga/'
-path = home + 'pks/pks/to_laptop/'
+
+def getPaths(directory):
+    paths = []
+    for (root, dirs, files) in os.walk(directory):
+        for fl in files:
+            filepath = os.path.join(root, fl)
+            if ".pkl" in filepath and not "gd.pkl" in filepath:
+                paths.append(filepath)
+    return paths
 
 def fetchKeys(substrings, keylist):
     res = []

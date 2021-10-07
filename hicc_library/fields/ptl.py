@@ -3,10 +3,16 @@
 """
 import h5py as hp
 import numpy as np
-from hicc_library.fields.field_super import Field
+from hicc_library.fields.field_super import Field, grid_props
 from hicc_library.grid.grid import Chunk
 
-
+class ptl_grid_props(grid_props):
+    
+    def __init__(self, base, mas, field):
+        self.type = base
+        super().__init__(base, mas, field, {})
+        return
+    
 class ptl(Field):
 
     def __init__(self, simname, snapshot, axis, resolution, chunk, pkl_path, 
@@ -14,7 +20,6 @@ class ptl(Field):
         super().__init__(simname, snapshot, axis, resolution, pkl_path, verbose)
         self.fieldname = 'ptl'
         self.chunk = chunk
-        self.gridnames = ['stmass', 'dm', 'ptl']
         
         self.loadpath = snappath%(chunk)
         
@@ -24,16 +29,25 @@ class ptl(Field):
             print("finished constructor for %s, chunknum = %d"%(self.fieldname,chunk))
         return
     
+    def getGridProps(self):
+        grp = {}
+        grids = ['ptl', 'dm', 'stmass']
+        for g in grids:
+            gp = ptl_grid_props(g, "CICW", self.fieldname)
+            if gp.isIncluded():
+                grp[gp.getName()] = gp
+        return grp
 
     def computeGrids(self, outfile):
         pos, vel, mass, slices = self._loadSnapshotData()
         in_rss = False
         super().computeGrids(outfile)
         ############# HELPER METHOD ##################################
-        def computePtl(gridname, pos, mass, slc, is_in_rss):
+        def computePtl(gprop, pos, mass, slc, is_in_rss):
         
-            grid = Chunk(gridname, self.resolution, self.chunk, verbose=self.v)
-            grid.in_rss = is_in_rss
+            grid = Chunk(gprop.getName(), self.resolution, self.chunk, verbose=self.v)
+            if is_in_rss:
+                grid.toRSS()
             
             if self.v:
                 grid.print()
@@ -42,13 +56,13 @@ class ptl(Field):
             grid.CICW(pos[slc, :], self.header['BoxSize'], mass[slc])
 
             # save them to file
-            self.saveData(outfile, grid)
+            self.saveData(outfile, grid, gprop)
             return
         
-        for g in self.gridnames:
-            if g == 'stmass':
+        for g in list(self.gridprops.values()):
+            if g.type == 'stmass':
                 slc = slices[2]
-            elif g == 'dm':
+            elif g.type == 'dm':
                 slc = slices[1]
             else:
                 slc = slice(None)
@@ -56,10 +70,10 @@ class ptl(Field):
         
         pos = self._toRedshiftSpace(pos, vel)
         in_rss = True
-        for g in self.gridnames:
-            if g == 'stmass':
+        for g in list(self.gridprops.values()):
+            if g.type == 'stmass':
                 slc = slices[2]
-            elif g == 'dm':
+            elif g.type == 'dm':
                 slc = slices[1]
             else:
                 slc = slice(None)

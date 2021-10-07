@@ -3,21 +3,49 @@
 """
 import h5py as hp
 import numpy as np
-from hicc_library.fields.field_super import Field
+from hicc_library.fields.field_super import Field, grid_props
 from hicc_library.grid.grid import Chunk
+import scipy.constants as sc
 
+class hiptl_grid_props(grid_props):
+
+    def __init__(self, base, mas, field, mass_or_temp = None, nH = None):
+        other = {}
+        other['mass'] = mass_or_temp
+        if not nH is None:
+            self.nH_bin = nH
+            nH_str = str(nH)
+            other['nH_bin'] = nH_str
+        else:
+            other['nH_bin'] = nH
+        self.model = base
+        super().__init__(base, mas, field, other)
+        return
+    
+
+    
 class hiptl(Field):
 
     def __init__(self, simname, snapshot, axis, resolution, chunk, pkl_path, 
-                verbose, snappath, hih2filepath):
+                verbose, snappath, hih2filepath, fieldname = 'hiptl'):
         super().__init__(simname, snapshot, axis, resolution, pkl_path, verbose)
         self.chunk = chunk
-        self.gridnames = self.getMolFracModelsPtl()
 
-        self.fieldname = 'hiptl'
+        self.fieldname = fieldname
         self.hih2filepath = hih2filepath%self.chunk
         self.loadpath = snappath%self.chunk
         return
+    
+    def getGridProps(self):
+        models = self.getMolFracModelsPtl()
+        mass_or_temp = ['mass', 'temp']
+        grp = {}
+        for m in models:
+            for mt in mass_or_temp:
+                gp = hiptl_grid_props(m, 'CICW', self.fieldname, mass_or_temp = mt)
+                if gp.isIncluded():
+                    grp[gp.getName()] = gp
+        return grp
     
     @staticmethod
     def getMolFracModelsPtl():
@@ -26,64 +54,89 @@ class hiptl(Field):
     def computeGrids(self, outfile):
         super().computeGrids(outfile)
         hih2file = hp.File(self.hih2filepath, 'r')
-        pos, vel, mass = self._loadSnapshotData()
+        pos, vel, mass, density = self._loadSnapshotData()
         in_rss = False
 
 
         ############ HELPER FUNCTION ############################################
-        def computeHI(gridname, pos, mass, is_in_rss):
-            grid = Chunk(gridname, self.resolution, self.chunk, verbose=self.v)
-            grid.in_rss = is_in_rss
+        def computeHI(gprop, pos, mass, density, is_in_rss):
+            grid = Chunk(gprop.getName(), self.resolution, self.chunk, verbose=self.v)
+            if is_in_rss:
+                grid.toRSS()
             
             if self.v:
                 hs = '#' * 20
-                print(hs+" COMPUTE HI FOR %s "%(gridname.upper()) + hs)
+                print(hs+" COMPUTE HI FOR %s "%(gprop.upper()) + hs)
                 print("is in redshift space?:%s"%str(is_in_rss))
                 print("does the grid agree?:%s"%str(is_in_rss))
 
             # getting data from hih2 files
             neutfrac = hih2file['PartType0']['f_neutral_H'][:]
-            molfrac = hih2file['PartType0']['f_mol_'+gridname][:]
+            molfrac = hih2file['PartType0']['f_mol_'+gprop.model][:]
             
             # converting the masses to HI mass
             HImass = mass*(1-molfrac)*neutfrac
+            HIrho = density * (1 - molfrac) * neutfrac
 
             # neutral fraction is -1 where models are not defined, 
             # so replace those values with 0
             HImass = np.where(HImass>=0, HImass, 
                     np.zeros(HImass.shape, dtype=np.float32))
+            HIrho = np.where(HIrho >= 0, HIrho, np.zeros_like(HIrho))
 
             # place particles into grid
-            grid.CICW(pos, self.header['BoxSize'], HImass)
+            if gprop["mass"] == 'temp':
+                T_HI = self.temperatureMap(HIrho)
+                grid.CICW(pos, self.header['BoxSize'], T_HI)
+            else:
+
+                grid.CICW(pos, self.header['BoxSize'], HImass)
 
             # save them to file
-            self.saveData(outfile, grid)
+            self.saveData(outfile, grid, gprop)
             # if we are in redshift space, the grid handles saving with 'rs'
             return
         #############################################################################
 
-        for g in self.gridnames:
-            computeHI(g, pos, mass, in_rss)
+        for g in list(self.gridprops.values()):
+            computeHI(g, pos, mass, density, in_rss)
         
         pos = self._toRedshiftSpace(pos, vel)
         in_rss = True
         
-        for g in self.gridnames:
-            computeHI(g, pos, mass, in_rss)
+        for g in list(self.gridprops.values()):
+            computeHI(g, pos, mass, density, in_rss)
         hih2file.close()
         return
     
-    
+    def temperatureMap(self, HIdensity):
+        # assumes that the HIdensity is given in units (sm/(Mpc/h)^3)
+
+        # convert to kg/m^3
+        kgpsm = 1.989e30
+        mpMpc = 3.086e22
+        HIdensity = HIdensity*kgpsm/((mpMpc/self.header['HubbleParam'])**3)
+        HIfq = 1420.4057e6 # Hz
+        lam_12 = 2.9e-15 # inverse seconds
+        factor = 3/32/sc.pi/sc.k/sc.m_p*sc.hbar*sc.c**3/HIfq**2*lam_12
+
+        # Wolz says they use comoving volume - not sure if that'll affect the maps
+        red_term = (1 + self.header['redshift'])**2 / (self.header['HubbleParam'] * 100)
+        return HIdensity * factor * red_term
+
+
     def _loadSnapshotData(self):
         f = hp.File(self.loadpath, 'r')
         pos = f['PartType0']['Coordinates'][:]
         vel = f['PartType0']['Velocities'][:]
         mass = f['PartType0']['Masses'][:]
+        density = f['PartType0']['Density'][:]
         mass = self._convertMass(mass)
         pos = self._convertPos(pos)
         vel = self._convertVel(vel)
+        density = self._convertDensity(density)
         f.close()
-        return pos, vel, mass
+        return pos, vel, mass, density
 
 
 class hiptl_nH(hiptl):
@@ -91,23 +144,39 @@ class hiptl_nH(hiptl):
     def __init__(self, simname, snapshot, axis, resolution, chunk, pkl_path, verbose, 
             snappath, hih2filepath):
         super().__init__(simname, snapshot, axis, resolution, chunk, pkl_path, verbose, 
-                snappath, hih2filepath)
-        self.fieldname = 'hiptl_nH'
-        
-        mods = self.getMolFracModelsPtl()
-        mods.append('all_neut')
-        nh_bins = self._getnHBins()
-        self.gridnames = []
+                snappath, hih2filepath, fieldname='hiptl_nH')
 
         self.vel_bins = np.logspace(-2, 6, 9)
         self.m_bins = np.logspace(-2, 8, 11)
-        for m in mods:
-            for n in range(len(nh_bins)+1):
-                self.gridnames.append(m+str(n))
-        
         return
     
+    def getGridProps(self):
+        models = self.getMolFracModelsPtl()
+        models.append('all_neut')
+        nhbins = self._getnHBins()
+        grp = []
+        for m in models:
+            for idx in range(len(nhbins)):
+                if idx == 0:
+                    lo = 0
+                    hi = nhbins[idx]
+                elif idx == len(nhbins) - 1:
+                    lo = nhbins[idx]
+                    hi = np.inf
+                else:
+                    lo = nhbins[idx-1]
+                    hi = nhbins[idx]
+
+                n = [lo,hi]
+                gp = hiptl_grid_props(m, 'CICW', self.fieldname,
+                        nH = n)
+                if gp.isIncluded():
+                    grp.append(gp)
+        return
+
     def computeGrids(self, outfile):
+
+
         ################## FROM FIELD_SUPER BECAUSE PYTHON IS DUMB ################################
         if self.v:
             print("starting to compute grids...")
@@ -118,32 +187,25 @@ class hiptl_nH(hiptl):
         if self.v:
             print("the saved pickle path: %s"%self.pkl_path)
         #########################################################################################
+        
+        
         hih2file = hp.File(self.hih2filepath, 'r')
         pos, vel, mass, density = self._loadSnapshotData()
         in_rss = False
         nHbins = self._getnHBins()
         saved_hists = [] # vel-mass histograms saved to the outfile
+
+
         ############ HELPER FUNCTION ############################################
-        def computeHI(gridname, pos, mass, density, is_in_rss):
-            grid = Chunk(gridname, self.resolution, self.chunk, verbose=self.v)
-            grid.in_rss = is_in_rss
+        def computeHI(gprop, pos, mass, density, is_in_rss):
+            grid = Chunk(gprop.getName(), self.resolution, self.chunk, verbose=self.v)
+            if is_in_rss:
+                grid.toRSS()
 
             if self.v:
                 grid.print()
-            
-            # get the lower and upper bounds for the nH bin.
-            # handles edge cases as well
-            idx = int(gridname[-1])
-            if idx == 0:
-                lo = 0
-                hi = nHbins[idx]
-            elif idx == len(nHbins):
-                lo = nHbins[-1]
-                hi = np.inf
-            else:
-                lo=nHbins[idx-1]
-                hi=nHbins[idx]
-            
+
+            bounds_nh = gprop.nH_bin
             kpctocm = 3.086e21
             smtog = 1.989e33
             m_p = 1.673e-24
@@ -151,8 +213,8 @@ class hiptl_nH(hiptl):
 
             # get molecular fraction. we also want a bin that is all the neutral hydrogen,
             # this handles that case
-            if not "all_neut" in gridname:
-                molfrac = hih2file['PartType0']['f_mol_'+gridname[:-1]][:]
+            if not "all_neut" in gprop.model():
+                molfrac = hih2file['PartType0']['f_mol_'+gprop.model][:]
             else:
                 molfrac = np.zeros_like(mass)
             
@@ -163,7 +225,7 @@ class hiptl_nH(hiptl):
             nH = density * neutfrac * factor
 
             # getting the mask
-            mask = (nH >= lo) & (nH < hi)
+            mask = (nH >= bounds_nh[0]) & (nH < bounds_nh[1])
 
             
             # converting the masses to HI mass
@@ -178,27 +240,26 @@ class hiptl_nH(hiptl):
             grid.CICW(pos[mask, :], self.header['BoxSize'], HImass[mask])
 
             # save them to file
-            self.saveData(outfile, grid, lo, hi)
+            self.saveData(outfile, grid, gprop)
             # if we are in redshift space, the grid handles saving with 'rs'
 
             # want to plot velocity vs mass for each nH bin
             # only need to do it for the first model, otherwise will just be a repeat.
-            dsetname = str([lo, hi])
-            if dsetname not in saved_hists:
-                self.vel_mass_hist(vel[mask, :], mass[mask], dsetname, outfile)
-                saved_hists.append(dsetname)
+            if gprop.props['nH_bin'] not in saved_hists:
+                self.vel_mass_hist(vel[mask, :], mass[mask], gprop.props['nH_bin'], outfile)
+                saved_hists.append(gprop.props['nH_bin'])
 
             return
         #############################################################################
 
 
-        for g in self.gridnames:
+        for g in list(self.gridprops.values()):
             computeHI(g, pos, mass, density, in_rss)
         
         pos = self._toRedshiftSpace(pos, vel)
         in_rss = True
 
-        for g in self.gridnames:
+        for g in list(self.gridprops.values()):
             computeHI(g, pos, mass, density, in_rss)
         hih2file.close()
 
@@ -211,10 +272,6 @@ class hiptl_nH(hiptl):
         self.saveHist(outfile, hist, dsetname)
         return
 
-    def saveData(self, outfile, grid, lo, hi):
-        dat = super().saveData(outfile, grid)
-        dat.attrs["nH_range"] = [lo, hi]
-        return
 
     def saveHist(self, outfile, hist, dsetname):
         dat = outfile.create_dataset(dsetname, data=hist)
@@ -226,24 +283,6 @@ class hiptl_nH(hiptl):
     def _getnHBins():
         dendec = np.logspace(-4, 2, num=4)
         return dendec
-    
-    def _loadSnapshotData(self):
-        pos, vel, mass = super()._loadSnapshotData()
-        f = hp.File(self.loadpath, 'r')
-        density = f['PartType0']['Density'][:]
-        density = self._convertDensity(density)
-        f.close()
-        return pos, vel, mass, density
-    
-    def _convertDensity(self, rho):
-        """
-        converts density from 1e10 solar mass/h / (ckpc/h)**3 to sm/kpc^3
-        """
-
-        h = self.header['HubbleParam']
-        rho *= 1e10/h/ self.header['Time']**3 * h**3
-        # converts rho to sm/kpc^3
-        return rho
 
 
 class h2ptl(hiptl):
@@ -251,9 +290,17 @@ class h2ptl(hiptl):
     def __init__(self, simname, snapshot, axis, resolution, chunk, pkl_path, 
                 verbose, snappath, hih2filepath):
         super().__init__(self, simname, snapshot, axis, resolution, chunk, pkl_path, 
-                verbose, snappath, hih2filepath)
-        self.fieldname = 'h2ptl'
+                verbose, snappath, hih2filepath, 'h2ptl')
         return
+    
+    def getGridProps(self):
+        models = self.getMolFracModelsPtl()
+        grp = []
+        for m in models:
+            gp = hiptl_grid_props(m, 'CICW', self.fieldname)
+            if gp.isIncluded():
+                grp.append(gp)
+        return grp
     
     def computeGrids(self, outfile):
         ############### FROM FIELD_SUPER #################################################
@@ -267,24 +314,24 @@ class h2ptl(hiptl):
             print("the saved pickle path: %s"%self.pkl_path)
         ####################################################################################
         hih2file = hp.File(self.hih2filepath, 'r')
-        pos, vel, mass = self._loadSnapshotData()
+        pos, vel, mass, density = self._loadSnapshotData()
         in_rss = False
 
 
         ############ HELPER FUNCTION ############################################
-        def computeH2(gridname, pos, mass, is_in_rss):
-            grid = Chunk(gridname, self.resolution, self.chunk, verbose=self.v)
+        def computeH2(gprop, pos, mass, is_in_rss):
+            grid = Chunk(gprop.getName(), self.resolution, self.chunk, verbose=self.v)
             grid.in_rss = is_in_rss
             
             if self.v:
                 hs = '#' * 20
-                print(hs+" COMPUTE H2 FOR %s "%(gridname.upper()) + hs)
+                print(hs+" COMPUTE H2 FOR %s "%(gprop.getName().upper()) + hs)
                 print("is in redshift space?:%s"%str(is_in_rss))
                 print("does the grid agree?:%s"%str(is_in_rss))
 
             # getting data from hih2 files
             neutfrac = hih2file['PartType0']['f_neutral_H'][:]
-            molfrac = hih2file['PartType0']['f_mol_'+gridname][:]
+            molfrac = hih2file['PartType0']['f_mol_'+gprop.model][:]
             
             # converting the masses to HI mass
             H2mass = mass*(molfrac)*neutfrac
@@ -298,18 +345,18 @@ class h2ptl(hiptl):
             grid.CICW(pos, self.header['BoxSize'], H2mass)
 
             # save them to file
-            self.saveData(outfile, grid)
+            self.saveData(outfile, grid, gprop)
             # if we are in redshift space, the grid handles saving with 'rs'
             return
         #############################################################################
 
-        for g in self.gridnames:
+        for g in list(self.gridprops.values()):
             computeH2(g, pos, mass, in_rss)
         
         pos = self._toRedshiftSpace(pos, vel)
         in_rss = True
         
-        for g in self.gridnames:
+        for g in list(self.gridprops.values()):
             computeH2(g, pos, mass, in_rss)
         hih2file.close()
         return
