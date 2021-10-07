@@ -66,7 +66,7 @@ class hiptl(Field):
             
             if self.v:
                 hs = '#' * 20
-                print(hs+" COMPUTE HI FOR %s "%(gprop.upper()) + hs)
+                print(hs+" COMPUTE HI FOR %s "%(gprop.getName().upper()) + hs)
                 print("is in redshift space?:%s"%str(is_in_rss))
                 print("does the grid agree?:%s"%str(is_in_rss))
 
