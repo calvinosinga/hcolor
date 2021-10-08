@@ -15,6 +15,21 @@ class vn_grid_props(grid_props):
         other['mass'] = mass_or_temp
 
         super().__init__(base, mas, field, other)
+    
+    def isCompatible(self, other):
+        sp = self.props
+        op = other.props
+        if sp['mass'] == 'temp':
+            if 'galaxy' in op['field']:
+                res = ['eBOSS', 'wiggleZ', '2df']
+                return op['resdef'] in res
+            else:
+                return False
+        else:
+            return True
+
+
+
 
 class vn(Field):
 
@@ -89,7 +104,7 @@ class vn(Field):
         factor = 3/32/sc.pi/sc.k/sc.m_p*sc.hbar*sc.c**3/HIfq**2*lam_12
 
         # Wolz says they use comoving volume - not sure if that'll affect the maps
-        red_term = (1 + self.header['redshift'])**2 / (self.header['HubbleParam'] * 100)
+        red_term = (1 + self.header['Redshift'])**2 / (self.header['HubbleParam'] * 100)
         return HIdensity * factor * red_term
     
     def _loadSnapshotData(self):

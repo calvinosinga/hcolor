@@ -22,6 +22,17 @@ class hiptl_grid_props(grid_props):
         super().__init__(base, mas, field, other)
         return
     
+    def isCompatible(self, other):
+        sp = self.props
+        op = other.props
+        if sp['mass'] == 'temp':
+            if 'galaxy' in op['field']:
+                res = ['eBOSS', 'wiggleZ', '2df']
+                return op['resdef'] in res
+            else:
+                return False
+        else:
+            return True
 
     
 class hiptl(Field):

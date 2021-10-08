@@ -76,7 +76,7 @@ class hisubhalo(Field):
         
         # there is a linewidths restriction, unsure how to approach that in papastergis
         # wolz is intensity map so no minimum threshold
-        return
+        return res_defs
         
 
     @staticmethod

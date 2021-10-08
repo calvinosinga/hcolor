@@ -100,8 +100,7 @@ class galaxy_grid_props(grid_props):
         elif self.props['resdef'] == 'diemer':
             cds = galaxy.getColorDefinitions()
             cds.remove('papa')
-            cds.remove('eBOSS_LRG')
-            cds.remove('eBOSS_ELG')
+            cds.remove('eBOSS')
             ms = ['stmass','mass']
             schts = ['CIC', 'CICW']
             return test(cds, ms, schts)
@@ -184,12 +183,10 @@ class galaxy(Field):
             y = photo['gi']
             red_mask = y > 0.0571 * (x + 24) + 1.25
             blue_mask = y < 0.0571 * (x + 24) + 1.1
-        elif col_def == 'eBOSS_ELG':
+        elif col_def == 'eBOSS':
+            #TODO: still need to implement without LRG ELG separate
             blue_mask = np.ones_like(stmass)
             red_mask = np.zeros_like(stmass)
-        elif col_def == 'eBOSS_LRG':
-            blue_mask = np.zeros_like(stmass)
-            red_mask = np.ones_like(stmass)
         else:
             y = photo['gr']
             x = float(col_def)
@@ -274,7 +271,7 @@ class galaxy(Field):
     @classmethod
     def getColorDefinitions(cls):
 
-        implemented_color_defs = ['papa', 'nelson', '0.5', '0.55', '0.6', '0.65', '0.7', 'eBOSS',]
+        implemented_color_defs = ['papa', 'nelson', '0.5', '0.55', '0.6', '0.65', '0.7', 'eBOSS']
         
         return implemented_color_defs
     
