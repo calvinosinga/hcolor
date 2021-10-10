@@ -40,7 +40,8 @@ class grid_props():
 
     def saveProps(self, h5set):
         for k,v in self.props.items():
-            h5set.attrs[k] = v
+            if not v is None:
+                h5set.attrs[k] = v
         return
     
     @classmethod
@@ -395,6 +396,10 @@ class Cross():
         gprops2 = self.field2.gridprops
         for k1 in keylist1:
             for k2 in keylist2:
+                if k1[-2:] == 'rs':
+                    k1 = k1[:-2]
+                if k2[-2:] == 'rs':
+                    k2 = k2[:-2]
                 gp1 = gprops1[k1]
                 gp2 = gprops2[k2]
                 if gp1.isCompatible(gp1) and gp2.isCompatible(gp2):

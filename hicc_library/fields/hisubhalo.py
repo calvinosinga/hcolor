@@ -122,7 +122,7 @@ class hisubhalo(Field):
 
             mass = hih2file[gprop.model][:] #already in solar masses
             if gprop.props['resdef'] == 'papa':
-                mask = self.getResolvedSubhalos(mass, gprop['resdef'])
+                mask = self.getResolvedSubhalos(mass, gprop.props['resdef'])
             else:
                 mask = np.ones_like(mass)
             if gprop.props['mas'] == 'CICW':
@@ -166,7 +166,7 @@ class h2subhalo(hisubhalo):
 
     def __init__(self, simname, snapshot, axis, resolution, pkl_path, verbose,
                 shcatpath, hih2filepath):
-        super().__init__(self, simname, snapshot, axis, resolution, pkl_path, verbose,
+        super().__init__(simname, snapshot, axis, resolution, pkl_path, verbose,
                 shcatpath, hih2filepath, 'h2subhalo')
         return
     

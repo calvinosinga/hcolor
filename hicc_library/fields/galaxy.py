@@ -130,14 +130,6 @@ class galaxy(Field):
         self.grsm_hists = {}
         self.gir_hists = {}
 
-        if self.v:
-            print('%s class variables:'%self.fieldname)
-            print('Resolution definition: %s'%self.use_res)
-            print('Resolution dictionary: %s'%str(self.res_dict))
-            print('Color Definition: %s'%self.use_col)
-            print('Is it using CICW?: %d'%self.use_cicw)
-            print('Is it using stellar mass?: %d'%self.use_stmass)
-
         return
     
     def getGridProps(self):

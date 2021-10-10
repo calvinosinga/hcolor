@@ -361,13 +361,13 @@ class h2ptl(hiptl):
             return
         #############################################################################
 
-        for g in list(self.gridprops.values()):
+        for g in self.gridprops:
             computeH2(g, pos, mass, in_rss)
         
         pos = self._toRedshiftSpace(pos, vel)
         in_rss = True
         
-        for g in list(self.gridprops.values()):
+        for g in self.gridprops:
             computeH2(g, pos, mass, in_rss)
         hih2file.close()
         return
