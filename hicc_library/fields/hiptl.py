@@ -96,7 +96,7 @@ class hiptl(Field):
             HIrho = np.where(HIrho >= 0, HIrho, np.zeros_like(HIrho))
 
             # place particles into grid
-            if gprop["mass"] == 'temp':
+            if gprop.props["mass"] == 'temp':
                 T_HI = self.temperatureMap(HIrho)
                 grid.CICW(pos, self.header['BoxSize'], T_HI)
             else:
@@ -224,7 +224,7 @@ class hiptl_nH(hiptl):
 
             # get molecular fraction. we also want a bin that is all the neutral hydrogen,
             # this handles that case
-            if not "all_neut" in gprop.model():
+            if not "all_neut" in gprop.model:
                 molfrac = hih2file['PartType0']['f_mol_'+gprop.model][:]
             else:
                 molfrac = np.zeros_like(mass)
