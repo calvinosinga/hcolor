@@ -264,13 +264,13 @@ class hiptl_nH(hiptl):
         #############################################################################
 
 
-        for g in list(self.gridprops.values()):
+        for g in self.gridprops:
             computeHI(g, pos, mass, density, in_rss)
         
         pos = self._toRedshiftSpace(pos, vel)
         in_rss = True
 
-        for g in list(self.gridprops.values()):
+        for g in self.gridprops.values():
             computeHI(g, pos, mass, density, in_rss)
         hih2file.close()
 
