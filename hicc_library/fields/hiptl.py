@@ -165,7 +165,7 @@ class hiptl_nH(hiptl):
         models = self.getMolFracModelsPtl()
         models.append('all_neut')
         nhbins = self._getnHBins()
-        grp = []
+        grp = {}
         for m in models:
             for idx in range(len(nhbins)):
                 if idx == 0:
@@ -182,8 +182,8 @@ class hiptl_nH(hiptl):
                 gp = hiptl_grid_props(m, 'CICW', self.fieldname,
                         nH = n)
                 if gp.isIncluded():
-                    grp.append(gp)
-        return
+                    grp[gp.getName()] = gp
+        return grp
 
     def computeGrids(self, outfile):
 
@@ -203,7 +203,6 @@ class hiptl_nH(hiptl):
         hih2file = hp.File(self.hih2filepath, 'r')
         pos, vel, mass, density = self._loadSnapshotData()
         in_rss = False
-        nHbins = self._getnHBins()
         saved_hists = [] # vel-mass histograms saved to the outfile
 
 
@@ -264,7 +263,7 @@ class hiptl_nH(hiptl):
         #############################################################################
 
 
-        for g in self.gridprops:
+        for g in self.gridprops.values():
             computeHI(g, pos, mass, density, in_rss)
         
         pos = self._toRedshiftSpace(pos, vel)
@@ -306,11 +305,11 @@ class h2ptl(hiptl):
     
     def getGridProps(self):
         models = self.getMolFracModelsPtl()
-        grp = []
+        grp = {}
         for m in models:
             gp = hiptl_grid_props(m, 'CICW', self.fieldname)
             if gp.isIncluded():
-                grp.append(gp)
+                grp[gp.getName()] = gp
         return grp
     
     def computeGrids(self, outfile):
@@ -361,13 +360,13 @@ class h2ptl(hiptl):
             return
         #############################################################################
 
-        for g in self.gridprops:
+        for g in self.gridprops.values():
             computeH2(g, pos, mass, in_rss)
         
         pos = self._toRedshiftSpace(pos, vel)
         in_rss = True
         
-        for g in self.gridprops:
+        for g in self.gridprops.values():
             computeH2(g, pos, mass, in_rss)
         hih2file.close()
         return

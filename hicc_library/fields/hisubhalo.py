@@ -149,7 +149,7 @@ class hisubhalo(Field):
         return
 
     def getResolvedSubhalos(self, mass, resdef):
-        resdict = self.getResolutionDefinitions()
+        resdict = self.getResolutionDefinitions()[resdef]
         mask = np.ones_like(mass)
         for k, v in resdict.items():
             if k == 'HI':
@@ -171,11 +171,18 @@ class h2subhalo(hisubhalo):
         return
     
     def computeGrids(self, outfile):
-        super().computeGrids(outfile)
+        ############ FROM FIELD_SUPER CLASS #######################################
+        if self.header is None:
+            raise ValueError("header needs to be loaded before computing grids")
+        dat = outfile.create_dataset('pickle', data=[0])
+        dat.attrs['path'] = self.pkl_path
+        if self.v:
+            print("the saved pickle path: %s"%self.pkl_path)
 
         if self.v:
             print("now computing the grids for h2subhalo...")
-        
+        #########################################################################
+
         hih2file = hp.File(self.hih2filepath, 'r')
         ids = hih2file['id_subhalo'][:] # used to idx into the subhalo catalog
         ids = ids.astype(np.int32)
