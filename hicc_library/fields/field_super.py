@@ -333,6 +333,10 @@ class Cross():
         gprops2 = self.field2.gridprops
         for k1 in keylist1:
             for k2 in keylist2:
+                if k1[-2:] == 'rs':
+                    k1 = k1[:-2]
+                if k2[-2:] == 'rs':
+                    k2 = k2[:-2]
                 gp1 = gprops1[k1]
                 gp2 = gprops2[k2]
 

@@ -71,7 +71,7 @@ elif FIELDNAME == 'h2ptlgrid':
     field = h2ptl(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, pickle_path,
             gd['verbose'], gd['snapshot'], gd['hih2ptl'])
 
-elif FIELDNAME == 'h2subhalo':
+elif FIELDNAME == 'h2subhalogrid':
     field = h2subhalo(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, pickle_path, 
             gd['verbose'], gd[SIMNAME], gd['hih2catsh'])
 else:

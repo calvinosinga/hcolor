@@ -19,8 +19,7 @@ class galaxy_grid_props(grid_props):
         lst = [mass_type, resdef, coldef]
         keys = ['mass', 'resdef','coldef']
         for i in range(len(lst)):
-            if not lst[i] is None:
-                other[keys[i]] = lst[i]
+            other[keys[i]] = lst[i]
 
         super().__init__(color, mas, field, other)
 

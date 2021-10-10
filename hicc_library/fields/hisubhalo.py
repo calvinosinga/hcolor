@@ -121,7 +121,7 @@ class hisubhalo(Field):
                 grid.toRSS()
 
             mass = hih2file[gprop.model][:] #already in solar masses
-            if gprop['resdef'] == 'papa':
+            if gprop.props['resdef'] == 'papa':
                 mask = self.getResolvedSubhalos(mass, gprop['resdef'])
             else:
                 mask = np.ones_like(mass)

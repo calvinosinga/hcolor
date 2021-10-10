@@ -300,7 +300,7 @@ class h2ptl(hiptl):
 
     def __init__(self, simname, snapshot, axis, resolution, chunk, pkl_path, 
                 verbose, snappath, hih2filepath):
-        super().__init__(self, simname, snapshot, axis, resolution, chunk, pkl_path, 
+        super().__init__(simname, snapshot, axis, resolution, chunk, pkl_path, 
                 verbose, snappath, hih2filepath, 'h2ptl')
         return
     
