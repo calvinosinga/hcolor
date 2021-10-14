@@ -380,6 +380,10 @@ class Cross():
     def _getKeys(self, gfile):
         klist = list(gfile.keys())
         klist.remove('pickle')
+        temp = copy.copy(klist)
+        for k in temp:
+            if gfile[k].attrs['gridname'] == -1:
+                klist.remove(k)
         return klist
 
     def computeXxis(self):

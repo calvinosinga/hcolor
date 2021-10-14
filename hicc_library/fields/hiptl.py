@@ -287,6 +287,7 @@ class hiptl_nH(hiptl):
         dat = outfile.create_dataset(dsetname, data=hist)
         dat.attrs['combine'] = -1
         dat.attrs['operation'] = 'hist'
+        dat.attrs['gridname'] = -1 # indicates this is not for xpk computation
         return
 
     @staticmethod
