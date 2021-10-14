@@ -124,8 +124,10 @@ class hisubhalo(Field):
             if gprop.props['resdef'] == 'papa':
                 mask = self.getResolvedSubhalos(mass, gprop.props['resdef'])
             else:
-                mask = np.ones_like(mass)
+                mask = np.ones_like(mass, dtype=np.int)
             if gprop.props['mas'] == 'CICW':
+                if not np.issubdtype(mask[0], int):
+                    mask = mask.astype('int64')
                 grid.CICW(pos[mask, :], self.header['BoxSize'], mass[mask])
             else:
                 grid.CIC(pos[mask, :], self.header['BoxSize'])
@@ -150,7 +152,7 @@ class hisubhalo(Field):
 
     def getResolvedSubhalos(self, mass, resdef):
         resdict = self.getResolutionDefinitions()[resdef]
-        mask = np.ones_like(mass)
+        mask = np.ones_like(mass, dtype=np.int)
         for k, v in resdict.items():
             if k == 'HI':
                 mask *= (mass >= v[0]) & (mass < v[1])

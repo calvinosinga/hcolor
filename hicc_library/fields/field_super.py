@@ -346,10 +346,6 @@ class Cross():
                     grid2 = Grid.loadGrid(gf2[k2])
 
                     self._xpk(grid1, grid2)
-        
-        if self.v:
-            print("xpks finished computing, results look like:")
-            print(self.xpks)
         return
     
     def _xpk(self, grid1, grid2):
@@ -416,7 +412,7 @@ class Cross():
             kname = '%sX%s'%(grid1.gridname, grid2.gridname)
 
             if self.v:
-                print("computing xpk for %s"%kname)
+                print("computing x-corr for %s"%kname)
             
             arrs = (self._toOverdensity(grid1.getGrid()), 
                     self._toOverdensity(grid2.getGrid()))

@@ -132,7 +132,7 @@ class hiptl(Field):
         factor = 3/32/sc.pi/sc.k/sc.m_p*sc.hbar*sc.c**3/HIfq**2*lam_12
 
         # Wolz says they use comoving volume - not sure if that'll affect the maps
-        red_term = (1 + self.header['redshift'])**2 / (self.header['HubbleParam'] * 100)
+        red_term = (1 + self.header['Redshift'])**2 / (self.header['HubbleParam'] * 100)
         return HIdensity * factor * red_term
 
 
@@ -331,7 +331,8 @@ class h2ptl(hiptl):
         ############ HELPER FUNCTION ############################################
         def computeH2(gprop, pos, mass, is_in_rss):
             grid = Chunk(gprop.getName(), self.resolution, self.chunk, verbose=self.v)
-            grid.in_rss = is_in_rss
+            if is_in_rss:
+                grid.toRSS()
             
             if self.v:
                 hs = '#' * 20

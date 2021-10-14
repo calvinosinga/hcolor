@@ -337,7 +337,7 @@ class galaxy(Field):
             
             # count the number of galaxies used for this grid
             self.counts[g.getName()] = np.sum(mask)
-            if gp['mass_type'] == 'stmass':
+            if gp['mass'] == 'stmass':
                 grid = computeGal(pos[mask, :], mass[mask, 4], g, in_rss)
             else:
                 mass = np.sum(mass, axis = 1)
