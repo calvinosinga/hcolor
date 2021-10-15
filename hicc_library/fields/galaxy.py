@@ -367,15 +367,15 @@ class galaxy(Field):
             resolved_dict = self.getResolutionDefinitions(self.simname)[gp['resdef']]
 
             resolved_mask = self.isResolved(mass[:, 4], photo, resolved_dict)
-            if gp.color == 'red':
+            if g.color == 'red':
                 blue_mask, red_mask = self.colorIndices(photo, mass[:, 4], gp['coldef'])
                 mask = red_mask * resolved_mask
-            elif gp.color == 'blue':
+            elif g.color == 'blue':
                 blue_mask, red_mask = self.colorIndices(photo, mass[:, 4], gp['coldef'])
                 mask = blue_mask * resolved_mask
-            elif gp.color == 'resolved':
+            elif g.color == 'resolved':
                 mask = resolved_mask
-            elif gp.color == 'all':
+            elif g.color == 'all':
                 mask = np.ones_like(resolved_mask)
             
 
