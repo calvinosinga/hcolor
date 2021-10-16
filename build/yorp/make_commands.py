@@ -29,29 +29,9 @@ print("resolution of grid: %d"%RESOLUTION)
 print("runs given: "+str(RUNNAMES))
 print("currently implemented fields: "+ str(implemented_fields))
 
+tng_sims = ['L205n2500TNG', 'L352160TNG', 'L751820TNG', 'L75n455TNG', 'L75n455TNG_DM', 'L75n910TNG']
 gd = {}
-LSTR = '/lustre/cosinga/'
-HIH2 = '/lustre/diemer/illustris/hih2/'
-HCOLOR = LSTR + 'hcolor/'
-
-gd['verbose']=VERBOSE
-gd[SIMNAME] = LSTR+'%s/'%SIMNAME
-gd['output'] = LSTR+'hcolor/output/'
-gd['output'] = gd['output']+'%s_%sB_%03dS_%dA_%dR'%(PREFIX, SIMNAME, SNAPSHOT, AXIS, RESOLUTION)
-gd['snapshot'] = gd[SIMNAME]+'snapdir_%03d/snap_%03d.'%(SNAPSHOT,SNAPSHOT) + "%d.hdf5" # chunks are given in fields subclasses
-gd['load_header'] = gd['snapshot']%(0)
-gd['create_grid'] = HCOLOR + 'run/create_grid.py'
-gd['combine'] = HCOLOR + 'run/combine.py'
-gd['hih2ptl'] = HIH2 + "hih2_particles_%03d"%SNAPSHOT + ".%d.hdf5"
-gd['post'] = gd[SIMNAME]+'postprocessing/'
-gd['dust'] = gd['post']+'stellar_light/'+ \
-        'Subhalo_StellarPhot_p07c_cf00dust_res_conv_ns1_rad30pkpc_%03d.hdf5'%SNAPSHOT
-gd['auto_result'] = HCOLOR+'run/auto.py'
-gd['cross_result'] = HCOLOR+'run/cross.py'
-gd['hih2catsh'] = gd['post']+'hih2_galaxy_%03d.hdf5'%SNAPSHOT
-gd['TREECOOL'] = gd[SIMNAME]+'TREECOOL_fg_dec11'
-gd['pickles'] = {}
-
+TNG = '/net/nyx/nyx1/diemer/illustris/'
 yorpfile = open('yorp.bash','w')
 
 # make the create_grids
