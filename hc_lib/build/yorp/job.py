@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import h5py as hp
 
 
@@ -17,6 +18,11 @@ class Job():
     def line(self):
         return
 
+class JobManager():
+    def __init__():
+        self.jdict = []
+        return
+    
 def makePtlJobs(name, nfiles, gd, pd):
     createJoblist = []
     createCmd = 'python3 %s'%pd['create_grid']
