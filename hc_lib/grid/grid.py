@@ -6,7 +6,6 @@ import numpy as np
 import h5py as hp
 import time
 
-from numpy.lib.function_base import trim_zeros
 
 class Grid():
 

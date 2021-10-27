@@ -1,13 +1,13 @@
 
-from hicc_library.fields.ptl import ptl
-from hicc_library.fields.galaxy import galaxy, galaxy_dust
+from hc_lib.fields.ptl import ptl
+from hc_lib.fields.galaxy import galaxy, galaxy_dust
 import sys
 import os
 import pickle
 import h5py as hp
-from hicc_library.fields.hiptl import hiptl, hiptl_nH, h2ptl
-from hicc_library.fields.hisubhalo import hisubhalo, h2subhalo
-from hicc_library.fields.vn import vn
+from hc_lib.fields.hiptl import hiptl, hiptl_nH, h2ptl
+from hc_lib.fields.hisubhalo import hisubhalo, h2subhalo
+from hc_lib.fields.vn import vn
 
 gd = pickle.load(open(os.getenv('GDFILE'),'rb'))
 

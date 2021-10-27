@@ -20,6 +20,7 @@
 import subprocess
 import time
 import os
+import psutil
 
 ########################################################################################################
 
@@ -35,7 +36,6 @@ printLine()
 
 start_time = time.time()
 
-N_PROC = os.environ["SLURM_JOB_CPUS_PER_NODE"]
 
 # Find commands to execute
 f = open('commands.txt', 'r')

@@ -2,15 +2,13 @@
 This file is responsible for the creation of the contituent sbatch files that make
 up the pipeline.
 """
-import os
 import illustris_python as il
 import numpy as np
 import h5py as hp
 import matplotlib.pyplot as plt
 from Pk_library import Pk, Xi, XPk, XXi
-import matplotlib as mpl
 import copy
-from hicc_library.plots import plot_lib as plib
+from hc_lib.plots import plot_lib as plib
 
 class grid_props():
     

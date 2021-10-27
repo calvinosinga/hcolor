@@ -6,7 +6,7 @@ for a file.
 import sys
 import os
 import pickle
-from hicc_library.grid.grid import Grid
+from hc_lib.grid.grid import Grid
 import h5py as hp
 
 
@@ -33,10 +33,11 @@ if gd['verbose']:
 klist = list(gridfile.keys())
 klist.remove('pickle')
 for key in klist:
-    grid = Grid.loadGrid(gridfile[key])
-    field.computePk(grid)
-    field.computeXi(grid)
-    field.makeSlice(grid)
+    if 'gridname' in dict(gridfile[key].attrs):
+        grid = Grid.loadGrid(gridfile[key])
+        field.computePk(grid)
+        field.computeXi(grid)
+        field.makeSlice(grid)
 
 pickle.dump(field, open(pkl_path, 'wb'), pickle.HIGHEST_PROTOCOL)
 gridfile.close()

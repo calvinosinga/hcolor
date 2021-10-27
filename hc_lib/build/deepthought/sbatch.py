@@ -8,13 +8,13 @@ from hicc_library.fields.galaxy import galaxy
 import copy
 class Sbatch():
 
-    def __init__(self, gd, fieldname, simname, snapshot, axis, resolution):
+    def __init__(self, gd, fieldname, run_params):
         # save the input fields
         self.fieldname = fieldname
-        self.simname = simname
-        self.snapshot = snapshot
-        self.axis = axis
-        self.resolution = resolution
+        self.simname = run_params['sim']
+        self.snapshot = run_params['snap']
+        self.axis = run_params['axis']
+        self.resolution = run_params['res']
 
         # if the field is based on the particle catalog, we need to run combine procedures
         # which makes the making of the sbatch files a bit more complicated

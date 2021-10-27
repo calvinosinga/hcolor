@@ -5,7 +5,7 @@ import os
 import numpy as np
 import h5py as hp
 import pickle
-from hicc_library.grid.grid import Chunk
+from hc_lib.grid.grid import Chunk
 
 IN_GRID = sys.argv[1]
 IN_START = int(sys.argv[2])

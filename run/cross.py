@@ -6,7 +6,7 @@ import sys
 import os
 import pickle
 import h5py as hp
-from hicc_library.fields.field_super import Cross
+from hc_lib.fields.field_super import Cross
 
 gd = pickle.load(open(os.getenv('GDFILE'),'rb'))
 

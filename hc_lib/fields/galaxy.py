@@ -2,8 +2,8 @@
 """
 
 """
-from hicc_library.grid.grid import Grid
-from hicc_library.fields.field_super import Field, grid_props
+from hc_lib.grid.grid import Grid
+from hc_lib.fields.field_super import Field, grid_props
 import h5py as hp
 import numpy as np
 from Pk_library import XPk, XXi

@@ -3,8 +3,8 @@
 """
 import h5py as hp
 import numpy as np
-from hicc_library.fields.field_super import Field, grid_props
-from hicc_library.grid.grid import Chunk
+from hc_lib.fields.field_super import Field, grid_props
+from hc_lib.grid.grid import Chunk
 import scipy.constants as sc
 
 class hiptl_grid_props(grid_props):

@@ -1,5 +1,5 @@
 import copy
-from hicc_library.plots import plot_lib as plib
+from hc_lib.plots import plot_lib as plib
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.gridspec as gspec
