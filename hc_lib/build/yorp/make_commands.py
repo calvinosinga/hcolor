@@ -18,7 +18,6 @@ runs = ioobj.getRuns()
 gdobj = IODict(rp, runs, OUT, TNG, HCOLOR)
 gdobj.add('TREECOOL', HCOLOR + 'TREECOOL_fg_dec11')
 
-jobs = []
 
-for r in range(len(runs)):
+
     
