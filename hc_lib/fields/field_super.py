@@ -283,7 +283,7 @@ class Field():
         return arr
 
 
-from hicc_library.grid.grid import Grid
+from hc_lib.grid.grid import Grid
 class Cross():
     def __init__(self, field1, field2, gridfilepath1, gridfilepath2):
         # the fieldname for this cross-power

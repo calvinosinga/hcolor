@@ -4,7 +4,7 @@ up the pipeline.
 """
 import os
 import h5py as hp
-from hicc_library.fields.galaxy import galaxy
+from hc_lib.fields.galaxy import galaxy
 import copy
 class Sbatch():
 
