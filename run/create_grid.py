@@ -59,6 +59,7 @@ elif FIELDNAME == 'galaxygrid':
 elif FIELDNAME == 'galaxy_dustgrid':
     field = galaxy_dust(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, pickle_path, 
             gd['verbose'], gd[SIMNAME], gd['dust'])
+        
 elif FIELDNAME == 'vngrid':
     field = vn(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, pickle_path,
             gd['verbose'], gd['snapshot'], gd['TREECOOL'])
