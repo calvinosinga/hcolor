@@ -10,12 +10,13 @@ TNG_PATH = '/lustre/cosinga/'
 HIH2 = '/lustre/diemer/illustris/hih2/'
 HCOLOR = '/lustre/cosinga/hcolor/'
 
+tng_dict = {'tng100':'tng100'}
 ioobj = Input()
 rp = ioobj.getParams()
 runs = ioobj.getRuns()
-
+TNG_PATH += tng_dict[rp['sim']] + '/'
 gdobj = IODict(rp, runs, OUT_PATH, TNG_PATH, HCOLOR)
-# the hih2 particles are in Benedikt's lustre directory
+#the hih2 particles are in Benedikt's lustre directory
 gdobj.add('hih2ptl', HIH2 + "hih2_particles_%03d"%rp['snap'] + ".%d.hdf5")
 gdobj.add('TREECOOL', TNG_PATH + 'TREECOOL_fg_dec11')
 gd = gdobj.getGlobalDict()
@@ -43,7 +44,7 @@ for f in range(len(fields)):
     savefiles.update(ssave)
     key = fields[f].fieldname+'grid'
     
-    gd['pickles'][key] = gd['results'] + fields[f]._get_base_name(key) + '.pkl'
+    gd['pickles'][key] = pd['results'] + fields[f]._get_base_name(key) + '.pkl'
 
 # make cross sbatch
 for i in range(len(fields)):
@@ -53,7 +54,7 @@ for i in range(len(fields)):
         galXgal = (fn1 == 'galaxy' and fn2 == 'galaxy') or (fn1 == 'galaxy_dust' \
                 and fn2 == 'galaxy_dust')
         if (ioobj.isHyd(fn1) and ioobj.isMat(fn2)) or galXgal:
-            xplotpath = gd['plots'] + '%sX%s/'%(fn1,fn2)
+            xplotpath = pd['plots'] + '%sX%s/'%(fn1,fn2)
             os.mkdir(xplotpath)
             xplotkey = '%sX%s_plots'%(fn1,fn2)
             gd[xplotkey]=xplotpath
@@ -63,7 +64,7 @@ for i in range(len(fields)):
             varnames.extend(cvar)
             savefiles.update(csave)
             rtup = (rp['sim'], rp['snap'], rp['axis'], rp['res'])
-            gd['pickles'][fn1 + 'X' + fn2] = gd['results'] + fn1 + 'X' + fn2 + \
+            gd['pickles'][fn1 + 'X' + fn2] = pd['results'] + fn1 + 'X' + fn2 + \
                     "_%sB_%03dS_%dA_%dR.pkl"%rtup
 
 gd.update(savefiles)
@@ -84,13 +85,13 @@ if gd["verbose"]:
 print("the global dictionary:")
 print(gd)
 
-gdpath = gd['output'] + 'gd.pkl'
+gdpath = pd['output'] + 'gd.pkl'
 w_path = open(gdpath, 'wb')
 pkl.dump(gd, w_path, pkl.HIGHEST_PROTOCOL)
 w_path.close()
 
 # creating the pipeline
-pipe = open(gd['output']+'sbatch/pipeline.bash', 'w')
+pipe = open(pd['output']+'sbatch/pipeline.bash', 'w')
 
 pipe.write("#!/bin/bash\n")
 pipe.write('GDFILE=%s\n'%gdpath)

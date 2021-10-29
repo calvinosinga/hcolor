@@ -47,7 +47,7 @@ class IODict():
         pd['output'] = outdir
         
         def create_subdirectory(subdir, savepath = True):
-            os.mkdir(outdir+subdir)
+            os.mkdir(outdir+subdir+'/')
             splt = subdir.split("/")
             # make sure they aren't saving over other paths
             if savepath:
@@ -55,11 +55,11 @@ class IODict():
             
             return
 
-        create_subdirectory("grids/")
-        create_subdirectory("sbatch/")
-        create_subdirectory("sbatch/logs/")
-        create_subdirectory("results/")
-        create_subdirectory("results/plots/")
+        create_subdirectory("grids")
+        create_subdirectory("sbatch")
+        create_subdirectory("sbatch/logs")
+        create_subdirectory("results")
+        create_subdirectory("results/plots")
 
         for i in runs:
             create_subdirectory("results/plots/"+i, False)

@@ -21,7 +21,7 @@ class Input():
         def _getParam(inmessage, comlist, errmessage, to_type = str):
             compatible = False
             while not compatible:
-                val = input(inmessage+'\n')
+                val = input(inmessage)
                 try:
                     val = to_type(val)
                 except ValueError:
@@ -33,7 +33,7 @@ class Input():
             return val
         
         rp = {}
-        rp['verbose'] = _getParam("verbosity (0,1):", [0,1], 'must be 0 or 1\n', int)
+        rp['verbose'] = _getParam("verbosity (0,1):", [0,1], 'must be 0 or 1', int)
 
         rp['prefix'] = input("prefix for output names:")
 
@@ -41,18 +41,18 @@ class Input():
         for s in self.simlist:
             outstr += s + ', '
         outstr = outstr[:-2]
-        rp['sim'] = _getParam("simulation name (%s)"%outstr, self.simlist,
+        rp['sim'] = _getParam("simulation name (%s):"%outstr, self.simlist,
                 "simulation name not in compatible list")
         
-        rp['snap'] = _getParam("snapshot :", self.snaplist, 
+        rp['snap'] = _getParam("snapshot:", self.snaplist, 
                 "snapshot not in compatible list: %s"%self.snaplist, int)
         
-        rp['axis'] = _getParam("axis: ", self.axislist,
+        rp['axis'] = _getParam("axis:", self.axislist,
                 "axis not in compatible list", int)
 
         compatible = False
         while not compatible:
-            res = input("grid resolution: ")
+            res = input("grid resolution:")
             try:
                 res = int(res)
             except ValueError:
@@ -68,7 +68,9 @@ class Input():
         while not done:
             field = input("fieldname (type done to exit): ")
             if not field in self.implemented:
-                print("not in implemented fields %s \n"%self.impmented)
+                done = field == 'done'
+                if not done:
+                    print("not in implemented fields %s \n"%self.implemented)
             else:
                 runs.append(field)
         return runs
