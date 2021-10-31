@@ -378,7 +378,7 @@ class galaxy(Field):
                 mask = np.ones_like(resolved_mask)
             
 
-            if gp['mass_type'] == 'stmass':
+            if gp['mass'] == 'stmass':
                 grid = computeGal(pos[mask, :], mass[mask, 4], g, in_rss)
             else:
                 mass = np.sum(mass, axis = 1)

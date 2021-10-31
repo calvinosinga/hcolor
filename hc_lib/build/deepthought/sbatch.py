@@ -29,10 +29,6 @@ class Sbatch():
 
         self.numfiles = header['NumFilesPerSnapshot']
 
-        # some fields, like galaxy, have additional elements that they
-        # would like to add to the global dictionary, this method handles that
-        self._add_global(gd)
-
         return
     
     def isCat(self):
@@ -194,10 +190,6 @@ class Sbatch():
         resjob.close()
         return
 
-    def _add_global(self, gd):
-        fn = self.fieldname
-        gd[self.plots_key]=self.plot_path
-        return
 
     def _name_savefiles(self, step_names):
         """

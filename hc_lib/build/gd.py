@@ -5,14 +5,17 @@ on various computers.
 import os
 import copy
 
+from numpy.lib.npyio import save
+
 class IODict():
 
     def __init__(self, run_params, runs, out_path, tng_path, hcolor_path):
         self.input_dict = {}
         self.path_dict = {}
         self.rparams = run_params
+        self.runs = runs
         self.addSimPaths(tng_path)
-        self.addOutPaths(out_path, runs)
+        self.addOutPaths(out_path)
         self.addPyPaths(hcolor_path)
         # other odds and ends to add to gd
         self.input_dict['pickles'] = {}
@@ -38,7 +41,7 @@ class IODict():
         # the chunk is given during the run stage
         return
     
-    def addOutPaths(self, out_path, runs):
+    def addOutPaths(self, out_path):
         rp = self.rparams
         pd = self.path_dict
         rtup = (rp['prefix'], rp['sim'], rp['snap'], rp['axis'], rp['res'])
@@ -48,13 +51,15 @@ class IODict():
             os.mkdir(outdir)
         pd['output'] = outdir
         
-        def create_subdirectory(subdir, savepath = True):
+        def create_subdirectory(subdir, savepath = 0):
             os.mkdir(outdir+subdir+'/')
             splt = subdir.split("/")
             # make sure they aren't saving over other paths
-            if savepath:
+            if savepath == 0:
                 pd[splt[-1]] = outdir + subdir+'/'
-            
+            elif savepath == 1:
+                pd[splt[-1]+'_'+splt[-2]] = outdir + subdir + '/'
+
             return
 
         create_subdirectory("grids")
@@ -63,15 +68,18 @@ class IODict():
         create_subdirectory("results")
         create_subdirectory("results/plots")
 
-        for i in runs:
-            create_subdirectory("results/plots/"+i, False)
-            create_subdirectory("sbatch/logs/"+i, False)
+        for i in self.runs:
+            create_subdirectory("results/plots/"+i, 1)
+            create_subdirectory("sbatch/logs/"+i, 2)
         return
 
     def getGlobalDict(self):
         gd = copy.copy(self.input_dict)
         gd['plots'] = self.path_dict['plots']
         gd['grids'] = self.path_dict['grids']
+        for i in self.runs:
+            k = i+'_plots'
+            gd[k] = self.path_dict[k]
         return gd
     
     def getInputDict(self):
