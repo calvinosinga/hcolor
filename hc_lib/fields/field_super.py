@@ -338,7 +338,8 @@ class Cross():
                     k2 = k2[:-2]
                 gp1 = gprops1[k1]
                 gp2 = gprops2[k2]
-
+                print(gp1)
+                print(gp2)
                 if gp1.isCompatible(gp2) and gp2.isCompatible(gp1):
                     grid1 = Grid.loadGrid(gf1[k1])
                     grid2 = Grid.loadGrid(gf2[k2])

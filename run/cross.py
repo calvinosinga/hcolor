@@ -19,7 +19,7 @@ PLOTDIRKEY = sys.argv[3]
 
 INGRIDPATH1 = gd['grids'] + gd[INGRIDKEY1]
 INGRIDPATH2 = gd['grids']+ gd[INGRIDKEY2]
-PLOTDIR = gd['plots'] + gd[PLOTDIRKEY]
+PLOTDIR = gd[PLOTDIRKEY]
 
 pkl_paths = []
 gridpaths = []

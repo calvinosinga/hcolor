@@ -26,49 +26,49 @@ class galaxy_grid_props(grid_props):
         return
     
     
-    def isCompatible(self, other):
-        def testProps(tests):
-            results = np.zeros(len(tests))
-            for t in range(len(tests)):
-                results[t] = op[tests[t]] == sp[tests[t]]
+    # def isCompatible(self, other):
+    #     # def testProps(tests):
+    #     #     results = np.zeros(len(tests))
+    #     #     for t in range(len(tests)):
+    #     #         results[t] = op[tests[t]] == sp[tests[t]]
             
-            return results.all()
+    #     #     return results.all()
         
-        op = other.props
-        sp = self.props
+    #     # op = other.props
+    #     # sp = self.props
 
 
-        if sp['field'] == op['field']:
-            tests = ['resdef', 'coldef', 'mas', 'mass']
-            return testProps(tests)
+    #     # if sp['field'] == op['field']:
+    #     #     tests = ['resdef', 'coldef', 'mas', 'mass']
+    #     #     return testProps(tests)
         
-        # elif sp['resdef'] == 'papa':
-        #     if op['field'] == 'hisubhalo':
-        #         tests = ['resdef', 'mas']
-        #         return testProps(tests)
-        
-
-        # elif sp['resdef'] == 'eBOSS':
-        #     if op['field'] == 'hiptl' or op['field'] == 'vn':
-        #         return op['mass'] == 'temp'
+    #     # elif sp['resdef'] == 'papa':
+    #     #     if op['field'] == 'hisubhalo':
+    #     #         tests = ['resdef', 'mas']
+    #     #         return testProps(tests)
         
 
-        # elif sp['resdef'] == 'wiggleZ':
-        #     if op['field'] == 'hiptl' or op['field'] == 'vn':
-        #         return op['mass'] == 'temp'
+    #     # elif sp['resdef'] == 'eBOSS':
+    #     #     if op['field'] == 'hiptl' or op['field'] == 'vn':
+    #     #         return op['mass'] == 'temp'
+        
+
+    #     # elif sp['resdef'] == 'wiggleZ':
+    #     #     if op['field'] == 'hiptl' or op['field'] == 'vn':
+    #     #         return op['mass'] == 'temp'
                 
 
-        # elif sp['resdef'] == '2df':
-        #     if op['field'] == 'hiptl' or op['field'] == 'vn':
-        #         return op['mass'] == 'temp'
+    #     # elif sp['resdef'] == '2df':
+    #     #     if op['field'] == 'hiptl' or op['field'] == 'vn':
+    #     #         return op['mass'] == 'temp'
                 
 
 
-        # elif sp['resdef'] == 'diemer':
-        #     fiducial_cd = ['nelson','0.6','0.55', '0.65']
-        #     return sp['coldef'] in fiducial_cd
+    #     # elif sp['resdef'] == 'diemer':
+    #     #     fiducial_cd = ['nelson','0.6','0.55', '0.65']
+    #     #     return sp['coldef'] in fiducial_cd
             
-        return True
+    #     return True
 
     def isIncluded(self):
 
