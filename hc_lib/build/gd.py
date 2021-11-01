@@ -36,8 +36,8 @@ class IODict():
         post = idict[simname] + 'postprocessing/'
         idict['dust'] = post + 'stellar_light/'+ \
                 'Subhalo_StellarPhot_p07c_cf00dust_res_conv_ns1_rad30pkpc_%03d.hdf5'%snap
-        idict['hih2catsh'] = post +'/hih2/hih2_galaxy_%03d.hdf5'%snap
-        idict['hih2ptl'] = post + '/hih2/hih2_particles_%03d'%snap + ".%d.hdf5"
+        idict['hih2catsh'] = post +'hih2/hih2_galaxy_%03d.hdf5'%snap
+        idict['hih2ptl'] = post + 'hih2/hih2_particles_%03d'%snap + ".%d.hdf5"
         # the chunk is given during the run stage
         return
     
