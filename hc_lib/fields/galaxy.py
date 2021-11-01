@@ -27,20 +27,20 @@ class galaxy_grid_props(grid_props):
     
     
     def isCompatible(self, other):
-        # def testProps(tests):
-        #     results = np.zeros(len(tests))
-        #     for t in range(len(tests)):
-        #         results[t] = op[tests[t]] == sp[tests[t]]
+        def testProps(tests):
+            results = np.zeros(len(tests))
+            for t in range(len(tests)):
+                results[t] = op[tests[t]] == sp[tests[t]]
             
-        #     return results.all()
+            return results.all()
         
-        # op = other.props
-        # sp = self.props
+        op = other.props
+        sp = self.props
 
 
-        # if sp['field'] == op['field']:
-        #     tests = ['resdef', 'coldef', 'mas', 'mass']
-        #     return testProps(tests)
+        if sp['field'] == op['field']:
+            tests = ['resdef', 'coldef', 'mas', 'mass']
+            return testProps(tests)
         
         # elif sp['resdef'] == 'papa':
         #     if op['field'] == 'hisubhalo':
