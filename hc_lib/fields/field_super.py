@@ -287,7 +287,7 @@ class Field():
             for k,v in indict.items():
                 outfile.create_dataset(k+idf, data=v, 
                         compression="gzip", compression_opts=9)
-                return
+            return
         
         add(self.pks, '_pk')
         add(self.xi, '_xi')
