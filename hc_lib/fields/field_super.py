@@ -282,7 +282,19 @@ class Field():
 
         return arr
 
-
+    def exportResults(self, outfile):
+        def add(indict, idf):
+            for k,v in indict.items():
+                outfile.create_dataset(k+idf, data=v, 
+                        compression="gzip", compression_opts=9)
+                return
+        
+        add(self.pks, '_pk')
+        add(self.xi, '_xi')
+        add(self.tdpks, '_2Dpk')
+        add(self.slices, '_slc')
+        return
+        
 from hc_lib.grid.grid import Grid
 class Cross():
     def __init__(self, field1, field2, gridfilepath1, gridfilepath2):
@@ -445,3 +457,15 @@ class Cross():
         arr = arr - 1
 
         return arr
+
+    def exportResults(self, outfile):
+        def add(indict, idf):
+            for k,v in indict.items():
+                outfile.create_dataset(k+idf, data=v, 
+                        compression="gzip", compression_opts=9)
+                return
+        
+        add(self.xpks, '_xpk')
+        add(self.xxi, '_xxi')
+        add(self.tdxpks, '_2Dxpk')
+        return
