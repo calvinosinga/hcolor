@@ -255,7 +255,7 @@ class hiptl_nH(hiptl):
 
             # want to plot velocity vs mass for each nH bin
             # only need to do it for the first model, otherwise will just be a repeat.
-            if gprop.props['nH_bin'] not in saved_hists:
+            if gprop.props['nH_bin'] not in self.saved_hists:
                 self.vel_mass_hist(vel[mask, :], mass[mask], gprop.props['nH_bin'], outfile)
                 self.saved_hists.append(gprop.props['nH_bin'])
 
