@@ -11,7 +11,7 @@ mpl.rcParams['text.usetex'] = True
 
 def main():
     sys.argv.pop(0)
-    OUTDIR = sys.argv.pop(1)
+    OUTDIR = sys.argv.pop(0)
     INGRIDS = sys.argv
     paths = plib.getPaths(OUTDIR)
     nhs = plib.checkPkls(paths, {'fieldname':"hiptl_nH"})
@@ -37,20 +37,21 @@ def vel_mass_hist(nhs, gridfiles, panel_length, panel_bt, border, fsize):
             if nlim[1] < hmax:
                 nlim[1] = hmax
         return nlim
-    
+
+            
     # TODO: probably should make some check to order both nhs, gridfiles lists
     nrows = len(gridfiles)
-    ncols = len(nhs[0]._getnHbins())
+    ncols = len(nhs[0].getnHBinStrings())
     fig, panels = plib.createFig(panel_length, nrows, ncols, panel_bt, border, border)
     for i in range(nrows):
         # getting bin info for this nh
         nh = nhs[i]
         grid = gridfiles[i]
-        nh_bins = nh._getnHbins()
+        nh_bin_names = nh.getnHBinStrings()
         velocity_bins = nh.vel_bins
         mass_bins = nh.m_bins
 
-        nlim = get_nlim(grid, nh_bins)
+        nlim = get_nlim(grid, nh_bin_names)
         for j in range(ncols):
             plt.sca(panels[i][j])
             

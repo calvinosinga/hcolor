@@ -87,7 +87,7 @@ def createFig(panel_length, nrows, ncols, panel_bt, xborder, yborder):
     if isinstance(xborder, float) or isinstance(xborder, int):
         xborder = [xborder, xborder]
     if isinstance(yborder, float) or isinstance(yborder, int):
-        xborder = [yborder, yborder]
+        yborder = [yborder, yborder]
     # creating Figure object
 
     figwidth = panel_length * ncols + panel_bt * (ncols - 1) + \
