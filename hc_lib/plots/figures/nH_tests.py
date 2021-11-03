@@ -18,8 +18,15 @@ def main():
     grids = []
     for i in INGRIDS:
         grids.append(hp.File(i, 'r'))
-    vel_mass_hist(nhs, grids, 3, 0.1, 0.5, 16)
-    plt.savefig("nh_vel_mass_hist.png")
+#    vel_mass_hist(nhs, grids, 3, 0.1, 0.5, 16)
+#    plt.savefig("nh_vel_mass_hist.png")
+    # plot that puts each nH bin on its own panel, compare redshift space to real space
+    redshift_model(nhs, grids, 3, 0.1, 0.5, 16)
+    redshift_nHbin(nhs, grids, 3, 0.1, 0.5, 16)
+    plt.savefig("nh_redshift_vs_real_space.png")
+
+    # plot that puts all nH bins on same 
+
     return
 
 def vel_mass_hist(nhs, gridfiles, panel_length, panel_bt, border, fsize):
@@ -69,6 +76,9 @@ def vel_mass_hist(nhs, gridfiles, panel_length, panel_bt, border, fsize):
 
     return
 
+def redshift_model(nhs, gridfiles, panel_length, panel_bt, border, fsize):
+    nrows = len(nhs)
+    ncols = len(nhs[0]
 
 if __name__ == '__main__':
     main()

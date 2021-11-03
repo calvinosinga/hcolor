@@ -203,7 +203,7 @@ class hiptl_nH(hiptl):
         hih2file = hp.File(self.hih2filepath, 'r')
         pos, vel, mass, density = self._loadSnapshotData()
         in_rss = False
-        saved_hists = [] # vel-mass histograms saved to the outfile
+        self.saved_hists = [] # vel-mass histograms saved to the outfile
 
 
         ############ HELPER FUNCTION ############################################
@@ -257,7 +257,7 @@ class hiptl_nH(hiptl):
             # only need to do it for the first model, otherwise will just be a repeat.
             if gprop.props['nH_bin'] not in saved_hists:
                 self.vel_mass_hist(vel[mask, :], mass[mask], gprop.props['nH_bin'], outfile)
-                saved_hists.append(gprop.props['nH_bin'])
+                self.saved_hists.append(gprop.props['nH_bin'])
 
             return
         #############################################################################
@@ -294,6 +294,18 @@ class hiptl_nH(hiptl):
     def _getnHBins():
         dendec = np.logspace(-4, 2, num=4)
         return dendec
+
+    def getnHBinStrings(self):
+        nH_bins = self._getnHBins()
+        edges = np.zeros(len(nH_bins)+2)
+        edges[1:-1] = nH_bins[:]
+        edges[0] = 0
+        edges[-1] = np.inf
+        nH_str = {}
+        for i in range(len(edges)-1):
+            b = [edges[i], edges[i+1]]
+            nH_str[i] = b
+        return nH_str
 
 
 class h2ptl(hiptl):
