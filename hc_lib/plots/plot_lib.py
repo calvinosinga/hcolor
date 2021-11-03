@@ -17,6 +17,15 @@ def getPaths(directory):
                 paths.append(filepath)
     return paths
 
+def checkPkls(paths, chdict):
+    pkls = []
+    for p in paths:
+        f = pkl.load(open(p, 'rb'))
+        for k,v in chdict.items():
+            if f.__dict__[k] == v:
+                pkls.append(f)
+    return pkls
+
 def fetchKeys(substrings, keylist):
     res = []
     for sub in substrings:

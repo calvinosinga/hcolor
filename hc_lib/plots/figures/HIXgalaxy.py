@@ -227,7 +227,6 @@ def HI_galaxy_Xpk_color(hiptls, hisubs, vns, in_rss = False, panel_length = 3, p
             if pkmin < yrange[0] and pkmin > 0:
                 yrange[0] = pkmin
     del fields
-    print(yrange)
     # get info from the fields to prepare plot
     box = hiptls[0].box
     snapshots = []
