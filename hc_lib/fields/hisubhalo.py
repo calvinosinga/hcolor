@@ -25,19 +25,32 @@ class hisubhalo_grid_props(grid_props):
         sp = self.props
         if sp['resdef'] == 'papa':
             mas = ['CIC']
-            return test(mas)
+            return test(mas) and sp['field'] == 'hisubhalo'
 
         return True
     
     def isCompatible(self, other):
         sp = self.props
         op = other.props
-
-        if sp['resdef'] == 'papa':
-            papa_fields = ['galaxy', 'galaxy_dust']
-            return sp['resdef'] == op['resdef'] and op['field'] in papa_fields
+        # hisubhaloXgalaxy
+        if 'galaxy' in op['field']:
+            # if both have papa resolution definition, include only hisubhalo
+            if op['resdef'] == 'papa':
+                return sp['resdef'] == 'papa' and sp['field'] =='hisubhalo'
+            
+            # if diemer resdef, include certain color definitions and resolved definition
+            elif op['resdef'] == 'diemer':
+                cdefs = ['0.55','0.6','0.65', 'nelson']
+                is_resolved = op['base'] == 'resolved'
+                return op['coldef'] in cdefs or is_resolved
+            
+            # if all mass, also include
+            elif op['base'] == 'all':
+                return True
+            
+            return False
         
-        return super().isCompatible(other)
+        return True
     
 class hisubhalo(Field):
 

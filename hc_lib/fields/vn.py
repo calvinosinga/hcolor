@@ -12,19 +12,40 @@ import scipy.constants as sc
 class vn_grid_props(grid_props):
     def __init__(self, base, mas, field, mass_or_temp):
         other = {}
-        other['mass'] = mass_or_temp
+        other['map'] = mass_or_temp
 
         super().__init__(base, mas, field, other)
     
     def isCompatible(self, other):
         sp = self.props
         op = other.props
-        if sp['mass'] == 'temp':
-            if 'galaxy' in op['field']:
+
+        # vnXgalaxy 
+        if 'galaxy' in op['field']:
+            # for comparisons to Anderson and Wolz -> stmass/resdef is eBOSS, wiggleZ, 2df
+            if 'temp' == sp['map']:
                 res = ['eBOSS', 'wiggleZ', '2df']
-                return op['resdef'] in res
-            else:
+                return op['resdef'] in res and op['mass'] == 'stmass'
+            
+            # if a mass map, it is either diemer or papa
+            elif op['resdef'] == 'diemer':
+                # the important color definitions
+                cols = ['0.6', '0.55', '0.65', 'nelson']
+
+                # also include resolved
+                is_resolved = op['base'] == 'resolved'
+
+                return op['coldef'] in cols or is_resolved
+            
+            # ignore all papa resdefs -> hisubhalo is more comparable
+            elif op['resdef'] == 'papa':
                 return False
+            
+            # if all = base, then include
+            elif op['base'] == 'all':
+                return True
+
+        
         else:
             return True
 

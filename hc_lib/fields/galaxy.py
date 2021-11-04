@@ -29,13 +29,22 @@ class galaxy_grid_props(grid_props):
         op = other.props
         sp = self.props
 
-        print(op['field'])
-        print(sp['field'])
+        # for galaxyXgalaxy
         if op['field'] == sp['field']:
             mas_match = op['mas'] == sp['mas']
             stmass_or_total = op['mass'] == sp['mass']
+            resdef_match = op['resdef'] == sp['resdef'] and op['resdef'] == 'diemer'
+            coldef_match = op['coldef'] == sp['coldef'] and sp['coldef'] == '0.6'
+            
+            return mas_match and stmass_or_total and resdef_match and coldef_match
+        
+        # hiptlXgalaxy handled by hiptl
+        
+        # hisubhaloXgalaxy handled by hisubhalo
 
-        return
+        # vnXgalaxy handled by vn
+
+        return True
     # def isCompatible(self, other):
     #     # def testProps(tests):
     #     #     results = np.zeros(len(tests))
@@ -107,14 +116,16 @@ class galaxy_grid_props(grid_props):
         elif self.props['resdef'] == '2df':
             return False # not implemented
 
+        # everything that isn't a color definition associated with an observation is fine
         elif self.props['resdef'] == 'diemer':
-            cds = galaxy.getColorDefinitions()
-            cds.remove('papa')
-            cds.remove('eBOSS')
-            ms = ['stmass','mass']
-            schts = ['CIC', 'CICW']
-            return test(cds, ms, schts)
+            return not (self.props['coldef'] == 'papa' or self.props['coldef'] == 'eBOSS')
 
+        # if this is gridprop obj for resolved, then
+        elif self.color == 'resolved':
+            return True
+        
+        elif self.color == 'all':
+            return True
         return False
 
 
