@@ -43,11 +43,13 @@ class hisubhalo(Field):
 
     def __init__(self, simname, snapshot, axis, resolution, pkl_path, verbose,
                 shcatpath, hih2filepath, fieldname = 'hisubhalo'):
-        super().__init__(simname, snapshot, axis, resolution, pkl_path, verbose)
+        
         self.fieldname = fieldname
  
         self.hih2filepath = hih2filepath
         self.loadpath = shcatpath
+        
+        super().__init__(simname, snapshot, axis, resolution, pkl_path, verbose)
         if self.v:
             print('\nhisubhalo object created, object dictionary:')
             print(self.__dict__)

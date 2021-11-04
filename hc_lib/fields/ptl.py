@@ -17,7 +17,7 @@ class ptl(Field):
 
     def __init__(self, simname, snapshot, axis, resolution, chunk, pkl_path, 
             verbose, snappath):
-        super().__init__(simname, snapshot, axis, resolution, pkl_path, verbose)
+        
         self.fieldname = 'ptl'
         self.chunk = chunk
         
@@ -25,6 +25,7 @@ class ptl(Field):
         
         self.isHI = False
         
+        super().__init__(simname, snapshot, axis, resolution, pkl_path, verbose)
         if self.v:
             print("finished constructor for %s, chunknum = %d"%(self.fieldname,chunk))
         return

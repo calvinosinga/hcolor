@@ -90,7 +90,6 @@ class Field():
 
 
         # other variables expected to be assigned values in subclasses
-        self.fieldname = ''
         self.gridprops = self.getGridProps()
         self.isHI = True
         return

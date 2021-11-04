@@ -35,13 +35,13 @@ class vn(Field):
 
     def __init__(self, simname, snapshot, axis, resolution, chunk, pkl_path, 
             verbose, snappath, treecoolpath):
-        super().__init__(simname, snapshot, axis, resolution, pkl_path, verbose)
+        
         self.fieldname = 'vn'
         self.chunk = chunk
         self.TREECOOL = treecoolpath
         
         self.loadpath = snappath%(chunk)
-        
+        super().__init__(simname, snapshot, axis, resolution, pkl_path, verbose)
         if self.v:
             print("finished constructor for %s, chunknum = %d"%(self.fieldname,chunk))
         return

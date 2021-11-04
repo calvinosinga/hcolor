@@ -25,7 +25,17 @@ class galaxy_grid_props(grid_props):
 
         return
     
-    
+    def isCompatible(self, other):
+        op = other.props
+        sp = self.props
+
+        print(op['field'])
+        print(sp['field'])
+        if op['field'] == sp['field']:
+            mas_match = op['mas'] == sp['mas']
+            stmass_or_total = op['mass'] == sp['mass']
+
+        return
     # def isCompatible(self, other):
     #     # def testProps(tests):
     #     #     results = np.zeros(len(tests))
@@ -116,7 +126,6 @@ class galaxy(Field):
     def __init__(self, simname, snapshot, axis, resolution, 
             pkl_path, verbose, catshpath, fieldname='galaxy'):
         
-        super().__init__(simname, snapshot, axis, resolution, pkl_path, verbose)
 
         self.fieldname = fieldname
         # we use blue/red/all for every color definition
@@ -131,6 +140,7 @@ class galaxy(Field):
         self.grsm_hists = {}
         self.gir_hists = {}
 
+        super().__init__(simname, snapshot, axis, resolution, pkl_path, verbose)
         return
     
     def getGridProps(self):
@@ -406,6 +416,7 @@ class galaxy(Field):
     def saveData(self, outfile, grid, gp):
         dat = super().saveData(outfile, grid, gp)
         dat.attrs['used_dust'] = False
+        print("called galaxy's saveData(..)")
         return dat
 
     
@@ -450,8 +461,10 @@ class galaxy_dust(galaxy):
 
     def saveData(self, outfile, grid, gp):
         dat = super().saveData(outfile, grid, gp)
-        dct = dat.attrs
-        dct['used_dust'] = True
+        print('galaxy_dust\'s saveData finished calling galaxy')
+        print(type(dat))
+        # dct = dat.attrs
+        # dct['used_dust'] = True
         return dat
     
 

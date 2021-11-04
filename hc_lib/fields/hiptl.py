@@ -39,12 +39,14 @@ class hiptl(Field):
 
     def __init__(self, simname, snapshot, axis, resolution, chunk, pkl_path, 
                 verbose, snappath, hih2filepath, fieldname = 'hiptl'):
-        super().__init__(simname, snapshot, axis, resolution, pkl_path, verbose)
+        
         self.chunk = chunk
 
         self.fieldname = fieldname
         self.hih2filepath = hih2filepath%self.chunk
         self.loadpath = snappath%self.chunk
+
+        super().__init__(simname, snapshot, axis, resolution, pkl_path, verbose)
         return
     
     def getGridProps(self):
