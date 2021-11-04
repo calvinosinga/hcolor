@@ -362,8 +362,8 @@ class galaxy(Field):
             if gp['mass'] == 'stmass':
                 grid = computeGal(pos[mask, :], mass[mask, 4], g, in_rss)
             else:
-                mass = np.sum(mass, axis = 1)
-                grid = computeGal(pos[mask, :], mass[mask], g, in_rss)
+                total_mass = np.sum(mass, axis = 1)
+                grid = computeGal(pos[mask, :], total_mass[mask], g, in_rss)
 
             if gp['resdef'] not in self.gir_hists.keys() and gp['resdef'] == 'papa':
                 gir = self.make_gi_r(photo['gi'][resolved_mask], photo['r'][resolved_mask])

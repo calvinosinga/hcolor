@@ -93,7 +93,7 @@ class vn(Field):
             if self.v:
                 grid.print()
             # place particles into grid
-            if gprop.props['mass'] == 'temp':
+            if gprop.props['map'] == 'temp':
                 T_HI = self.temperatureMap(mass / volume)
                 grid.CICW(pos, self.header['BoxSize'], T_HI)
             
