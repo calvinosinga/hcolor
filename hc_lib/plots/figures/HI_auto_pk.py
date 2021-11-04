@@ -17,7 +17,12 @@ def main():
     OUTDIR = sys.argv[0]
     paths = plib.getPaths(OUTDIR)
     
-    vn = []
+    h2ptls = plib.checkPkls(paths, {'fieldname':'h2ptl'})
+    hiptls = plib.checkPkls(paths, {'fieldname':'hiptl'})
+    vns = plib.checkPkls(paths, {'fieldname':'vn'})
+
+    make_ptl_slices(hiptls, h2ptls, vns)
+
     hiptl = []
     hisub = []
     
@@ -43,6 +48,10 @@ def main():
     plt.clf()
     return
 
+def make_slices(hiptls, h2ptls, vns):
+    
+    for i in hiptls:
+            
 
 def HI_auto_pk(hiptls, hisubs, vns, in_rss = False, panel_length = 3, 
             panel_bt = 0.1, text_space=0.9, border = 0.5, fsize=16):
