@@ -466,6 +466,6 @@ class Cross():
                 return
         
         add(self.xpks, '_xpk')
-        add(self.xxi, '_xxi')
+        add(self.xxis, '_xxi')
         add(self.tdxpks, '_2Dxpk')
         return
