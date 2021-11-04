@@ -406,7 +406,7 @@ class galaxy(Field):
     def saveData(self, outfile, grid, gp):
         dat = super().saveData(outfile, grid, gp)
         dat.attrs['used_dust'] = False
-        return
+        return dat
 
     
     
