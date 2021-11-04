@@ -14,9 +14,9 @@ def main():
     # remove the script name
     sys.argv.pop(0)
 
-    # the infiles are given through the command-line
-    INFILE = sys.argv[0]
-    f = open(INFILE, 'r')
+    OUTDIR = sys.argv[0]
+    paths = plib.getPaths(OUTDIR)
+    
     vn = []
     hiptl = []
     hisub = []

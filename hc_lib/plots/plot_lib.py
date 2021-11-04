@@ -219,3 +219,44 @@ def fillpks(k, pks, boxsize, resolution, keylist = None, label = '',
     if not nyq:
         plt.xlim(np.min(k), fq)
     return
+
+def plot_slices(field, key_array, row_labels, col_labels, bar_text,
+        panel_length, panel_bt, border):
+    
+
+    dim = key_array.shape
+    fig, panels = createFig(panel_length, dim[0], dim[1], panel_bt, border, border)
+    nlim = [np.inf, 0]
+    for i in range(dim[0]):
+        for j in range(dim[1]):
+            nmin = np.min(field.slices[key_array[i][j]])
+            nmax = np.max(field.slices[key_array[i][j]])
+            if nlim[0] > nmin:
+                nlim[0] = nmin
+            if nlim[1] < nmax:
+                nlim[1] = nmax
+    
+    for i in range(dim[0]):
+        for j in range(dim[1]):
+            plt.sca(panels[i][j])
+            key = key_array[i][j]
+            plt.imshow(field.slices[key][:], extent=(0, field.box, 0, field.box),
+                    origin='lower', norm=mpl.colors.LogNorm(vmin=nlim[0], vmax=nlim[1]))
+            cbar = plt.colorbar()
+            cbar.set_ylabel(bar_text, rotation=270)
+            # on the first row
+            if i == 0:
+                ax = plt.gca()
+                ax.xaxis.set_label_position('top')
+                plt.xlabel(col_labels[j])
+            if j == dim[1]-1:
+                ax = plt.gca()
+                ax.yaxis.set_label_position('right')
+                plt.ylabel(row_labels[i])
+    figsize = fig.get_size_inches()
+    fig.text(0.5, border/2/figsize[1], 'x (Mpc)', ha='center',
+            va='center', fontsize = 16)
+    fig.text(border/2/figsize[0], 0.5, 'y (Mpc)', ha='center',
+            va='center', fontsize = 16, rotation='vertical')
+    return
+      
