@@ -16,16 +16,16 @@ def main():
 
     OUTDIR = sys.argv[0]
     paths = plib.getPaths(OUTDIR)
-    
+       
     h2ptls = plib.checkPkls(paths, {'fieldname':'h2ptl'})
     hiptls = plib.checkPkls(paths, {'fieldname':'hiptl'})
     vns = plib.checkPkls(paths, {'fieldname':'vn'})
-
+    
     make_ptl_slices(hiptls, h2ptls, vns)
 
     hisubs = plib.checkPkls(paths, {'fieldname':'hisubhalo'})
 
-    compare_HI_slices(hiptls, vns, hisubs)
+    #compare_HI_slices(hiptls, vns, hisubs)
     
     # def name_test(fn, test):
     #     return test == fn
@@ -56,7 +56,7 @@ def make_ptl_slices(hiptls, h2ptls, vns, panel_length = 3,
         models = h.getMolFracModelsPtl()
         spaces = ['real-space', 'redshift-space']
 
-        key_array = np.empty((len(models), len(spaces)), dtype=str)
+        key_array = np.empty((len(models), len(spaces)), dtype=object)
 
         for k in list(h.slices.keys()):
             if k[-2:] == 'rs':
@@ -68,13 +68,13 @@ def make_ptl_slices(hiptls, h2ptls, vns, panel_length = 3,
             for m in range(len(models)):
                 if models[m] in k:
                     row_idx = m
-                
-            key_array[row_idx][col_idx] = k
+            if 'mass' in k:
+                key_array[row_idx][col_idx] = k
         
         plib.plot_slices(h, key_array, models, spaces, 
                 'HI mass', panel_length, panel_bt, border)
         
-        plt.savefig("hiptl_slice_models_vs_space_%03d"%h.header['Redshift'])
+        plt.savefig("hiptl_slice_models_vs_space_%03d"%h.snapshot)
         plt.clf()
     
     for i in range(len(h2ptls)):
@@ -82,7 +82,7 @@ def make_ptl_slices(hiptls, h2ptls, vns, panel_length = 3,
         models = h.getMolFracModelsPtl()
         spaces = ['real-space', 'redshift-space']
 
-        key_array = np.empty((len(models), len(spaces)), dtype=str)
+        key_array = np.empty((len(models), len(spaces)), dtype=object)
 
         for k in list(h.slices.keys()):
             if k[-2:] == 'rs':
@@ -93,12 +93,12 @@ def make_ptl_slices(hiptls, h2ptls, vns, panel_length = 3,
             row_idx = -1
             for m in range(len(models)):
                 if models[m] in k:
-                    row_idx = m
-                
+                    row_idx = m    
             key_array[row_idx][col_idx] = k
         
         plib.plot_slices(h, key_array, models, spaces, 
                 'HI mass', panel_length, panel_bt, border)
+                
         
         plt.savefig("h2ptl_slice_models_vs_space_%03d"%h.header['Redshift'])
         plt.clf()
@@ -109,11 +109,11 @@ def make_ptl_slices(hiptls, h2ptls, vns, panel_length = 3,
         models = ['VN18-Particle']
         spaces = ['real-space', 'redshift-space']
 
-        key_array = np.empty((len(models), len(spaces)), dtype=str)
+        key_array = np.empty((len(models), len(spaces)), dtype=object)
 
-        key_array[0, 0] = 'vn'
-        key_array[0, 1] = 'vnrs'
-        
+        key_array[0, 0] = 'vn_CICW_mass'
+        key_array[0, 1] = 'vn_CICW_massrs'
+        #print(list(v.slices.keys()))
         plib.plot_slices(v, key_array, models, spaces, 
                 'HI mass', panel_length, panel_bt, border)
         
@@ -135,7 +135,7 @@ def compare_HI_slices(hiptls, vns, hisubs, panel_length = 3,
     
     # make real-space comparison, redshift-space is not needed
     idx_array = np.empty((len(snaps), 3), dtype=object)
-    key_array = np.empty_like(idx_array, dtype=str)
+    key_array = np.empty_like(idx_array)
     for s in range(len(snaps)):
         hiptl_idx = get_snap_idx(hiptls, snaps[s])
         vn_idx = get_snap_idx(vns, snaps[s])

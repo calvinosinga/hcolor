@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.gridspec as gspec
 import copy
-
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 mpl.rcParams['text.usetex'] = True
 
 def getPaths(directory):
@@ -13,7 +13,7 @@ def getPaths(directory):
     for (root, dirs, files) in os.walk(directory):
         for fl in files:
             filepath = os.path.join(root, fl)
-            if ".pkl" in filepath and not "gd.pkl" in filepath:
+            if ".pkl" in filepath and not "gd.pkl" in filepath and not ".hdf5" in filepath:
                 paths.append(filepath)
     return paths
 
@@ -227,9 +227,10 @@ def fillpks(k, pks, boxsize, resolution, keylist = None, label = '',
 def plot_slices(field, key_array, row_labels, col_labels, bar_text,
         panel_length, panel_bt, border):
     
-
+    cmap = copy.copy(mpl.cm.get_cmap("plasma"))
     dim = key_array.shape
-    fig, panels = createFig(panel_length, dim[0], dim[1], panel_bt, border, border)
+    xborder = [border*1.5, border]
+    fig, panels = createFig(panel_length, dim[0], dim[1], panel_bt, xborder, border)
     nlim = [np.inf, 0]
     for i in range(dim[0]):
         for j in range(dim[1]):
@@ -239,24 +240,32 @@ def plot_slices(field, key_array, row_labels, col_labels, bar_text,
                 nlim[0] = nmin
             if nlim[1] < nmax:
                 nlim[1] = nmax
-    
+    nlim[0] = max(nlim[0], 2)
     for i in range(dim[0]):
         for j in range(dim[1]):
             plt.sca(panels[i][j])
             key = key_array[i][j]
-            plt.imshow(field.slices[key][:], extent=(0, field.box, 0, field.box),
-                    origin='lower', norm=mpl.colors.LogNorm(vmin=nlim[0], vmax=nlim[1]))
-            cbar = plt.colorbar()
-            cbar.set_ylabel(bar_text, rotation=270)
+            #if nlim[0] <= 0:
+            #    nlim[0] = 1e-6
+            im = plt.imshow(field.slices[key][:], extent=(0, field.box, 0, field.box),
+                    origin='lower', cmap=cmap, vmin=nlim[0], vmax=nlim[1]) #norm=mpl.colors.LogNorm(vmin=nlim[0], vmax=nlim[1]))
             # on the first row
+            ax = plt.gca()
+            ax.tick_params(which="both", direction='in')
+            #divider = make_axes_locatable(ax)
+            #cax = divider.append_axes("right",size="5%",pad=0.05)
+            cbar = plt.colorbar(im,fraction=0.046, pad=0.04)
+            #cbar.set_label(bar_text, rotation=270)
             if i == 0:
-                ax = plt.gca()
                 ax.xaxis.set_label_position('top')
                 plt.xlabel(col_labels[j])
-            if j == dim[1]-1:
-                ax = plt.gca()
-                ax.yaxis.set_label_position('right')
+            if not i == dim[0]-1:
+                ax.xaxis.set_ticklabels([])
+            if j == 0:
+                #ax.yaxis.set_label_position('right')
                 plt.ylabel(row_labels[i])
+            else:
+                ax.yaxis.set_ticklabels([])
     figsize = fig.get_size_inches()
     fig.text(0.5, border/2/figsize[1], 'x (Mpc)', ha='center',
             va='center', fontsize = 16)
