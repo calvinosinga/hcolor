@@ -24,7 +24,7 @@ def main():
 
     hisubs = plib.checkPkls(paths, {'fieldname':'hisubhalo'})
 
-    compare_HI_slices(hiptls, vns, hisubs)
+    #compare_HI_slices(hiptls, vns, hisubs)
     return
 
 
@@ -107,6 +107,7 @@ def make_ptl_slices(hiptls, h2ptls, vns, ptls, panel_length = 3,
 
         key_array = np.empty((len(ptl_types), len(spaces)), dtype=object)
 
+
         for i in range(len(ptl_types)):
             for j in range(len(spaces)):
                 if j == 1:
@@ -115,7 +116,7 @@ def make_ptl_slices(hiptls, h2ptls, vns, ptls, panel_length = 3,
                     spc = ''
                 key_array[i,j] = ptl_types[i]+spc
         
-        plib.plot_slices(p, key_array, ptl_types, spaces, 
+        plib.plot_slices(p, key_array, ['all', 'stellar', 'dark matter'], spaces, 
                 'mass', panel_length, panel_bt, border)
         
         plt.savefig("ptl_slice_ptltype_vs_space_%03d"%p.snapshot)
