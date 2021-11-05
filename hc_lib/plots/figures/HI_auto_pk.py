@@ -23,35 +23,160 @@ def main():
 
     make_ptl_slices(hiptls, h2ptls, vns)
 
-    hiptl = []
-    hisub = []
-    
-    def name_test(fn, test):
-        return test == fn
-    
-    for p in list(f):
-        p = p.replace('\n', '')
-        f = pkl.load(open(p, 'rb'))
-        if name_test("vn", f.fieldname):
-            vn.append(f)
-        elif name_test("hiptl", f.fieldname):
-            hiptl.append(f)
-        elif name_test("hisubhalo", f.fieldname):
-            hisub.append(f)
-    path = '/lustre/cosinga/hcolor/figures/'
-    HI_auto_pk(hiptl, hisub, vn)
-    plt.savefig(path+"HI_auto_real.png")
-    plt.clf()
+    hisubs = plib.checkPkls(paths, {'fieldname':'hisubhalo'})
 
-    HI_auto_pk(hiptl, hisub, vn, in_rss=True)
-    plt.savefig(path+"HI_auto_redshift.png")
-    plt.clf()
+    compare_HI_slices(hiptls, vns, hisubs)
+    
+    # def name_test(fn, test):
+    #     return test == fn
+    
+    # for p in list(f):
+    #     p = p.replace('\n', '')
+    #     f = pkl.load(open(p, 'rb'))
+    #     if name_test("vn", f.fieldname):
+    #         vn.append(f)
+    #     elif name_test("hiptl", f.fieldname):
+    #         hiptl.append(f)
+    #     elif name_test("hisubhalo", f.fieldname):
+    #         hisub.append(f)
+    # path = '/lustre/cosinga/hcolor/figures/'
+    # HI_auto_pk(hiptl, hisub, vn)
+    # plt.savefig(path+"HI_auto_real.png")
+    # plt.clf()
+
+    # HI_auto_pk(hiptl, hisub, vn, in_rss=True)
+    # plt.savefig(path+"HI_auto_redshift.png")
+    # plt.clf()
     return
 
-def make_slices(hiptls, h2ptls, vns):
-    
-    for i in hiptls:
+def make_ptl_slices(hiptls, h2ptls, vns, panel_length = 3,
+            panel_bt = 0.1, border = 0.5):
+    for i in range(len(hiptls)):
+        h = hiptls[i]
+        models = h.getMolFracModelsPtl()
+        spaces = ['real-space', 'redshift-space']
+
+        key_array = np.empty((len(models), len(spaces)), dtype=str)
+
+        for k in list(h.slices.keys()):
+            if k[-2:] == 'rs':
+                col_idx = 1
+            else:
+                col_idx = 0
             
+            row_idx = -1
+            for m in range(len(models)):
+                if models[m] in k:
+                    row_idx = m
+                
+            key_array[row_idx][col_idx] = k
+        
+        plib.plot_slices(h, key_array, models, spaces, 
+                'HI mass', panel_length, panel_bt, border)
+        
+        plt.savefig("hiptl_slice_models_vs_space_%03d"%h.header['Redshift'])
+        plt.clf()
+    
+    for i in range(len(h2ptls)):
+        h = h2ptls[i]
+        models = h.getMolFracModelsPtl()
+        spaces = ['real-space', 'redshift-space']
+
+        key_array = np.empty((len(models), len(spaces)), dtype=str)
+
+        for k in list(h.slices.keys()):
+            if k[-2:] == 'rs':
+                col_idx = 1
+            else:
+                col_idx = 0
+            
+            row_idx = -1
+            for m in range(len(models)):
+                if models[m] in k:
+                    row_idx = m
+                
+            key_array[row_idx][col_idx] = k
+        
+        plib.plot_slices(h, key_array, models, spaces, 
+                'HI mass', panel_length, panel_bt, border)
+        
+        plt.savefig("h2ptl_slice_models_vs_space_%03d"%h.header['Redshift'])
+        plt.clf()
+    
+
+    for i in range(len(vns)):
+        v = vns[i]
+        models = ['VN18-Particle']
+        spaces = ['real-space', 'redshift-space']
+
+        key_array = np.empty((len(models), len(spaces)), dtype=str)
+
+        key_array[0, 0] = 'vn'
+        key_array[0, 1] = 'vnrs'
+        
+        plib.plot_slices(v, key_array, models, spaces, 
+                'HI mass', panel_length, panel_bt, border)
+        
+        plt.savefig("vn_slice_models_vs_space_%03d"%v.header["Redshift"])
+        plt.clf()
+    
+    return
+
+def compare_HI_slices(hiptls, vns, hisubs, panel_length = 3,
+            panel_bt = 0.1, border = 0.5):
+    
+    snaps, redshifts = plib.getSnaps(hiptls+vns+hisubs)
+    
+    def get_snap_idx(flist, snap):
+        for f in range(len(flist)):
+            if flist[f].snap == snap:
+                return f
+        return -1
+    
+    # make real-space comparison, redshift-space is not needed
+    idx_array = np.empty((len(snaps), 3), dtype=object)
+    key_array = np.empty_like(idx_array, dtype=str)
+    for s in range(len(snaps)):
+        hiptl_idx = get_snap_idx(hiptls, snaps[s])
+        vn_idx = get_snap_idx(vns, snaps[s])
+        hisub_idx = get_snap_idx(hisubs, snaps[s])
+
+        field_indices = [hiptl_idx, vn_idx, hisub_idx]
+        modelptl = hiptls[0].getMolFracModelsPtl()[0]
+        modelsub = hisubs[0].getMolFracModelsGal()[0]
+        keys = [modelptl, 'vn', modelsub]
+        for n in range(len(field_indices)):
+            idx_array[s, n] = (n, field_indices[n])
+            key_array[s, n] = keys[n]
+    row_labels = ["z=%03d"%z for z in redshifts]
+    plib.compare_slices([hiptls, vns, hisubs], idx_array, key_array,
+            row_labels, ["D18-Particle", "VN18-Particle", "D18-Subhalo"],
+            "HI mass", panel_length, panel_bt, border)
+    
+    plt.savefig("HI_comparison_slices_redshift_vs_field.png")
+    plt.clf()
+    return
+            
+def compare_neutral_hydrogen_slices(hiptls, h2ptls, panel_length=3, 
+        panel_bt = 0.1, border=0.5):
+
+        def get_snap_idx(flist, snap):
+            for f in range(len(flist)):
+                if flist[f].snap == snap:
+                    return f
+            return -1
+        
+
+        snaps,_ = plib.getSnaps(hiptls+h2ptls)
+
+        for s in range(len(snaps)):
+            idx_array = np.empty((len(snaps), 2), dtype=object)
+            key_array = np.empty_like(idx_array, dtype=str)
+            
+            
+            
+            
+
 
 def HI_auto_pk(hiptls, hisubs, vns, in_rss = False, panel_length = 3, 
             panel_bt = 0.1, text_space=0.9, border = 0.5, fsize=16):
@@ -100,7 +225,7 @@ def HI_auto_pk(hiptls, hisubs, vns, in_rss = False, panel_length = 3,
 
     key_dict = {'hiptl':hiptlkeys, 'hisubhalo':hisubkeys, 'vn':vnkeys}
     yrange = plib.getYrange(fields, key_dict)
-    snapshots = plib.getSnaps(fields)
+    snapshots, _ = plib.getSnaps(fields)
 
     fig, panels = plib.createFig(panel_length, 1, len(snapshots), panel_bt,
             border, border)

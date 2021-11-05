@@ -76,11 +76,15 @@ def getYrange(fields, keys_dict, is_X):
 
 def getSnaps(fields):
     snapshots = []
+    redshifts = []
     for f in fields:
         if not f.snapshot in snapshots:
             snapshots.append(f.snapshot)
+            redshifts.append(f.header["Redshift"])
     snapshots.sort()
-    return snapshots
+    redshifts.sort()
+    redshifts = redshifts[::-1]
+    return snapshots, redshifts
 
 def createFig(panel_length, nrows, ncols, panel_bt, xborder, yborder):
     # border input can be either a list or single number
@@ -258,5 +262,47 @@ def plot_slices(field, key_array, row_labels, col_labels, bar_text,
             va='center', fontsize = 16)
     fig.text(border/2/figsize[0], 0.5, 'y (Mpc)', ha='center',
             va='center', fontsize = 16, rotation='vertical')
-    return
-      
+    return fig, panels
+
+def compare_slices(fields, idx_array, key_array, row_labels, col_labels, bar_text,
+        panel_length, panel_bt, border):
+    
+
+    dim = key_array.shape
+    fig, panels = createFig(panel_length, dim[0], dim[1], panel_bt, border, border)
+    nlim = [np.inf, 0]
+    for i in range(dim[0]):
+        for j in range(dim[1]):
+            idx = idx_array[i][j]
+            nmin = np.min(fields[idx[0]][idx[1]].slices[key_array[i][j]])
+            nmax = np.max(fields[idx[0]][idx[1]].slices[key_array[i][j]])
+            if nlim[0] > nmin:
+                nlim[0] = nmin
+            if nlim[1] < nmax:
+                nlim[1] = nmax
+    
+    for i in range(dim[0]):
+        for j in range(dim[1]):
+            plt.sca(panels[i][j])
+            key = key_array[i][j]
+            field = fields[idx_array[i][j][0]][idx_array[i][j][1]]
+
+            plt.imshow(field.slices[key][:], extent=(0, field.box, 0, field.box),
+                    origin='lower', norm=mpl.colors.LogNorm(vmin=nlim[0], vmax=nlim[1]))
+            cbar = plt.colorbar()
+            cbar.set_ylabel(bar_text, rotation=270)
+            # on the first row
+            if i == 0:
+                ax = plt.gca()
+                ax.xaxis.set_label_position('top')
+                plt.xlabel(col_labels[j])
+            if j == dim[1]-1:
+                ax = plt.gca()
+                ax.yaxis.set_label_position('right')
+                plt.ylabel(row_labels[i])
+    figsize = fig.get_size_inches()
+    fig.text(0.5, border/2/figsize[1], 'x (Mpc)', ha='center',
+            va='center', fontsize = 16)
+    fig.text(border/2/figsize[0], 0.5, 'y (Mpc)', ha='center',
+            va='center', fontsize = 16, rotation='vertical')
+    return fig, panels
