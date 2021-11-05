@@ -3,4 +3,5 @@ output/*
 *.dat
 *.pyc
 *__pycache__*
-figures/*
+figures/*.py
+figures/*.bash
