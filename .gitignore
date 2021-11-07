@@ -4,4 +4,5 @@ output/*
 *.pyc
 *__pycache__*
 figures/*.py
-figures/*.bash
+figures/*.ipynb
+*.ipynb_ch*

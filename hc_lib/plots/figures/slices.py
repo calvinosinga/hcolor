@@ -11,20 +11,24 @@ mpl.rcParams['text.usetex'] = True
 def main():
     # remove the script name
     sys.argv.pop(0)
-
+    print("loading paths to pickle files...")
     OUTDIR = sys.argv[0]
     paths = plib.getPaths(OUTDIR)
-       
+
+    print("loading pickle files...")
     h2ptls = plib.checkPkls(paths, {'fieldname':'h2ptl'})
     hiptls = plib.checkPkls(paths, {'fieldname':'hiptl'})
     vns = plib.checkPkls(paths, {'fieldname':'vn'})
     ptls = plib.checkPkls(paths, {'fieldname':'ptl'})
-    
-    make_ptl_slices(hiptls, h2ptls, vns, ptls)
-
-    compare_ptl_slices(hiptls, h2ptls, vns, ptls)
     hisubs = plib.checkPkls(paths, {'fieldname':'hisubhalo'})
 
+    print("now plotting the slices for particle catalog fields...")
+    make_ptl_slices(hiptls, h2ptls, vns, ptls)
+    
+    print("now plotting slices to compare particle catalog fields...")
+    compare_ptl_slices(hiptls, h2ptls, vns, ptls)
+
+    print("now comparing HI slices...")
     compare_HI_slices(hiptls, vns, hisubs)
     return
 
@@ -129,14 +133,14 @@ def compare_ptl_slices(hiptls, h2ptls, vns, ptls, panel_length=3,
 
         def get_snap_idx(flist, snap):
             for f in range(len(flist)):
-                if flist[f].snap == snap:
+                if flist[f].snapshot == snap:
                     return f
             return -1
         
         
         snaps, redshifts = plib.getSnaps(hiptls+h2ptls+vns+ptls)
         fields = [hiptls, h2ptls, vns, ptls]
-        row_labels = ["z=%03d"%z for z in redshifts]
+        row_labels = ["z=%0.02f"%z for z in redshifts]
         for s in range(len(snaps)):
             idx_array = np.empty((len(snaps), 4), dtype=object)
             key_array = np.empty_like(idx_array)
@@ -145,18 +149,18 @@ def compare_ptl_slices(hiptls, h2ptls, vns, ptls, panel_length=3,
             vnidx = get_snap_idx(vns, s)
             ptlidx = get_snap_idx(ptls, s)
             indices = np.array([hiidx, h2idx, vnidx, ptlidx])
-            keys = ['GD14_CICW_mass', 'GD14_CICW_mass', 
+            keys = ['GD14_CICW_mass', 'GD14_CICW', 
                     'vn_CICW_mass','ptl_CICW']
 
             for i in range(len(indices)):
                 idx_array[s, i] = (i, indices[i])
-                key_array[s, i] = (i, keys[i])
+                key_array[s, i] = keys[i]
         
         col_labels = ['D18-Particle HI (GD14)', 'D18-Particle H$_2$ (GD14)', 'VN18-Particle',
                 'Particle']
-        
+        cmap_cycle = ['winter', 'bone', 'plasma', 'jet']
         plib.compare_slices(fields, idx_array, key_array, row_labels, col_labels,
-                "mass", panel_length, panel_bt, border)
+                "mass", panel_length, panel_bt, border, False, cmap_cycle)
         plt.savefig("ptl_slices_comparison_redshift_vs_field.png")
         plt.clf()
         return
@@ -169,7 +173,7 @@ def compare_HI_slices(hiptls, vns, hisubs, panel_length = 3,
     
     def get_snap_idx(flist, snap):
         for f in range(len(flist)):
-            if flist[f].snap == snap:
+            if flist[f].snapshot == snap:
                 return f
         return -1
     
@@ -183,12 +187,11 @@ def compare_HI_slices(hiptls, vns, hisubs, panel_length = 3,
 
         field_indices = [hiptl_idx, vn_idx, hisub_idx]
 
-        keys = ['GD14_CICW_mass', 'GD14_CICW_mass', 
-                'vn_CICW_mass','ptl_CICW']
+        keys = ['GD14_CICW_mass','vn_CICW_mass', 'm_hi_GD14_map_CICW_diemer']
         for n in range(len(field_indices)):
             idx_array[s, n] = (n, field_indices[n])
             key_array[s, n] = keys[n]
-    row_labels = ["z=%03d"%z for z in redshifts]
+    row_labels = ["z=%0.02f"%z for z in redshifts]
     plib.compare_slices([hiptls, vns, hisubs], idx_array, key_array,
             row_labels, ["D18-Particle", "VN18-Particle", "D18-Subhalo"],
             "HI mass", panel_length, panel_bt, border)

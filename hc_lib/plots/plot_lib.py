@@ -8,6 +8,7 @@ import copy
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 mpl.rcParams['text.usetex'] = True
 
+
 def getPaths(directory):
     paths = []
     for (root, dirs, files) in os.walk(directory):
@@ -225,9 +226,9 @@ def fillpks(k, pks, boxsize, resolution, keylist = None, label = '',
     return
 
 def plot_slices(field, key_array, row_labels, col_labels, bar_text,
-        panel_length, panel_bt, border, same_cmap = True):
+        panel_length, panel_bt, border, same_cmap = True, 
+        cmap_cycle = ["plasma"]):
     
-    cmap = copy.copy(mpl.cm.get_cmap("plasma"))
     dim = key_array.shape
     xborder = [border*1.5, border]
     fig, panels = createFig(panel_length, dim[0], dim[1], panel_bt, xborder, border)
@@ -249,9 +250,11 @@ def plot_slices(field, key_array, row_labels, col_labels, bar_text,
             key = key_array[i][j]
 
             if same_cmap:
+                cmap = copy.copy(mpl.cm.get_cmap(cmap_cycle[0]))
                 im = plt.imshow(field.slices[key][:], extent=(0, field.box, 0, field.box),
                     origin='lower', cmap=cmap, vmin=nlim[0], vmax=nlim[1])
             else:
+                cmap = copy.copy(mpl.cm.get_cmap(cmap_cycle[j%len(cmap_cycle)]))
                 im = plt.imshow(field.slices[key][:], extent=(0, field.box, 0, field.box),
                     origin='lower', cmap=cmap)
             # on the first row
@@ -277,41 +280,54 @@ def plot_slices(field, key_array, row_labels, col_labels, bar_text,
     return fig, panels
 
 def compare_slices(fields, idx_array, key_array, row_labels, col_labels, bar_text,
-        panel_length, panel_bt, border):
+        panel_length, panel_bt, border, same_cmap = True, cmap_cycle=["plasma"]):
     
-
+    
     dim = key_array.shape
-    fig, panels = createFig(panel_length, dim[0], dim[1], panel_bt, border, border)
+    xborder = [border*1.5, border]
+    fig, panels = createFig(panel_length, dim[0], dim[1], panel_bt, xborder, border)
     nlim = [np.inf, 0]
     for i in range(dim[0]):
         for j in range(dim[1]):
             idx = idx_array[i][j]
-            nmin = np.min(fields[idx[0]][idx[1]].slices[key_array[i][j]])
-            nmax = np.max(fields[idx[0]][idx[1]].slices[key_array[i][j]])
+            key = key_array[i][j]
+            f = fields[idx[0]][idx[1]]
+            nmin = np.min(f.slices[key])
+            nmax = np.max(f.slices[key])
             if nlim[0] > nmin:
                 nlim[0] = nmin
             if nlim[1] < nmax:
                 nlim[1] = nmax
-    
+    nlim[0] = max(nlim[0],2)    
     for i in range(dim[0]):
         for j in range(dim[1]):
             plt.sca(panels[i][j])
             key = key_array[i][j]
             field = fields[idx_array[i][j][0]][idx_array[i][j][1]]
+            if same_cmap:
+                cmap = copy.copy(mpl.cm.get_cmap(cmap_cycle[0]))
+                im = plt.imshow(field.slices[key][:], extent=(0, field.box, 0, field.box),
+                        origin='lower', cmap=cmap, vmin=nlim[0], vmax=nlim[1])
+            else:
+                cmap = copy.copy(mpl.cm.get_cmap(cmap_cycle[j%len(cmap_cycle)]))
+                im = plt.imshow(field.slices[key][:], extent=(0, field.box, 0, field.box),
+                        origin="lower", cmap=cmap)
 
-            plt.imshow(field.slices[key][:], extent=(0, field.box, 0, field.box),
-                    origin='lower', norm=mpl.colors.LogNorm(vmin=nlim[0], vmax=nlim[1]))
-            cbar = plt.colorbar()
-            cbar.set_ylabel(bar_text, rotation=270)
+            cbar = plt.colorbar(im, fraction=0.046, pad=0.04)
+            #cbar.set_ylabel(bar_text, rotation=270)
             # on the first row
+            ax = plt.gca()
+            ax.tick_params(which="both", direction="in")
             if i == 0:
-                ax = plt.gca()
                 ax.xaxis.set_label_position('top')
                 plt.xlabel(col_labels[j])
-            if j == dim[1]-1:
-                ax = plt.gca()
-                ax.yaxis.set_label_position('right')
+            if not i == dim[0]-1:
+                ax.xaxis.set_ticklabels([])
+            if j == 0:
                 plt.ylabel(row_labels[i])
+            else:
+                ax.yaxis.set_ticklabels([])
+
     figsize = fig.get_size_inches()
     fig.text(0.5, border/2/figsize[1], 'x (Mpc)', ha='center',
             va='center', fontsize = 16)
