@@ -45,49 +45,6 @@ class galaxy_grid_props(grid_props):
         # vnXgalaxy handled by vn
 
         return True
-    # def isCompatible(self, other):
-    #     # def testProps(tests):
-    #     #     results = np.zeros(len(tests))
-    #     #     for t in range(len(tests)):
-    #     #         results[t] = op[tests[t]] == sp[tests[t]]
-            
-    #     #     return results.all()
-        
-    #     # op = other.props
-    #     # sp = self.props
-
-
-    #     # if sp['field'] == op['field']:
-    #     #     tests = ['resdef', 'coldef', 'mas', 'mass']
-    #     #     return testProps(tests)
-        
-    #     # elif sp['resdef'] == 'papa':
-    #     #     if op['field'] == 'hisubhalo':
-    #     #         tests = ['resdef', 'mas']
-    #     #         return testProps(tests)
-        
-
-    #     # elif sp['resdef'] == 'eBOSS':
-    #     #     if op['field'] == 'hiptl' or op['field'] == 'vn':
-    #     #         return op['mass'] == 'temp'
-        
-
-    #     # elif sp['resdef'] == 'wiggleZ':
-    #     #     if op['field'] == 'hiptl' or op['field'] == 'vn':
-    #     #         return op['mass'] == 'temp'
-                
-
-    #     # elif sp['resdef'] == '2df':
-    #     #     if op['field'] == 'hiptl' or op['field'] == 'vn':
-    #     #         return op['mass'] == 'temp'
-                
-
-
-    #     # elif sp['resdef'] == 'diemer':
-    #     #     fiducial_cd = ['nelson','0.6','0.55', '0.65']
-    #     #     return sp['coldef'] in fiducial_cd
-            
-    #     return True
 
     def isIncluded(self):
 
@@ -343,9 +300,13 @@ class galaxy(Field):
 
             # create the appropriate mask for the color
             gp = g.props
-            resolved_dict = self.getResolutionDefinitions(self.simname)[gp['resdef']]
+            if not gp['resdef'] is None:
+                resolved_dict = self.getResolutionDefinitions(self.simname)[gp['resdef']]
+                resolved_mask = self.isResolved(mass[:, 4], photo, resolved_dict)
+            else: # "all" does not have resdef -> so none are masked
+                resolved_mask = np.ones_like(mass[:, 4])
+            
 
-            resolved_mask = self.isResolved(mass[:, 4], photo, resolved_dict)
             if g.color == 'red':
                 blue_mask, red_mask = self.colorIndices(photo, mass[:, 4], gp['coldef'])
                 mask = red_mask * resolved_mask
@@ -386,9 +347,13 @@ class galaxy(Field):
 
             # create the appropriate mask for the color
             gp = g.props
-            resolved_dict = self.getResolutionDefinitions(self.simname)[gp['resdef']]
 
-            resolved_mask = self.isResolved(mass[:, 4], photo, resolved_dict)
+            if not gp['resdef'] is None:
+                resolved_dict = self.getResolutionDefinitions(self.simname)[gp['resdef']]
+                resolved_mask = self.isResolved(mass[:, 4], photo, resolved_dict)
+            else:
+                resolved_mask = np.ones_like(mass[:, 4])
+            
             if g.color == 'red':
                 blue_mask, red_mask = self.colorIndices(photo, mass[:, 4], gp['coldef'])
                 mask = red_mask * resolved_mask
@@ -404,8 +369,8 @@ class galaxy(Field):
             if gp['mass'] == 'stmass':
                 grid = computeGal(pos[mask, :], mass[mask, 4], g, in_rss)
             else:
-                mass = np.sum(mass, axis = 1)
-                grid = computeGal(pos[mask, :], mass[mask], g, in_rss)
+                total_mass = np.sum(mass, axis = 1)
+                grid = computeGal(pos[mask, :], total_mass[mask], g, in_rss)
             self.saveData(outfile, grid, g)
             del grid
         

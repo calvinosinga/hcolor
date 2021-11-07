@@ -380,7 +380,7 @@ class h2ptl(hiptl):
             neutfrac = hih2file['PartType0']['f_neutral_H'][:]
             molfrac = hih2file['PartType0']['f_mol_'+gprop.model][:]
             
-            # converting the masses to HI mass
+            # converting the masses to H2 mass
             H2mass = mass*(molfrac)*neutfrac
 
             # neutral fraction is -1 where models are not defined, 

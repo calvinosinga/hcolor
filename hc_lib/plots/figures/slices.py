@@ -2,7 +2,6 @@ from hc_lib.plots import plot_lib as plib
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.gridspec as gspec
-import copy
 import pickle as pkl
 import numpy as np
 import sys
@@ -20,11 +19,13 @@ def main():
     hiptls = plib.checkPkls(paths, {'fieldname':'hiptl'})
     vns = plib.checkPkls(paths, {'fieldname':'vn'})
     ptls = plib.checkPkls(paths, {'fieldname':'ptl'})
+    
     make_ptl_slices(hiptls, h2ptls, vns, ptls)
 
+    compare_ptl_slices(hiptls, h2ptls, vns, ptls)
     hisubs = plib.checkPkls(paths, {'fieldname':'hisubhalo'})
 
-    #compare_HI_slices(hiptls, vns, hisubs)
+    compare_HI_slices(hiptls, vns, hisubs)
     return
 
 
@@ -117,11 +118,49 @@ def make_ptl_slices(hiptls, h2ptls, vns, ptls, panel_length = 3,
                 key_array[i,j] = ptl_types[i]+spc
         
         plib.plot_slices(p, key_array, ['all', 'stellar', 'dark matter'], spaces, 
-                'mass', panel_length, panel_bt, border)
+                'mass', panel_length, panel_bt, border, same_cmap=False)
         
         plt.savefig("ptl_slice_ptltype_vs_space_%03d"%p.snapshot)
         plt.clf()
     return
+
+def compare_ptl_slices(hiptls, h2ptls, vns, ptls, panel_length=3, 
+        panel_bt = 0.1, border=0.5):
+
+        def get_snap_idx(flist, snap):
+            for f in range(len(flist)):
+                if flist[f].snap == snap:
+                    return f
+            return -1
+        
+        
+        snaps, redshifts = plib.getSnaps(hiptls+h2ptls+vns+ptls)
+        fields = [hiptls, h2ptls, vns, ptls]
+        row_labels = ["z=%03d"%z for z in redshifts]
+        for s in range(len(snaps)):
+            idx_array = np.empty((len(snaps), 4), dtype=object)
+            key_array = np.empty_like(idx_array)
+            hiidx = get_snap_idx(hiptls, s)
+            h2idx = get_snap_idx(h2ptls, s)
+            vnidx = get_snap_idx(vns, s)
+            ptlidx = get_snap_idx(ptls, s)
+            indices = np.array([hiidx, h2idx, vnidx, ptlidx])
+            keys = ['GD14_CICW_mass', 'GD14_CICW_mass', 
+                    'vn_CICW_mass','ptl_CICW']
+
+            for i in range(len(indices)):
+                idx_array[s, i] = (i, indices[i])
+                key_array[s, i] = (i, keys[i])
+        
+        col_labels = ['D18-Particle HI (GD14)', 'D18-Particle H$_2$ (GD14)', 'VN18-Particle',
+                'Particle']
+        
+        plib.compare_slices(fields, idx_array, key_array, row_labels, col_labels,
+                "mass", panel_length, panel_bt, border)
+        plt.savefig("ptl_slices_comparison_redshift_vs_field.png")
+        plt.clf()
+        return
+
 
 def compare_HI_slices(hiptls, vns, hisubs, panel_length = 3,
             panel_bt = 0.1, border = 0.5):
@@ -143,9 +182,9 @@ def compare_HI_slices(hiptls, vns, hisubs, panel_length = 3,
         hisub_idx = get_snap_idx(hisubs, snaps[s])
 
         field_indices = [hiptl_idx, vn_idx, hisub_idx]
-        modelptl = hiptls[0].getMolFracModelsPtl()[0]
-        modelsub = hisubs[0].getMolFracModelsGal()[0]
-        keys = [modelptl, 'vn', modelsub]
+
+        keys = ['GD14_CICW_mass', 'GD14_CICW_mass', 
+                'vn_CICW_mass','ptl_CICW']
         for n in range(len(field_indices)):
             idx_array[s, n] = (n, field_indices[n])
             key_array[s, n] = keys[n]
@@ -154,25 +193,11 @@ def compare_HI_slices(hiptls, vns, hisubs, panel_length = 3,
             row_labels, ["D18-Particle", "VN18-Particle", "D18-Subhalo"],
             "HI mass", panel_length, panel_bt, border)
     
-    plt.savefig("HI_comparison_slices_redshift_vs_field.png")
+    plt.savefig("HI_slices_comparison_redshift_vs_field.png")
     plt.clf()
     return
             
-def compare_neutral_hydrogen_slices(hiptls, h2ptls, panel_length=3, 
-        panel_bt = 0.1, border=0.5):
 
-        def get_snap_idx(flist, snap):
-            for f in range(len(flist)):
-                if flist[f].snap == snap:
-                    return f
-            return -1
-        
-
-        snaps,_ = plib.getSnaps(hiptls+h2ptls)
-
-        for s in range(len(snaps)):
-            idx_array = np.empty((len(snaps), 2), dtype=object)
-            key_array = np.empty_like(idx_array, dtype=str)
             
             
 if __name__ == "__main__":
