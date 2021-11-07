@@ -60,7 +60,7 @@ class galaxy_grid_props(grid_props):
             schts = ['CIC']
             return test(cds, ms, schts)
         
-        elif self.props['resdef'] == 'wigglez':
+        elif self.props['resdef'] == 'wiggleZ':
             return False # not implemented
         
         elif self.props['resdef'] == 'eBOSS':
@@ -75,7 +75,12 @@ class galaxy_grid_props(grid_props):
 
         # everything that isn't a color definition associated with an observation is fine
         elif self.props['resdef'] == 'diemer':
-            return not (self.props['coldef'] == 'papa' or self.props['coldef'] == 'eBOSS')
+            coldef_is_compatible = not (self.props['coldef'] == 'papa' or self.props['coldef'] == 'eBOSS')
+            # CIC between stmass and all mass should be the same - removing redundancy
+            is_CICW = self.props['mas'] == 'CICW'
+            is_CIC_and_stmass = self.props['mas'] == 'CIC' and self.props['mass'] == 'stmass'
+
+            return coldef_is_compatible and (is_CICW or is_CIC_and_stmass)
 
         # if this is gridprop obj for resolved, then
         elif self.color == 'resolved':
@@ -330,7 +335,7 @@ class galaxy(Field):
                 gir = self.make_gi_r(photo['gi'][resolved_mask], photo['r'][resolved_mask])
                 self.gir_hists[gp['resdef']] = gir
             
-            if gp['resdef'] not in self.grsm_hists.keys():
+            if gp['resdef'] not in self.grsm_hists.keys() and not gp['resdef'] is None:
                 grsm = self.make_gr_stmass(photo['gr'][resolved_mask], mass[resolved_mask, 4])
                 self.grsm_hists[gp['resdef']] = grsm
             
@@ -392,7 +397,6 @@ class galaxy(Field):
     def saveData(self, outfile, grid, gp):
         dat = super().saveData(outfile, grid, gp)
         dat.attrs['used_dust'] = False
-        print("called galaxy's saveData(..)")
         return dat
 
     
@@ -438,7 +442,6 @@ class galaxy_dust(galaxy):
     def saveData(self, outfile, grid, gp):
         dat = super().saveData(outfile, grid, gp)
         print('galaxy_dust\'s saveData finished calling galaxy')
-        print(type(dat))
         # dct = dat.attrs
         # dct['used_dust'] = True
         return dat
