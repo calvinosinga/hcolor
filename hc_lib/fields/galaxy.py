@@ -304,7 +304,7 @@ class galaxy(Field):
                 resolved_dict = self.getResolutionDefinitions(self.simname)[gp['resdef']]
                 resolved_mask = self.isResolved(mass[:, 4], photo, resolved_dict)
             else: # "all" does not have resdef -> so none are masked
-                resolved_mask = np.ones_like(mass[:, 4])
+                resolved_mask = np.ones_like(mass[:, 4], dtype=bool)
             
 
             if g.color == 'red':
@@ -316,7 +316,7 @@ class galaxy(Field):
             elif g.color == 'resolved':
                 mask = resolved_mask
             elif g.color == 'all':
-                mask = np.ones_like(resolved_mask)
+                mask = np.ones_like(resolved_mask, dtype=bool)
             
             # count the number of galaxies used for this grid
             self.counts[g.getName()] = np.sum(mask)
@@ -352,7 +352,7 @@ class galaxy(Field):
                 resolved_dict = self.getResolutionDefinitions(self.simname)[gp['resdef']]
                 resolved_mask = self.isResolved(mass[:, 4], photo, resolved_dict)
             else:
-                resolved_mask = np.ones_like(mass[:, 4])
+                resolved_mask = np.ones_like(mass[:, 4], dtype=bool)
             
             if g.color == 'red':
                 blue_mask, red_mask = self.colorIndices(photo, mass[:, 4], gp['coldef'])
@@ -363,7 +363,7 @@ class galaxy(Field):
             elif g.color == 'resolved':
                 mask = resolved_mask
             elif g.color == 'all':
-                mask = np.ones_like(resolved_mask)
+                mask = np.ones_like(resolved_mask, dtype=bool)
             
 
             if gp['mass'] == 'stmass':
