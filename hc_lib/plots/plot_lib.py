@@ -27,13 +27,19 @@ def checkPkls(paths, chdict):
                 pkls.append(f)
     return pkls
 
-def fetchKeys(substrings, keylist):
+def fetchKeys(getstrings, rmstrings, keylist):
     res = []
-    for sub in substrings:
+    for sub in getstrings:
         for k in keylist:
             if sub in k and not k in res:
                 res.append(k)
     
+    temp = copy.copy(res)
+    for rm in rmstrings:
+        for k in temp:
+            if rm in k:
+                res.remove(k)
+        
     if 'k' in res:
         res.remove('k')
     if 'Nmodes' in res:
@@ -41,20 +47,6 @@ def fetchKeys(substrings, keylist):
     if 'r' in res:
         res.remove('r')
     return res
-
-def rmKeys(keywords, keylist):
-    klist = copy.copy(keylist)
-    for word in keywords:
-        for k in klist:
-            if word in k:
-                klist.remove(k)
-    if 'k' in klist:
-        klist.remove('k')
-    if 'Nmodes' in klist:
-        klist.remove("Nmodes")
-    if 'r' in klist:
-        klist.remove('r')
-    return klist
 
 def getYrange(fields, keys_dict, is_X):
     yrange = [np.inf, 0]
@@ -334,3 +326,4 @@ def compare_slices(fields, idx_array, key_array, row_labels, col_labels, bar_tex
     fig.text(border/2/figsize[0], 0.5, 'y (Mpc)', ha='center',
             va='center', fontsize = 16, rotation='vertical')
     return fig, panels
+

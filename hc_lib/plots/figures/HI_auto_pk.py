@@ -1,4 +1,5 @@
 
+from numpy.lib.type_check import real
 from hc_lib.plots import plot_lib as plib
 import matplotlib.pyplot as plt
 import matplotlib as mpl
@@ -7,39 +8,93 @@ import copy
 import pickle as pkl
 import numpy as np
 import sys
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 mpl.rcParams['text.usetex'] = True
 
 def main():
     
-    
-    # def name_test(fn, test):
-    #     return test == fn
-    
-    # for p in list(f):
-    #     p = p.replace('\n', '')
-    #     f = pkl.load(open(p, 'rb'))
-    #     if name_test("vn", f.fieldname):
-    #         vn.append(f)
-    #     elif name_test("hiptl", f.fieldname):
-    #         hiptl.append(f)
-    #     elif name_test("hisubhalo", f.fieldname):
-    #         hisub.append(f)
-    # path = '/lustre/cosinga/hcolor/figures/'
-    # HI_auto_pk(hiptl, hisub, vn)
-    # plt.savefig(path+"HI_auto_real.png")
-    # plt.clf()
+    print("loading paths...")
+    OUTDIR = sys.argv.pop(1)
+    paths = plib.getPaths(OUTDIR)
 
-    # HI_auto_pk(hiptl, hisub, vn, in_rss=True)
-    # plt.savefig(path+"HI_auto_redshift.png")
-    # plt.clf()
+    print("loading pickle files...")
+    hiptls = plib.checkPkls(paths, {'fieldname':'hiptl'})
+    vns = plib.checkPkls(paths, {'fieldname':'vn'})
+    hisubs = plib.checkPkls(paths, {'fieldname':'hisubhalo'})
+
+    print("plotting individual models for hiptl...")
+    hiptl_individual_models(hiptls)
+
+    print("plotting individual models for hisubhalo...")
+    # HI_auto_pk(hiptls, hisubs, vns)
+
+
     return
 
 
+def hiptl_individual_models(hiptls, panel_length = 3, 
+            panel_bt = 0.1, border = 0.5, fsize=16):
+    
+    
+    snapshots, redshifts = plib.getSnaps(hiptls)
+    nrows = len(snapshots)
+    col_labels = ["real space", "redshift space", "comparison"]
+    ncols = len(col_labels)
 
+    fig, panels = plib.createFig(panel_length, nrows, ncols, panel_bt,
+            border, border)
+    
+    # getting keys for each part:
+    real_keys = plib.fetchKeys([],['rs', 'temp'], list(hiptls[0].keys()))
+    redsh_keys = plib.fetchKeys(['rs'], ['temp'], list(hiptls[0].keys()))
+    yrange = plib.getYrange(hiptls, real_keys + redsh_keys, False)
 
-def HI_auto_pk(hiptls, hisubs, vns, in_rss = False, panel_length = 3, 
-            panel_bt = 0.1, text_space=0.9, border = 0.5, fsize=16):
+    keys = [real_keys, redsh_keys]
+    for i in range(nrows):
+        snap = snapshots[i]
+
+        for f in hiptls:
+            if f.snapshot == snap:
+                field = f
+                break
+        
+        for j in range(ncols):
+            plt.sca(panels[i][j])
+            # comparison column will look different
+            colors = ['blue', 'red']
+            if j < len(keys):
+                labels = [st.split('_')[0] for st in keys[j]]
+                print(keys)
+                print(labels)
+                plib.plotpks(field.pks['k'], field.pks, field.box, field.resolution,
+                        keys[j], labels)
+                plt.ylim(yrange[0], yrange[1])
+            
+            else:
+                for k in range(len(keys)):
+                    plib.fillpks(field.pks['k'], field.pks, field.box, field.resolution,
+                            keys[k], label = col_labels[k], color= colors[k])
+                plt.legend()
+                plt.ylim(yrange[0], yrange[1])
+                pk_ax = plt.gca()
+                divider = make_axes_locatable(pk_ax)
+                frac_ax = divider.append_axes("bottom", size="75%", pad=panel_bt,
+                        sharex=pk_ax)
+                
+                distortions = {}
+                for k in keys[0]:
+                    distortions[k] = field.pks[k] / field.pks[k+'rs']
+                plt.sca(frac_ax)
+                plib.fillpks(field.pks['k'], distortions, field.box, field.resolution,
+                        keys[0], color='green')
+    plt.savefig("hiptl_models_redshift_vs_distortions.png")
+    plt.clf()
+    return
+            
+
+def HI_auto_pk(hiptls, hisubs, vns, panel_length = 3, 
+            panel_bt = 0.1, border = 0.5, fsize=16):
     """
     Makes HI-auto power spectra plots, for real space or redshift space.
     Each panel represents another redshift.
@@ -51,32 +106,20 @@ def HI_auto_pk(hiptls, hisubs, vns, in_rss = False, panel_length = 3,
 
     # get the desired keys for each field - if the fields are not
     # in the results, then make the keys an empty list
-    if not in_rss:
-        if vns:
-            vnkeys = ['vn']
-        else:
-            vnkeys = []
-        if hiptls:
-            hiptlkeys = plib.rmKeys(['rs'], list(hiptls[0].pks.keys()))
-        else:
-            hiptlkeys = []
-        if hisubs:
-            hisubkeys = plib.rmKeys(['rs'], list(hisubs[0].pks.keys()))
-        else:
-            hisubkeys = []
+
+    if vns:
+        vnkeys = ['vn']
     else:
-        if vns:
-            vnkeys = ['vnrs']
-        else:
-            vnkeys = []
-        if hiptls:
-            hiptlkeys = plib.fetchKeys(['rs'], list(hiptls[0].pks.keys()))
-        else:
-            hiptlkeys = []
-        if hisubs:
-            hisubkeys = plib.fetchKeys(['rs'], list(hisubs[0].pks.keys()))
-        else:
-            hisubkeys = []
+        vnkeys = []
+    if hiptls:
+        hiptlkeys = plib.rmKeys(['rs'], list(hiptls[0].pks.keys()))
+    else:
+        hiptlkeys = []
+    if hisubs:
+        hisubkeys = plib.rmKeys(['rs'], list(hisubs[0].pks.keys()))
+    else:
+        hisubkeys = []
+
     
     fields = []
     fields.extend(hiptls)
