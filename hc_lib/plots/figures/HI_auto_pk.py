@@ -27,7 +27,10 @@ def main():
     hiptl_individual_models(hiptls)
 
     print("plotting individual models for hisubhalo...")
-    # HI_auto_pk(hiptls, hisubs, vns)
+    hisubhalo_individual_models(hisubs)
+
+    print("plotting auto power spectra for HI...")    
+    HI_auto_pk(hiptls, hisubs, vns)
 
 
     return
@@ -123,7 +126,8 @@ def hisubhalo_individual_models(hisubs, panel_length=3, panel_bt = 0.1,
     
     # getting keys for each part:
     real_keys = plib.fetchKeys(['CICW'],['rs', 'papa'], list(hisubs[0].pks.keys()))
-    redsh_keys = plib.fetchKeys(['rs', 'CICW'], ['papa'], list(hisubs[0].pks.keys()))
+    redsh_keys = [k+'rs' for k in real_keys]
+
     print(real_keys)
     print(redsh_keys)
     keys = {'hisubhalo':real_keys + redsh_keys}
@@ -209,25 +213,28 @@ def HI_auto_pk(hiptls, hisubs, vns, panel_length = 3,
         return None
     
     vn_real_keys = plib.fetchKeys(['mass'], ['rs'], list(vns[0].pks.keys()))
-    vn_redsh_keys = plib.fetchKeys(['rs', 'mass'], [], list(vns[0].pks.keys()))
+    vn_redsh_keys = [k+'rs' for k in vn_real_keys] 
     vn_keys = vn_real_keys + vn_redsh_keys
 
     hiptl_real_keys = plib.fetchKeys(['mass'], ['rs'], list(hiptls[0].pks.keys()))
-    hiptl_redsh_keys = plib.fetchKeys(['mass', 'rs'], [], list(hiptls[0].pks.keys()))
+    hiptl_redsh_keys = [k+'rs' for k in hiptl_real_keys] 
     hiptl_keys = hiptl_redsh_keys + hiptl_real_keys
 
-    hisub_real_keys = plib.fetchKeys(['mass'], ['rs', 'papa'], list(hisubs[0].pks.keys()))
-    hisub_redsh_keys = plib.fetchKeys(['mass', 'rs'], ['papa'], list(hisubs[0].pks.keys()))
+    hisub_real_keys = plib.fetchKeys(['diemer'], ['rs', 'papa', '_CIC_'], list(hisubs[0].pks.keys()))
+    hisub_redsh_keys = [k+'rs' for k in hisub_real_keys]
     hisub_keys = hisub_redsh_keys + hisub_real_keys
 
-    
+    print(vn_keys)
+    print(hiptl_keys)
+    print(hisub_keys)
+
     fields = []
     fields.extend(hiptls)
     fields.extend(hisubs)
     fields.extend(vns)
 
     key_dict = {'hiptl':hiptl_keys, 'hisubhalo':hisub_keys, 'vn':vn_keys}
-    yrange = plib.getYrange(fields, key_dict)
+    yrange = plib.getYrange(fields, key_dict, False)
     snapshots, redshifts = plib.getSnaps(fields)
 
     col_labels = ['real space', 'redshift space']
@@ -248,7 +255,7 @@ def HI_auto_pk(hiptls, hisubs, vns, panel_length = 3,
             if col_labels[j] == 'real space':
                 plib.plotpks(vn.pks['k'], vn.pks, vn.box, vn.resolution,
                         keylist = vn_real_keys, colors = ['green'],
-                        labels = ['V-N18'])
+                        labels = ['VN18-Particle'])
 
  
                 plib.fillpks(hisub.pks['k'], hisub.pks, hisub.box, hisub.resolution,
@@ -257,20 +264,20 @@ def HI_auto_pk(hiptls, hisubs, vns, panel_length = 3,
                 
                 plib.fillpks(hiptl.pks['k'], hiptl.pks, hiptl.box, hiptl.resolution,
                         keylist = hiptl_real_keys, color = 'blue',
-                        label = 'D18-Subhalo')
+                        label = 'D18-Particle')
             elif col_labels[j] == 'redshift space':
                 plib.plotpks(vn.pks['k'], vn.pks, vn.box, vn.resolution,
-                        keylist = vn_real_keys, colors = ['green'],
-                        labels = ['V-N18'])
+                        keylist = vn_redsh_keys, colors = ['green'],
+                        labels = ['VN18-Particle'])
 
  
                 plib.fillpks(hisub.pks['k'], hisub.pks, hisub.box, hisub.resolution,
-                        keylist = hisub_real_keys, color = 'orange',
+                        keylist = hisub_redsh_keys, color = 'orange',
                         label = 'D18-Subhalo')
                 
                 plib.fillpks(hiptl.pks['k'], hiptl.pks, hiptl.box, hiptl.resolution,
-                        keylist = hiptl_real_keys, color = 'blue',
-                        label = 'D18-Subhalo')
+                        keylist = hiptl_redsh_keys, color = 'blue',
+                        label = 'D18-Particle')
 
             ax = plt.gca()
             plt.ylabel('')
