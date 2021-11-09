@@ -46,9 +46,12 @@ def hiptl_individual_models(hiptls, panel_length = 3,
             border, border)
     
     # getting keys for each part:
-    real_keys = plib.fetchKeys([],['rs', 'temp'], list(hiptls[0].keys()))
-    redsh_keys = plib.fetchKeys(['rs'], ['temp'], list(hiptls[0].keys()))
-    yrange = plib.getYrange(hiptls, real_keys + redsh_keys, False)
+    real_keys = plib.fetchKeys(['CICW'],['rs', 'temp'], list(hiptls[0].pks.keys()))
+    redsh_keys = plib.fetchKeys(['rs'], ['temp'], list(hiptls[0].pks.keys()))
+    print(real_keys)
+    print(redsh_keys)
+    keys = {'hiptl':real_keys + redsh_keys}
+    yrange = plib.getYrange(hiptls, keys, False)
 
     keys = [real_keys, redsh_keys]
     for i in range(nrows):
@@ -65,30 +68,47 @@ def hiptl_individual_models(hiptls, panel_length = 3,
             colors = ['blue', 'red']
             if j < len(keys):
                 labels = [st.split('_')[0] for st in keys[j]]
-                print(keys)
-                print(labels)
                 plib.plotpks(field.pks['k'], field.pks, field.box, field.resolution,
-                        keys[j], labels)
+                        keys[j], labels=labels)
                 plt.ylim(yrange[0], yrange[1])
             
             else:
                 for k in range(len(keys)):
                     plib.fillpks(field.pks['k'], field.pks, field.box, field.resolution,
                             keys[k], label = col_labels[k], color= colors[k])
-                plt.legend()
+                plt.legend(loc = 'upper right')
                 plt.ylim(yrange[0], yrange[1])
-                pk_ax = plt.gca()
-                divider = make_axes_locatable(pk_ax)
-                frac_ax = divider.append_axes("bottom", size="75%", pad=panel_bt,
-                        sharex=pk_ax)
+                #pk_ax = plt.gca()
+                #divider = make_axes_locatable(pk_ax)
+                #frac_ax = divider.append_axes("bottom", size="75%", pad=panel_bt,
+                #        sharex=pk_ax)
                 
-                distortions = {}
-                for k in keys[0]:
-                    distortions[k] = field.pks[k] / field.pks[k+'rs']
-                plt.sca(frac_ax)
-                plib.fillpks(field.pks['k'], distortions, field.box, field.resolution,
-                        keys[0], color='green')
-    plt.savefig("hiptl_models_redshift_vs_distortions.png")
+                #distortions = {}
+                #for k in keys[0]:
+                #    distortions[k] = field.pks[k] / field.pks[k+'rs']
+                #plt.sca(frac_ax)
+                #plib.fillpks(field.pks['k'], distortions, field.box, field.resolution,
+                #        keys[0], color='green')
+            ax = plt.gca()
+            plt.xlabel('')
+            plt.ylabel('')
+            if i == 0:
+                ax.xaxis.set_label_position('top')
+                plt.xlabel(col_labels[j])
+            if not i == nrows-1:
+                ax.xaxis.set_ticklabels([])
+            if j == 0:
+                plt.text(field.pks['k'][0], yrange[0], '\tz=%.2f'%redshifts[i], 
+                        fontsize = fsize, ha = 'left', va = 'bottom')
+            else:
+                ax.yaxis.set_ticklabels([])
+    figsize = fig.get_size_inches()
+    fig.text(0.5, border/2/figsize[1], 'k (h/Mpc)', ha='center', va = 'center', 
+            fontsize = fsize)
+
+    fig.text(border/2/figsize[0], 0.5, 'P(k) (h/Mpc)$^3$', ha='center', va = 'center', 
+            fontsize = fsize, rotation = 'vertical')
+    plt.savefig("hiptl_pk_models_redshift_vs_distortions.png")
     plt.clf()
     return
             

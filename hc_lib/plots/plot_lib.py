@@ -28,17 +28,18 @@ def checkPkls(paths, chdict):
     return pkls
 
 def fetchKeys(getstrings, rmstrings, keylist):
-    res = []
-    for sub in getstrings:
+    
+    temp = copy.copy(keylist)
+    for rm in rmstrings:
         for k in keylist:
-            if sub in k and not k in res:
+            if rm in k and k in temp:
+                temp.remove(k)
+    res = []
+    for gt in getstrings:
+        for k in temp:
+            if gt in k and not k in res:
                 res.append(k)
     
-    temp = copy.copy(res)
-    for rm in rmstrings:
-        for k in temp:
-            if rm in k:
-                res.remove(k)
         
     if 'k' in res:
         res.remove('k')
