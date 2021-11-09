@@ -29,16 +29,19 @@ def checkPkls(paths, chdict):
 
 def fetchKeys(getstrings, rmstrings, keylist):
     
-    temp = copy.copy(keylist)
-    for rm in rmstrings:
-        for k in keylist:
-            if rm in k and k in temp:
-                temp.remove(k)
     res = []
-    for gt in getstrings:
-        for k in temp:
-            if gt in k and not k in res:
-                res.append(k)
+    for k in keylist:
+        has_a_get_string = False
+        for g in getstrings:
+            if g in k:
+                has_a_get_string = True
+        has_a_rm_string = False
+        for r in rmstrings:
+            if r in k:
+                has_a_rm_string = True
+        
+        if has_a_get_string and not has_a_rm_string:
+            res.append(k)
     
         
     if 'k' in res:
