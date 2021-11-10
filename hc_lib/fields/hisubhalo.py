@@ -62,6 +62,7 @@ class hisubhalo(Field):
         self.hih2filepath = hih2filepath
         self.loadpath = shcatpath
         
+        self.counts = {}
         super().__init__(simname, snapshot, axis, resolution, pkl_path, verbose)
         if self.v:
             print('\nhisubhalo object created, object dictionary:')
