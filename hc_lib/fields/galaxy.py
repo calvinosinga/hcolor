@@ -3,12 +3,12 @@
 
 """
 from hc_lib.grid.grid import Grid
-from hc_lib.fields.field_super import Field, Props
+from hc_lib.fields.field_super import Field, grid_props
 from hc_lib.build.input import Input
 import h5py as hp
 import numpy as np
 
-class galaxy_props(Props):
+class galaxy_grid_props(grid_props):
     """
     Since each galaxy field has an enormous number of grids, this contains the data
     for one grid
@@ -20,7 +20,7 @@ class galaxy_props(Props):
         for i in range(len(lst)):
             other[keys[i]] = lst[i]
 
-        super().__init__(mas, field, other)
+        super().__init__(color, mas, field, other)
 
         return
     

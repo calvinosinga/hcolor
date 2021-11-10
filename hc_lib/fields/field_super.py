@@ -8,11 +8,11 @@ import h5py as hp
 from Pk_library import Pk, Xi, XPk, XXi
 import copy
 
-class Props():
+class grid_props():
     
-    def __init__(self, mas, field, in_rss, other_props):
+    def __init__(self, base, mas, field, in_rss, other_props):
         self.props = {}
-        self.props['rss'] = in_rss
+        self.props['base'] = base
         self.props['mas'] = mas
         self.props['field'] = field
         self.props.update(other_props)
@@ -42,7 +42,7 @@ class Props():
     
     @classmethod
     def loadProps(cls, dct):
-        return Props(dct.pop('base'), dct.pop('mas'), 
+        return grid_props(dct.pop('base'), dct.pop('mas'), 
                 dct.pop("field"), dct)
     
     def isCompatible(self, other):

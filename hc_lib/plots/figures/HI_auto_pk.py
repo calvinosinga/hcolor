@@ -37,9 +37,9 @@ def hiptl_individual_models(hiptls, panel_length = 3,
     nrows = len(snapshots)
     col_labels = ["real space", "redshift space", "comparison"]
     ncols = len(col_labels)
-
+    xborder = [1.5*border, border]
     fig, panels = plib.createFig(panel_length, nrows, ncols, panel_bt,
-            border, border)
+            xborder, border)
     
     # getting keys for each part:
     real_keys = plib.fetchKeys(['CICW'],['rs', 'temp'], list(hiptls[0].pks.keys()))
@@ -114,9 +114,9 @@ def hisubhalo_individual_models(hisubs, panel_length=3, panel_bt = 0.1,
     nrows = len(snapshots)
     col_labels = ["real space", "redshift space", "space comparison"]
     ncols = len(col_labels)
-
+    xborder = [1.5 * border, border]
     fig, panels = plib.createFig(panel_length, nrows, ncols, panel_bt,
-            border, border)
+            xborder, border)
     
     # getting keys for each part:
     real_keys = plib.fetchKeys(['CICW'],['rs', 'papa'], list(hisubs[0].pks.keys()))
@@ -234,8 +234,9 @@ def HI_auto_pk(hiptls, hisubs, vns, panel_length = 3,
     col_labels = ['real space', 'redshift space']
     nrows = len(snapshots)
     ncols = len(col_labels)
+    xborder = [1.5 * border, border]
     fig, panels = plib.createFig(panel_length, nrows, ncols, panel_bt,
-            border, border)
+            xborder, border)
     
     # now making each panel
     
@@ -290,16 +291,16 @@ def HI_auto_pk(hiptls, hisubs, vns, panel_length = 3,
                 ax.set_xticklabels([])
             
             if j == 0:
-                plt.text(hiptls[0].pks['k'][0], yrange[0] * 1.1,
+                plt.text(0.05, 0.05,
                     'z=%.1f'%redshifts[i], fontsize = fsize, ha = 'left', va = 'bottom',
-                    fontweight = 'bold')
+                    fontweight = 'bold', transform = ax.transAxes)
             else:
                 ax.set_yticklabels([])
         
 
     figsize = fig.get_size_inches()
     fig.text(border/2/figsize[0], 0.5, r'P(k) (Mpc/h)$^{-3}$',ha = 'center',
-            va = 'center', fontsize=fsize)
+            va = 'center', fontsize=fsize, rotation='vertical')
     fig.text(0.5, border/2/figsize[1], r'k (Mpc/h)$^{-1}$', ha = 'center',
             va = 'center', fontsize=fsize)
     
