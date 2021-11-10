@@ -1,14 +1,8 @@
-
-from numpy.lib.type_check import real
 from hc_lib.plots import plot_lib as plib
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-import matplotlib.gridspec as gspec
-import copy
-import pickle as pkl
 import numpy as np
 import sys
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 mpl.rcParams['text.usetex'] = True
 

@@ -46,5 +46,4 @@ if gd['verbose']:
 res = Cross(field1, field2, gridpaths[0], gridpaths[1])
 res.computeXpks()
 res.computeXxis()
-res.exportResults(hp.File(OUTFILEPATH+'.hdf5','w'))
 pickle.dump(res, open(OUTFILEPATH, 'wb'), pickle.HIGHEST_PROTOCOL)

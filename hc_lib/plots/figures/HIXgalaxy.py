@@ -9,28 +9,10 @@ import pickle as pkl
 mpl.rcParams['text.usetex'] = True
 
 def main():
-    # remove the script name
-    sys.argv.pop(0)
 
     # the infiles are given through the text file given in the command-line
-    INFILE = sys.argv[0]
-    f = open(INFILE, 'r')
-    vnx = []
-    hiptlx = []
-    hisubx = []
-    
-    def name_test(fn, test):
-        return test == 'galaxyX%s'%fn or test == '%sXgalaxy'%fn
-    
-    for p in list(f):
-        p = p.replace('\n', '')
-        f = pkl.load(open(p, 'rb'))
-        if name_test("vn", f.fieldname):
-            vnx.append(f)
-        elif name_test("hiptl", f.fieldname):
-            hiptlx.append(f)
-        elif name_test("hisubhalo", f.fieldname):
-            hisubx.append(f)
+    OUTDIR = sys.argv[0]
+
     path = '/lustre/cosinga/hcolor/figures/'
     # make the plot in real-space
     HI_galaxy_Xpk_methodology(hiptlx, hisubx, vnx)

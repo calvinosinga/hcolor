@@ -3,25 +3,24 @@
 
 """
 from hc_lib.grid.grid import Grid
-from hc_lib.fields.field_super import Field, grid_props
+from hc_lib.fields.field_super import Field, Props
 from hc_lib.build.input import Input
 import h5py as hp
 import numpy as np
 
-class galaxy_grid_props(grid_props):
+class galaxy_props(Props):
     """
     Since each galaxy field has an enormous number of grids, this contains the data
     for one grid
     """
     def __init__(self, color, mas, field, mass_type, resdef, coldef):
         other = {}
-        self.color = color
-        lst = [mass_type, resdef, coldef]
-        keys = ['mass', 'resdef','coldef']
+        lst = [color, mass_type, resdef, coldef]
+        keys = ['color', 'mass', 'resdef','coldef']
         for i in range(len(lst)):
             other[keys[i]] = lst[i]
 
-        super().__init__(color, mas, field, other)
+        super().__init__(mas, field, other)
 
         return
     
@@ -129,18 +128,18 @@ class galaxy(Field):
                 for cd in colordefs:
                     for mt in mass_type:
                         for Mt in MAS_type:
-                            gp = galaxy_grid_props(c, Mt, self.fieldname, mt, r, cd)
+                            gp = galaxy_props(c, Mt, self.fieldname, mt, r, cd)
                             if gp.isIncluded():
                                 gridnames[gp.getName()] = gp
         for r in resolutions:
             for mt in mass_type:
                 for Mt in MAS_type:
-                    gp = galaxy_grid_props('resolved', Mt, self.fieldname, mt, r, None)
+                    gp = galaxy_props('resolved', Mt, self.fieldname, mt, r, None)
                     if gp.isIncluded():
                         gridnames[gp.getName()] = gp
         for mt in mass_type:
             for Mt in MAS_type:
-                gp = galaxy_grid_props('all', Mt, self.fieldname, mt, None, None)
+                gp = galaxy_props('all', Mt, self.fieldname, mt, None, None)
                 if gp.isIncluded():
                     gridnames[gp.getName()] = gp
         
@@ -312,15 +311,15 @@ class galaxy(Field):
                 resolved_mask = np.ones_like(mass[:, 4], dtype=bool)
             
 
-            if g.color == 'red':
+            if gp['color'] == 'red':
                 blue_mask, red_mask = self.colorIndices(photo, mass[:, 4], gp['coldef'])
                 mask = red_mask * resolved_mask
-            elif g.color == 'blue':
+            elif gp['color'] == 'blue':
                 blue_mask, red_mask = self.colorIndices(photo, mass[:, 4], gp['coldef'])
                 mask = blue_mask * resolved_mask
-            elif g.color == 'resolved':
+            elif gp['color'] == 'resolved':
                 mask = resolved_mask
-            elif g.color == 'all':
+            elif gp['color'] == 'all':
                 mask = np.ones_like(resolved_mask, dtype=bool)
             
             # count the number of galaxies used for this grid
@@ -359,15 +358,15 @@ class galaxy(Field):
             else:
                 resolved_mask = np.ones_like(mass[:, 4], dtype=bool)
             
-            if g.color == 'red':
+            if gp['color'] == 'red':
                 blue_mask, red_mask = self.colorIndices(photo, mass[:, 4], gp['coldef'])
                 mask = red_mask * resolved_mask
-            elif g.color == 'blue':
+            elif gp['color'] == 'blue':
                 blue_mask, red_mask = self.colorIndices(photo, mass[:, 4], gp['coldef'])
                 mask = blue_mask * resolved_mask
-            elif g.color == 'resolved':
+            elif gp['color'] == 'resolved':
                 mask = resolved_mask
-            elif g.color == 'all':
+            elif gp['color'] == 'all':
                 mask = np.ones_like(resolved_mask, dtype=bool)
             
 

@@ -38,7 +38,6 @@ for key in klist:
         field.computePk(grid)
         field.computeXi(grid)
         field.makeSlice(grid)
-        field.exportResults(hp.File(pkl_path+'.hdf5','w'))
 
 pickle.dump(field, open(pkl_path, 'wb'), pickle.HIGHEST_PROTOCOL)
 gridfile.close()

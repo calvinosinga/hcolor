@@ -5,16 +5,14 @@ up the pipeline.
 import illustris_python as il
 import numpy as np
 import h5py as hp
-import matplotlib.pyplot as plt
 from Pk_library import Pk, Xi, XPk, XXi
 import copy
-from hc_lib.plots import plot_lib as plib
 
-class grid_props():
+class Props():
     
-    def __init__(self, base, mas, field, other_props):
+    def __init__(self, mas, field, in_rss, other_props):
         self.props = {}
-        self.props['base'] = base
+        self.props['rss'] = in_rss
         self.props['mas'] = mas
         self.props['field'] = field
         self.props.update(other_props)
@@ -44,7 +42,7 @@ class grid_props():
     
     @classmethod
     def loadProps(cls, dct):
-        return grid_props(dct.pop('base'), dct.pop('mas'), 
+        return Props(dct.pop('base'), dct.pop('mas'), 
                 dct.pop("field"), dct)
     
     def isCompatible(self, other):
@@ -53,7 +51,7 @@ class grid_props():
         """
         return self.props['mas'] == other.props['mas']
 
-    
+
 class Field():
 
     def __init__(self, simname, snapshot, axis, resolution, pkl_path, verbose):
@@ -76,6 +74,7 @@ class Field():
         self.xi = {}
         self.slices = {}
         self.tdpks = {}
+        self.result_props = {}
 
         if self.v:
             print("\n\ninputs given to superclass constructor:")
@@ -87,8 +86,6 @@ class Field():
         
         self.header = None # dictionary that stores basic sim info
         
-
-
         # other variables expected to be assigned values in subclasses
         self.gridprops = self.getGridProps()
         self.isHI = True
@@ -113,7 +110,7 @@ class Field():
             print(self.header)
         return
     
-    def computeGrids(self, outfile):
+    def setupGrids(self, outfile):
         if self.v:
             print("starting to compute grids...")
         if self.header is None:
@@ -124,11 +121,6 @@ class Field():
             print("the saved pickle path: %s"%self.pkl_path)
         return
     
-    def computeAux(self):
-        """
-        Compute auxiliary information/plots
-        """
-        return
     
     def computePk(self, grid):
         arr = grid.getGrid()
@@ -142,7 +134,6 @@ class Field():
             self.saved_Nmodes1D = True
 
         self.pks[grid.gridname] = pk.Pk[:,0]
-
         if grid.in_rss:
             if not self.saved_k2D:
                 self.tdpks['kper'] = pk.kper
@@ -183,30 +174,6 @@ class Field():
         gp.saveProps(dat)
         return dat
     
-    def plotPks(self, plotdir):
-        box = self.header['BoxSize']
-        for pk in self.pks:
-            plib.plotpks(self.pks['k'], self.pks, box, self.axis, 
-                    self.resolution, keylist=[pk])
-            
-            plt.savefig(plotdir+pk+'_1Dpk.png')
-            plt.clf()
-        
-        for pk in self.tdpks:
-            plib.plot2Dpk(self.tdpks['kpar'], self.tdpks['kper'], self.tdpks[pk])
-            plt.savefig(plotdir+pk+'_2Dpk.png')
-            plt.clf()
-        return
-
-    def plotXis(self, plotdir):
-        box = self.header['BoxSize']
-        for x in self.xi:
-            plib.plotxis(self.xi['r'], self.xi, box, self.axis, 
-                    self.resolution, keylist=[x])
-            plt.savefig(plotdir+x+'_1Dxi.png')
-            plt.clf()
-        return
-
     def equals(self, other_field):
         fntest = self.fieldname == other_field.fieldname
         sstest = self.snapshot == other_field.snapshot
@@ -214,13 +181,7 @@ class Field():
         voltest = self.header['BoxSize'] == other_field.header['BoxSize']
         restest = self.resolution == other_field.resolution
         return fntest and sstest and axtest and voltest and restest
-    
-    def getGridsForX(self, other):
-        xgrids = {}
-        for g in self.gridnames:
-            xgrids[g] = other.gridnames
-        return xgrids
-    
+     
     def _loadSnapshotData(self):
         """
         The fields that use snapshot data vary in what they need too much,
@@ -280,19 +241,6 @@ class Field():
         arr = arr - 1
 
         return arr
-
-    def exportResults(self, outfile):
-        def add(indict, idf):
-            for k,v in indict.items():
-                outfile.create_dataset(k+idf, data=v, 
-                        compression="gzip", compression_opts=9)
-            return
-        
-        add(self.pks, '_pk')
-        add(self.xi, '_xi')
-        add(self.tdpks, '_2Dpk')
-        add(self.slices, '_slc')
-        return
         
 from hc_lib.grid.grid import Grid
 class Cross():
@@ -456,15 +404,3 @@ class Cross():
         arr = arr - 1
 
         return arr
-
-    def exportResults(self, outfile):
-        def add(indict, idf):
-            for k,v in indict.items():
-                outfile.create_dataset(k+idf, data=v, 
-                        compression="gzip", compression_opts=9)
-                return
-        
-        add(self.xpks, '_xpk')
-        add(self.xxis, '_xxi')
-        add(self.tdxpks, '_2Dxpk')
-        return
