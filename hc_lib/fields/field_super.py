@@ -10,7 +10,7 @@ import copy
 
 class grid_props():
     
-    def __init__(self, base, mas, field, in_rss, other_props):
+    def __init__(self, base, mas, field, other_props):
         self.props = {}
         self.props['base'] = base
         self.props['mas'] = mas

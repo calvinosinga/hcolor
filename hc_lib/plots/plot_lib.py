@@ -31,16 +31,16 @@ def fetchKeys(getstrings, rmstrings, keylist):
     
     res = []
     for k in keylist:
-        has_a_get_string = False
+        has_all_get_strings = True
         for g in getstrings:
-            if g in k:
-                has_a_get_string = True
+            if not g in k:
+                has_all_get_strings = False
         has_a_rm_string = False
         for r in rmstrings:
             if r in k:
                 has_a_rm_string = True
         
-        if has_a_get_string and not has_a_rm_string:
+        if has_all_get_strings and not has_a_rm_string:
             res.append(k)
     
         
