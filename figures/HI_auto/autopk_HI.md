@@ -4,6 +4,8 @@ This shows plots comparing various auto power spectra of the HI distributions us
 
 ## To Do
 * The nyquist frequency doesn't quite match up with where the shot noise occurs, shift the xlimit over a bit
+* Investigate why there is a bump across VN18 and D18 at k~1.5 - idea is that they exhibit the same behavior even though they shouldn't necessarily "know" about each other.
+* Calculate the strength of redshift-space distortions similar to Paco
 
 # D18-Particle Auto Power
 
@@ -25,3 +27,10 @@ There's clearly a bug somewhere, the flat power spectrum indicates that the fiel
 ## To Do
 * Find bug
 
+# HI Auto Power Comparisons
+
+<img src='HI_auto_pk_redshift_vs_space.png'>
+
+VN18 and D18-Particle look fine, again some issue with D18-Subhalo.
+## To Do
+* 

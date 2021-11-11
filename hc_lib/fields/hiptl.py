@@ -378,15 +378,14 @@ class h2ptl(hiptl):
 
             # getting data from hih2 files
             neutfrac = hih2file['PartType0']['f_neutral_H'][:]
+            neutfrac = neutfrac.astype('float32')
+            neutfrac = np.where(neutfrac>=0, neutfrac, np.zeros_like(neutfrac))
+
             molfrac = hih2file['PartType0']['f_mol_'+gprop.model][:]
-            
+            molfrac = molfrac.astype('float32')
+            molfrac = np.where(molfrac>=0, molfrac, np.zeros_like(molfrac))
             # converting the masses to H2 mass
             H2mass = mass*(molfrac)*neutfrac
-
-            # neutral fraction is -1 where models are not defined, 
-            # so replace those values with 0
-            H2mass = np.where(H2mass>=0, H2mass, 
-                    np.zeros(H2mass.shape, dtype=np.float32))
 
             # place particles into grid
             grid.CICW(pos, self.header['BoxSize'], H2mass)
