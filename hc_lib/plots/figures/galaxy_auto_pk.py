@@ -47,6 +47,11 @@ def color_cuts(gals):
 
 def stmass_vs_total(gals):
     return
+def dust_sensitivity_galaxy_resolution(gals, gdusts):
+    return
+
+def dust_sensitivity_color_cut(gals, gdusts):
+    return
 
 def dust_sensitivity_stmass(gals, gdusts, panel_length = 3, 
         panel_bt = 0.1, border = 1, fsize=16):
@@ -106,7 +111,7 @@ def dust_sensitivity_stmass(gals, gdusts, panel_length = 3,
                             pkeys, colors=colors, labels=['No Dust'] + labels)
                     plib.plotpks(gdust.pks['k'], gdust.pks, gdust.box, gdust.resolution,
                         pkeys, labels=['With Dust']+labels, colors=colors, linestyles=linestyles_dust)
-                
+                ax = plt.gca()
                 ymin, ymax = ax.get_ylim()
                 if ymin > 0:
                     yrange[0] = min(yrange[0], ymin)
@@ -115,8 +120,17 @@ def dust_sensitivity_stmass(gals, gdusts, panel_length = 3,
 
             else:
                 ratio_pks = {}
-                labels = ['Red, Stellar', 'Blue, Stellar', 'Red, All', 'Blue, All']
+                labels = []
                 linestyles = []
+                for pkey in pkeys:
+                    ratio_pks[pkey] = gal.pks[pkey]/gdust.pks[pkey]
+                    if 'red' in pkey:
+                        labels.append('Red Galaxies')
+                        colors.append('red')
+                    elif 'blue' 
+                        labels.append('Blue Galaxies')
+                        color.append('blue')
+                    
                 for l in labels:
                     if 'Red' in l:
                         colors.append('red')
@@ -132,9 +146,10 @@ def dust_sensitivity_stmass(gals, gdusts, panel_length = 3,
 
                 plib.plotpks(gal.pks['k'], ratio_pks, gal.box, gal.resolution, 
                         pkeys, colors = colors, labels = labels, linestyles = linestyles)
-            
+                plt.yscale('linear')
+                 
             ax = plt.gca()
-            
+            plt.ylabel('')
 
             if i == 0:
                 ax.xaxis.set_label_position('top')
@@ -166,11 +181,11 @@ def dust_sensitivity_stmass(gals, gdusts, panel_length = 3,
             va = 'center', fontsize = fsize, rotation = 'vertical')
     fig.text(0.5, border/3/figsize[1], r'k (h/Mpc)', ha = 'center',
             va = 'center', fontsize = fsize)
-    plt.savefig('dust_sensitivity_mass_type%s.png'%get_suffix(gal))
+    plt.savefig('dust_sensitivity_mass_type_%s.png'%get_suffix(gal))
     plt.clf()      
     return
 
-def dust_sensitivity_stmass(gals, gdusts, panel_length = 3, 
+def dust_sensitivity_space(gals, gdusts, panel_length = 3, 
         panel_bt = 0.1, border = 1, fsize=16):
     snapshots, redshifts = plib.getSnaps(gals + gdusts)
     
@@ -233,6 +248,7 @@ def dust_sensitivity_stmass(gals, gdusts, panel_length = 3,
                     plib.plotpks(gdust.pks['k'], gdust.pks, gdust.box, gdust.resolution,
                         pkeys, labels=['With Dust']+labels, colors=colors, linestyles=linestyles_dust)
                 
+                ax = plt.gca()
                 ymin, ymax = ax.get_ylim()
                 if ymin > 0:
                     yrange[0] = min(yrange[0], ymin)
@@ -295,7 +311,7 @@ def dust_sensitivity_stmass(gals, gdusts, panel_length = 3,
             va = 'center', fontsize = fsize, rotation = 'vertical')
     fig.text(0.5, border/3/figsize[1], r'k (h/Mpc)', ha = 'center',
             va = 'center', fontsize = fsize)
-    plt.savefig('dust_sensitivity_mass_type%s.png'%get_suffix(gal))
+    plt.savefig('dust_sensitivity_space_%s.png'%get_suffix(gal))
     plt.clf()      
     return
 
