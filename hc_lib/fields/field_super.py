@@ -121,7 +121,18 @@ class Field():
             print("the saved pickle path: %s"%self.pkl_path)
         return
     
-    
+    # to be deleted soon
+    def computeGrids(self, outfile):
+        if self.v:
+            print("starting to compute grids...")
+        if self.header is None:
+            raise ValueError("header needs to be loaded before computing grids")
+        dat = outfile.create_dataset('pickle', data=[0])
+        dat.attrs['path'] = self.pkl_path
+        if self.v:
+            print("the saved pickle path: %s"%self.pkl_path)
+        return
+
     def computePk(self, grid):
         arr = grid.getGrid()
         arr = self._toOverdensity(arr)

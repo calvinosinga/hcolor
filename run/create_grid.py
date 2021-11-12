@@ -80,7 +80,6 @@ else:
 
 field.loadHeader(gd['load_header'])
 field.computeGrids(outfile)
-field.computeAux()
 # for fields with chunks, there will already be a pickle file with
 # the needed information so we don't need to create a new one with
 # each chunk.

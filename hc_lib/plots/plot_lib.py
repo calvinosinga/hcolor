@@ -63,8 +63,13 @@ def getYrange(fields, keys_dict, is_X):
         nyq = f.resolution * np.pi / f.box
         nyq_idx = np.argmin(np.abs(pks['k'] - nyq))
         for k in keys:
+            print('another iteration...')
+            print(k)
+            print(yrange)
+            
             pkmax = np.max(pks[k][:nyq_idx])
             pkmin = np.min(pks[k][:nyq_idx])
+            print(pkmax, pkmin)
             if pkmax > yrange[1]:
                 yrange[1] = pkmax
             if pkmin < yrange[0] and pkmin > 0:
