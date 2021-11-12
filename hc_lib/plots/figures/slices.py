@@ -32,13 +32,17 @@ def main():
     compare_HI_slices(hiptls, vns, hisubs)
     return
 
+def get_suffix(field):
+    tup = (field.simname, field.snapshot, field.axis, field.resolution)
+    suf = "%sB_%03dS_%dA_%dR"%tup
+    return suf
 
 def make_ptl_slices(hiptls, h2ptls, vns, ptls, panel_length = 3,
             panel_bt = 0.1, border = 0.5):
     for i in range(len(hiptls)):
         h = hiptls[i]
         models = h.getMolFracModelsPtl()
-        spaces = ['real-space', 'redshift-space']
+        spaces = ['Real Space', 'Redshift Space']
 
         key_array = np.empty((len(models), len(spaces)), dtype=object)
 
@@ -58,13 +62,13 @@ def make_ptl_slices(hiptls, h2ptls, vns, ptls, panel_length = 3,
         plib.plot_slices(h, key_array, models, spaces, 
                 'HI mass', panel_length, panel_bt, border)
         
-        plt.savefig("slices/hiptl_slice_models_vs_space_%03d"%h.snapshot)
+        plt.savefig("slices/hiptl_slice_models_vs_space_%s"%get_suffix(h))
         plt.clf()
     
     for i in range(len(h2ptls)):
         h = h2ptls[i]
         models = h.getMolFracModelsPtl()
-        spaces = ['real-space', 'redshift-space']
+        spaces = ['Real Space', 'Redshift Space']
 
         key_array = np.empty((len(models), len(spaces)), dtype=object)
 
@@ -84,14 +88,14 @@ def make_ptl_slices(hiptls, h2ptls, vns, ptls, panel_length = 3,
                 'HI mass', panel_length, panel_bt, border)
                 
         
-        plt.savefig("slices/h2ptl_slice_models_vs_space_%03d"%h.snapshot)
+        plt.savefig("slices/h2ptl_slice_models_vs_space_%s"%get_suffix(h))
         plt.clf()
     
 
     for i in range(len(vns)):
         v = vns[i]
         models = ['VN18-Particle']
-        spaces = ['real-space', 'redshift-space']
+        spaces = ['Real Space', 'Redshift Space']
 
         key_array = np.empty((len(models), len(spaces)), dtype=object)
 
@@ -101,14 +105,14 @@ def make_ptl_slices(hiptls, h2ptls, vns, ptls, panel_length = 3,
         plib.plot_slices(v, key_array, models, spaces, 
                 'HI mass', panel_length, panel_bt, border)
         
-        plt.savefig("slices/vn_slice_models_vs_space_%03d"%v.snapshot)
+        plt.savefig("slices/vn_slice_models_vs_space_%s"%get_suffix(v))
         plt.clf()
     
     for i in range(len(ptls)):
         p = ptls[i]
         ptl_types = ['ptl', 'stmass', 'dm']
         ptl_types = [i+'_CICW' for i in ptl_types]
-        spaces = ['real-space', 'redshift-space']
+        spaces = ['Real Space', 'Redshift Space']
 
         key_array = np.empty((len(ptl_types), len(spaces)), dtype=object)
 
@@ -124,7 +128,7 @@ def make_ptl_slices(hiptls, h2ptls, vns, ptls, panel_length = 3,
         plib.plot_slices(p, key_array, ['all', 'stellar', 'dark matter'], spaces, 
                 'mass', panel_length, panel_bt, border, same_cmap=False)
         
-        plt.savefig("slices/ptl_slice_ptltype_vs_space_%03d"%p.snapshot)
+        plt.savefig("slices/ptl_slice_ptltype_vs_space_%s"%get_suffix(p))
         plt.clf()
     return
 
@@ -177,7 +181,7 @@ def compare_HI_slices(hiptls, vns, hisubs, panel_length = 3,
                 return f
         return -1
     
-    # make real-space comparison, redshift-space is not needed
+    # make real-space comparison, Redshift Space is not needed
     idx_array = np.empty((len(snaps), 3), dtype=object)
     key_array = np.empty_like(idx_array)
     for s in range(len(snaps)):

@@ -162,7 +162,7 @@ def plotpks(k, pks, boxsize, resolution, keylist = None, colors = None,
     ax = plt.gca()
     ax.tick_params(which='both',direction='in')
     return
-    
+
 def plot2Dpk(kpar, kper, pk, do_axes_labels = True):
     cmap = copy.copy(mpl.cm.get_cmap("plasma"))
     cmap.set_under('w')
