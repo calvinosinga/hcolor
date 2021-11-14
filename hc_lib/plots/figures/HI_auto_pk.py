@@ -7,7 +7,7 @@ import sys
 mpl.rcParams['text.usetex'] = True
 
 def main():
-    
+    print("___________MAKING HI AUTO POWER_____________")
     print("loading paths...")
     OUTDIR = sys.argv.pop(1)
     paths = plib.getPaths(OUTDIR)

@@ -128,18 +128,18 @@ class galaxy(Field):
                 for cd in colordefs:
                     for mt in mass_type:
                         for Mt in MAS_type:
-                            gp = galaxy_props(c, Mt, self.fieldname, mt, r, cd)
+                            gp = galaxy_grid_props(c, Mt, self.fieldname, mt, r, cd)
                             if gp.isIncluded():
                                 gridnames[gp.getName()] = gp
         for r in resolutions:
             for mt in mass_type:
                 for Mt in MAS_type:
-                    gp = galaxy_props('resolved', Mt, self.fieldname, mt, r, None)
+                    gp = galaxy_grid_props('resolved', Mt, self.fieldname, mt, r, None)
                     if gp.isIncluded():
                         gridnames[gp.getName()] = gp
         for mt in mass_type:
             for Mt in MAS_type:
-                gp = galaxy_props('all', Mt, self.fieldname, mt, None, None)
+                gp = galaxy_grid_props('all', Mt, self.fieldname, mt, None, None)
                 if gp.isIncluded():
                     gridnames[gp.getName()] = gp
         
@@ -245,7 +245,7 @@ class galaxy(Field):
     @classmethod
     def getColorDefinitions(cls):
 
-        implemented_color_defs = ['papa', 'nelson', '0.5', '0.55', '0.6', '0.65', '0.7', 'eBOSS']
+        implemented_color_defs = ['papa', 'nelson', '0.50', '0.55', '0.60', '0.65', '0.70', 'eBOSS']
         
         return implemented_color_defs
     

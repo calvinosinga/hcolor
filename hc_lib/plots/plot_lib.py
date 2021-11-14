@@ -94,6 +94,8 @@ def createFig(panel_length, nrows, ncols, panel_bt, xborder, yborder):
         xborder = [xborder, xborder]
     if isinstance(yborder, float) or isinstance(yborder, int):
         yborder = [yborder, yborder]
+    if isinstance(panel_bt, float) or isinstance(panel_bt, int):
+        panel_bt = [panel_bt, panel_bt]
     # creating Figure object
 
     figwidth = panel_length * ncols + panel_bt * (ncols - 1) + \
@@ -107,7 +109,7 @@ def createFig(panel_length, nrows, ncols, panel_bt, xborder, yborder):
     gs = gspec.GridSpec(nrows, ncols)
     plt.subplots_adjust(left= xborder[0]/figwidth, right=1-xborder[1]/figwidth,
             top=1-yborder[1]/figheight, bottom=yborder[0]/figheight,
-            wspace=panel_bt, hspace=panel_bt)
+            wspace=panel_bt[0], hspace=panel_bt[1])
     
     # making panels list
     panels = []
