@@ -245,7 +245,7 @@ class galaxy(Field):
     @classmethod
     def getColorDefinitions(cls):
 
-        implemented_color_defs = ['papa', 'nelson', '0.50', '0.55', '0.60', '0.65', '0.70', 'eBOSS']
+        implemented_color_defs = ['papa', 'nelson', '0.5', '0.55', '0.6', '0.65', '0.7', 'eBOSS']
         
         return implemented_color_defs
     

@@ -98,9 +98,9 @@ def createFig(panel_length, nrows, ncols, panel_bt, xborder, yborder):
         panel_bt = [panel_bt, panel_bt]
     # creating Figure object
 
-    figwidth = panel_length * ncols + panel_bt * (ncols - 1) + \
+    figwidth = panel_length * ncols + panel_bt[0] * (ncols - 1) + \
             xborder[0] + xborder[1]
-    figheight = panel_length * nrows + panel_bt * (nrows - 1) + \
+    figheight = panel_length * nrows + panel_bt[1] * (nrows - 1) + \
             yborder[0] + yborder[1]
     
     fig = plt.figure(figsize=(figwidth, figheight))

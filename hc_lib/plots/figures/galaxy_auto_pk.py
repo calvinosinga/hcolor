@@ -55,13 +55,13 @@ def galaxy_auto_redshift_vs_space(gals, panel_length = 3, panel_bt = 0.1, border
     for i in range(nrows):
         snap = snapshots[i]
         gal = match_snapshot(snap, gals)
-        pkeys = plib.fetchKeys(['0.6', 'stmass'], ['rs','0.65','papa', 'all', 'eBOSS'], list(gal.pks.keys()))
         for j in range(ncols):
             plt.sca(panels[i][j])
             ax = plt.gca()
             colors = []
             labels = []
 
+            pkeys = plib.fetchKeys(['0.6', 'stmass'], ['rs','0.65','papa', 'all', 'eBOSS'], list(gal.pks.keys()))
             if col_labels[j] == 'Redshift Space':
                 pkeys = [pkey + 'rs' for pkey in pkeys]
             for pkey in pkeys:
@@ -169,7 +169,9 @@ def dust_sensitivity_color_cut(gals, gdusts, panel_length = 3,
 
             if j < ncols - 2:
                 cut = col_labels[j]
-                other_cuts = copy.copy(col_labels).remove(cut)
+                other_cuts = copy.copy(col_labels)
+                other_cuts.remove(cut)
+                
                 if cut == '0.65' or cut == "0.55":
                     other_cuts.remove(cut[:-1])
                     pkeys = plib.fetchKeys([cut, 'stmass'], ['rs', 'resolved'] + other_cuts, galkeys)
@@ -209,7 +211,8 @@ def dust_sensitivity_color_cut(gals, gdusts, panel_length = 3,
                 labels = []
                 pkeys = []
                 for c in cuts:
-                    other_cuts = copy.copy(cuts).remove(c)
+                    other_cuts = copy.copy(cuts)
+                    other_cuts.remove(c)
                     if c == '0.65':
                         other_cuts.remove('0.6')
                     pkeys += plib.fetchKeys([c, 'stmass'], other_cuts+['rs', 'resolved'], galkeys)
@@ -255,7 +258,8 @@ def dust_sensitivity_color_cut(gals, gdusts, panel_length = 3,
                 labels = []
                 pkeys = []
                 for c in cuts:
-                    other_cuts = copy.copy(col_labels).remove(c)
+                    other_cuts = copy.copy(col_labels)
+                    other_cuts.remove(c)
                     pkeys += plib.fetchKeys([c, 'stmass'], other_cuts+['rs', 'resolved'], galkeys)
                 linestyles = []
                 for pkey in pkeys:
