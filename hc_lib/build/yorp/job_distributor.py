@@ -21,6 +21,7 @@ import subprocess
 import time
 import os
 import psutil
+import pickle as pkl
 
 ########################################################################################################
 
@@ -38,15 +39,10 @@ start_time = time.time()
 
 
 # Find commands to execute
-f = open('commands.txt', 'r')
-commands = []
-for line in f.readlines():
-    commands.append(line.rstrip())
-n_commands = len(commands)
-print("Found " + str(n_commands) + " commands:")
-for i in range(n_commands):
-    print(i, commands[i])
-
+jm = pkl.load(open('job_manager.pkl', 'rb'))
+queue = jm.getQueue()
+n_commands = len(queue)
+N_PROC = psutil.cpu_count()
 printLine()
 
 pipes = {}
@@ -62,16 +58,15 @@ while complete < n_commands:
             del pipes[p]
 
             dt = time.time() - start_time
-            print("[%4d s] Completed  %3d  %s" % (dt, p, commands[p]))
+            print("[%4d s] Completed  %3d  %s" % (dt, p, queue[p].getJobName()))
 
     while len(pipes) < N_PROC and i < n_commands:
-        logName = "Command_%03d.log" % (i)
+        logName = "%s.log" % (queue[i].getJobName())
         fLog = open(logName, 'w')
-        arguments = ['srun', '--exclusive', '-N1', '-n1', '-np', '1']
-        arguments.extend(commands[i].split())
+        arguments = queue[i].getCmd()
         pipes[i] = subprocess.Popen(arguments, stdout = fLog, stderr=subprocess.STDOUT)
         dt = time.time() - start_time
-        print("[%4d s] Started    %3d  %s" % (dt, i, commands[i]))
+        print("[%4d s] Started    %3d  %s" % (dt, i, queue[i].getJobName()))
         i += 1
     
     time.sleep(1)

@@ -1,6 +1,40 @@
 #!/usr/bin/env python3
 import h5py as hp
+from hc_lib.build.input import Input
+from hc_lib.build.gd import IODict
+import pickle as pkl
+# yorp file paths
+OUTPATH = '/yorp16a/cosinga/'
+TNGPATH = '/net/nyx/nyx1/diemer/illustris/'
+HCOLOR = '/home/cosinga/hcolor/'
 
+tng_dict = {'tng100':'L75n1820TNG', 'tng300':'L205n2500TNG',
+        'tng100-2':'L75n910TNG', 'tng100-3':'L75n455TNG', 
+        'tng50':'L35n2160TNG'}
+def main():
+    ioobj = Input()
+    runs = ioobj.getRuns()
+    rp = ioobj.getParams()
+
+    gdobj = IODict(rp, runs, OUTPATH, TNGPATH+tng_dict[rp['sim']]+'/', HCOLOR)
+    gd = gdobj.getGlobalDict()
+    pd = gdobj.getPathDict()
+
+    # load number of files
+    f = hp.File(gd["load_header"],'r')
+    header = dict(f['Header'].attrs)
+
+    numfiles = header['NumFilesPerSnapshot']
+    jman = JobManager()
+
+    for r in runs:
+        if ioobj.isPtl(r):
+            jman.addPtlJobs(r, numfiles, pd)
+        if ioobj.isCat(r):
+            jman.addCatJobs(r, pd)
+    pkl.dump(jman, open('job_manager.pkl', 'wb'), pkl.HIGHEST_PROTOCOL)
+    
+    return
 
 class Job():
     def __init__(self, fieldname, jobID, cmdargs):
@@ -27,6 +61,9 @@ class Job():
     # check when to add Cross Jobs?
     def getCmd(self):
         return
+    
+    def getDep(self):
+        return self.dependencies
 
 class JobManager():
     def __init__(self):
@@ -85,23 +122,36 @@ class JobManager():
         self.jlist.append(createJob)
         return
     
-
-    def getQueue(): #TODO turn the job list into organized queue
-        return
+    def _getJob(self, jobname):
+        for j in self.jlist:
+            if jobname == j.getJobName():
+                return j
+        return None
     
-def makeJobs(ioobj, gd, pd):
-    runs = ioobj.getRuns()
-    rp = ioobj.getParams()
+    def _addRoot(self, job, queue):
+        if not job.getDep() and job not in queue:
+            queue.append(job)
+            return
+        elif job in queue:
+            return
+        else:
+            dep = job.getDep()
+            depjob = self._getJob(dep.getJobName())
+            self._addRoot(depjob, queue)
+            queue.append(job)
+            return
+        
 
-    # load number of files
-    f = hp.File(gd["load_header"],'r')
-    header = dict(f['Header'].attrs)
+    def getQueue(self):
+        queue = []
+        for j in range(len(self.jlist)):
+            self._addRoot(self.jlist[j], queue)
+                
+        return queue
 
-    numfiles = header['NumFilesPerSnapshot']
-    jobs = []
-    for r in range(len(runs)):
-        # if this field is based on particle catalog...
-        if ioobj.isPtl(runs[r]):
+if __name__ == '__main__':
+    main()
+
 
 
 

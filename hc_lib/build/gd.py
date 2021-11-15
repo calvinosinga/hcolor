@@ -5,8 +5,6 @@ on various computers.
 import os
 import copy
 
-from numpy.lib.npyio import save
-
 class IODict():
 
     def __init__(self, run_params, runs, out_path, tng_path, hcolor_path):

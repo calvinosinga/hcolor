@@ -80,11 +80,13 @@ class Input():
     
     def isCat(self, name):
         return name in self.gcat_runs
+    
     def isHyd(self, name):
         return name in self.hydrogen_runs
     
     def isMat(self, name):
         return name in self.matter_runs
+    
     def getParams(self):
         return self.rparams
     
