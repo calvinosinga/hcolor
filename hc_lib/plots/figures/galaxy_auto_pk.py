@@ -25,8 +25,20 @@ def main():
     dust_sensitivity_space(gals, gdusts)
     dust_sensitivity_galaxy_resolution(gals, gdusts)
 
-    print("now making evolution of galaxy auto power as a function of redshift...")
-    galaxy_auto_redshift_vs_space(gals)
+    print("now making evolution of galaxy auto in different spaces...")
+    galaxy_auto_redshiftR_spaceC_color(gals)
+    galaxy_auto_redshiftR_colorC_space(gals)
+
+    print("galaxy auto power for different mass definitions...")
+    galaxy_auto_redshiftR_colorC_mass(gals)
+
+    print("galaxy auto power for different color cuts...")
+    galaxy_auto_redshiftR_colorC_colorcut(gals)
+
+    print("galaxy auto for different mass assignment schemes...")
+    galaxy_auto_redshiftR_colorC_MAS(gals)
+
+    print("")
     return
 
 def get_suffix(field):
@@ -34,7 +46,167 @@ def get_suffix(field):
     suf = "%sB_%03dS_%dA_%dR"%tup
     return suf
 
-def galaxy_auto_redshift_vs_space(gals, panel_length = 3, panel_bt = 0.33, border = 1, fsize = 16):
+def galaxy_auto_redshiftR_colorC_mass(gals, panel_length = 3, panel_bt = 0.1, border = 1, fsize = 16):
+    snapshots, redshifts = plib.getSnaps(gals)
+    
+    def match_snapshot(snapshot, fields):
+        for f in fields:
+            if snapshot == f.snapshot:
+                return f
+        return None
+
+    col_labels = ['Red', 'Blue', 'All Galaxies']
+    colors = ['red', 'blue', 'green']
+    pk_name = ['red', 'blue', 'resolved']
+    nrows = len(snapshots)
+    ncols = len(col_labels)
+    fig, panels = plib.createFig(panel_length, nrows, ncols, panel_bt, 
+        border, border)
+    
+    yrange = [np.inf, 0]
+
+    for i in range(nrows):
+        snap = snapshots[i]
+        gal = match_snapshot(snap, gals)
+        for j in range(ncols):
+            plt.sca(panels[i][j])
+            ax = plt.gca()
+            pkeys = plib.fetchKeys(['0.6', 'CICW', pk_name[j]],['rs','0.65', 'papa', 'eBOSS'],
+                    list(gal.pks.keys()))
+            print(pkeys)
+            labels = []
+            linestyles = []
+            for pkey in pkeys:
+                if 'rs' in pkey:
+                    labels.append('Stellar Mass')
+                    linestyles.append('-')
+                else:
+                    labels.append('All Species')
+                    linestyles.append('--')
+            plib.plotpks(gal.pks['k'], gal.pks, gal.box, gal.resolution, pkeys,
+                        colors[j]*len(pkeys), labels, linestyles=linestyles)
+            
+            ymin, ymax = ax.get_ylim()
+            if ymin > 0:
+                yrange[0] = min(yrange[0], ymin)
+
+            yrange[1] = max(yrange[1], ymax)       
+            plt.ylabel('')
+
+            if i == 0:
+                ax.xaxis.set_label_position('top')
+                plt.xlabel(col_labels[j])
+                plt.legend(loc = 'upper right')
+            else:
+                plt.xlabel('')
+                ax.get_legend().remove()
+                ax.set_xticklabels([])
+            
+            if j == 0:
+                plt.text(0.05, 0.05,
+                    'z=%.1f'%redshifts[i], fontsize = fsize, ha = 'left', va = 'bottom',
+                    fontweight = 'bold', transform = ax.transAxes)
+            else:
+                ax.set_yticklabels([])
+                ax.get_legend().remove()
+
+
+    for i in range(nrows):
+        for j in range(ncols):
+            plt.sca(panels[i][j])
+            plt.ylim(yrange[0], yrange[1])
+    figsize = fig.get_size_inches()
+    fig.text(border/3/figsize[0], 0.5, r'P(k) (h/Mpc)$^3$', ha = 'center',
+            va = 'center', fontsize = fsize, rotation = 'vertical')
+    fig.text(0.5, border/3/figsize[1], r'k (h/Mpc)', ha = 'center',
+            va = 'center', fontsize = fsize)
+    plt.savefig('galaxy_auto_redshiftR_colorC_mass_%s.png'%get_suffix(gal))
+    plt.clf()      
+
+    return
+
+def galaxy_auto_redshiftR_colorC_space(gals, panel_length = 3, panel_bt = 0.1, border = 1, fsize = 16):
+    snapshots, redshifts = plib.getSnaps(gals)
+    
+    def match_snapshot(snapshot, fields):
+        for f in fields:
+            if snapshot == f.snapshot:
+                return f
+        return None
+
+    # plotting redshift vs space
+    col_labels = ['Red', 'Blue', 'All Galaxies']
+    colors = ['red', 'blue', 'green']
+    pk_name = ['red', 'blue', 'resolved']
+    nrows = len(snapshots)
+    ncols = len(col_labels)
+    fig, panels = plib.createFig(panel_length, nrows, ncols, panel_bt, 
+        border, border)
+    
+    yrange = [np.inf, 0]
+
+    for i in range(nrows):
+        snap = snapshots[i]
+        gal = match_snapshot(snap, gals)
+        for j in range(ncols):
+            plt.sca(panels[i][j])
+            ax = plt.gca()
+            pkeys = plib.fetchKeys(['0.6', 'stmass', 'CICW', pk_name[j]],['0.65', 'papa', 'eBOSS'],
+                    list(gal.pks.keys()))
+            labels = []
+            linestyles = []
+            for pkey in pkeys:
+                if 'rs' in pkey:
+                    labels.append('Redshift Space')
+                    linestyles.append('--')
+                else:
+                    labels.append('Real Space')
+                    linestyles.append('-')
+            print(pkeys)
+            plib.plotpks(gal.pks['k'], gal.pks, gal.box, gal.resolution, pkeys,
+                        [colors[j]]*len(pkeys), labels, linestyles=linestyles)
+
+            ymin, ymax = ax.get_ylim()
+            if ymin > 0:
+                yrange[0] = min(yrange[0], ymin)
+
+            yrange[1] = max(yrange[1], ymax)            
+            plt.ylabel('')
+
+            if i == 0:
+                ax.xaxis.set_label_position('top')
+                plt.xlabel(col_labels[j])
+                plt.legend(loc = 'upper right')
+            else:
+                plt.xlabel('')
+                ax.get_legend().remove()
+                ax.set_xticklabels([])
+            
+            if j == 0:
+                plt.text(0.05, 0.05,
+                    'z=%.1f'%redshifts[i], fontsize = fsize, ha = 'left', va = 'bottom',
+                    fontweight = 'bold', transform = ax.transAxes)
+            else:
+                ax.set_yticklabels([])
+                ax.get_legend().remove()
+
+
+    for i in range(nrows):
+        for j in range(ncols):
+            if i < nrows - 1 and j < ncols - 1:
+                plt.sca(panels[i][j])
+                plt.ylim(yrange[0], yrange[1])
+    figsize = fig.get_size_inches()
+    fig.text(border/3/figsize[0], 0.5, r'P(k) (h/Mpc)$^3$', ha = 'center',
+            va = 'center', fontsize = fsize, rotation = 'vertical')
+    fig.text(0.5, border/3/figsize[1], r'k (h/Mpc)', ha = 'center',
+            va = 'center', fontsize = fsize)
+    plt.savefig('galaxy_auto_redshiftR_colorC_space_%s.png'%get_suffix(gal))
+    plt.clf()      
+
+    return
+
+def galaxy_auto_redshiftR_spaceC_color(gals, panel_length = 3, panel_bt = 0.1, border = 1, fsize = 16):
     snapshots, redshifts = plib.getSnaps(gals)
     
     def match_snapshot(snapshot, fields):
@@ -47,7 +219,7 @@ def galaxy_auto_redshift_vs_space(gals, panel_length = 3, panel_bt = 0.33, borde
     col_labels = ['Real Space', 'Redshift Space', 'Redshift Space Distortions']
     nrows = len(snapshots)
     ncols = len(col_labels)
-    fig, panels = plib.createFig(panel_length, nrows, ncols, [panel_bt*1.5, panel_bt], 
+    fig, panels = plib.createFig(panel_length, nrows, ncols, panel_bt, 
         border, border)
     
     yrange = [np.inf, 0]
@@ -102,6 +274,7 @@ def galaxy_auto_redshift_vs_space(gals, panel_length = 3, panel_bt = 0.33, borde
             else:
                 plt.xlabel('')
                 ax.get_legend().remove()
+            if not i == nrows - 1:
                 ax.set_xticklabels([])
             
             if j == 0:
@@ -126,11 +299,163 @@ def galaxy_auto_redshift_vs_space(gals, panel_length = 3, panel_bt = 0.33, borde
             va = 'center', fontsize = fsize, rotation = 'vertical')
     fig.text(0.5, border/3/figsize[1], r'k (h/Mpc)', ha = 'center',
             va = 'center', fontsize = fsize)
-    plt.savefig('galaxy_auto_redshift_vs_space_%s.png'%get_suffix(gal))
+    plt.savefig('galaxy_auto_redshiftR_spaceC_color_%s.png'%get_suffix(gal))
     plt.clf()      
 
     return
 
+def galaxy_auto_redshiftR_colorC_colorcut(gals, panel_length = 3, panel_bt = 0.1, border = 1, fsize = 16):
+    snapshots, redshifts = plib.getSnaps(gals)
+    
+    def match_snapshot(snapshot, fields):
+        for f in fields:
+            if snapshot == f.snapshot:
+                return f
+        return None
+
+    col_labels = ['Red', 'Blue', 'All Galaxies']
+    pk_name = ['red', 'blue', 'resolved']
+    nrows = len(snapshots)
+    ncols = len(col_labels)
+    fig, panels = plib.createFig(panel_length, nrows, ncols, panel_bt, 
+        border, border)
+    
+    yrange = [np.inf, 0]
+
+    for i in range(nrows):
+        snap = snapshots[i]
+        gal = match_snapshot(snap, gals)
+        for j in range(ncols):
+            plt.sca(panels[i][j])
+            ax = plt.gca()
+            pkeys = plib.fetchKeys(['CICW', pk_name[j], 'stmass'],['rs', 'papa', 'eBOSS'],
+                    list(gal.pks.keys()))
+            
+            labels = []
+            for pkey in pkeys:
+                spt = pkey.split('_')
+                labels.append(spt[-1])
+            print(pkeys)
+            plib.plotpks(gal.pks['k'], gal.pks, gal.box, gal.resolution, pkeys,
+                        labels= labels)
+            
+            plt.ylabel('')
+            ymin, ymax = ax.get_ylim()
+            if ymin > 0:
+                yrange[0] = min(yrange[0], ymin)
+
+            yrange[1] = max(yrange[1], ymax)
+            if i == 0:
+                ax.xaxis.set_label_position('top')
+                plt.xlabel(col_labels[j])
+                plt.legend(loc = 'upper right')
+            else:
+                plt.xlabel('')
+                ax.get_legend().remove()
+                ax.set_xticklabels([])
+            
+            if j == 0:
+                plt.text(0.05, 0.05,
+                    'z=%.1f'%redshifts[i], fontsize = fsize, ha = 'left', va = 'bottom',
+                    fontweight = 'bold', transform = ax.transAxes)
+            else:
+                ax.set_yticklabels([])
+                ax.get_legend().remove()
+
+
+    for i in range(nrows):
+        for j in range(ncols):
+            
+            plt.sca(panels[i][j])
+            plt.ylim(yrange[0], yrange[1])
+    figsize = fig.get_size_inches()
+    fig.text(border/3/figsize[0], 0.5, r'P(k) (h/Mpc)$^3$', ha = 'center',
+            va = 'center', fontsize = fsize, rotation = 'vertical')
+    fig.text(0.5, border/3/figsize[1], r'k (h/Mpc)', ha = 'center',
+            va = 'center', fontsize = fsize)
+    plt.savefig('galaxy_auto_redshiftR_colorC_colorcut_%s.png'%get_suffix(gal))
+    plt.clf()      
+    return
+
+def galaxy_auto_redshiftR_colorC_MAS(gals, panel_length = 3, panel_bt = 0.1, border = 1, fsize = 16):
+    snapshots, redshifts = plib.getSnaps(gals)
+    
+    def match_snapshot(snapshot, fields):
+        for f in fields:
+            if snapshot == f.snapshot:
+                return f
+        return None
+
+    col_labels = ['Red', 'Blue', 'All Galaxies']
+    pk_name = ['red', 'blue', 'resolved']
+    colors = ['red', 'blue', 'green']
+    nrows = len(snapshots)
+    ncols = len(col_labels)
+    fig, panels = plib.createFig(panel_length, nrows, ncols, [panel_bt*1.5, panel_bt], 
+        border, border)
+    
+    yrange = [np.inf, 0]
+
+    for i in range(nrows):
+        snap = snapshots[i]
+        gal = match_snapshot(snap, gals)
+        for j in range(ncols):
+            plt.sca(panels[i][j])
+            ax = plt.gca()
+            pkeys = plib.fetchKeys([pk_name[j], '0.6', 'stmass'],['rs', '0.65', 'papa', 'eBOSS', 'nelson'],
+                    list(gal.pks.keys()))
+            
+            labels = []
+            linestyles = []
+            for pkey in pkeys:
+                if 'CICW' in pkey:
+                    labels.append('Mass Weighted')
+                    linestyles.append('-')
+                else:
+                    labels.append('Not Weighted')
+                    linestyles.append('--')
+
+            print(pkeys)
+            plib.plotpks(gal.pks['k'], gal.pks, gal.box, gal.resolution, pkeys,
+                        colors=[colors[j]]*len(pkeys), labels= labels)
+            
+            plt.ylabel('')
+            ymin, ymax = ax.get_ylim()
+            if ymin > 0:
+                yrange[0] = min(yrange[0], ymin)
+
+            yrange[1] = max(yrange[1], ymax)
+            if i == 0:
+                ax.xaxis.set_label_position('top')
+                plt.xlabel(col_labels[j])
+                plt.legend(loc = 'upper right')
+            else:
+                plt.xlabel('')
+                ax.get_legend().remove()
+                ax.set_xticklabels([])
+            
+            if j == 0:
+                plt.text(0.05, 0.05,
+                    'z=%.1f'%redshifts[i], fontsize = fsize, ha = 'left', va = 'bottom',
+                    fontweight = 'bold', transform = ax.transAxes)
+            else:
+                ax.set_yticklabels([])
+                ax.get_legend().remove()
+
+
+    for i in range(nrows):
+        for j in range(ncols):
+
+            plt.sca(panels[i][j])
+            plt.ylim(yrange[0], yrange[1])
+    figsize = fig.get_size_inches()
+    fig.text(border/3/figsize[0], 0.5, r'P(k) (h/Mpc)$^3$', ha = 'center',
+            va = 'center', fontsize = fsize, rotation = 'vertical')
+    fig.text(0.5, border/3/figsize[1], r'k (h/Mpc)', ha = 'center',
+            va = 'center', fontsize = fsize)
+    plt.savefig('galaxy_auto_redshiftR_colorC_MAS_%s.png'%get_suffix(gal))
+    plt.clf()      
+    return
 
 def dust_sensitivity_galaxy_resolution(gals, gdusts):
     return

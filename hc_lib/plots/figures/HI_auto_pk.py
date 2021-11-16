@@ -18,112 +18,131 @@ def main():
     hisubs = plib.checkPkls(paths, {'fieldname':'hisubhalo'})
 
     print("plotting individual models for hiptl...")
-    hiptl_individual_models(hiptls)
+    hiptl_auto_redshiftR_spaceC_model(hiptls)
 
     print("plotting individual models for hisubhalo...")
-    hisubhalo_individual_models(hisubs)
+    hisubhalo_auto_redshiftR_spaceC_model(hisubs)
 
     print("plotting auto power spectra for HI...")    
     HI_auto_pk(hiptls, hisubs, vns)
 
 
     return
+def match_snapshot(snapshot, fields):
+    for f in fields:
+        if snapshot == f.snapshot:
+            return f
+    return None
 
+def get_suffix(field):
+    tup = (field.simname, field.snapshot, field.axis, field.resolution)
+    suf = "%sB_%03dS_%dA_%dR"%tup
+    return suf
 
-def hiptl_individual_models(hiptls, panel_length = 3, 
-            panel_bt = 0.1, border = 0.5, fsize=16):
+def hiptl_auto_redshiftR_spaceC_model(hiptls, panel_length = 3, 
+            panel_bt = 0.33, border = 1, fsize=16):
     
     snapshots, redshifts = plib.getSnaps(hiptls)
     nrows = len(snapshots)
-    col_labels = ["real space", "redshift space", "comparison"]
+    col_labels = ["Real Space", "Redshift Space", "Comparison", "Distortions"]
     ncols = len(col_labels)
-    xborder = [1.5*border, border]
     fig, panels = plib.createFig(panel_length, nrows, ncols, panel_bt,
-            xborder, border)
+            border, border)
     
     # getting keys for each part:
     real_keys = plib.fetchKeys(['CICW'],['rs', 'temp'], list(hiptls[0].pks.keys()))
-    redsh_keys = plib.fetchKeys(['rs'], ['temp'], list(hiptls[0].pks.keys()))
+    redsh_keys = plib.fetchKeys(['CICW', 'rs'], ['temp'], list(hiptls[0].pks.keys()))
     print(real_keys)
     print(redsh_keys)
-    keys = {'hiptl':real_keys + redsh_keys}
-    yrange = plib.getYrange(hiptls, keys, False)
+    
+    yrange = [np.inf, 0]
 
-    keys = [real_keys, redsh_keys]
+    keys = {'Real Space':real_keys, 'Redshift Space':redsh_keys}
     for i in range(nrows):
         snap = snapshots[i]
 
-        for f in hiptls:
-            if f.snapshot == snap:
-                field = f
-                break
+        field = match_snapshot(snap, hiptls)
         
         for j in range(ncols):
             plt.sca(panels[i][j])
+            ax = plt.gca()
             # comparison column will look different
-            colors = ['blue', 'red']
-            if j < len(keys):
-                labels = [st.split('_')[0] for st in keys[j]]
+            if j == 0 or j == 1:
+                labels = [st.split('_')[0] for st in keys[col_labels[j]]]
                 plib.plotpks(field.pks['k'], field.pks, field.box, field.resolution,
                         keys[j], labels=labels)
-                plt.ylim(yrange[0], yrange[1])
+                
+                ymin, ymax = ax.get_ylim()
+                if ymin > 0:
+                    yrange[0] = min(yrange[0], ymin)
+
+                yrange[1] = max(yrange[1], ymax)
+                plt.ylabel('')    
+                
             
-            else:
+            elif j == 2:
+                colors = ['blue', 'red']
                 for k in range(len(keys)):
                     plib.fillpks(field.pks['k'], field.pks, field.box, field.resolution,
-                            keys[k], label = col_labels[k], color= colors[k])
+                            keys[col_labels[k]], label = col_labels[k], color= colors[k])
                 plt.legend(loc = 'upper right')
-                plt.ylim(yrange[0], yrange[1])
-                #pk_ax = plt.gca()
-                #divider = make_axes_locatable(pk_ax)
-                #frac_ax = divider.append_axes("bottom", size="75%", pad=panel_bt,
-                #        sharex=pk_ax)
+
+                ymin, ymax = ax.get_ylim()
+                if ymin > 0:
+                    yrange[0] = min(yrange[0], ymin)
+
+                yrange[1] = max(yrange[1], ymax)
+
+                plt.ylabel('')
                 
-                #distortions = {}
-                #for k in keys[0]:
-                #    distortions[k] = field.pks[k] / field.pks[k+'rs']
-                #plt.sca(frac_ax)
-                #plib.fillpks(field.pks['k'], distortions, field.box, field.resolution,
-                #        keys[0], color='green')
-            ax = plt.gca()
-            plt.xlabel('')
-            plt.ylabel('')
+            elif j == 3:
+                distortions = {}
+                labels = []
+                for pkey in keys[col_labels[0]]:
+                    distortions[pkey] = field.pks[pkey+'rs']/field.pks[pkey]
+                    labels.append(pkey.split('_')[0])
+                plib.plotpks(field.pks['k'], distortions, field.box. field.resolution,
+                        keys[col_labels[0]], labels=labels)
+                plt.ylabel('$\frac{P_z(k)}{P_r(k)}$')
+                plt.yscale('linear')
+
             if i == 0:
                 ax.xaxis.set_label_position('top')
                 plt.xlabel(col_labels[j])
+            else:
+                plt.xlabel('')
+                ax.get_legend().remove()
             if not i == nrows-1:
                 ax.xaxis.set_ticklabels([])
             if j == 0:
-                plt.text(field.pks['k'][0], yrange[0]*1.10, '\tz=%.2f'%redshifts[i], 
-                        fontsize = fsize, ha = 'left', va = 'bottom')
+                plt.text(0.05, 0.05, 'z=%.1f'%redshifts[i], fontsize = fsize, 
+                        ha = 'left', va = 'bottom', transform = ax.transAxes)
             else:
                 ax.yaxis.set_ticklabels([])
+            
     figsize = fig.get_size_inches()
-    fig.text(0.5, border/2/figsize[1], 'k (h/Mpc)', ha='center', va = 'center', 
+    fig.text(0.5, border/3/figsize[1], 'k (h/Mpc)', ha='center', va = 'center', 
             fontsize = fsize)
 
-    fig.text(border/2/figsize[0], 0.5, 'P(k) (h/Mpc)$^3$', ha='center', va = 'center', 
+    fig.text(border/3/figsize[0], 0.5, 'P(k) (h/Mpc)$^3$', ha='center', va = 'center', 
             fontsize = fsize, rotation = 'vertical')
-    plt.savefig("HI_auto/hiptl_pk_models_redshift_vs_distortions.png")
+    plt.savefig("HI_auto/hiptl_auto_redshiftR_spaceC_models_%s.png"%get_suffix(hiptls[0]))
     plt.clf()
     return
             
-def hisubhalo_individual_models(hisubs, panel_length=3, panel_bt = 0.1,
-            border = 0.5, fsize = 16):
+def hisubhalo_auto_redshiftR_spaceC_model(hisubs, panel_length=3, panel_bt = 0.33,
+            border = 1, fsize = 16):
     snapshots, redshifts = plib.getSnaps(hisubs)
     nrows = len(snapshots)
-    col_labels = ["real space", "redshift space", "space comparison"]
+    col_labels = ["Real Space", "Redshift Space", "Comparison"]
     ncols = len(col_labels)
-    xborder = [1.5 * border, border]
     fig, panels = plib.createFig(panel_length, nrows, ncols, panel_bt,
-            xborder, border)
+            border, border)
     
     # getting keys for each part:
     real_keys = plib.fetchKeys(['CICW'],['rs', 'papa'], list(hisubs[0].pks.keys()))
     redsh_keys = [k+'rs' for k in real_keys]
 
-    print(real_keys)
-    print(redsh_keys)
     keys = {'hisubhalo':real_keys + redsh_keys}
     yrange = plib.getYrange(hisubs, keys, False)
 
@@ -131,10 +150,7 @@ def hisubhalo_individual_models(hisubs, panel_length=3, panel_bt = 0.1,
     for i in range(nrows):
         snap = snapshots[i]
 
-        for f in hisubs:
-            if f.snapshot == snap:
-                field = f
-                break
+        field = match_snapshot(snap, hisubs)
         
         for j in range(ncols):
             plt.sca(panels[i][j])
@@ -152,17 +168,7 @@ def hisubhalo_individual_models(hisubs, panel_length=3, panel_bt = 0.1,
                             keys[k], label = col_labels[k], color= colors[k])
                 plt.legend(loc = 'upper right')
                 plt.ylim(yrange[0], yrange[1])
-                #pk_ax = plt.gca()
-                #divider = make_axes_locatable(pk_ax)
-                #frac_ax = divider.append_axes("bottom", size="75%", pad=panel_bt,
-                #        sharex=pk_ax)
-                
-                #distortions = {}
-                #for k in keys[0]:
-                #    distortions[k] = field.pks[k] / field.pks[k+'rs']
-                #plt.sca(frac_ax)
-                #plib.fillpks(field.pks['k'], distortions, field.box, field.resolution,
-                #        keys[0], color='green')
+
             ax = plt.gca()
             plt.xlabel('')
             plt.ylabel('')
