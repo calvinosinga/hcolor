@@ -52,8 +52,6 @@ def hiptl_auto_redshiftR_spaceC_model(hiptls, panel_length = 3,
     # getting keys for each part:
     real_keys = plib.fetchKeys(['CICW'],['rs', 'temp'], list(hiptls[0].pks.keys()))
     redsh_keys = plib.fetchKeys(['CICW', 'rs'], ['temp'], list(hiptls[0].pks.keys()))
-    print(real_keys)
-    print(redsh_keys)
     
     yrange = [np.inf, 0]
 
@@ -153,24 +151,41 @@ def hisubhalo_auto_redshiftR_spaceC_model(hisubs, panel_length=3, panel_bt = 0.3
         
         for j in range(ncols):
             plt.sca(panels[i][j])
+            ax = plt.gca()
             # comparison column will look different
-            colors = ['blue', 'red']
-            if j < len(keys):
-                labels = [st.split('_')[2] for st in keys[j]]
+            if j == 0 or j == 1:
+                labels = [st.split('_')[0] for st in keys[j]]
                 plib.plotpks(field.pks['k'], field.pks, field.box, field.resolution,
                         keys[j], labels=labels)
-                plt.ylim(yrange[0], yrange[1])
+                
+                ymin, ymax = ax.get_ylim()
+                if ymin > 0:
+                    yrange[0] = min(yrange[0], ymin)
+
+                yrange[1] = max(yrange[1], ymax)
+                plt.ylabel('')
             
-            else:
+            elif j == 2:
+                colors = ['blue', 'red']
                 for k in range(len(keys)):
                     plib.fillpks(field.pks['k'], field.pks, field.box, field.resolution,
                             keys[k], label = col_labels[k], color= colors[k])
                 plt.legend(loc = 'upper right')
                 plt.ylim(yrange[0], yrange[1])
+                plt.ylabel('')
 
+            elif j == 3:
+                distortions = {}
+                labels = []
+                for pkey in keys[0]:
+                    distortions[pkey] = field.pks[pkey+'rs']/field.pks[pkey]
+                    labels.append(pkey.split('_')[0])
+                plib.plotpks(field.pks['k'], distortions, field.box, field.resolution,
+                        keys[col_labels[0]], labels=labels)
+                plt.ylabel('$\frac{P_z(k)}{P_r(k)}$')
+                plt.yscale('linear')
             ax = plt.gca()
             plt.xlabel('')
-            plt.ylabel('')
             if i == 0:
                 ax.xaxis.set_label_position('top')
                 plt.xlabel(col_labels[j])
@@ -187,11 +202,11 @@ def hisubhalo_auto_redshiftR_spaceC_model(hisubs, panel_length=3, panel_bt = 0.3
 
     fig.text(border/2/figsize[0], 0.5, 'P(k) (h/Mpc)$^3$', ha='center', va = 'center', 
             fontsize = fsize, rotation = 'vertical')
-    plt.savefig("HI_auto/hisubhalo_pk_models_redshift_vs_distortions.png")
+    plt.savefig("HI_auto/hisubhalo_auto_redshiftR_spaceC_models_%s.png"%get_suffix(hisubs[0]))
     plt.clf()
     return
 
-def HI_auto_pk(hiptls, hisubs, vns, panel_length = 3, 
+def HI_auto_redshiftR_spaceC_field(hiptls, hisubs, vns, panel_length = 3, 
             panel_bt = 0.1, border = 0.5, fsize=16):
     """
     Makes HI-auto power spectra plots, for real space or redshift space.
@@ -205,11 +220,7 @@ def HI_auto_pk(hiptls, hisubs, vns, panel_length = 3,
     # get the desired keys for each field - if the fields are not
     # in the results, then make the keys an empty list
 
-    def match_snapshot(snapshot, fields):
-        for f in fields:
-            if snapshot == f.snapshot:
-                return f
-        return None
+
     
     vn_real_keys = plib.fetchKeys(['mass'], ['rs'], list(vns[0].pks.keys()))
     vn_redsh_keys = [k+'rs' for k in vn_real_keys] 
@@ -236,7 +247,7 @@ def HI_auto_pk(hiptls, hisubs, vns, panel_length = 3,
     yrange = plib.getYrange(fields, key_dict, False)
     snapshots, redshifts = plib.getSnaps(fields)
 
-    col_labels = ['real space', 'redshift space']
+    col_labels = ['Real Space', 'Redshift Space', 'Distortions']
     nrows = len(snapshots)
     ncols = len(col_labels)
     xborder = [1.5 * border, border]
@@ -252,7 +263,7 @@ def HI_auto_pk(hiptls, hisubs, vns, panel_length = 3,
         hisub = match_snapshot(snap, hisubs)
         for j in range(ncols):
             plt.sca(panels[i][j])
-            if col_labels[j] == 'real space':
+            if col_labels[j] == 'Real Space':
                 plib.plotpks(vn.pks['k'], vn.pks, vn.box, vn.resolution,
                         keylist = vn_real_keys, colors = ['green'],
                         labels = ['VN18-Particle'])
@@ -265,7 +276,9 @@ def HI_auto_pk(hiptls, hisubs, vns, panel_length = 3,
                 plib.fillpks(hiptl.pks['k'], hiptl.pks, hiptl.box, hiptl.resolution,
                         keylist = hiptl_real_keys, color = 'blue',
                         label = 'D18-Particle')
-            elif col_labels[j] == 'redshift space':
+                
+                plt.ylabel('')
+            elif col_labels[j] == 'Redshift Space':
                 plib.plotpks(vn.pks['k'], vn.pks, vn.box, vn.resolution,
                         keylist = vn_redsh_keys, colors = ['green'],
                         labels = ['VN18-Particle'])
@@ -278,9 +291,35 @@ def HI_auto_pk(hiptls, hisubs, vns, panel_length = 3,
                 plib.fillpks(hiptl.pks['k'], hiptl.pks, hiptl.box, hiptl.resolution,
                         keylist = hiptl_redsh_keys, color = 'blue',
                         label = 'D18-Particle')
+                plt.ylabel('')
+            elif col_labels[j] == 'Distortions':
+                
+                fields = [hiptl, vn, hisub]
+                keys = [hiptl_real_keys, vn_real_keys, hisub_real_keys]
+                labels = ['D18-Particle', 'VN18-Particle', 'D18-Subhalo']
+                for f in range(len(fields)):
+                    distortions = {}
+                    for pkey in keys[f]:
+                        distortions[pkey] = fields[f].pks[pkey+'rs']/fields[f].pks[pkey]
+                    if fields[f].fieldname == 'vn':
+                        fld = fields[f]
+                        plib.plotpks(fld.pks['k'], distortions, fld.box, fld.resolution,
+                                colors=['green'], labels=[labels[f]])
+                    else:
+                        fld = fields[f]
+                        if fld.fieldname == 'hiptl':
+                            col = 'blue'
+                        else:
+                            col = 'orange'
+                        plib.fillpks(fld.pks['k'], distortions, fld.box, fld.resolution,
+                                color=col)
+                    
+                    plt.yscale('linear')
+                    plt.ylabel('$\frac{P_z(k)}{P_r(k)}$')
+
 
             ax = plt.gca()
-            plt.ylabel('')
+           
             if i == 0 and j == 0:
                 plt.legend(loc='upper right')
             else:
@@ -304,12 +343,12 @@ def HI_auto_pk(hiptls, hisubs, vns, panel_length = 3,
         
 
     figsize = fig.get_size_inches()
-    fig.text(border/2/figsize[0], 0.5, r'P(k) (Mpc/h)$^{-3}$',ha = 'center',
+    fig.text(border/3/figsize[0], 0.5, r'P(k) (Mpc/h)$^{-3}$',ha = 'center',
             va = 'center', fontsize=fsize, rotation='vertical')
-    fig.text(0.5, border/2/figsize[1], r'k (Mpc/h)$^{-1}$', ha = 'center',
+    fig.text(0.5, border/3/figsize[1], r'k (Mpc/h)$^{-1}$', ha = 'center',
             va = 'center', fontsize=fsize)
     
-    plt.savefig("HI_auto/HI_auto_pk_redshift_vs_space.png")
+    plt.savefig("HI_auto/HI_auto_redshiftR_vs_spaceC_field_%s.png"%get_suffix(vns[0]))
     plt.clf()
     return
 
