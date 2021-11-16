@@ -24,7 +24,7 @@ def main():
     hisubhalo_auto_redshiftR_spaceC_model(hisubs)
 
     print("plotting auto power spectra for HI...")    
-    HI_auto_pk(hiptls, hisubs, vns)
+    HI_auto_redshiftR_spaceC_field(hiptls, hisubs, vns)
 
 
     return
@@ -101,7 +101,7 @@ def hiptl_auto_redshiftR_spaceC_model(hiptls, panel_length = 3,
                     labels.append(pkey.split('_')[0])
                 plib.plotpks(field.pks['k'], distortions, field.box, field.resolution,
                         keys[col_labels[0]], labels=labels)
-                plt.ylabel('$\frac{P_z(k)}{P_r(k)}$')
+                plt.ylabel(r'$\frac{P_z(k)}{P_r(k)}$')
                 plt.yscale('linear')
 
             if i == 0:
@@ -181,8 +181,8 @@ def hisubhalo_auto_redshiftR_spaceC_model(hisubs, panel_length=3, panel_bt = 0.3
                     distortions[pkey] = field.pks[pkey+'rs']/field.pks[pkey]
                     labels.append(pkey.split('_')[0])
                 plib.plotpks(field.pks['k'], distortions, field.box, field.resolution,
-                        keys[col_labels[0]], labels=labels)
-                plt.ylabel('$\frac{P_z(k)}{P_r(k)}$')
+                        keys[0], labels=labels)
+                plt.ylabel(r'$\frac{P_z(k)}{P_r(k)}$')
                 plt.yscale('linear')
             ax = plt.gca()
             plt.xlabel('')
@@ -315,7 +315,7 @@ def HI_auto_redshiftR_spaceC_field(hiptls, hisubs, vns, panel_length = 3,
                                 color=col)
                     
                     plt.yscale('linear')
-                    plt.ylabel('$\frac{P_z(k)}{P_r(k)}$')
+                    plt.ylabel(r'$\frac{P_z(k)}{P_r(k)}$')
 
 
             ax = plt.gca()

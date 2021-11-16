@@ -46,7 +46,7 @@ def get_suffix(field):
     suf = "%sB_%03dS_%dA_%dR"%tup
     return suf
 
-def galaxy_auto_redshiftR_colorC_mass(gals, panel_length = 3, panel_bt = 0.1, border = 1, fsize = 16):
+def galaxy_auto_redshiftR_colorC_mass(gals, panel_length = 3, panel_bt = 0.33, border = 1, fsize = 16):
     snapshots, redshifts = plib.getSnaps(gals)
     
     def match_snapshot(snapshot, fields):
@@ -71,7 +71,7 @@ def galaxy_auto_redshiftR_colorC_mass(gals, panel_length = 3, panel_bt = 0.1, bo
         for j in range(ncols):
             plt.sca(panels[i][j])
             ax = plt.gca()
-            pkeys = plib.fetchKeys(['0.6', 'CICW', pk_name[j]],['rs','0.65', 'papa', 'eBOSS'],
+            pkeys = plib.fetchKeys(['CICW', pk_name[j]],['rs','0.5','0.55','0.7','0.65', 'papa', 'eBOSS'],
                     list(gal.pks.keys()))
             print(pkeys)
             labels = []
