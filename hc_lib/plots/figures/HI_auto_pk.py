@@ -70,7 +70,7 @@ def hiptl_auto_redshiftR_spaceC_model(hiptls, panel_length = 3,
             if j == 0 or j == 1:
                 labels = [st.split('_')[0] for st in keys[col_labels[j]]]
                 plib.plotpks(field.pks['k'], field.pks, field.box, field.resolution,
-                        keys[j], labels=labels)
+                        keys[col_labels[j]], labels=labels)
                 
                 ymin, ymax = ax.get_ylim()
                 if ymin > 0:
@@ -101,7 +101,7 @@ def hiptl_auto_redshiftR_spaceC_model(hiptls, panel_length = 3,
                 for pkey in keys[col_labels[0]]:
                     distortions[pkey] = field.pks[pkey+'rs']/field.pks[pkey]
                     labels.append(pkey.split('_')[0])
-                plib.plotpks(field.pks['k'], distortions, field.box. field.resolution,
+                plib.plotpks(field.pks['k'], distortions, field.box, field.resolution,
                         keys[col_labels[0]], labels=labels)
                 plt.ylabel('$\frac{P_z(k)}{P_r(k)}$')
                 plt.yscale('linear')
@@ -134,7 +134,7 @@ def hisubhalo_auto_redshiftR_spaceC_model(hisubs, panel_length=3, panel_bt = 0.3
             border = 1, fsize = 16):
     snapshots, redshifts = plib.getSnaps(hisubs)
     nrows = len(snapshots)
-    col_labels = ["Real Space", "Redshift Space", "Comparison"]
+    col_labels = ["Real Space", "Redshift Space", "Comparison", "Distortions"]
     ncols = len(col_labels)
     fig, panels = plib.createFig(panel_length, nrows, ncols, panel_bt,
             border, border)
@@ -143,8 +143,7 @@ def hisubhalo_auto_redshiftR_spaceC_model(hisubs, panel_length=3, panel_bt = 0.3
     real_keys = plib.fetchKeys(['CICW'],['rs', 'papa'], list(hisubs[0].pks.keys()))
     redsh_keys = [k+'rs' for k in real_keys]
 
-    keys = {'hisubhalo':real_keys + redsh_keys}
-    yrange = plib.getYrange(hisubs, keys, False)
+    yrange = [np.inf, 0]
 
     keys = [real_keys, redsh_keys]
     for i in range(nrows):
