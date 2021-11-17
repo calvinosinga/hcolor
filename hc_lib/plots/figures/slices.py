@@ -10,6 +10,7 @@ mpl.rcParams['text.usetex'] = True
 
 def main():
     # remove the script name
+    print('________MAKING SLICE PLOTS_________')
     sys.argv.pop(0)
     print("loading paths to pickle files...")
     OUTDIR = sys.argv[0]
@@ -30,6 +31,8 @@ def main():
 
     print("now comparing HI slices...")
     compare_HI_slices(hiptls, vns, hisubs)
+
+    print('___________FINISHING SLICE PLOTS________')
     return
 
 def get_suffix(field):
@@ -85,7 +88,7 @@ def make_ptl_slices(hiptls, h2ptls, vns, ptls, panel_length = 3,
             key_array[row_idx][col_idx] = k
         
         plib.plot_slices(h, key_array, models, spaces, 
-                'HI mass', panel_length, panel_bt, border)
+                r'H$_2$ mass', panel_length, panel_bt, border)
                 
         
         plt.savefig("slices/h2ptl_slice_models_vs_space_%s"%get_suffix(h))
@@ -104,7 +107,7 @@ def make_ptl_slices(hiptls, h2ptls, vns, ptls, panel_length = 3,
         #print(list(v.slices.keys()))
         plib.plot_slices(v, key_array, models, spaces, 
                 'HI mass', panel_length, panel_bt, border)
-        
+        plt.ylabel('')
         plt.savefig("slices/vn_slice_models_vs_space_%s"%get_suffix(v))
         plt.clf()
     
@@ -126,7 +129,7 @@ def make_ptl_slices(hiptls, h2ptls, vns, ptls, panel_length = 3,
                 key_array[i,j] = ptl_types[i]+spc
         
         plib.plot_slices(p, key_array, ['all', 'stellar', 'dark matter'], spaces, 
-                'mass', panel_length, panel_bt, border, same_cmap=False)
+                'mass', panel_length, panel_bt*3, border, same_cmap=False)
         
         plt.savefig("slices/ptl_slice_ptltype_vs_space_%s"%get_suffix(p))
         plt.clf()
@@ -165,7 +168,7 @@ def compare_ptl_slices(hiptls, h2ptls, vns, ptls, panel_length=3,
         cmap_cycle = ['winter', 'bone', 'plasma', 'jet']
         plib.compare_slices(fields, idx_array, key_array, row_labels, col_labels,
                 "mass", panel_length, panel_bt, border, False, cmap_cycle)
-        plt.savefig("slices/ptl_slices_comparison_redshift_vs_field.png")
+        plt.savefig("slices/ptl_slices_comparison_redshift_vs_field_%s.png"%get_suffix(hiptls[0]))
         plt.clf()
         return
 
@@ -200,7 +203,7 @@ def compare_HI_slices(hiptls, vns, hisubs, panel_length = 3,
             row_labels, ["D18-Particle", "VN18-Particle", "D18-Subhalo"],
             "HI mass", panel_length, panel_bt, border)
     
-    plt.savefig("slices/HI_slices_comparison_redshift_vs_field.png")
+    plt.savefig("slices/HI_slices_comparison_redshift_vs_field_%s.png"%get_suffix(hiptls[0]))
     plt.clf()
     return
             

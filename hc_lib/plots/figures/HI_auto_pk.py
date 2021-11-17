@@ -26,7 +26,7 @@ def main():
     print("plotting auto power spectra for HI...")    
     HI_auto_redshiftR_spaceC_field(hiptls, hisubs, vns)
 
-
+    print('___________FINISHED HI AUTO POWER_____________')
     return
 def match_snapshot(snapshot, fields):
     for f in fields:
@@ -116,7 +116,13 @@ def hiptl_auto_redshiftR_spaceC_model(hiptls, panel_length = 3,
                 plt.text(0.05, 0.05, 'z=%.1f'%redshifts[i], fontsize = fsize, 
                         ha = 'left', va = 'bottom', transform = ax.transAxes)
             else:
-                ax.yaxis.set_ticklabels([])
+                if not j == ncols - 1:
+                    ax.yaxis.set_ticklabels([])
+            
+    for i in range(nrows):
+        for j in range(ncols-1):
+            plt.sca(panels[i][j])
+            plt.ylim(yrange[0], yrange[1])
             
     figsize = fig.get_size_inches()
     fig.text(0.5, border/3/figsize[1], 'k (h/Mpc)', ha='center', va = 'center', 
@@ -154,7 +160,7 @@ def hisubhalo_auto_redshiftR_spaceC_model(hisubs, panel_length=3, panel_bt = 0.3
             ax = plt.gca()
             # comparison column will look different
             if j == 0 or j == 1:
-                labels = [st.split('_')[0] for st in keys[j]]
+                labels = [st.split('_')[2] for st in keys[j]]
                 plib.plotpks(field.pks['k'], field.pks, field.box, field.resolution,
                         keys[j], labels=labels)
                 
@@ -179,7 +185,7 @@ def hisubhalo_auto_redshiftR_spaceC_model(hisubs, panel_length=3, panel_bt = 0.3
                 labels = []
                 for pkey in keys[0]:
                     distortions[pkey] = field.pks[pkey+'rs']/field.pks[pkey]
-                    labels.append(pkey.split('_')[0])
+                    labels.append(pkey.split('_')[2])
                 plib.plotpks(field.pks['k'], distortions, field.box, field.resolution,
                         keys[0], labels=labels)
                 plt.ylabel(r'$\frac{P_z(k)}{P_r(k)}$')
@@ -192,22 +198,28 @@ def hisubhalo_auto_redshiftR_spaceC_model(hisubs, panel_length=3, panel_bt = 0.3
             if not i == nrows-1:
                 ax.xaxis.set_ticklabels([])
             if j == 0:
-                plt.text(field.pks['k'][0], yrange[0]*1.10, '\tz=%.2f'%redshifts[i], 
-                        fontsize = fsize, ha = 'left', va = 'bottom')
+                plt.text(0.05, 0.05, 'z=%.1f'%redshifts[i], 
+                        fontsize = fsize, ha = 'center', va = 'center', transform = ax.transAxes)
             else:
-                ax.yaxis.set_ticklabels([])
+                if not j == ncols - 1:
+                    ax.yaxis.set_ticklabels([])
+    for i in range(nrows):
+        for j in range(ncols-1):
+            plt.sca(panels[i][j])
+            plt.ylim(yrange[0], yrange[1])
+            
     figsize = fig.get_size_inches()
-    fig.text(0.5, border/2/figsize[1], 'k (h/Mpc)', ha='center', va = 'center', 
+    fig.text(0.5, border/3/figsize[1], 'k (h/Mpc)', ha='center', va = 'center', 
             fontsize = fsize)
 
-    fig.text(border/2/figsize[0], 0.5, 'P(k) (h/Mpc)$^3$', ha='center', va = 'center', 
+    fig.text(border/3/figsize[0], 0.5, 'P(k) (h/Mpc)$^3$', ha='center', va = 'center', 
             fontsize = fsize, rotation = 'vertical')
     plt.savefig("HI_auto/hisubhalo_auto_redshiftR_spaceC_models_%s.png"%get_suffix(hisubs[0]))
     plt.clf()
     return
 
 def HI_auto_redshiftR_spaceC_field(hiptls, hisubs, vns, panel_length = 3, 
-            panel_bt = 0.1, border = 0.5, fsize=16):
+            panel_bt = 0.33, border = 0.5, fsize=16):
     """
     Makes HI-auto power spectra plots, for real space or redshift space.
     Each panel represents another redshift.

@@ -38,7 +38,7 @@ def main():
     print("galaxy auto for different mass assignment schemes...")
     galaxy_auto_redshiftR_colorC_MAS(gals)
 
-    print("")
+    print("_______________FINISHED GALAXY AUTO POWER__________")
     return
 
 def get_suffix(field):
@@ -71,20 +71,23 @@ def galaxy_auto_redshiftR_colorC_mass(gals, panel_length = 3, panel_bt = 0.33, b
         for j in range(ncols):
             plt.sca(panels[i][j])
             ax = plt.gca()
-            pkeys = plib.fetchKeys(['CICW', pk_name[j]],['rs','0.5','0.55','0.7','0.65', 'papa', 'eBOSS'],
+            if pk_name[j] == 'resolved':
+                pkeys = plib.fetchKeys(['CICW', pk_name[j]], ['papa', 'eBOSS','nelson','rs'], list(gal.pks.keys()))
+            else:
+                pkeys = plib.fetchKeys(['CICW', pk_name[j]],['rs','0.5','0.55','0.7','0.65', 'nelson','papa', 'eBOSS'],
                     list(gal.pks.keys()))
             print(pkeys)
             labels = []
             linestyles = []
             for pkey in pkeys:
-                if 'rs' in pkey:
+                if 'stmass' in pkey:
                     labels.append('Stellar Mass')
                     linestyles.append('-')
                 else:
                     labels.append('All Species')
                     linestyles.append('--')
             plib.plotpks(gal.pks['k'], gal.pks, gal.box, gal.resolution, pkeys,
-                        colors[j]*len(pkeys), labels, linestyles=linestyles)
+                        [colors[j]]*len(pkeys), labels, linestyles=linestyles)
             
             ymin, ymax = ax.get_ylim()
             if ymin > 0:
@@ -120,7 +123,7 @@ def galaxy_auto_redshiftR_colorC_mass(gals, panel_length = 3, panel_bt = 0.33, b
             va = 'center', fontsize = fsize, rotation = 'vertical')
     fig.text(0.5, border/3/figsize[1], r'k (h/Mpc)', ha = 'center',
             va = 'center', fontsize = fsize)
-    plt.savefig('galaxy_auto_redshiftR_colorC_mass_%s.png'%get_suffix(gal))
+    plt.savefig('galaxy_auto/galaxy_auto_redshiftR_colorC_mass_%s.png'%get_suffix(gal))
     plt.clf()      
 
     return
@@ -151,8 +154,12 @@ def galaxy_auto_redshiftR_colorC_space(gals, panel_length = 3, panel_bt = 0.1, b
         for j in range(ncols):
             plt.sca(panels[i][j])
             ax = plt.gca()
-            pkeys = plib.fetchKeys(['0.6', 'stmass', 'CICW', pk_name[j]],['0.65', 'papa', 'eBOSS'],
-                    list(gal.pks.keys()))
+            if j == ncols - 1:
+                pkeys = plib.fetchKeys(['CICW','stmass',pk_name[j]], ['papa', 'eBOSS'], 
+                        list(gal.pks.keys()))
+            else:
+                pkeys = plib.fetchKeys(['0.6', 'stmass', 'CICW', pk_name[j]],['0.65', 'papa', 'eBOSS'],
+                        list(gal.pks.keys()))
             labels = []
             linestyles = []
             for pkey in pkeys:
@@ -201,12 +208,12 @@ def galaxy_auto_redshiftR_colorC_space(gals, panel_length = 3, panel_bt = 0.1, b
             va = 'center', fontsize = fsize, rotation = 'vertical')
     fig.text(0.5, border/3/figsize[1], r'k (h/Mpc)', ha = 'center',
             va = 'center', fontsize = fsize)
-    plt.savefig('galaxy_auto_redshiftR_colorC_space_%s.png'%get_suffix(gal))
+    plt.savefig('galaxy_auto/galaxy_auto_redshiftR_colorC_space_%s.png'%get_suffix(gal))
     plt.clf()      
 
     return
 
-def galaxy_auto_redshiftR_spaceC_color(gals, panel_length = 3, panel_bt = 0.1, border = 1, fsize = 16):
+def galaxy_auto_redshiftR_spaceC_color(gals, panel_length = 3, panel_bt = 0.33, border = 1, fsize = 16):
     snapshots, redshifts = plib.getSnaps(gals)
     
     def match_snapshot(snapshot, fields):
@@ -299,7 +306,7 @@ def galaxy_auto_redshiftR_spaceC_color(gals, panel_length = 3, panel_bt = 0.1, b
             va = 'center', fontsize = fsize, rotation = 'vertical')
     fig.text(0.5, border/3/figsize[1], r'k (h/Mpc)', ha = 'center',
             va = 'center', fontsize = fsize)
-    plt.savefig('galaxy_auto_redshiftR_spaceC_color_%s.png'%get_suffix(gal))
+    plt.savefig('galaxy_auto/galaxy_auto_redshiftR_spaceC_color_%s.png'%get_suffix(gal))
     plt.clf()      
 
     return
@@ -373,7 +380,7 @@ def galaxy_auto_redshiftR_colorC_colorcut(gals, panel_length = 3, panel_bt = 0.1
             va = 'center', fontsize = fsize, rotation = 'vertical')
     fig.text(0.5, border/3/figsize[1], r'k (h/Mpc)', ha = 'center',
             va = 'center', fontsize = fsize)
-    plt.savefig('galaxy_auto_redshiftR_colorC_colorcut_%s.png'%get_suffix(gal))
+    plt.savefig('galaxy_auto/galaxy_auto_redshiftR_colorC_colorcut_%s.png'%get_suffix(gal))
     plt.clf()      
     return
 
@@ -402,8 +409,11 @@ def galaxy_auto_redshiftR_colorC_MAS(gals, panel_length = 3, panel_bt = 0.1, bor
         for j in range(ncols):
             plt.sca(panels[i][j])
             ax = plt.gca()
-            pkeys = plib.fetchKeys([pk_name[j], '0.6', 'stmass'],['rs', '0.65', 'papa', 'eBOSS', 'nelson'],
-                    list(gal.pks.keys()))
+            if pk_name[j] == 'resolved':
+                pkeys = plib.fetchKeys([pk_name[j], 'stmass', 'diemer'], ['rs'],list(gal.pks.keys()))
+            else:
+                pkeys = plib.fetchKeys([pk_name[j], '0.6', 'stmass'],['rs', '0.65', 'papa', 'eBOSS', 'nelson'],
+                        list(gal.pks.keys()))
             
             labels = []
             linestyles = []
@@ -453,7 +463,7 @@ def galaxy_auto_redshiftR_colorC_MAS(gals, panel_length = 3, panel_bt = 0.1, bor
             va = 'center', fontsize = fsize, rotation = 'vertical')
     fig.text(0.5, border/3/figsize[1], r'k (h/Mpc)', ha = 'center',
             va = 'center', fontsize = fsize)
-    plt.savefig('galaxy_auto_redshiftR_colorC_MAS_%s.png'%get_suffix(gal))
+    plt.savefig('galaxy_auto/galaxy_auto_redshiftR_colorC_MAS_%s.png'%get_suffix(gal))
     plt.clf()      
     return
 
@@ -475,7 +485,8 @@ def dust_sensitivity_color_cut(gals, gdusts, panel_length = 3,
     
     col_labels = gals[0].getColorDefinitions()
     col_labels.append('Straight Cut Ratios')
-    col_labels.append('Observational Cut Ratios')
+    col_labels.remove('eBOSS')
+    col_labels.remove('papa')
     nrows = len(snapshots)
     ncols = len(col_labels)
     fig, panels = plib.createFig(panel_length, nrows, ncols, panel_bt, 
@@ -495,7 +506,7 @@ def dust_sensitivity_color_cut(gals, gdusts, panel_length = 3,
             labels = []
             ax = plt.gca()
 
-            if j < ncols - 2:
+            if j < ncols - 1:
                 cut = col_labels[j]
                 other_cuts = copy.copy(col_labels)
                 other_cuts.remove(cut)
@@ -538,7 +549,7 @@ def dust_sensitivity_color_cut(gals, gdusts, panel_length = 3,
                 yrange[1] = max(yrange[1], ymax)
                 plt.ylabel('')
 
-            elif j == ncols - 2:
+            elif j == ncols - 1:
                 ratio_pks = {}
                 cuts = ['0.6','0.65', '0.55']
                 labels = []
@@ -581,48 +592,48 @@ def dust_sensitivity_color_cut(gals, gdusts, panel_length = 3,
                 
                 for pkey in pkeys:
                     ratio_pks[pkey] = gal.pks[pkey]/gdust.pks[pkey]
-
-                plib.plotpks(gal.pks['k'], ratio_pks, gal.box, gal.resolution, 
-                        pkeys, colors = colors, labels = labels, linestyles = linestyles)
-            
-            elif j == ncols - 1:
-                ratio_pks = {}
-                cuts = ['0.6','papa']
-                labels = []
-                pkeys = []
-                for c in cuts:
-                    other_cuts = copy.copy(col_labels)
-                    other_cuts.remove(c)
-                    pkeys += plib.fetchKeys([c, 'stmass'], other_cuts+['rs', 'resolved'], galkeys)
-                linestyles = []
-                for pkey in pkeys:
-                    if 'red' in pkey:
-                        colors.append('red')
-                    elif 'blue' in pkey:
-                        colors.append('blue')
-
-
-                    if 'papa' in pkey:
-                        cut_label = 'Papastergis (2013)'
-                        if cut_label not in labels:
-                            labels.append(cut_label)
-                        else:
-                            labels.append('')
-                        linestyles.append(':')
-                    else:
-                        cut_label = 'g-r = 0.6'
-                        if cut_label not in labels:
-                            labels.append(cut_label)
-                        else:
-                            labels.append('')
-                        linestyles.append('-')
-                
-                for pkey in pkeys:
-                    ratio_pks[pkey] = gal.pks[pkey]/gdust.pks[pkey]
-
                 plib.plotpks(gal.pks['k'], ratio_pks, gal.box, gal.resolution, 
                         pkeys, colors = colors, labels = labels, linestyles = linestyles)
                 plt.yscale('linear')
+                            
+#            elif j == ncols - 1:
+#                ratio_pks = {}
+#                cuts = ['0.6','papa']
+#                labels = []
+#                pkeys = []
+#                for c in cuts:
+#                    other_cuts = copy.copy(col_labels)
+#                    other_cuts.remove(c)
+#                    pkeys += plib.fetchKeys([c, 'stmass'], other_cuts+['rs', 'resolved'], galkeys)
+#                linestyles = []
+#                for pkey in pkeys:
+#                    if 'red' in pkey:
+#                        colors.append('red')
+#                    elif 'blue' in pkey:
+#                        colors.append('blue')
+#
+#
+#                    if 'papa' in pkey:
+#                        cut_label = 'Papastergis (2013)'
+#                        if cut_label not in labels:
+#                            labels.append(cut_label)
+#                        else:
+#                            labels.append('')
+#                        linestyles.append(':')
+#                    else:
+#                        cut_label = 'g-r = 0.6'
+#                        if cut_label not in labels:
+#                            labels.append(cut_label)
+#                        else:
+#                            labels.append('')
+#                        linestyles.append('-')
+#                
+#                for pkey in pkeys:
+#                    ratio_pks[pkey] = gal.pks[pkey]/gdust.pks[pkey]
+#
+#                plib.plotpks(gal.pks['k'], ratio_pks, gal.box, gal.resolution, 
+#                        pkeys, colors = colors, labels = labels, linestyles = linestyles)
+#                plt.yscale('linear')
             if i == 0:
                 ax.xaxis.set_label_position('top')
                 title = col_labels[j]
@@ -634,7 +645,6 @@ def dust_sensitivity_color_cut(gals, gdusts, panel_length = 3,
                 plt.legend(loc = 'upper right')
             else:
                 plt.xlabel('')
-                ax.get_legend().remove()
                 ax.set_xticklabels([])
             
             if j == 0:
@@ -646,6 +656,9 @@ def dust_sensitivity_color_cut(gals, gdusts, panel_length = 3,
             
             else:
                 ax.set_yticklabels([])
+            
+            if not i == 0 or not (j == 0 or j == 1 or j == ncols-1):
+                ax.get_legend().remove()
 
 
     for i in range(nrows):
@@ -658,7 +671,7 @@ def dust_sensitivity_color_cut(gals, gdusts, panel_length = 3,
             va = 'center', fontsize = fsize, rotation = 'vertical')
     fig.text(0.5, border/3/figsize[1], r'k (h/Mpc)', ha = 'center',
             va = 'center', fontsize = fsize)
-    plt.savefig('dust_sensitivity_color_cut_%s.png'%get_suffix(gal))
+    plt.savefig('galaxy_auto/dust_sensitivity_color_cut_%s.png'%get_suffix(gal))
     plt.clf()      
     return
 
@@ -793,7 +806,7 @@ def dust_sensitivity_stmass(gals, gdusts, panel_length = 3,
             va = 'center', fontsize = fsize, rotation = 'vertical')
     fig.text(0.5, border/3/figsize[1], r'k (h/Mpc)', ha = 'center',
             va = 'center', fontsize = fsize)
-    plt.savefig('dust_sensitivity_mass_type_%s.png'%get_suffix(gal))
+    plt.savefig('galaxy_auto/dust_sensitivity_mass_type_%s.png'%get_suffix(gal))
     plt.clf()      
     return
 
@@ -866,7 +879,7 @@ def dust_sensitivity_space(gals, gdusts, panel_length = 3,
                     yrange[0] = min(yrange[0], ymin)
 
                 yrange[1] = max(yrange[1], ymax)
-
+                plt.ylabel('')
             else:
                 ratio_pks = {}
                 labels = []
@@ -935,7 +948,7 @@ def dust_sensitivity_space(gals, gdusts, panel_length = 3,
             va = 'center', fontsize = fsize, rotation = 'vertical')
     fig.text(0.5, border/3/figsize[1], r'k (h/Mpc)', ha = 'center',
             va = 'center', fontsize = fsize)
-    plt.savefig('dust_sensitivity_space_%s.png'%get_suffix(gal))
+    plt.savefig('galaxy_auto/dust_sensitivity_space_%s.png'%get_suffix(gal))
     plt.clf()      
     return
 

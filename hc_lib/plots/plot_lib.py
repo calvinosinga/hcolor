@@ -62,11 +62,7 @@ def getYrange(fields, keys_dict, is_X):
         keys = keys_dict[f.fieldname]
         nyq = f.resolution * np.pi / f.box
         nyq_idx = np.argmin(np.abs(pks['k'] - nyq))
-        for k in keys:
-            print('another iteration...')
-            print(k)
-            print(yrange)
-            
+        for k in keys:            
             pkmax = np.max(pks[k][:nyq_idx])
             pkmin = np.min(pks[k][:nyq_idx])
             print(pkmax, pkmin)
@@ -87,6 +83,25 @@ def getSnaps(fields):
     redshifts.sort()
     redshifts = redshifts[::-1]
     return snapshots, redshifts
+
+def setyLim(panels, exclude):
+    dim = exclude.shape
+    yrange = [np.inf, 0]
+    for i in range(dim[0]):
+        for j in range(dim[1]):
+            if not exclude[i,j]:
+                
+                ymin, ymax = panels[i][j].get_ylim()
+                if ymin > 0:
+                    yrange[0] = min(yrange[0], ymin)
+                yrange[1] = max(yrange[1], ymax)
+
+    for i in range(dim[0]):
+        for j in range(dim[1]):
+            if not exclude[i,j]:
+                plt.sca(panels[i][j])
+                plt.ylim(yrange[0], yrange[1])
+    return yrange
 
 def createFig(panel_length, nrows, ncols, panel_bt, xborder, yborder):
     # border input can be either a list or single number
