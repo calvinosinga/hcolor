@@ -5,17 +5,18 @@
 
 from hc_lib.grid.grid import Grid
 from hc_lib.fields.field_super import Field, grid_props
+import copy
 import h5py as hp
 import numpy as np
 
 class hisubhalo_grid_props(grid_props):
 
-    def __init__(self, base, mas, field, resdef):
+    def __init__(self, mas, field, space, model, HI_res):
         other = {}
-        self.model = base
+        other['model'] = model
         
-        other['resdef'] = resdef
-        super().__init__(base, mas, field, other)
+        other['HI_res'] = HI_res
+        super().__init__(mas, field, space, other)
     
     def isIncluded(self):
         def test(schts):
@@ -23,33 +24,43 @@ class hisubhalo_grid_props(grid_props):
             return mastest
             
         sp = self.props
-        if sp['resdef'] == 'papa':
+        if sp['HI_res'] == 'papastergis_ALFALFA':
             mas = ['CIC']
-            return test(mas) and sp['field'] == 'hisubhalo'
+            return test(mas) and sp['fieldname'] == 'hisubhalo'
 
         return True
+    
+    def setupGrids(self, outfile):
+        return super().setupGrids(outfile)
     
     def isCompatible(self, other):
         sp = self.props
         op = other.props
         # hisubhaloXgalaxy
-        if 'galaxy' in op['field']:
+        if 'galaxy' in op['fieldname']:
             # if both have papa resolution definition, include only hisubhalo
-            if op['resdef'] == 'papa':
-                return sp['resdef'] == 'papa' and sp['field'] =='hisubhalo'
+            if op['gal_res'] == 'papastergis_SDSS':
+                return sp['HI_res'] == 'papastergis_ALFALFA'
             
             # if diemer resdef, include certain color definitions and resolved definition
-            elif op['resdef'] == 'diemer':
-                cdefs = ['0.55','0.6','0.65', 'nelson']
-                is_resolved = op['base'] == 'resolved'
-                return op['coldef'] in cdefs or is_resolved
+            elif op['gal_res'] == 'diemer':
+                cdefs = ['0.55','0.60','0.65', 'visual_inspection']
+                is_resolved = op['color'] == 'resolved'
+                return op['color_cut'] in cdefs or is_resolved
             
-            # if all mass, also include
-            elif op['base'] == 'all':
+            # if all galaxies, also include
+            elif op['color'] == 'all':
                 return True
             
             return False
         
+        elif op['fieldname'] == 'ptl':
+            if sp['fieldname'] == 'hisubhalo':
+                models = hisubhalo.getMolFracModelsGal()
+            elif sp['fieldname'] == 'h2subhalo':
+                models = h2subhalo.getMolFracModelsGal()
+            
+            return sp['model'] == models[0]
         return True
     
 class hisubhalo(Field):
@@ -87,7 +98,7 @@ class hisubhalo(Field):
         mean_baryon_cell = {'tng100':1.4e6, 'tng100-2':11.2e6, 'tng100-3':89.2e6,
                 'tng300':11e6, 'tng300-2':88e6, 'tng300-3':703e6}
         res_defs = {}
-        res_defs['papa'] = {'HI':(10**7.5, np.inf)} 
+        res_defs['papastergis_ALFALFA'] = {'HI':(10**7.5, np.inf)} 
         res_defs['diemer'] = {'HI':(0, np.inf)} # by default, already implemented on data
         
         # there is a linewidths restriction, unsure how to approach that in papastergis
@@ -112,7 +123,7 @@ class hisubhalo(Field):
     
 
     def computeGrids(self, outfile):
-        super().computeGrids(outfile)
+        super().setupGrids(outfile)
 
         if self.v:
             print("now computing the grids for hisubhalo...")
@@ -129,16 +140,16 @@ class hisubhalo(Field):
 
         pos = self._convertPos(pos)
 
-        in_rss = False
+        temp = copy.copy(pos)
+        rspos = self._toRedshiftSpace(temp, vel)
+        del temp, vel
         ############### HELPER METHOD ###############################
-        def computeHI(gprop, pos, is_in_rss):
-            grid = Grid(gprop.getName(), self.resolution, verbose=self.v)
-            if is_in_rss:
-                grid.toRSS()
+        def computeHI(gprop, pos):
+            grid = Grid(gprop.getName(), self.grid_resolution, verbose=self.v)
 
             mass = hih2file[gprop.model][:] #already in solar masses
             if gprop.props['resdef'] == 'papa':
-                mask = self.getResolvedSubhalos(mass, gprop.props['resdef'])
+                mask = self.getResolvedSubhalos(mass, gprop.props['HI_res'])
             else:
                 mask = np.ones_like(mass, dtype=bool)
             if gprop.props['mas'] == 'CICW':
@@ -149,8 +160,8 @@ class hisubhalo(Field):
             else:
                 grid.CIC(pos[mask, :], self.header['BoxSize'])
             
-            if gprop.props['resdef'] not in self.counts:
-                self.counts[gprop.props['resdef']] = np.sum(mask)
+            if gprop.getName() not in self.counts:
+                self.counts[gprop.getName()] = np.sum(mask)
             
             
             self.saveData(outfile, grid, gprop)
@@ -161,12 +172,11 @@ class hisubhalo(Field):
         ###############################################################
 
         for g in list(self.gridprops.values()):
-            computeHI(g, pos, in_rss)
-        
-        pos = self._toRedshiftSpace(pos, vel)
-        in_rss = True
-        for g in list(self.gridprops.values()):
-            computeHI(g, pos, in_rss)
+            if g.props["space"] == 'real':
+                pos_arr = pos
+            elif g.props['space'] == 'redshift':
+                pos_arr = rspos
+            computeHI(g, pos_arr)
         
         return
 
@@ -178,7 +188,8 @@ class hisubhalo(Field):
                 mask *= (mass >= v[0]) & (mass < v[1])
         return mask
 
-
+    def makeSlice(self, grid, perc=0.1, mid=None, avg=True):
+        return super().makeSlice(grid, perc=perc, mid=mid, avg=avg)
 
     def _convertVel(self, vel):
         # subhalos' velocities are already in km/s
@@ -193,17 +204,7 @@ class h2subhalo(hisubhalo):
         return
     
     def computeGrids(self, outfile):
-        ############ FROM FIELD_SUPER CLASS #######################################
-        if self.header is None:
-            raise ValueError("header needs to be loaded before computing grids")
-        dat = outfile.create_dataset('pickle', data=[0])
-        dat.attrs['path'] = self.pkl_path
-        if self.v:
-            print("the saved pickle path: %s"%self.pkl_path)
-
-        if self.v:
-            print("now computing the grids for h2subhalo...")
-        #########################################################################
+        super().setupGrids(outfile)
 
         hih2file = hp.File(self.hih2filepath, 'r')
         ids = hih2file['id_subhalo'][:] # used to idx into the subhalo catalog
@@ -216,13 +217,14 @@ class h2subhalo(hisubhalo):
         vel = data['SubhaloVel'][ids] # km/s
 
         pos = self._convertPos(pos)
+        temp = copy.copy(pos)
+        rspos = self._toRedshiftSpace(temp, vel)
+        del temp, vel
 
-        in_rss = False
         ############### HELPER METHOD ###############################
-        def computeH2(gprop, pos, is_in_rss):
-            grid = Grid(gprop.getName(), self.resolution, verbose=self.v)
-            if is_in_rss:
-                grid.toRSS()
+        def computeH2(gprop, pos):
+            grid = Grid(gprop.getName(), self.grid_resolution, verbose=self.v)
+
             mass = hih2file[gprop.model][:] #already in solar masses
             if gprop.props['mas'] == 'CICW':
                 grid.CICW(pos, self.header['BoxSize'], mass)
@@ -236,12 +238,11 @@ class h2subhalo(hisubhalo):
         ###############################################################
 
         for g in list(self.gridprops.values()):
-            computeH2(g, pos, in_rss)
-        
-        pos = self._toRedshiftSpace(pos, vel)
-        in_rss = True
-        for g in list(self.gridprops.values()):
-            computeH2(g, pos, in_rss)
+            if g.props['space'] == 'real':
+                pos_arr = pos
+            elif g.props['space'] == 'redshift':
+                pos_arr = rspos
+            computeH2(g, pos_arr)
         
         return
     

@@ -7,6 +7,7 @@ import sys
 import os
 import pickle
 from hc_lib.grid.grid import Grid
+from hc_lib.fields.field_super import grid_props
 import h5py as hp
 
 
@@ -35,9 +36,10 @@ klist.remove('pickle')
 for key in klist:
     if 'gridname' in dict(gridfile[key].attrs):
         grid = Grid.loadGrid(gridfile[key])
-        field.computePk(grid)
-        field.computeXi(grid)
-        field.makeSlice(grid)
+        gp = grid_props.loadProps(gridfile[key].attrs)
+        field.computePk(grid, gp)
+        field.computeXi(grid, gp)
+        field.makeSlice(grid, gp)
 
 pickle.dump(field, open(pkl_path, 'wb'), pickle.HIGHEST_PROTOCOL)
 gridfile.close()

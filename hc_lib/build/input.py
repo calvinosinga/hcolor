@@ -11,7 +11,8 @@ class Input():
     axislist = [0,1,2]
     hydrogen_runs = ['hiptl', 'h2ptl', 'hiptl_nH', 'vn', 'hisubhalo', 'h2subhalo']
     matter_runs = ['galaxy', 'galaxy_dust', 'ptl']
-
+    atomic_runs = ['hiptl', 'hisubhalo', 'vn', 'hiptl_nH']
+    molecular_runs = ['h2subhalo', 'h2ptl']
     def __init__(self):
         self.rparams = self.getUserRunParams()
         self.runs = self.getFields()
@@ -86,6 +87,12 @@ class Input():
     
     def isMat(self, name):
         return name in self.matter_runs
+    
+    def isAtomic(self, name):
+        return name in self.atomic_runs
+    
+    def isMolecular(self,name):
+        return name in self.molecular_runs
     
     def getParams(self):
         return self.rparams

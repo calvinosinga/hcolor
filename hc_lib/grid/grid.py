@@ -3,7 +3,6 @@ This file defines two grid classes
 """
 
 import numpy as np
-import h5py as hp
 import time
 
 
@@ -17,13 +16,12 @@ class Grid():
             self.grid = grid
             self.is_computed = True
             
-        self.in_rss = False
         self.gridname = gridname
-        self.ignore = False
         self.combine = -1 # not intended for combination (see chunk)
         self.resolution = res
         self.mas_runtime = 0
         self.v = verbose
+        self.grid_sum = 0
         return
     
     def print(self):       
@@ -40,10 +38,10 @@ class Grid():
             raise RuntimeError("grid is empty; has not been computed")
         return self.grid
     
-    def toRSS(self):
-        self.in_rss = True
-        self.gridname = self.gridname + 'rs'
-        return
+    # def toRSS(self):
+    #     self.in_rss = True
+    #     self.gridname = self.gridname + 'rs'
+    #     return
     
     def isChunk(self):
         return False
@@ -78,7 +76,8 @@ class Grid():
             self.grid[index_u[0],index_u[1],index_d[2]] += u[0]*u[1]*d[2]
             self.grid[index_u[0],index_u[1],index_u[2]] += u[0]*u[1]*u[2]
         self.is_computed = True
-        self.mas_runtime = time.time() - start
+        self._computeMASRuntime(start, time.time())
+        self._computeGridSum()
         return
 
     def CICW(self, pos, boxsize, mass):
@@ -118,16 +117,23 @@ class Grid():
 
 
         self.is_computed = True
-        self.mas_runtime = time.time() - start
+        self._computeMASRuntime(start, time.time())
+        self._computeGridSum()
         if self.v:
             print("finished CICW...")
             print("grid sum: %.3e"%np.sum(self.grid))
             print('#'*40 + '\n')
         return
     
-    def ignoreGrid(self):
-        self.ignore = True
+    def _computeGridSum(self):
+        self.grid_sum = np.sum(self.grid)
+    
+    def _computeMASRuntime(self, start, stop):
+        self.mas_runtime = stop - start
         return
+    # def ignoreGrid(self):
+    #     self.ignore = True
+    #     return
     
     def saveGrid(self, outfile):
         
@@ -136,10 +142,10 @@ class Grid():
         
         dct = dat.attrs
         dct["resolution"] = self.resolution
-        dct["in_rss"] = self.in_rss
         dct["gridname"] = self.gridname
-        dct["ignore"] = self.ignore
         dct["combine"] = self.combine
+        dct['grid_sum'] = self.grid_sum
+
         if self.is_computed:
             dct["mas_runtime"] = self.mas_runtime
         if self.v:
@@ -150,12 +156,11 @@ class Grid():
         return dat
     
     @classmethod
-    def loadGrid(cls, dataset, verbose=False):
+    def loadGrid(cls, dataset):
         dct = dict(dataset.attrs)
         grid = Grid(dct['gridname'], dct['resolution'], dataset[:])
         grid.mas_runtime = dct['mas_runtime']
-        grid.ignore = dct['ignore']
-        grid.in_rss = dct['in_rss']
+        grid.grid_sum = dct['grid_sum']
         grid.is_computed = True
         return grid
     
@@ -164,9 +169,18 @@ class Chunk(Grid):
     def __init__(self, gridname, res, chunk_num, grid=None, verbose=False):
         super().__init__(gridname, res, grid, verbose)
         self.combine = 1
-        self.mas_runtime = 0
+        self.mas_runtime = []
         self.chunk_nums = [chunk_num]
+        self.grid_sum = []
+        self.combine_runtimes = []
         return
+    
+    def _computeMASRuntime(self, start, stop):
+        self.mas_runtime.append(stop-start)
+        return
+    
+    def _computeGridSum(self):
+        self.grid_sum.append(np.sum(self.grid))
     
     def isChunk(self):
         return True
@@ -174,6 +188,7 @@ class Chunk(Grid):
     def saveGrid(self, outfile):
         dat = super().saveGrid(outfile)
         dat.attrs['chunks'] = self.chunk_nums
+        dat.attrs['combine_runtimes'] = self.combine_runtimes
         return dat
         
     def combineChunks(self, other_chunk):
@@ -186,10 +201,14 @@ class Chunk(Grid):
             print("\nother chunk:")
             other_chunk.print()
         
+        start = time.time()
         self.grid += other_chunk.getGrid()
+        stop = time.time()
         self.combine += 1
+        self.combine_runtimes.append(stop-start)
         self.chunk_nums.extend(list(other_chunk.chunk_nums))
-        self.mas_runtime += other_chunk.mas_runtime
+        self.mas_runtime.extend(list(other_chunk.mas_runtime))
+        self.combine_runtimes.extend(list(other_chunk.combine_runtimes))
         if self.v:
             print("finished combine. Resulting grid\'s properties:")
             self.print()
@@ -200,10 +219,9 @@ class Chunk(Grid):
     def loadGrid(cls, dataset, verbose=False):
         dct = dict(dataset.attrs)
         grid = Chunk(dct['gridname'], dct['resolution'], 0, dataset[:], verbose=verbose)
-        grid.in_rss = dct['in_rss']
-        grid.ignore = dct['ignore']
         grid.is_computed = True
         grid.mas_runtime = dct['mas_runtime']
         grid.combine = dct['combine']
+        grid.grid_sum = dct['grid_sum']
         grid.chunk_nums = list(dct['chunks'])
         return grid

@@ -3,14 +3,15 @@
 """
 import h5py as hp
 import numpy as np
+import copy
 from hc_lib.fields.field_super import Field, grid_props
 from hc_lib.grid.grid import Chunk
 
 class ptl_grid_props(grid_props):
     
-    def __init__(self, base, mas, field):
-        self.type = base
-        super().__init__(base, mas, field, {})
+    def __init__(self, mas, field, space, species):
+        other = {'species':species}
+        super().__init__(mas, field, space, other)
         return
     
 class ptl(Field):
@@ -22,9 +23,7 @@ class ptl(Field):
         self.chunk = chunk
         
         self.loadpath = snappath%(chunk)
-        
-        self.isHI = False
-        
+                
         super().__init__(simname, snapshot, axis, resolution, pkl_path, verbose)
         if self.v:
             print("finished constructor for %s, chunknum = %d"%(self.fieldname,chunk))
@@ -33,22 +32,26 @@ class ptl(Field):
     def getGridProps(self):
         grp = {}
         grids = ['ptl', 'dm', 'stmass']
+        spaces = ['real', 'redshift']
         for g in grids:
-            gp = ptl_grid_props(g, "CICW", self.fieldname)
-            if gp.isIncluded():
-                grp[gp.getName()] = gp
+            for s in spaces:
+                gp = ptl_grid_props("CICW", self.fieldname, s, g)
+                if gp.isIncluded():
+                    grp[gp.getName()] = gp
         return grp
 
     def computeGrids(self, outfile):
         pos, vel, mass, slices = self._loadSnapshotData()
-        in_rss = False
-        super().computeGrids(outfile)
+        super().setupGrids(outfile)
+
+        temp = copy.copy(pos)
+        rspos = self._toRedshiftSpace(temp, vel)
+        del temp, vel
+
         ############# HELPER METHOD ##################################
-        def computePtl(gprop, pos, mass, slc, is_in_rss):
+        def computePtl(gprop, pos, mass, slc):
         
-            grid = Chunk(gprop.getName(), self.resolution, self.chunk, verbose=self.v)
-            if is_in_rss:
-                grid.toRSS()
+            grid = Chunk(gprop.getName(), self.grid_resolution, self.chunk, verbose=self.v)
             
             if self.v:
                 grid.print()
@@ -59,27 +62,22 @@ class ptl(Field):
             # save them to file
             self.saveData(outfile, grid, gprop)
             return
-        
-        for g in list(self.gridprops.values()):
-            if g.type == 'stmass':
-                slc = slices[2]
-            elif g.type == 'dm':
-                slc = slices[1]
-            else:
-                slc = slice(None)
-            computePtl(g, pos, mass, slc, in_rss)
-        
-        pos = self._toRedshiftSpace(pos, vel)
-        in_rss = True
-        for g in list(self.gridprops.values()):
-            if g.type == 'stmass':
-                slc = slices[2]
-            elif g.type == 'dm':
-                slc = slices[1]
-            else:
-                slc = slice(None)
+        ################################################################
 
-            computePtl(g, pos, mass, slc, in_rss)
+        for g in list(self.gridprops.values()):
+            if g.props['species'] == 'stmass':
+                slc = slices[2]
+            elif g.props['species'] == 'dm':
+                slc = slices[1]
+            else:
+                slc = slice(None)
+            
+            if g.props['space'] == 'real':
+                pos_arr = pos
+            elif g.props['space'] == 'redshift':
+                pos_arr = rspos
+            computePtl(g, pos_arr, mass, slc)
+        
         return
     
     

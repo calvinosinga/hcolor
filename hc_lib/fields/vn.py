@@ -5,49 +5,53 @@ import h5py as hp
 import numpy as np
 from hc_lib.fields.field_super import Field, grid_props
 from hc_lib.grid.grid import Chunk
+from hc_lib.fields.galaxy import galaxy
+import copy
 from HI_library import HI_mass_from_Illustris_snap as vnhi
 import scipy.constants as sc
 
 
 class vn_grid_props(grid_props):
-    def __init__(self, base, mas, field, mass_or_temp):
+    def __init__(self, mas, field, space, mass_or_temp):
         other = {}
         other['map'] = mass_or_temp
 
-        super().__init__(base, mas, field, other)
+        super().__init__(mas, field, space, other)
     
     def isCompatible(self, other):
         sp = self.props
         op = other.props
 
         # vnXgalaxy 
-        if 'galaxy' in op['field']:
+        if 'galaxy' in op['fieldname']:
             # for comparisons to Anderson and Wolz -> stmass/resdef is eBOSS, wiggleZ, 2df
             if 'temp' == sp['map']:
-                res = ['eBOSS', 'wiggleZ', '2df']
-                return op['resdef'] in res and op['mass'] == 'stmass'
+                obs = galaxy.getObservationalDefinitions()
+                obs.remove('papastergis_SDSS')
+                obs_match = op['gal_res'] in obs and op['color_cut'] in obs
+                return obs_match
             
             # if a mass map, it is either diemer or papa
-            elif op['resdef'] == 'diemer':
+            elif op['gal_res'] == 'diemer':
                 # the important color definitions
-                cols = ['0.6', '0.55', '0.65', 'nelson']
+                cols = ['0.60', '0.55', '0.65', 'visual_inspection']
 
                 # also include resolved
-                is_resolved = op['base'] == 'resolved'
+                is_resolved = op['color'] == 'resolved'
 
-                return op['coldef'] in cols or is_resolved
+                return op['color_cut'] in cols or is_resolved
             
             # ignore all papa resdefs -> hisubhalo is more comparable
-            elif op['resdef'] == 'papa':
+            elif op['gal_res'] == 'papastergis_SDSS':
                 return False
             
             # if all = base, then include
-            elif op['base'] == 'all':
+            elif op['color'] == 'all':
                 return True
 
-        
+        # vnXptl
         else:
-            return True
+            return sp['map'] == 'mass'
 
 
 
@@ -68,27 +72,30 @@ class vn(Field):
         return
     
     def getGridProps(self):
-        gnames = ['vn']
         MorT = ['mass', 'temp']
+        spaces = ['real', 'redshift']
         grp = {}
-        for g in gnames:
+        for s in spaces:
             for mt in MorT:
-                gp = vn_grid_props(g, "CICW", self.fieldname, mt)
+                gp = vn_grid_props("CICW", self.fieldname, s, mt)
                 if gp.isIncluded():
                     grp[gp.getName()] = gp
 
         return grp
     
     def computeGrids(self, outfile):
+        super().setupGrids(outfile)
+
         pos, vel, mass, volume = self._loadSnapshotData()
-        in_rss = False
-        super().computeGrids(outfile)
-        ############# HELPER METHOD ##################################
-        def computeHI(gprop, pos, mass, volume, is_in_rss):
+        temp = copy.copy(pos)
+        rspos = self._toRedshiftSpace(temp, vel)
+        del temp, vel
         
-            grid = Chunk(gprop.getName(), self.resolution, self.chunk, verbose = self.v)
-            if is_in_rss:
-                grid.toRSS()
+        ############# HELPER METHOD ##################################
+        def computeHI(gprop, pos, mass, volume):
+        
+            grid = Chunk(gprop.getName(), self.grid_resolution, self.chunk, verbose = self.v)
+
             
             if self.v:
                 grid.print()
@@ -105,12 +112,11 @@ class vn(Field):
             return
 
         for g in list(self.gridprops.values()):
-            computeHI(g, pos, mass, volume, in_rss)
-        
-        pos = self._toRedshiftSpace(pos, vel)
-        in_rss = True
-        for g in list(self.gridprops.values()):
-            computeHI(g, pos, mass, volume, in_rss)
+            if g.props['space'] == 'real':
+                pos_arr = pos
+            elif g.props['space'] == 'redshift':
+                pos_arr = rspos
+            computeHI(g, pos_arr, mass, volume)
         return
     
     def temperatureMap(self, HIdensity):

@@ -4,38 +4,40 @@
 """
 from hc_lib.grid.grid import Grid
 from hc_lib.fields.field_super import Field, grid_props
-from hc_lib.build.input import Input
 import h5py as hp
 import numpy as np
+import copy
 
 class galaxy_grid_props(grid_props):
     """
     Since each galaxy field has an enormous number of grids, this contains the data
     for one grid
     """
-    def __init__(self, color, mas, field, mass_type, resdef, coldef):
+    def __init__(self, mas, field, space, color, species, 
+                gal_resolution_def, color_cut):
         other = {}
-        lst = [color, mass_type, resdef, coldef]
-        keys = ['color', 'mass', 'resdef','coldef']
+        lst = [color, species, gal_resolution_def, color_cut]
+        keys = ['color', 'species', 'gal_res','color_cut']
         for i in range(len(lst)):
             other[keys[i]] = lst[i]
 
-        super().__init__(color, mas, field, other)
+        super().__init__(mas, field, space, other)
 
         return
     
+
     def isCompatible(self, other):
         op = other.props
         sp = self.props
 
         # for galaxyXgalaxy
-        if op['field'] == sp['field']:
+        if op['fieldname'] == sp['fieldname']:
             mas_match = op['mas'] == sp['mas']
-            stmass_or_total = op['mass'] == sp['mass']
-            resdef_match = op['resdef'] == sp['resdef'] and op['resdef'] == 'diemer'
-            coldef_match = op['coldef'] == sp['coldef'] and sp['coldef'] == '0.6'
-            
-            return mas_match and stmass_or_total and resdef_match and coldef_match
+            stmass_or_total = op['species'] == sp['species']
+            resdef_match = op['gal_res'] == sp['gal_res'] and op['gal_res'] == 'diemer'
+            coldef_match = op['color_cut'] == sp['color_cut'] and sp['color_cut'] == '0.60'
+            space_match = op['space'] == sp['space']
+            return mas_match and stmass_or_total and resdef_match and coldef_match and space_match
         
         # hiptlXgalaxy handled by hiptl
         
@@ -48,45 +50,63 @@ class galaxy_grid_props(grid_props):
     def isIncluded(self):
 
         def test(cds, mts, schts):
-            cdtest = self.props['coldef'] in cds
-            mtest = self.props['mass'] in mts
+            cdtest = self.props['color_cut'] in cds
+            mtest = self.props['species'] in mts
             mastest = self.props['mas'] in schts
             return cdtest and mtest and mastest
         
-        if self.props['resdef'] == 'papa':
-            cds = ['papa']
+
+        if self.props['gal_res'] == 'papastergis_SDSS':
+            cds = ['papastergis_SDSS']
             ms = ['stmass']
             schts = ['CIC']
             return test(cds, ms, schts)
         
-        elif self.props['resdef'] == 'wiggleZ':
-            return False # not implemented
-        
-        elif self.props['resdef'] == 'eBOSS':
-            cds = ['eBOSS']
+        elif self.props['gal_res'] == 'wolz_wiggleZ':
+            cds = ['wolz_wiggleZ']
             ms = ['stmass']
             schts = ['CIC']
-            return False
+            return test(cds, ms, schts)
+        
+        elif self.props['gal_res'] == 'wolz_eBOSS_ELG':
+            cds = ['wolz_eBOSS_ELG']
+            ms = ['stmass']
+            schts = ['CIC']
+            return test(cds, ms, schts)
 
+        elif self.props['gal_res'] == 'wolz_eBOSS_LRG':
+            cds = ['wolz_eBOSS_LRG']
+            ms = ['stmass']
+            schts = ['CIC']
+            return test(cds, ms, schts)
 
-        elif self.props['resdef'] == '2df':
-            return False # not implemented
+        elif self.props['gal_res'] == 'anderson_2df':
+            cds = ['anderson_2df']
+            ms = ['stmass']
+            schts = ['CIC']
+            return test(cds, ms, schts)
 
         # everything that isn't a color definition associated with an observation is fine
-        elif self.props['resdef'] == 'diemer':
-            coldef_is_compatible = not (self.props['coldef'] == 'papa' or self.props['coldef'] == 'eBOSS')
+        elif self.props['gal_res'] == 'diemer':
+            obs_color_cuts = galaxy.getObservationalColorDefinitions()
+            coldef_is_compatible = not (self.props['color_cut'] in obs_color_cuts)
             # CIC between stmass and all mass should be the same - removing redundancy
             is_CICW = self.props['mas'] == 'CICW'
-            is_CIC_and_stmass = self.props['mas'] == 'CIC' and self.props['mass'] == 'stmass'
+            is_CIC_and_stmass = self.props['mas'] == 'CIC' and self.props['species'] == 'stmass'
 
             return coldef_is_compatible and (is_CICW or is_CIC_and_stmass)
 
         # if this is gridprop obj for resolved, then
-        elif self.color == 'resolved':
-            return True
+        elif self.props['color'] == 'resolved':
+            # removing redundancy in CIC with both kinds of mass
+            is_CICW = self.props['mas'] == 'CICW'
+            is_CIC_and_stmass = self.props['mas'] == 'CIC' and self.props['species'] == 'stmass'
+            return is_CICW or is_CIC_and_stmass
         
-        elif self.color == 'all':
-            return True
+        elif self.props['color'] == 'all':
+            is_CICW = self.props['mas'] == 'CICW'
+            is_CIC_and_stmass = self.props['mas'] == 'CIC' and self.props['species'] == 'stmass'
+            return is_CICW or is_CIC_and_stmass
         return False
 
 
@@ -105,8 +125,6 @@ class galaxy(Field):
         # each run will do each color definition provided, but will need a different run to
         # use a different resolution definition.
         
-        self.isHI = False
-
         self.loadpath = catshpath
         self.counts = {}
         self.grsm_hists = {}
@@ -121,6 +139,7 @@ class galaxy(Field):
         colordefs = self.getColorDefinitions()
         mass_type = ['stmass', 'total']
         MAS_type = ['CIC','CICW']
+        spaces = ['redshift', 'real']
         gridnames = {}
 
         for c in colors:
@@ -128,42 +147,58 @@ class galaxy(Field):
                 for cd in colordefs:
                     for mt in mass_type:
                         for Mt in MAS_type:
-                            gp = galaxy_grid_props(c, Mt, self.fieldname, mt, r, cd)
-                            if gp.isIncluded():
-                                gridnames[gp.getName()] = gp
+                            for s in spaces:
+                                gp = galaxy_grid_props(Mt, self.fieldname, s, c, mt, r, cd)
+                                if gp.isIncluded():
+                                    gridnames[gp.getH5DsetName()] = gp
         for r in resolutions:
             for mt in mass_type:
                 for Mt in MAS_type:
-                    gp = galaxy_grid_props('resolved', Mt, self.fieldname, mt, r, None)
-                    if gp.isIncluded():
-                        gridnames[gp.getName()] = gp
+                    for s in spaces:
+                        gp = galaxy_grid_props(Mt, self.fieldname, s, 'resolved', mt, r, None)
+                        if gp.isIncluded():
+                            gridnames[gp.getH5DsetName()] = gp
         for mt in mass_type:
             for Mt in MAS_type:
-                gp = galaxy_grid_props('all', Mt, self.fieldname, mt, None, None)
-                if gp.isIncluded():
-                    gridnames[gp.getName()] = gp
+                for s in spaces:
+                    gp = galaxy_grid_props(Mt, self.fieldname,s, 'all', mt, None, None)
+                    if gp.isIncluded():
+                        gridnames[gp.getH5DsetName()] = gp
         
         return gridnames
     
     @staticmethod
-    def colorIndices(photo, stmass, col_def):
-        if col_def == 'nelson':
+    def colorIndices(photo, stmass, color_cut):
+        if color_cut == 'visual_inspection':
             x = stmass
             y = photo['gr']
             red_mask = y > 0.65 + 0.02 * (np.log10(x) - 10.28)
             blue_mask = np.invert(red_mask)
-        elif col_def == 'papa':
+        elif color_cut == 'papastergis_SDSS':
             x = photo['r']
             y = photo['gi']
             red_mask = y > 0.0571 * (x + 24) + 1.25
             blue_mask = y < 0.0571 * (x + 24) + 1.1
-        elif col_def == 'eBOSS':
-            #TODO: still need to implement without LRG ELG separate
+            # excludes green valley galaxies in between these two lines
+        elif color_cut == 'wolz_eBOSS_ELG':
+            
             blue_mask = np.ones_like(stmass)
             red_mask = np.zeros_like(stmass)
+        elif color_cut == 'wolz_eBOSS_LRG':
+            blue_mask = np.zeros_like(stmass)
+            red_mask = np.ones_like(stmass)
+        
+        elif color_cut == 'wolz_wiggleZ':
+            blue_mask = np.ones_like(stmass)
+            red_mask = np.zeros_like(stmass)
+
+        elif color_cut == 'anderson_2df':
+            x = photo['b_j']
+            y = photo['r_f']
+            red_mask = x - y > 1.07
         else:
             y = photo['gr']
-            x = float(col_def)
+            x = float(color_cut)
             red_mask = y > x
             blue_mask = np.invert(red_mask)
         return blue_mask, red_mask
@@ -217,7 +252,7 @@ class galaxy(Field):
         # the different definitions of what makes a galaxy resolved
         galaxy_min_resolution = {}
         # from papastergis 2013, minimum for galaxies is r-band lum of -17 mag
-        galaxy_min_resolution['papa'] = {'r':(-np.inf,-17)}
+        galaxy_min_resolution['papastergis_SDSS'] = {'r':(-np.inf,-17)}
         # papastergis makes an additional cut (i-z) > -0.25, but states that
         # this cut eliminates a small number of misidentified galaxies by the 
         # SDSS pipeline
@@ -227,29 +262,35 @@ class galaxy(Field):
 
         # wigglez isn't a good comparison, TNG doesn't have any equivalent UV
         # filters and wigglez has poor r definition (from wolz)
-        galaxy_min_resolution['wiggleZ'] = {'r':(20,22)}
+        galaxy_min_resolution['wolz_wiggleZ'] = {'r':(20,22)}
         
         # eBOSS Emission line galaxies
-        galaxy_min_resolution['eBOSS'] = {'g':(21.825,22.825), 'gr':'gr_elg', 
-                'rz':'rz_elg'}
+        galaxy_min_resolution['wolz_eBOSS_ELG'] = {'g':(21.825, 22.825), 'gr':'gr_elg',
+        'rz':'rz_elg'}
         # since gr and rz depend on other values, use strings to indicate a method
         # to use in the resolution definition
-
-        # galaxy_min_resolution['eBOSS_LRG'] = {'i':(19.9,21.8), 'z':(-np.inf, 19.95),
-        #         'ri':(0.98, np.inf)}
+        galaxy_min_resolution['wolz_eBOSS_LRG'] = {'i':(19.9,21.8), 'z':(-np.inf, 19.95),
+                 'ri':(0.98, np.inf)}
         # I still need to check if there is an equivalent band for IRACI in TNG
 
-        galaxy_min_resolution['2df'] = {'bj':(19.45)}
+        galaxy_min_resolution['anderson_2df'] = {'b_j':(19.45), 'r_f':(21)}
         return galaxy_min_resolution
     
     @classmethod
     def getColorDefinitions(cls):
-
-        implemented_color_defs = ['papa', 'nelson', '0.5', '0.55', '0.6', '0.65', '0.7', 'eBOSS']
+        obs = cls.getObservationalDefinitions()
+        implemented_color_defs = ['visual_inspection', '0.50', '0.55', 
+                '0.60', '0.65', '0.70']
         
-        return implemented_color_defs
+        return implemented_color_defs.extend(obs)
     
+    @classmethod
+    def getObservationalDefinitions(cls):
+        return ['papastergis_SDSS', 'wolz_eBOSS_ELG', 'wolz_eBOSS_LRG', 'anderson_2df',
+                'wolz_wiggleZ']
     
+    def makeSlice(self, grid, perc=0.1, mid=None, avg=True):
+        return super().makeSlice(grid, perc=perc, mid=mid, avg=avg)
     
     def _loadGalaxyData(self, simpath, fields):
         data = super()._loadGalaxyData(simpath, fields)
@@ -275,111 +316,83 @@ class galaxy(Field):
 
     def computeGrids(self, outfile):
         ########################## HELPER FUNCTION ###############################
-        def computeGal(pos, mass, gc, is_in_rss):
-            grid = Grid(gc.getName(), self.resolution, verbose=self.v)
-            if is_in_rss:
-                grid.toRSS()
-
+        def computeGal(pos, mass, gc):
+            grid = Grid(gc.getName(), self.grid_resolution, verbose=self.v)
+            
+            if gc.props['space'] == 'real':
+                pos_arr = pos
+            elif gc.props['space'] == 'redshift':
+                pos_arr = rspos
+            
             if gc.props['mas'] == 'CICW':
-                grid.CICW(pos, self.header['BoxSize'], mass)
+                grid.CICW(pos_arr, self.header['BoxSize'], mass)
             else:
-                grid.CIC(pos, self.header['BoxSize'])
+                grid.CIC(pos_arr, self.header['BoxSize'])
             
             return grid
         ###########################################################################
 
         # saves the associated pickle filepath to the hdf5 output
-        super().computeGrids(outfile)
+        super().setupGrids(outfile)
 
         # getting the galaxy data
         fields = ['SubhaloStellarPhotometrics','SubhaloPos','SubhaloMassType',
                 'SubhaloVel']   
         pos, vel, mass, photo = self._loadGalaxyData(self.loadpath, fields)
+        temp = copy.copy(pos)
+        rspos = self._toRedshiftSpace(temp, vel)
+        del vel, temp
         
-            
-        in_rss = False
+        
         for g in self.gridprops.values():
             if self.v:
                 print("now making grids for %s"%g.getName())
 
             # create the appropriate mask for the color
             gp = g.props
-            if not gp['resdef'] is None:
-                resolved_dict = self.getResolutionDefinitions(self.simname)[gp['resdef']]
+            if not gp['gal_res'] is None:
+                resolved_dict = self.getResolutionDefinitions(self.simname)[gp['gal_res']]
                 resolved_mask = self.isResolved(mass[:, 4], photo, resolved_dict)
             else: # "all" does not have resdef -> so none are masked
                 resolved_mask = np.ones_like(mass[:, 4], dtype=bool)
             
 
             if gp['color'] == 'red':
-                blue_mask, red_mask = self.colorIndices(photo, mass[:, 4], gp['coldef'])
+                blue_mask, red_mask = self.colorIndices(photo, mass[:, 4], gp['color_cut'])
                 mask = red_mask * resolved_mask
             elif gp['color'] == 'blue':
-                blue_mask, red_mask = self.colorIndices(photo, mass[:, 4], gp['coldef'])
+                blue_mask, red_mask = self.colorIndices(photo, mass[:, 4], gp['color_cut'])
                 mask = blue_mask * resolved_mask
             elif gp['color'] == 'resolved':
                 mask = resolved_mask
             elif gp['color'] == 'all':
                 mask = np.ones_like(resolved_mask, dtype=bool)
             
+            mask.astype(bool)
             # count the number of galaxies used for this grid
             self.counts[g.getName()] = np.sum(mask)
-            if gp['mass'] == 'stmass':
-                grid = computeGal(pos[mask, :], mass[mask, 4], g, in_rss)
+            if gp['species'] == 'stmass':
+                grid = computeGal(pos[mask, :], mass[mask, 4], g)
             else:
                 total_mass = np.sum(mass, axis = 1)
-                grid = computeGal(pos[mask, :], total_mass[mask], g, in_rss)
+                grid = computeGal(pos[mask, :], total_mass[mask], g)
 
-            if gp['resdef'] not in self.gir_hists.keys() and gp['resdef'] == 'papa':
+            if gp['gal_res'] not in self.gir_hists.keys() and gp['gal_res'] == 'papastergis_SDSS':
                 gir = self.make_gi_r(photo['gi'][resolved_mask], photo['r'][resolved_mask])
-                self.gir_hists[gp['resdef']] = gir
+                self.gir_hists[gp['gal_res']] = gir
             
-            if gp['resdef'] not in self.grsm_hists.keys() and not gp['resdef'] is None:
+            if gp['gal_res'] not in self.grsm_hists.keys() and not gp['gal_res'] is None:
                 grsm = self.make_gr_stmass(photo['gr'][resolved_mask], mass[resolved_mask, 4])
-                self.grsm_hists[gp['resdef']] = grsm
+                self.grsm_hists[gp['gal_res']] = grsm
             
-            self.saveData(outfile, grid, g)
-            del grid
-        
-        # now doing redshift-space grids
-        pos = self._toRedshiftSpace(pos, vel)
-        in_rss = True
-
-        for g in list(self.gridprops.values()):
-            if self.v:
-                print("now making grids for %s"%g.getName())
-
-            # create the appropriate mask for the color
-            gp = g.props
-
-            if not gp['resdef'] is None:
-                resolved_dict = self.getResolutionDefinitions(self.simname)[gp['resdef']]
-                resolved_mask = self.isResolved(mass[:, 4], photo, resolved_dict)
-            else:
-                resolved_mask = np.ones_like(mass[:, 4], dtype=bool)
-            
-            if gp['color'] == 'red':
-                blue_mask, red_mask = self.colorIndices(photo, mass[:, 4], gp['coldef'])
-                mask = red_mask * resolved_mask
-            elif gp['color'] == 'blue':
-                blue_mask, red_mask = self.colorIndices(photo, mass[:, 4], gp['coldef'])
-                mask = blue_mask * resolved_mask
-            elif gp['color'] == 'resolved':
-                mask = resolved_mask
-            elif gp['color'] == 'all':
-                mask = np.ones_like(resolved_mask, dtype=bool)
-            
-
-            if gp['mass'] == 'stmass':
-                grid = computeGal(pos[mask, :], mass[mask, 4], g, in_rss)
-            else:
-                total_mass = np.sum(mass, axis = 1)
-                grid = computeGal(pos[mask, :], total_mass[mask], g, in_rss)
             self.saveData(outfile, grid, g)
             del grid
         
         return
     
+    def setupGrids(self, outfile):
+        return super().setupGrids(outfile)
+        
     def make_gr_stmass(self, gr, stmass):
         stmass = np.ma.masked_equal(stmass, 0)
         gr_stmass = np.histogram2d(np.log10(stmass), gr, bins=50)
@@ -395,7 +408,6 @@ class galaxy(Field):
     
     def saveData(self, outfile, grid, gp):
         dat = super().saveData(outfile, grid, gp)
-        dat.attrs['used_dust'] = False
         return dat
 
     
@@ -441,8 +453,6 @@ class galaxy_dust(galaxy):
     def saveData(self, outfile, grid, gp):
         dat = super().saveData(outfile, grid, gp)
         print('galaxy_dust\'s saveData finished calling galaxy')
-        # dct = dat.attrs
-        # dct['used_dust'] = True
         return dat
     
 

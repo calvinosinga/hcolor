@@ -5,55 +5,61 @@ import h5py as hp
 import numpy as np
 from hc_lib.fields.field_super import Field, grid_props
 from hc_lib.grid.grid import Chunk
+import copy
+from hc_lib.fields.galaxy import galaxy
 import scipy.constants as sc
 
 class hiptl_grid_props(grid_props):
 
-    def __init__(self, base, mas, field, mass_or_temp = None, nH = None):
+    def __init__(self, mas, field, space, model, mass_or_temp = None, nH = None):
         other = {}
         other['map'] = mass_or_temp
+        other['model'] = model
         if not nH is None:
             self.nH_bin = nH
             nH_str = str(nH)
             other['nH_bin'] = nH_str
         else:
             other['nH_bin'] = nH
-        self.model = base
-        super().__init__(base, mas, field, other)
+        super().__init__(mas, field, space, other)
         return
     
     def isCompatible(self, other):
         sp = self.props
         op = other.props
 
-        # hiptl/h2ptlXgalaxy 
-        if 'galaxy' in op['field']:
+        # hiptl/h2ptlXgalaxy/galaxy_dust
+        if 'galaxy' in op['fieldname']:
             # for comparisons to Anderson and Wolz -> stmass/resdef is eBOSS, wiggleZ, 2df
             if 'temp' == sp['map']:
-                res = ['eBOSS', 'wiggleZ', '2df']
-                return op['resdef'] in res and op['mass'] == 'stmass'
+                obs_defs = galaxy.getObservationalDefinitions()
+                obs_defs.remove('papastergis_SDSS')
+                match_obs = op['gal_res'] in obs_defs and op['color_cut'] in obs_defs
+                return match_obs
             
-            # if a mass map, it is either diemer or papa
-            elif op['resdef'] == 'diemer':
+            # if a mass map, it is either diemer
+            elif op['gal_res'] == 'diemer':
                 # the important color definitions
-                cols = ['0.6', '0.55', '0.65', 'nelson']
+                cols = ['0.60', '0.55', '0.65', 'visual_inspection']
 
                 # also include resolved
-                is_resolved = op['base'] == 'resolved'
+                is_resolved = op['color'] == 'resolved'
 
-                return op['coldef'] in cols or is_resolved
+                return op['color_cut'] in cols or is_resolved
             
             # ignore all papa resdefs -> hisubhalo is more comparable
-            elif op['resdef'] == 'papa':
+            elif op['gal_res'] == 'papa':
                 return False
             
-            # if all = base, then include
-            elif op['base'] == 'all':
+            # if all = color, then include
+            elif op['color'] == 'all':
                 return True
 
-        
+        # hiptlXptl
         else:
-            return True
+            # include if mass map, not temp map
+            return sp['map'] == 'mass'
+            
 
     
 class hiptl(Field):
@@ -73,12 +79,14 @@ class hiptl(Field):
     def getGridProps(self):
         models = self.getMolFracModelsPtl()
         mass_or_temp = ['mass', 'temp']
+        spaces = ['redshift', 'real']
         grp = {}
-        for m in models:
-            for mt in mass_or_temp:
-                gp = hiptl_grid_props(m, 'CICW', self.fieldname, mass_or_temp = mt)
-                if gp.isIncluded():
-                    grp[gp.getName()] = gp
+        for s in spaces:
+            for m in models:
+                for mt in mass_or_temp:
+                    gp = hiptl_grid_props('CICW', self.fieldname, s, m, mass_or_temp = mt)
+                    if gp.isIncluded():
+                        grp[gp.getName()] = gp
         return grp
     
     @staticmethod
@@ -89,20 +97,17 @@ class hiptl(Field):
         super().computeGrids(outfile)
         hih2file = hp.File(self.hih2filepath, 'r')
         pos, vel, mass, density = self._loadSnapshotData()
-        in_rss = False
-
+        temp = copy.copy(pos)
+        rspos = self._toRedshiftSpace(temp, vel)
+        del temp, vel
 
         ############ HELPER FUNCTION ############################################
-        def computeHI(gprop, pos, mass, density, is_in_rss):
-            grid = Chunk(gprop.getName(), self.resolution, self.chunk, verbose=self.v)
-            if is_in_rss:
-                grid.toRSS()
+        def computeHI(gprop, pos, mass, density):
+            grid = Chunk(gprop.getName(), self.grid_resolution, self.chunk, verbose=self.v)
             
             if self.v:
                 hs = '#' * 20
                 print(hs+" COMPUTE HI FOR %s "%(gprop.getName().upper()) + hs)
-                print("is in redshift space?:%s"%str(is_in_rss))
-                print("does the grid agree?:%s"%str(is_in_rss))
 
             # getting data from hih2 files
             neutfrac = hih2file['PartType0']['f_neutral_H'][:]
@@ -118,12 +123,12 @@ class hiptl(Field):
                     np.zeros(HImass.shape, dtype=np.float32))
             HIrho = np.where(HIrho >= 0, HIrho, np.zeros_like(HIrho))
 
+   
             # place particles into grid
             if gprop.props["map"] == 'temp':
                 T_HI = self.temperatureMap(HIrho)
                 grid.CICW(pos, self.header['BoxSize'], T_HI)
             else:
-
                 grid.CICW(pos, self.header['BoxSize'], HImass)
 
             # save them to file
@@ -133,14 +138,12 @@ class hiptl(Field):
         #############################################################################
 
         for g in list(self.gridprops.values()):
-            computeHI(g, pos, mass, density, in_rss)
-        
-        pos = self._toRedshiftSpace(pos, vel)
-        in_rss = True
-        
-        for g in list(self.gridprops.values()):
-            computeHI(g, pos, mass, density, in_rss)
-        hih2file.close()
+            if g.props['space'] == 'real':
+                pos_arr = pos
+            elif g.props['space'] == 'redshift':
+                pos_arr = rspos
+            computeHI(g, pos_arr, mass, density)
+
         return
     
     def temperatureMap(self, HIdensity):
@@ -231,7 +234,7 @@ class hiptl_nH(hiptl):
 
         ############ HELPER FUNCTION ############################################
         def computeHI(gprop, pos, mass, density, is_in_rss):
-            grid = Chunk(gprop.getName(), self.resolution, self.chunk, verbose=self.v)
+            grid = Chunk(gprop.getName(), self.grid_resolution, self.chunk, verbose=self.v)
             if is_in_rss:
                 grid.toRSS()
 
@@ -361,20 +364,19 @@ class h2ptl(hiptl):
         ####################################################################################
         hih2file = hp.File(self.hih2filepath, 'r')
         pos, vel, mass, density = self._loadSnapshotData()
-        in_rss = False
+
+        temp = copy.copy(pos)
+        rspos = self._toRedshiftSpace(temp, vel)
+        del temp, vel, density
 
 
         ############ HELPER FUNCTION ############################################
-        def computeH2(gprop, pos, mass, is_in_rss):
-            grid = Chunk(gprop.getName(), self.resolution, self.chunk, verbose=self.v)
-            if is_in_rss:
-                grid.toRSS()
+        def computeH2(gprop, pos, mass):
+            grid = Chunk(gprop.getName(), self.grid_resolution, self.chunk, verbose=self.v)
             
             if self.v:
                 hs = '#' * 20
                 print(hs+" COMPUTE H2 FOR %s "%(gprop.getName().upper()) + hs)
-                print("is in redshift space?:%s"%str(is_in_rss))
-                print("does the grid agree?:%s"%str(is_in_rss))
 
             # getting data from hih2 files
             neutfrac = hih2file['PartType0']['f_neutral_H'][:]
@@ -397,12 +399,11 @@ class h2ptl(hiptl):
         #############################################################################
 
         for g in self.gridprops.values():
-            computeH2(g, pos, mass, in_rss)
+            if g.props['space'] == 'real':
+                pos_arr = pos
+            elif g.props['space'] == 'redshift':
+                pos_arr = rspos
+            computeH2(g, pos_arr, mass)
         
-        pos = self._toRedshiftSpace(pos, vel)
-        in_rss = True
-        
-        for g in self.gridprops.values():
-            computeH2(g, pos, mass, in_rss)
         hih2file.close()
         return
