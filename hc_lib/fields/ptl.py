@@ -37,7 +37,7 @@ class ptl(Field):
             for s in spaces:
                 gp = ptl_grid_props("CICW", self.fieldname, s, g)
                 if gp.isIncluded():
-                    grp[gp.getName()] = gp
+                    grp[gp.getH5DsetName()] = gp
         return grp
 
     def computeGrids(self, outfile):
@@ -51,7 +51,7 @@ class ptl(Field):
         ############# HELPER METHOD ##################################
         def computePtl(gprop, pos, mass, slc):
         
-            grid = Chunk(gprop.getName(), self.grid_resolution, self.chunk, verbose=self.v)
+            grid = Chunk(gprop.getH5DsetName(), self.grid_resolution, self.chunk, verbose=self.v)
             
             if self.v:
                 grid.print()

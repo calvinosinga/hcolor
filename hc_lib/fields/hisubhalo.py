@@ -83,14 +83,16 @@ class hisubhalo(Field):
     def getGridProps(self):
         models = self.getMolFracModelsGal()
         mas = ['CIC', 'CICW']
+        spaces = ['redshift', 'real']
         res = list(self.getResolutionDefinitions().keys())
         grp = {}
         for m in models:
-            for s in mas:
+            for s in spaces:
                 for r in res:
-                    gp = hisubhalo_grid_props(m, s, self.fieldname, r)
-                    if gp.isIncluded():
-                        grp[gp.getName()] = gp
+                    for M in mas:
+                        gp = hisubhalo_grid_props(M, self.fieldname, s, m, r)
+                        if gp.isIncluded():
+                            grp[gp.getH5DsetName()] = gp
         return grp
     @staticmethod
     def getResolutionDefinitions():
@@ -145,7 +147,7 @@ class hisubhalo(Field):
         del temp, vel
         ############### HELPER METHOD ###############################
         def computeHI(gprop, pos):
-            grid = Grid(gprop.getName(), self.grid_resolution, verbose=self.v)
+            grid = Grid(gprop.getH5DsetName(), self.grid_resolution, verbose=self.v)
 
             mass = hih2file[gprop.model][:] #already in solar masses
             if gprop.props['resdef'] == 'papa':
@@ -160,8 +162,8 @@ class hisubhalo(Field):
             else:
                 grid.CIC(pos[mask, :], self.header['BoxSize'])
             
-            if gprop.getName() not in self.counts:
-                self.counts[gprop.getName()] = np.sum(mask)
+            if gprop.getH5DsetName() not in self.counts:
+                self.counts[gprop.getH5DsetName()] = np.sum(mask)
             
             
             self.saveData(outfile, grid, gprop)
@@ -223,7 +225,7 @@ class h2subhalo(hisubhalo):
 
         ############### HELPER METHOD ###############################
         def computeH2(gprop, pos):
-            grid = Grid(gprop.getName(), self.grid_resolution, verbose=self.v)
+            grid = Grid(gprop.getH5DsetName(), self.grid_resolution, verbose=self.v)
 
             mass = hih2file[gprop.model][:] #already in solar masses
             if gprop.props['mas'] == 'CICW':

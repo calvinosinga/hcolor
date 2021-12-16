@@ -79,7 +79,7 @@ class vn(Field):
             for mt in MorT:
                 gp = vn_grid_props("CICW", self.fieldname, s, mt)
                 if gp.isIncluded():
-                    grp[gp.getName()] = gp
+                    grp[gp.getH5DsetName()] = gp
 
         return grp
     
@@ -94,7 +94,7 @@ class vn(Field):
         ############# HELPER METHOD ##################################
         def computeHI(gprop, pos, mass, volume):
         
-            grid = Chunk(gprop.getName(), self.grid_resolution, self.chunk, verbose = self.v)
+            grid = Chunk(gprop.getH5DsetName(), self.grid_resolution, self.chunk, verbose = self.v)
 
             
             if self.v:

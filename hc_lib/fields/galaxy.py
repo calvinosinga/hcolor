@@ -282,7 +282,8 @@ class galaxy(Field):
         implemented_color_defs = ['visual_inspection', '0.50', '0.55', 
                 '0.60', '0.65', '0.70']
         
-        return implemented_color_defs.extend(obs)
+        implemented_color_defs.extend(obs)
+        return implemented_color_defs
     
     @classmethod
     def getObservationalDefinitions(cls):
@@ -317,7 +318,7 @@ class galaxy(Field):
     def computeGrids(self, outfile):
         ########################## HELPER FUNCTION ###############################
         def computeGal(pos, mass, gc):
-            grid = Grid(gc.getName(), self.grid_resolution, verbose=self.v)
+            grid = Grid(gc.getH5DsetName(), self.grid_resolution, verbose=self.v)
             
             if gc.props['space'] == 'real':
                 pos_arr = pos
@@ -346,7 +347,7 @@ class galaxy(Field):
         
         for g in self.gridprops.values():
             if self.v:
-                print("now making grids for %s"%g.getName())
+                print("now making grids for %s"%g.getH5DsetName())
 
             # create the appropriate mask for the color
             gp = g.props
@@ -370,7 +371,7 @@ class galaxy(Field):
             
             mask.astype(bool)
             # count the number of galaxies used for this grid
-            self.counts[g.getName()] = np.sum(mask)
+            self.counts[g.getH5DsetName()] = np.sum(mask)
             if gp['species'] == 'stmass':
                 grid = computeGal(pos[mask, :], mass[mask, 4], g)
             else:

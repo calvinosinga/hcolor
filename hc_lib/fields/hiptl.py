@@ -86,7 +86,7 @@ class hiptl(Field):
                 for mt in mass_or_temp:
                     gp = hiptl_grid_props('CICW', self.fieldname, s, m, mass_or_temp = mt)
                     if gp.isIncluded():
-                        grp[gp.getName()] = gp
+                        grp[gp.getH5DsetName()] = gp
         return grp
     
     @staticmethod
@@ -103,11 +103,11 @@ class hiptl(Field):
 
         ############ HELPER FUNCTION ############################################
         def computeHI(gprop, pos, mass, density):
-            grid = Chunk(gprop.getName(), self.grid_resolution, self.chunk, verbose=self.v)
+            grid = Chunk(gprop.getH5DsetName(), self.grid_resolution, self.chunk, verbose=self.v)
             
             if self.v:
                 hs = '#' * 20
-                print(hs+" COMPUTE HI FOR %s "%(gprop.getName().upper()) + hs)
+                print(hs+" COMPUTE HI FOR %s "%(gprop.getH5DsetName().upper()) + hs)
 
             # getting data from hih2 files
             neutfrac = hih2file['PartType0']['f_neutral_H'][:]
@@ -208,7 +208,7 @@ class hiptl_nH(hiptl):
                 gp = hiptl_grid_props(m, 'CICW', self.fieldname,
                         nH = n)
                 if gp.isIncluded():
-                    grp[gp.getName()] = gp
+                    grp[gp.getH5DsetName()] = gp
         return grp
 
     def computeGrids(self, outfile):
@@ -234,7 +234,7 @@ class hiptl_nH(hiptl):
 
         ############ HELPER FUNCTION ############################################
         def computeHI(gprop, pos, mass, density, is_in_rss):
-            grid = Chunk(gprop.getName(), self.grid_resolution, self.chunk, verbose=self.v)
+            grid = Chunk(gprop.getH5DsetName(), self.grid_resolution, self.chunk, verbose=self.v)
             if is_in_rss:
                 grid.toRSS()
 
@@ -348,7 +348,7 @@ class h2ptl(hiptl):
         for m in models:
             gp = hiptl_grid_props(m, 'CICW', self.fieldname)
             if gp.isIncluded():
-                grp[gp.getName()] = gp
+                grp[gp.getH5DsetName()] = gp
         return grp
     
     def computeGrids(self, outfile):
@@ -372,11 +372,11 @@ class h2ptl(hiptl):
 
         ############ HELPER FUNCTION ############################################
         def computeH2(gprop, pos, mass):
-            grid = Chunk(gprop.getName(), self.grid_resolution, self.chunk, verbose=self.v)
+            grid = Chunk(gprop.getH5DsetName(), self.grid_resolution, self.chunk, verbose=self.v)
             
             if self.v:
                 hs = '#' * 20
-                print(hs+" COMPUTE H2 FOR %s "%(gprop.getName().upper()) + hs)
+                print(hs+" COMPUTE H2 FOR %s "%(gprop.getH5DsetName().upper()) + hs)
 
             # getting data from hih2 files
             neutfrac = hih2file['PartType0']['f_neutral_H'][:]
