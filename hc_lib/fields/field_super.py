@@ -7,6 +7,7 @@ import numpy as np
 import h5py as hp
 from Pk_library import Pk, Xi, XPk, XXi
 import copy
+import time
 from hc_lib.build.input import Input
 
 class grid_props():
@@ -24,8 +25,10 @@ class grid_props():
 
     def getH5DsetName(self):
         out = ''
+        
         for k, v in self.props.items():
-            if not v is None:
+            compute_input = k == 'compute_slice' or k == 'compute_xi'
+            if not v is None and not compute_input:
                 out+= "%s_"%v
         
         out = out[:-1]
@@ -58,9 +61,10 @@ class grid_props():
         return mas and space
 
 class ResultContainer():
-    def __init__(self, field_obj, grid_props, values):
+    def __init__(self, field_obj, grid_props, values, runtime):
         self.values = values
         self.props = {}
+        self.props['result_runtime'] = runtime
         self.props['is_auto'] = True
         self._extract_field_properties(field_obj)
         self._extract_grid_properties(grid_props)
@@ -182,9 +186,12 @@ class Field():
 
 
     def computePk(self, grid, grid_props):
+        start = time.time()
         arr = grid.getGrid()
         arr = self._toOverdensity(arr)
         pk = Pk(arr, self.header["BoxSize"], axis = self.axis, MAS='CIC')
+        runtime = time.time() - start
+
         if not self.saved_k:
             self.k = pk.k3D
             self.saved_k = True
@@ -192,7 +199,7 @@ class Field():
             self.Nmodes1D = pk.Nmodes1D
             self.saved_Nmodes1D = True
 
-        rc = ResultContainer(self, grid_props, pk.Pk[:,0])
+        rc = ResultContainer(self, grid_props, pk.Pk[:,0], runtime)
         self.pks.append(rc)
         if grid_props['space'] == 'redshift':
             if not self.saved_k2D:
@@ -202,25 +209,28 @@ class Field():
             if not self.saved_Nmodes2D:
                 self.Nmodes2D = pk.Nmodes2D
                 self.saved_Nmodes2D = True
-            rc2D = ResultContainer(self, grid_props, pk.Pk2D[:])
+            rc2D = ResultContainer(self, grid_props, pk.Pk2D[:], runtime)
             self.tdpks.append(rc2D)
         
         return
     
     def computeXi(self, grid, grid_props):
         if grid_props['compute_xi']:
+            start = time.time()
             arr = grid.getGrid()
             arr = self._toOverdensity(arr)
             xi = Xi(arr, self.header["BoxSize"], axis = self.axis, MAS='CIC')
+            runtime = time.time() - start
             if not self.saved_r:
                 self.r=xi.r3D
                 self.saved_r = True
-            rc = ResultContainer(self, grid_props, xi.xi[:,0])
+            rc = ResultContainer(self, grid_props, xi.xi[:,0], runtime)
             self.xi.append(rc)
         return
 
     def makeSlice(self, grid, grid_props, perc=0.1, mid=None, avg = False):
         if grid_props['compute_slice']:
+            start = time.time()
             arr = grid.getGrid()
             if avg:
                 arr = arr[::2,::2,::2] + arr[1::2, 1::2, 1::2]
@@ -229,7 +239,8 @@ class Field():
             if mid is None:
                 mid = int(dim/2)
             slc = np.log10(np.sum(arr[:, mid-slcidx:mid+slcidx, :], axis=(self.axis+1)%3))
-            rc = ResultContainer(self, grid_props, slc)
+            runtime = time.time()-start
+            rc = ResultContainer(self, grid_props, slc, runtime)
             self.slices.append(rc)
         return
     

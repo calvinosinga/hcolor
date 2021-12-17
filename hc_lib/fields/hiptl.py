@@ -111,7 +111,7 @@ class hiptl(Field):
 
             # getting data from hih2 files
             neutfrac = hih2file['PartType0']['f_neutral_H'][:]
-            molfrac = hih2file['PartType0']['f_mol_'+gprop.model][:]
+            molfrac = hih2file['PartType0']['f_mol_'+gprop.props['model']][:]
             
             # converting the masses to HI mass
             HImass = mass*(1-molfrac)*neutfrac
@@ -383,7 +383,7 @@ class h2ptl(hiptl):
             neutfrac = neutfrac.astype('float32')
             neutfrac = np.where(neutfrac>=0, neutfrac, np.zeros_like(neutfrac))
 
-            molfrac = hih2file['PartType0']['f_mol_'+gprop.model][:]
+            molfrac = hih2file['PartType0']['f_mol_'+gprop.props['model']][:]
             molfrac = molfrac.astype('float32')
             molfrac = np.where(molfrac>=0, molfrac, np.zeros_like(molfrac))
             # converting the masses to H2 mass

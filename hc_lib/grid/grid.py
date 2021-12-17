@@ -220,8 +220,8 @@ class Chunk(Grid):
         dct = dict(dataset.attrs)
         grid = Chunk(dct['gridname'], dct['resolution'], 0, dataset[:], verbose=verbose)
         grid.is_computed = True
-        grid.mas_runtime = dct['mas_runtime']
+        grid.mas_runtime = list(dct['mas_runtime'])
         grid.combine = dct['combine']
-        grid.grid_sum = dct['grid_sum']
+        grid.grid_sum = list(dct['grid_sum'])
         grid.chunk_nums = list(dct['chunks'])
         return grid

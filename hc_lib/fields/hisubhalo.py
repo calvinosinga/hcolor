@@ -149,7 +149,7 @@ class hisubhalo(Field):
         def computeHI(gprop, pos):
             grid = Grid(gprop.getH5DsetName(), self.grid_resolution, verbose=self.v)
 
-            mass = hih2file[gprop.model][:] #already in solar masses
+            mass = hih2file[gprop.props['model']][:] #already in solar masses
             if gprop.props['resdef'] == 'papa':
                 mask = self.getResolvedSubhalos(mass, gprop.props['HI_res'])
             else:

@@ -88,7 +88,7 @@ class galaxy_grid_props(grid_props):
 
         # everything that isn't a color definition associated with an observation is fine
         elif self.props['gal_res'] == 'diemer':
-            obs_color_cuts = galaxy.getObservationalColorDefinitions()
+            obs_color_cuts = galaxy.getObservationalDefinitions()
             coldef_is_compatible = not (self.props['color_cut'] in obs_color_cuts)
             # CIC between stmass and all mass should be the same - removing redundancy
             is_CICW = self.props['mas'] == 'CICW'
