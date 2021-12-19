@@ -42,6 +42,7 @@ class grid_props():
         return True
 
     def saveProps(self, h5set):
+        print("saveProps method has started...")
         for k,v in self.props.items():
             if not v is None:
                 h5set.attrs[k] = v
@@ -61,8 +62,12 @@ class grid_props():
         return mas and space
 
 class ResultContainer():
-    def __init__(self, field_obj, grid_props, values, runtime):
-        self.values = values
+    def __init__(self, field_obj, grid_props, runtime, xvalues, yvalues = None, 
+            zvalues = None, Nmodes = None):
+        self.xvalues = xvalues
+        self.yvalues = yvalues
+        self.zvalues = zvalues
+        self.Nmodes = Nmodes
         self.props = {}
         self.props['result_runtime'] = runtime
         self.props['is_auto'] = True
@@ -86,11 +91,24 @@ class ResultContainer():
         self.props['is_particle'] = Input.isPtl(f.fieldname)
         self.props['is_groupcat'] = Input.isCat(f.fieldname)
         self.props['is_matter'] = Input.isMat(f.fieldname)
-
         return
     
     def _extract_grid_properties(self, gp):
         self.props.update(gp.props)
+        return
+
+    def addCrossedField(self, other_rc):
+        temp = {}
+        for k,v in self.props.items():
+            skip = ['is_auto']
+            if not k in skip:
+                othprop = other_rc.getProp(k)
+                if v == othprop:
+                    temp[k] = v
+                else:
+                    temp[k] = [v, othprop]
+        self.props = temp
+        self.props['is_auto'] = False
         return
 
     def getProp(self, prop_key):
@@ -99,8 +117,29 @@ class ResultContainer():
         except KeyError:
             return None
     
+    def matchProps(self, desired_props):
+        isMatch = True
+        for k,v in desired_props.items():
+            self_val = self.getProp(k)
+
+            if isinstance(v, list) and isinstance(self_val, list):
+                matchone = v[0] == self_val[0] and v[1] == self_val[1]
+                matchtwo = v[0] == self_val[1] and v[1] == self_val[0]
+                isMatch = isMatch and (matchone or matchtwo)
+            elif isinstance(self_val, list):
+                isMatch = isMatch and v in self_val
+            else:
+                isMatch = isMatch and v == self_val
+
+
+        return isMatch
+    
+    def addProp(self, key, val):
+        self.props[key] = val
+        return
+        
     def getValues(self):
-        return self.values
+        return self.xvalues, self.yvalues, self.zvalues
         
 
     
@@ -115,25 +154,11 @@ class Field():
         self.axis = axis
         self.pkl_path = pkl_path
         self.v = verbose
-
-        # class variables for results
-        self.saved_k = False
-        self.saved_k2D = False
-        self.saved_r = False
-        self.saved_Nmodes1D = False
-        self.saved_Nmodes2D = False
         
         self.pks = []
         self.xi = []
         self.slices = []
         self.tdpks = []
-
-        self.k = None
-        self.r = None
-        self.kper = None
-        self.kpar = None
-        self.Nmodes1D = None
-        self.Nmodes2D = None
 
         if self.v:
             print("\n\ninputs given to superclass constructor:")
@@ -192,24 +217,12 @@ class Field():
         pk = Pk(arr, self.header["BoxSize"], axis = self.axis, MAS='CIC')
         runtime = time.time() - start
 
-        if not self.saved_k:
-            self.k = pk.k3D
-            self.saved_k = True
-        if not self.saved_Nmodes1D:
-            self.Nmodes1D = pk.Nmodes1D
-            self.saved_Nmodes1D = True
-
-        rc = ResultContainer(self, grid_props, pk.Pk[:,0], runtime)
+        rc = ResultContainer(self, grid_props, runtime, pk.k3D, pk.Pk[:,0], 
+                Nmodes = pk.Nmodes3D)
         self.pks.append(rc)
         if grid_props['space'] == 'redshift':
-            if not self.saved_k2D:
-                self.kper = pk.kper
-                self.kpar = pk.kpar
-                self.saved_k2D = True
-            if not self.saved_Nmodes2D:
-                self.Nmodes2D = pk.Nmodes2D
-                self.saved_Nmodes2D = True
-            rc2D = ResultContainer(self, grid_props, pk.Pk2D[:], runtime)
+            rc2D = ResultContainer(self, grid_props, runtime, pk.kpar, pk.kper,
+                    pk.Pk2D[:], pk.Nmodes2D)
             self.tdpks.append(rc2D)
         
         return
@@ -221,10 +234,7 @@ class Field():
             arr = self._toOverdensity(arr)
             xi = Xi(arr, self.header["BoxSize"], axis = self.axis, MAS='CIC')
             runtime = time.time() - start
-            if not self.saved_r:
-                self.r=xi.r3D
-                self.saved_r = True
-            rc = ResultContainer(self, grid_props, xi.xi[:,0], runtime)
+            rc = ResultContainer(self, grid_props, runtime, xi.r3D, xi.xi[:,0])
             self.xi.append(rc)
         return
 
@@ -240,13 +250,14 @@ class Field():
                 mid = int(dim/2)
             slc = np.log10(np.sum(arr[:, mid-slcidx:mid+slcidx, :], axis=(self.axis+1)%3))
             runtime = time.time()-start
-            rc = ResultContainer(self, grid_props, slc, runtime)
+            rc = ResultContainer(self, grid_props, runtime, slc)
             self.slices.append(rc)
         return
     
     def saveData(self, outfile, grid, gp):
         # saves grid. resolution, rss (combine info if chunk) -> attrs
         dat = grid.saveGrid(outfile)
+        print('calling saveprops method...')
         gp.saveProps(dat)
         return dat
     
@@ -259,16 +270,16 @@ class Field():
         return fntest and sstest and axtest and voltest and restest
     
     def getPks(self):
-        return self.k, self.pks
+        return self.pks
     
     def get2Dpks(self):
-        return self.kpar, self.kper, self.tdpks
+        return self.tdpks
     
     def getSlices(self):
         return self.slices
     
     def getXis(self):
-        return self.r, self.xi
+        return self.xi
 
     def _loadSnapshotData(self):
         """
@@ -330,26 +341,6 @@ class Field():
 
         return arr
 
-class CrossResultContainer():
-    def __init__(self, rc1, rc2):
-        self.rc1 = rc1
-        self.rc2 = rc2
-        self.rc1.props['is_auto'] = False
-        self.rc2.props['is_auto'] = False
-
-        self._checkValues()
-        return
-    
-    def _checkValues(self):
-        if not self.rc1.getValues() == self.rc2.getValues():
-            raise ValueError("Result Container Values are not equal")
-        return
-    
-    def getProp(self, prop_key):
-        return self.rc1.getProp(prop_key), self.rc2.getProp(prop_key)
-    
-    def getValues(self):
-        return self.rc1.getValues()
     
 from hc_lib.grid.grid import Grid
 class Cross():
@@ -362,21 +353,10 @@ class Cross():
         self.gfpath1 = gridfilepath1
         self.gfpath2 = gridfilepath2
 
-        self.saved_xk = False
-        self.saved_xr = False
-        self.saved_xk2D = False
-        self.saved_Nmodes1D = False
-        self.saved_Nmodes2D = False
         self.xpks = []
         self.xxis = []
         self.tdxpks = []
 
-        self.r = None
-        self.k = None
-        self.kper = None
-        self.kpar = None
-        self.Nmodes1D = None
-        self.Nmodes2D = None
 
         self.v = field1.v
         self.box = self.field1.header['BoxSize']
@@ -399,16 +379,16 @@ class Cross():
         return (f11test and f22test) or (f12test and f21test)
     
     def getPks(self):
-        return self.k, self.xpks
+        return self.xpks
     
     def get2Dpks(self):
-        return self.kpar, self.kper, self.tdxpks
+        return self.tdxpks
     
     def getSlices(self):
         return None
     
     def getXis(self):
-        return self.r, self.xxis
+        return self.xxis
     
     def computeXpks(self):
         if self.v:
@@ -430,19 +410,18 @@ class Cross():
         return
     
     def _xpk(self, grid1, grid2, gp1, gp2):
-
+        start = time.time()
         arrs = (self._toOverdensity(grid1.getGrid()), 
                 self._toOverdensity(grid2.getGrid()))
         xpk = XPk(arrs, self.box, self.axis, MAS=['CIC','CIC'])
-        if not self.saved_xk:
-            self.k = xpk.k3D
-            self.saved_xk = True
-        if not self.saved_Nmodes1D:
-            self.Nmodes1D = xpk.Nmodes1D
-            self.saved_Nmodes1D = True
-        rc1 = ResultContainer(self.field1, gp1, xpk.XPk[:,0,0])
-        rc2 = ResultContainer(self.field2, gp2, xpk.XPk[:,0,0])
-        self.xpks.append(CrossResultContainer(rc1, rc2))
+        runtime = time.time() - start
+
+        rc1 = ResultContainer(self.field1, gp1, runtime, xpk.k3D, 
+                xpk.XPk[:,0,0], Nmodes = xpk.Nmodes3D)
+        rc2 = ResultContainer(self.field2, gp2, runtime, xpk.k3D,
+                xpk.XPk[:,0,0], Nmodes=xpk.Nmodes3D)
+        rc1.addCrossedField(rc2)
+        self.xpks.append(rc1)
 
         do_2D = gp1['space'] == 'redshift' and gp2['space'] == 'redshift'
         if do_2D:
@@ -453,9 +432,12 @@ class Cross():
             if not self.saved_Nmodes2D:
                 self.Nmodes2D= xpk.Nmodes2D
                 self.saved_Nmodes2D = True
-            rc1 = ResultContainer(self.field1, gp1, xpk.PkX2D[:,0])
-            rc2 = ResultContainer(self.field2, gp2, xpk.PkX2D[:,0])
-            self.tdxpk.append(CrossResultContainer(rc1, rc2))
+            rc1 = ResultContainer(self.field1, gp1, runtime, xpk.kpar, xpk.kper,
+                    xpk.PkX2D[:,0], Nmodes= xpk.Nmodes2D)
+            rc2 = ResultContainer(self.field2, gp2, runtime, xpk.kpar, xpk.kper, 
+                    xpk.PkX2D[:,0], Nmodes=xpk.Nmodes2D)
+            rc1.addCrossedField(rc2)
+            self.tdxpks.append(rc1)
 
         return
 
@@ -488,17 +470,19 @@ class Cross():
         return
     
     def _xxi(self, grid1, grid2, gp1, gp2):
-        
+        start = time.time()
         arrs = (self._toOverdensity(grid1.getGrid()), 
                 self._toOverdensity(grid2.getGrid()))
         xxi = XXi(arrs[0], arrs[1], self.box, MAS=['CIC','CIC'], axis=self.axis)
+        runtime = time.time() - start
         if not self.saved_xr:
             self.r = xxi.r3D
             self.saved_xr = True
         
-        rc1 = ResultContainer(self.field1, gp1, xxi.xi[:,0])
-        rc2 = ResultContainer(self.field2, gp2, xxi.xi[:,0])
-        self.xxis.append(CrossResultContainer(rc1, rc2))
+        rc1 = ResultContainer(self.field1, gp1, runtime, xxi.r3D, xxi.xi[:,0])
+        rc2 = ResultContainer(self.field2, gp2, runtime, xxi.r3D, xxi.xi[:,0])
+        rc1.addCrossedField(rc2)
+        self.xxis.append(rc1)
 
         return
     

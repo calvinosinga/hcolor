@@ -94,7 +94,7 @@ class hiptl(Field):
         return ['GD14', 'GK11', 'S14', 'K13']
     
     def computeGrids(self, outfile):
-        super().computeGrids(outfile)
+        super().setupGrids(outfile)
         hih2file = hp.File(self.hih2filepath, 'r')
         pos, vel, mass, density = self._loadSnapshotData()
         temp = copy.copy(pos)
@@ -133,7 +133,6 @@ class hiptl(Field):
 
             # save them to file
             self.saveData(outfile, grid, gprop)
-            # if we are in redshift space, the grid handles saving with 'rs'
             return
         #############################################################################
 

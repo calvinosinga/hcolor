@@ -73,7 +73,6 @@ class hisubhalo(Field):
         self.hih2filepath = hih2filepath
         self.loadpath = shcatpath
         
-        self.counts = {}
         super().__init__(simname, snapshot, axis, resolution, pkl_path, verbose)
         if self.v:
             print('\nhisubhalo object created, object dictionary:')
@@ -94,6 +93,7 @@ class hisubhalo(Field):
                         if gp.isIncluded():
                             grp[gp.getH5DsetName()] = gp
         return grp
+
     @staticmethod
     def getResolutionDefinitions():
         # taken from Pillepich et al 2018, table 1 (in solar masses)
@@ -112,7 +112,8 @@ class hisubhalo(Field):
     def getMolFracModelsGal():
         """
         Returns a list of the molecular fraction models provided by Diemer+ 2018,
-        specifically the ones that correspond to the subhalo catalog.
+        specifically the ones that
+        rrespond to the subhalo catalog.
         """
         models = ['GD14','GK11','K13','S14']
         proj = ['map','vol']
@@ -150,7 +151,7 @@ class hisubhalo(Field):
             grid = Grid(gprop.getH5DsetName(), self.grid_resolution, verbose=self.v)
 
             mass = hih2file[gprop.props['model']][:] #already in solar masses
-            if gprop.props['resdef'] == 'papa':
+            if gprop.props['HI_res'] == 'papa':
                 mask = self.getResolvedSubhalos(mass, gprop.props['HI_res'])
             else:
                 mask = np.ones_like(mass, dtype=bool)
@@ -161,9 +162,6 @@ class hisubhalo(Field):
 
             else:
                 grid.CIC(pos[mask, :], self.header['BoxSize'])
-            
-            if gprop.getH5DsetName() not in self.counts:
-                self.counts[gprop.getH5DsetName()] = np.sum(mask)
             
             
             self.saveData(outfile, grid, gprop)

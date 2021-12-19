@@ -21,6 +21,7 @@ class Grid():
         self.resolution = res
         self.mas_runtime = 0
         self.v = verbose
+        self.count = 0
         self.grid_sum = 0
         return
     
@@ -38,10 +39,6 @@ class Grid():
             raise RuntimeError("grid is empty; has not been computed")
         return self.grid
     
-    # def toRSS(self):
-    #     self.in_rss = True
-    #     self.gridname = self.gridname + 'rs'
-    #     return
     
     def isChunk(self):
         return False
@@ -78,6 +75,7 @@ class Grid():
         self.is_computed = True
         self._computeMASRuntime(start, time.time())
         self._computeGridSum()
+        self.count = ptls
         return
 
     def CICW(self, pos, boxsize, mass):
@@ -119,6 +117,7 @@ class Grid():
         self.is_computed = True
         self._computeMASRuntime(start, time.time())
         self._computeGridSum()
+        self.count = ptls
         if self.v:
             print("finished CICW...")
             print("grid sum: %.3e"%np.sum(self.grid))
@@ -127,13 +126,12 @@ class Grid():
     
     def _computeGridSum(self):
         self.grid_sum = np.sum(self.grid)
+        return
     
     def _computeMASRuntime(self, start, stop):
         self.mas_runtime = stop - start
         return
-    # def ignoreGrid(self):
-    #     self.ignore = True
-    #     return
+
     
     def saveGrid(self, outfile):
         
@@ -145,7 +143,7 @@ class Grid():
         dct["gridname"] = self.gridname
         dct["combine"] = self.combine
         dct['grid_sum'] = self.grid_sum
-
+        dct['count'] = self.count
         if self.is_computed:
             dct["mas_runtime"] = self.mas_runtime
         if self.v:
@@ -161,6 +159,7 @@ class Grid():
         grid = Grid(dct['gridname'], dct['resolution'], dataset[:])
         grid.mas_runtime = dct['mas_runtime']
         grid.grid_sum = dct['grid_sum']
+        grid.count = dct['count']
         grid.is_computed = True
         return grid
     
@@ -209,6 +208,7 @@ class Chunk(Grid):
         self.chunk_nums.extend(list(other_chunk.chunk_nums))
         self.mas_runtime.extend(list(other_chunk.mas_runtime))
         self.combine_runtimes.extend(list(other_chunk.combine_runtimes))
+        self.count += other_chunk.count
         if self.v:
             print("finished combine. Resulting grid\'s properties:")
             self.print()
@@ -224,4 +224,5 @@ class Chunk(Grid):
         grid.combine = dct['combine']
         grid.grid_sum = list(dct['grid_sum'])
         grid.chunk_nums = list(dct['chunks'])
+        grid.count = dct['count']
         return grid

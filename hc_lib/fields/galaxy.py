@@ -126,7 +126,6 @@ class galaxy(Field):
         # use a different resolution definition.
         
         self.loadpath = catshpath
-        self.counts = {}
         self.grsm_hists = {}
         self.gir_hists = {}
 
@@ -320,15 +319,12 @@ class galaxy(Field):
         def computeGal(pos, mass, gc):
             grid = Grid(gc.getH5DsetName(), self.grid_resolution, verbose=self.v)
             
-            if gc.props['space'] == 'real':
-                pos_arr = pos
-            elif gc.props['space'] == 'redshift':
-                pos_arr = rspos
+
             
             if gc.props['mas'] == 'CICW':
-                grid.CICW(pos_arr, self.header['BoxSize'], mass)
+                grid.CICW(pos, self.header['BoxSize'], mass)
             else:
-                grid.CIC(pos_arr, self.header['BoxSize'])
+                grid.CIC(pos, self.header['BoxSize'])
             
             return grid
         ###########################################################################
@@ -371,12 +367,16 @@ class galaxy(Field):
             
             mask.astype(bool)
             # count the number of galaxies used for this grid
-            self.counts[g.getH5DsetName()] = np.sum(mask)
+            if gp['space'] == 'real':
+                pos_arr = pos
+            elif gp['space'] == 'redshift':
+                pos_arr = rspos
+
             if gp['species'] == 'stmass':
-                grid = computeGal(pos[mask, :], mass[mask, 4], g)
+                grid = computeGal(pos_arr[mask, :], mass[mask, 4], g)
             else:
                 total_mass = np.sum(mass, axis = 1)
-                grid = computeGal(pos[mask, :], total_mass[mask], g)
+                grid = computeGal(pos_arr[mask, :], total_mass[mask], g)
 
             if gp['gal_res'] not in self.gir_hists.keys() and gp['gal_res'] == 'papastergis_SDSS':
                 gir = self.make_gi_r(photo['gi'][resolved_mask], photo['r'][resolved_mask])

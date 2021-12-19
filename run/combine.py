@@ -94,7 +94,7 @@ for k in range(len(keylist)):
         
         f1 = hp.File(infiles[0], 'r')
         chunk1 = Chunk.loadGrid(f1[keylist[k]], gd['verbose'])
-        
+
         for i in range(1,len(infiles)):
             try:
                 f2 = hp.File(infiles[i],'r')
@@ -104,6 +104,10 @@ for k in range(len(keylist)):
                 chunk2 = Chunk.loadGrid(f2[keylist[k]], gd['verbose'])
                 chunk1.combineChunks(chunk2)
         dat = chunk1.saveGrid(w)
+        old_attrs = dict(f1[keylist[k]].attrs)
+        for old_key in old_attrs:
+            if old_key not in dict(dat.attrs):
+                dat.attrs[old_key] = old_attrs[old_key]
     
     # sum the histograms
     elif ops[keylist[k]] == 'hist':
@@ -128,6 +132,9 @@ for k in range(len(keylist)):
         dat = w.create_dataset(keylist[k], data=tot_hist)
         dat.attrs["combine"] = f1[keylist[k]].attrs["combine"]
         dat.attrs["operation"] = f1[keylist[k]].attrs['operation']
+        for old_key in old_attrs:
+            if old_key not in dict(dat.attrs):
+                dat.attrs[old_key] = old_attrs[old_key]
     # extend the datasets
     elif ops[keylist[k]] == 'extend':
         #TODO:
