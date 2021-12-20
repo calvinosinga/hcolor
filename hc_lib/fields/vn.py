@@ -3,58 +3,12 @@
 """
 import h5py as hp
 import numpy as np
-from hc_lib.fields.field_super import Field, grid_props
+from hc_lib.fields.field_super import Field
 from hc_lib.grid.grid import Chunk
-from hc_lib.fields.galaxy import galaxy
 import copy
 from HI_library import HI_mass_from_Illustris_snap as vnhi
 import scipy.constants as sc
-
-
-class vn_grid_props(grid_props):
-    def __init__(self, mas, field, space, mass_or_temp):
-        other = {}
-        other['map'] = mass_or_temp
-
-        super().__init__(mas, field, space, other)
-    
-    def isCompatible(self, other):
-        sp = self.props
-        op = other.props
-
-        # vnXgalaxy 
-        if 'galaxy' in op['fieldname']:
-            # for comparisons to Anderson and Wolz -> stmass/resdef is eBOSS, wiggleZ, 2df
-            if 'temp' == sp['map']:
-                obs = galaxy.getObservationalDefinitions()
-                obs.remove('papastergis_SDSS')
-                obs_match = op['gal_res'] in obs and op['color_cut'] in obs
-                return obs_match
-            
-            # if a mass map, it is either diemer or papa
-            elif op['gal_res'] == 'diemer':
-                # the important color definitions
-                cols = ['0.60', '0.55', '0.65', 'visual_inspection']
-
-                # also include resolved
-                is_resolved = op['color'] == 'resolved'
-
-                return op['color_cut'] in cols or is_resolved
-            
-            # ignore all papa resdefs -> hisubhalo is more comparable
-            elif op['gal_res'] == 'papastergis_SDSS':
-                return False
-            
-            # if all = base, then include
-            elif op['color'] == 'all':
-                return True
-
-        # vnXptl
-        else:
-            return sp['map'] == 'mass'
-
-
-
+from hc_lib.grid.grid_props import vn_grid_props
 
 class vn(Field):
 

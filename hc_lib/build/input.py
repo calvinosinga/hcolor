@@ -75,24 +75,30 @@ class Input():
             else:
                 runs.append(field)
         return runs
-        
-    def isPtl(self, name):
-        return name in self.ptl_runs
     
-    def isCat(self, name):
-        return name in self.gcat_runs
+    @classmethod
+    def isPtl(cls, name):
+        return name in cls.ptl_runs
     
-    def isHyd(self, name):
-        return name in self.hydrogen_runs
+    @classmethod
+    def isCat(cls, name):
+        return name in cls.gcat_runs
     
-    def isMat(self, name):
-        return name in self.matter_runs
+    @classmethod
+    def isHyd(cls, name):
+        return name in cls.hydrogen_runs
     
-    def isAtomic(self, name):
-        return name in self.atomic_runs
+    @classmethod
+    def isMat(cls, name):
+        return name in cls.matter_runs
     
-    def isMolecular(self,name):
-        return name in self.molecular_runs
+    @classmethod
+    def isAtomic(cls, name):
+        return name in cls.atomic_runs
+    
+    @classmethod
+    def isMolecular(cls,name):
+        return name in cls.molecular_runs
     
     def getParams(self):
         return self.rparams

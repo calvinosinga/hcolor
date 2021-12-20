@@ -4,64 +4,54 @@
 """
 
 from hc_lib.grid.grid import Grid
-from hc_lib.fields.field_super import Field, grid_props
+from hc_lib.fields.field_super import Field
+from hc_lib.grid.grid_props import hisubhalo_grid_props
 import copy
 import h5py as hp
 import numpy as np
 
-class hisubhalo_grid_props(grid_props):
+def getResolutionDefinitions():
+    # taken from Pillepich et al 2018, table 1 (in solar masses)
+    mean_baryon_cell = {'tng100':1.4e6, 'tng100-2':11.2e6, 'tng100-3':89.2e6,
+            'tng300':11e6, 'tng300-2':88e6, 'tng300-3':703e6}
+    res_defs = {}
+    res_defs['papastergis_ALFALFA'] = {'HI':(10**7.5, np.inf)} 
+    res_defs['diemer'] = {'HI':(0, np.inf)} # by default, already implemented on data
+    
+    # there is a linewidths restriction, unsure how to approach that in papastergis
+    # wolz is intensity map so no minimum threshold
+    return res_defs
+    
 
-    def __init__(self, mas, field, space, model, HI_res):
-        other = {}
-        other['model'] = model
-        
-        other['HI_res'] = HI_res
-        super().__init__(mas, field, space, other)
-    
-    def isIncluded(self):
-        def test(schts):
-            mastest = self.props['mas'] in schts
-            return mastest
-            
-        sp = self.props
-        if sp['HI_res'] == 'papastergis_ALFALFA':
-            mas = ['CIC']
-            return test(mas) and sp['fieldname'] == 'hisubhalo'
+def getMolFracModelsGalHI():
+    """
+    Returns a list of the molecular fraction models provided by Diemer+ 2018,
+    specifically the ones that respond to the subhalo catalog.
+    """
+    models = ['GD14','GK11','K13','S14']
+    proj = ['map','vol']
+    modelnames = []
+    for m in models:
+        for p in proj:
+            modelnames.append('m_hi_%s_%s'%(m,p))
+    modelnames.append('m_hi_L08_map')
+    return modelnames
 
-        return True
     
-    def setupGrids(self, outfile):
-        return super().setupGrids(outfile)
-    
-    def isCompatible(self, other):
-        sp = self.props
-        op = other.props
-        # hisubhaloXgalaxy
-        if 'galaxy' in op['fieldname']:
-            # if both have papa resolution definition, include only hisubhalo
-            if op['gal_res'] == 'papastergis_SDSS':
-                return sp['HI_res'] == 'papastergis_ALFALFA'
-            
-            # if diemer resdef, include certain color definitions and resolved definition
-            elif op['gal_res'] == 'diemer':
-                cdefs = ['0.55','0.60','0.65', 'visual_inspection']
-                is_resolved = op['color'] == 'resolved'
-                return op['color_cut'] in cdefs or is_resolved
-            
-            # if all galaxies, also include
-            elif op['color'] == 'all':
-                return True
-            
-            return False
-        
-        elif op['fieldname'] == 'ptl':
-            if sp['fieldname'] == 'hisubhalo':
-                models = hisubhalo.getMolFracModelsGal()
-            elif sp['fieldname'] == 'h2subhalo':
-                models = h2subhalo.getMolFracModelsGal()
-            
-            return sp['model'] == models[0]
-        return True
+def getMolFracModelsGalH2():
+    """
+    Returns a list of the molecular fraction models provided by Diemer+ 2018,
+    specifically the ones that correspond to the subhalo catalog.
+    """
+    models = ['GD14','GK11','K13','S14']
+    proj = ['map','vol']
+    gridnames = []
+    for m in models:
+        for p in proj:
+            gridnames.append('m_h2_%s_%s'%(m,p))
+    gridnames.append('m_h2_L08_map')
+    return gridnames
+
     
 class hisubhalo(Field):
 
@@ -80,10 +70,10 @@ class hisubhalo(Field):
         return
     
     def getGridProps(self):
-        models = self.getMolFracModelsGal()
+        models = getMolFracModelsGalHI()
         mas = ['CIC', 'CICW']
         spaces = ['redshift', 'real']
-        res = list(self.getResolutionDefinitions().keys())
+        res = list(getResolutionDefinitions().keys())
         grp = {}
         for m in models:
             for s in spaces:
@@ -93,36 +83,6 @@ class hisubhalo(Field):
                         if gp.isIncluded():
                             grp[gp.getH5DsetName()] = gp
         return grp
-
-    @staticmethod
-    def getResolutionDefinitions():
-        # taken from Pillepich et al 2018, table 1 (in solar masses)
-        mean_baryon_cell = {'tng100':1.4e6, 'tng100-2':11.2e6, 'tng100-3':89.2e6,
-                'tng300':11e6, 'tng300-2':88e6, 'tng300-3':703e6}
-        res_defs = {}
-        res_defs['papastergis_ALFALFA'] = {'HI':(10**7.5, np.inf)} 
-        res_defs['diemer'] = {'HI':(0, np.inf)} # by default, already implemented on data
-        
-        # there is a linewidths restriction, unsure how to approach that in papastergis
-        # wolz is intensity map so no minimum threshold
-        return res_defs
-        
-
-    @staticmethod
-    def getMolFracModelsGal():
-        """
-        Returns a list of the molecular fraction models provided by Diemer+ 2018,
-        specifically the ones that
-        rrespond to the subhalo catalog.
-        """
-        models = ['GD14','GK11','K13','S14']
-        proj = ['map','vol']
-        modelnames = []
-        for m in models:
-            for p in proj:
-                modelnames.append('m_hi_%s_%s'%(m,p))
-        modelnames.append('m_hi_L08_map')
-        return modelnames
     
 
     def computeGrids(self, outfile):
@@ -181,7 +141,7 @@ class hisubhalo(Field):
         return
 
     def getResolvedSubhalos(self, mass, resdef):
-        resdict = self.getResolutionDefinitions()[resdef]
+        resdict = getResolutionDefinitions()[resdef]
         mask = np.ones_like(mass, dtype=bool)
         for k, v in resdict.items():
             if k == 'HI':
@@ -245,18 +205,4 @@ class h2subhalo(hisubhalo):
             computeH2(g, pos_arr)
         
         return
-    
-    @staticmethod
-    def getMolFracModelsGal():
-        """
-        Returns a list of the molecular fraction models provided by Diemer+ 2018,
-        specifically the ones that correspond to the subhalo catalog.
-        """
-        models = ['GD14','GK11','K13','S14']
-        proj = ['map','vol']
-        gridnames = []
-        for m in models:
-            for p in proj:
-                gridnames.append('m_h2_%s_%s'%(m,p))
-        gridnames.append('m_h2_L08_map')
-        return gridnames
+

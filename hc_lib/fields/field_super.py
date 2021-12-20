@@ -10,57 +10,6 @@ import copy
 import time
 from hc_lib.build.input import Input
 
-class grid_props():
-    
-    def __init__(self, mas, field, space, other_props,
-                compute_xi = True, compute_slice = True):
-        self.props = {}
-        self.props['mas'] = mas
-        self.props['fieldname'] = field
-        self.props['space'] = space
-        self.props['compute_xi'] = compute_xi
-        self.props['compute_slice'] = compute_slice
-        self.props.update(other_props)
-        return
-
-    def getH5DsetName(self):
-        out = ''
-        
-        for k, v in self.props.items():
-            compute_input = k == 'compute_slice' or k == 'compute_xi'
-            if not v is None and not compute_input:
-                out+= "%s_"%v
-        
-        out = out[:-1]
-        return out
-
-    def isIncluded(self):
-        """
-        Determines if the grid with the given properties should be included
-        in the analysis.
-        """
-        return True
-
-    def saveProps(self, h5set):
-        print("saveProps method has started...")
-        for k,v in self.props.items():
-            if not v is None:
-                h5set.attrs[k] = v
-        return
-    
-    @classmethod
-    def loadProps(cls, dct):
-        return grid_props(dct.pop('mas'), 
-                dct.pop("fieldname"), dct.pop('space'), dct)
-    
-    def isCompatible(self, other):
-        """
-        Reports if two grids are compatible for cross-correlation
-        """
-        mas = self.props['mas'] == other.props['mas']
-        space = self.props['space'] == other.props['space']
-        return mas and space
-
 class ResultContainer():
     def __init__(self, field_obj, grid_props, runtime, xvalues, yvalues = None, 
             zvalues = None, Nmodes = None):
@@ -257,7 +206,6 @@ class Field():
     def saveData(self, outfile, grid, gp):
         # saves grid. resolution, rss (combine info if chunk) -> attrs
         dat = grid.saveGrid(outfile)
-        print('calling saveprops method...')
         gp.saveProps(dat)
         return dat
     

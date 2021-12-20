@@ -4,15 +4,11 @@
 import h5py as hp
 import numpy as np
 import copy
-from hc_lib.fields.field_super import Field, grid_props
+from hc_lib.fields.field_super import Field
 from hc_lib.grid.grid import Chunk
+from hc_lib.grid.grid_props import ptl_grid_props
 
-class ptl_grid_props(grid_props):
-    
-    def __init__(self, mas, field, space, species):
-        other = {'species':species}
-        super().__init__(mas, field, space, other)
-        return
+
     
 class ptl(Field):
 

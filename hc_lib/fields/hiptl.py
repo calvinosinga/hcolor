@@ -3,65 +3,15 @@
 """
 import h5py as hp
 import numpy as np
-from hc_lib.fields.field_super import Field, grid_props
+from hc_lib.fields.field_super import Field
 from hc_lib.grid.grid import Chunk
 import copy
-from hc_lib.fields.galaxy import galaxy
 import scipy.constants as sc
+from hc_lib.grid.grid_props import hiptl_grid_props
 
-class hiptl_grid_props(grid_props):
+def getMolFracModelsPtl():
+    return ['GD14', 'GK11', 'S14', 'K13']
 
-    def __init__(self, mas, field, space, model, mass_or_temp = None, nH = None):
-        other = {}
-        other['map'] = mass_or_temp
-        other['model'] = model
-        if not nH is None:
-            self.nH_bin = nH
-            nH_str = str(nH)
-            other['nH_bin'] = nH_str
-        else:
-            other['nH_bin'] = nH
-        super().__init__(mas, field, space, other)
-        return
-    
-    def isCompatible(self, other):
-        sp = self.props
-        op = other.props
-
-        # hiptl/h2ptlXgalaxy/galaxy_dust
-        if 'galaxy' in op['fieldname']:
-            # for comparisons to Anderson and Wolz -> stmass/resdef is eBOSS, wiggleZ, 2df
-            if 'temp' == sp['map']:
-                obs_defs = galaxy.getObservationalDefinitions()
-                obs_defs.remove('papastergis_SDSS')
-                match_obs = op['gal_res'] in obs_defs and op['color_cut'] in obs_defs
-                return match_obs
-            
-            # if a mass map, it is either diemer
-            elif op['gal_res'] == 'diemer':
-                # the important color definitions
-                cols = ['0.60', '0.55', '0.65', 'visual_inspection']
-
-                # also include resolved
-                is_resolved = op['color'] == 'resolved'
-
-                return op['color_cut'] in cols or is_resolved
-            
-            # ignore all papa resdefs -> hisubhalo is more comparable
-            elif op['gal_res'] == 'papa':
-                return False
-            
-            # if all = color, then include
-            elif op['color'] == 'all':
-                return True
-
-        # hiptlXptl
-        else:
-            # include if mass map, not temp map
-            return sp['map'] == 'mass'
-            
-
-    
 class hiptl(Field):
 
     def __init__(self, simname, snapshot, axis, resolution, chunk, pkl_path, 
@@ -77,7 +27,7 @@ class hiptl(Field):
         return
     
     def getGridProps(self):
-        models = self.getMolFracModelsPtl()
+        models = getMolFracModelsPtl()
         mass_or_temp = ['mass', 'temp']
         spaces = ['redshift', 'real']
         grp = {}
@@ -89,9 +39,6 @@ class hiptl(Field):
                         grp[gp.getH5DsetName()] = gp
         return grp
     
-    @staticmethod
-    def getMolFracModelsPtl():
-        return ['GD14', 'GK11', 'S14', 'K13']
     
     def computeGrids(self, outfile):
         super().setupGrids(outfile)
@@ -187,7 +134,7 @@ class hiptl_nH(hiptl):
         return
     
     def getGridProps(self):
-        models = self.getMolFracModelsPtl()
+        models = getMolFracModelsPtl()
         models.append('all_neut')
         nhbins = self._getnHBins()
         grp = {}
@@ -342,7 +289,7 @@ class h2ptl(hiptl):
         return
     
     def getGridProps(self):
-        models = self.getMolFracModelsPtl()
+        models = getMolFracModelsPtl()
         grp = {}
         for m in models:
             gp = hiptl_grid_props(m, 'CICW', self.fieldname)
