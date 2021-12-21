@@ -22,6 +22,7 @@ import time
 import os
 import psutil
 import pickle as pkl
+import sys
 
 ########################################################################################################
 
@@ -37,9 +38,10 @@ printLine()
 
 start_time = time.time()
 
+prefix = sys.argv[1]
 
 # Find commands to execute
-jm = pkl.load(open('job_manager.pkl', 'rb'))
+jm = pkl.load(open(prefix + '_job_manager.pkl', 'rb'))
 queue = jm.getQueue()
 n_commands = len(queue)
 N_PROC = psutil.cpu_count()

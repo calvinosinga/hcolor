@@ -1,41 +1,5 @@
 #!/usr/bin/env python3
-import h5py as hp
-from hc_lib.build.input import Input
-from hc_lib.build.gd import IODict
-import pickle as pkl
-# yorp file paths
-OUTPATH = '/yorp16b/cosinga/'
-TNGPATH = '/net/nyx/nyx1/diemer/illustris/'
-HCOLOR = '/home/cosinga/hcolor/'
 
-tng_dict = {'tng100':'L75n1820TNG', 'tng300':'L205n2500TNG',
-        'tng100-2':'L75n910TNG', 'tng100-3':'L75n455TNG', 
-        'tng50':'L35n2160TNG'}
-    
-def main():
-    ioobj = Input()
-    runs = ioobj.getRuns()
-    rp = ioobj.getParams()
-
-    gdobj = IODict(rp, runs, OUTPATH, TNGPATH+tng_dict[rp['sim']]+'output/', HCOLOR)
-    gd = gdobj.getGlobalDict()
-    pd = gdobj.getPathDict()
-
-    # load number of files
-    f = hp.File(gd["load_header"],'r')
-    header = dict(f['Header'].attrs)
-
-    numfiles = header['NumFilesPerSnapshot']
-    jman = JobManager()
-
-    for r in runs:
-        if ioobj.isPtl(r):
-            jman.addPtlJobs(r, numfiles, pd)
-        if ioobj.isCat(r):
-            jman.addCatJobs(r, pd)
-    pkl.dump(jman, open('job_manager.pkl', 'wb'), pkl.HIGHEST_PROTOCOL)
-    
-    return
 
 class Job():
     def __init__(self, fieldname, jobID, cmdargs):
@@ -56,6 +20,9 @@ class Job():
             self.dependencies.append(dep_jobID)
         return
     
+    def getID(self):
+        return self.id
+
     def getJobName(self):
         return "%s_%s"%(self.fn, self.id)
 
@@ -109,10 +76,14 @@ class JobManager():
         
         return
 
-    def addCatJobs(self, fieldname, pd):
+    def addCatJobs(self, fieldname, path_dict, run_params):
+        pd = path_dict
+        #gd = global_dict
+        rp = run_params
         # define the command line arguments for the two processes
         #TODO fill out the rest of the cmd line arguments
-        create_args = ['python3',pd['create_grid']]
+        create_args = ['python3',pd['create_grid'], fieldname, rp['sim'], rp['snap'],
+                rp['axis'], rp['res']]
         auto_args = ['python3', pd['auto_result']]
 
         createJob = Job(fieldname, "create", create_args)
@@ -120,7 +91,7 @@ class JobManager():
 
         autoJob = Job(fieldname, "auto", auto_args)
         autoJob.addDep(createJob)
-        self.jlist.append(createJob)
+        self.jlist.append(autoJob)
         return
     
     def _getJob(self, jobname):
@@ -149,9 +120,6 @@ class JobManager():
             self._addRoot(self.jlist[j], queue)
                 
         return queue
-
-if __name__ == '__main__':
-    main()
 
 
 
