@@ -11,6 +11,7 @@ HCOLOR = '/home/cosinga/hcolor/'
 tng_dict = {'tng100':'L75n1820TNG', 'tng300':'L205n2500TNG',
         'tng100-2':'L75n910TNG', 'tng100-3':'L75n455TNG', 
         'tng50':'L35n2160TNG'}
+    
 def main():
     ioobj = Input()
     runs = ioobj.getRuns()
@@ -70,7 +71,7 @@ class JobManager():
         self.jlist = []
         return
     
-
+    #TODO: create cross jobs
     def addPtlJobs(self, fieldname, nfiles, pd):
         # define the command line arguments for the three processes
         #TODO fill out the rest of the cmd line arguments
