@@ -17,7 +17,7 @@ def main():
     runs = ioobj.getRuns()
     rp = ioobj.getParams()
 
-    gdobj = IODict(rp, runs, OUTPATH, TNGPATH+tng_dict[rp['sim']]+'/', HCOLOR)
+    gdobj = IODict(rp, runs, OUTPATH, TNGPATH+tng_dict[rp['sim']]+'output/', HCOLOR)
     gd = gdobj.getGlobalDict()
     pd = gdobj.getPathDict()
 
