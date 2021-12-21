@@ -7,7 +7,7 @@ import sys
 import os
 import pickle
 from hc_lib.grid.grid import Grid
-from hc_lib.fields.field_super import grid_props
+from hc_lib.grid.grid_props import grid_props
 import h5py as hp
 
 
