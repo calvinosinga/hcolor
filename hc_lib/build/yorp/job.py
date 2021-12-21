@@ -4,7 +4,7 @@ from hc_lib.build.input import Input
 from hc_lib.build.gd import IODict
 import pickle as pkl
 # yorp file paths
-OUTPATH = '/yorp16a/cosinga/'
+OUTPATH = '/yorp16b/cosinga/'
 TNGPATH = '/net/nyx/nyx1/diemer/illustris/'
 HCOLOR = '/home/cosinga/hcolor/'
 
