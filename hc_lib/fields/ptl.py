@@ -27,7 +27,7 @@ class ptl(Field):
     
     def getGridProps(self):
         grp = {}
-        grids = ['ptl', 'dm', 'stmass']
+        grids = ['ptl', 'dm', 'stmass', 'gas']
         spaces = ['real', 'redshift']
         for g in grids:
             for s in spaces:
@@ -65,6 +65,8 @@ class ptl(Field):
                 slc = slices[2]
             elif g.props['species'] == 'dm':
                 slc = slices[1]
+            elif g.props['species'] == 'gas':
+                slc = slices[0]
             else:
                 slc = slice(None)
             

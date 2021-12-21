@@ -1,7 +1,5 @@
 import copy
-from hc_lib.fields.galaxy import getObservationalDefinitions as galaxyObsResDef
-from hc_lib.fields.hisubhalo import getMolFracModelsGalHI as galMolFracModelsHI
-from hc_lib.fields.hisubhalo import getMolFracModelsGalH2 as galMolFracModelsH2
+import hc_lib.fields.run_lib as rl
 
 
 class grid_props():
@@ -44,8 +42,26 @@ class grid_props():
     @classmethod
     def loadProps(cls, dct):
         temp = copy.copy(dict(dct))
-        return grid_props(temp.pop('mas'), 
-                temp.pop("fieldname"), temp.pop('space'), temp)
+        fn = temp['fieldname']
+
+        if fn == 'galaxy' or fn == 'galaxy_dust':
+            return galaxy_grid_props.loadProps(temp)
+
+        elif fn == 'hiptl' or fn == 'h2ptl' or fn == 'hiptl_nH':
+            return hiptl_grid_props.loadProps(temp)
+        
+        elif fn == 'hisubhalo' or fn == 'h2subhalo':
+            return hisubhalo_grid_props.loadProps(temp)
+        
+        elif fn == 'ptl':
+            return ptl_grid_props.loadProps(temp)
+        
+        elif fn == 'vn':
+            return vn_grid_props.loadProps(temp)
+
+        else:
+            return grid_props(temp.pop('mas'), 
+                    temp.pop("fieldname"), temp.pop('space'), temp)
     
     def isCompatible(self, other):
         """
@@ -74,6 +90,12 @@ class galaxy_grid_props(grid_props):
 
         return
     
+    @classmethod
+    def loadProps(cls, dct):
+        g = galaxy_grid_props(dct.pop('mas'), dct.pop('fieldname'), 
+                dct.pop('space'), dct.pop('color'), dct.pop('species'),
+                dct.pop('gal_res'), dct.pop('color_cut'))
+        return g
 
     def isCompatible(self, other):
         op = other.props
@@ -137,7 +159,7 @@ class galaxy_grid_props(grid_props):
 
         # everything that isn't a color definition associated with an observation is fine
         elif self.props['gal_res'] == 'diemer':
-            obs_color_cuts = galaxyObsResDef()
+            obs_color_cuts = rl.galaxyObsColorDefs()
             coldef_is_compatible = not (self.props['color_cut'] in obs_color_cuts)
             # CIC between stmass and all mass should be the same - removing redundancy
             is_CICW = self.props['mas'] == 'CICW'
@@ -175,6 +197,10 @@ class hiptl_grid_props(grid_props):
         super().__init__(mas, field, space, other)
         return
     
+    @classmethod
+    def loadProps(cls, dct):
+        return hiptl_grid_props(dct.pop('mas'), dct.pop('fieldname'),
+                dct.pop('space'), dct.pop('model'), dct.pop('map'), dct.pop('nH_bin'))
     def isCompatible(self, other):
         sp = self.props
         op = other.props
@@ -183,7 +209,7 @@ class hiptl_grid_props(grid_props):
         if 'galaxy' in op['fieldname']:
             # for comparisons to Anderson and Wolz -> stmass/resdef is eBOSS, wiggleZ, 2df
             if 'temp' == sp['map']:
-                obs_defs = galaxyObsResDef()
+                obs_defs = rl.galaxyObsColorDefs()
                 obs_defs.remove('papastergis_SDSS')
                 match_obs = op['gal_res'] in obs_defs and op['color_cut'] in obs_defs
                 return match_obs
@@ -221,6 +247,11 @@ class hisubhalo_grid_props(grid_props):
         
         other['HI_res'] = HI_res
         super().__init__(mas, field, space, other)
+    
+    @classmethod
+    def loadProps(cls, dct):
+        return hisubhalo_grid_props(dct.pop('mas'), dct.pop('fieldname'),
+                dct.pop('space'), dct.pop('model'), dct.pop('HI_res'))
     
     def isIncluded(self):
         def test(schts):
@@ -260,9 +291,9 @@ class hisubhalo_grid_props(grid_props):
         
         elif op['fieldname'] == 'ptl':
             if sp['fieldname'] == 'hisubhalo':
-                models = galMolFracModelsHI
+                models = rl.getMolFracModelsGalHI()
             elif sp['fieldname'] == 'h2subhalo':
-                models = galMolFracModelsH2
+                models = rl.getMolFracModelsGalH2()
             
             return sp['model'] == models[0]
         return True
@@ -275,6 +306,11 @@ class ptl_grid_props(grid_props):
         other = {'species':species}
         super().__init__(mas, field, space, other)
         return
+    
+    @classmethod
+    def loadProps(cls, dct):
+        return ptl_grid_props(dct.pop('mas'), dct.pop('fieldname'),
+                dct.pop('space'), dct.pop('species'))
 
 ################################################################################################################
 
@@ -284,6 +320,11 @@ class vn_grid_props(grid_props):
         other['map'] = mass_or_temp
 
         super().__init__(mas, field, space, other)
+
+    @classmethod
+    def loadProps(cls, dct):
+        return vn_grid_props(dct.pop('mas'), dct.pop('fieldname'),
+                dct.pop('space'), dct.pop('map'))
     
     def isCompatible(self, other):
         sp = self.props
@@ -293,7 +334,7 @@ class vn_grid_props(grid_props):
         if 'galaxy' in op['fieldname']:
             # for comparisons to Anderson and Wolz -> stmass/resdef is eBOSS, wiggleZ, 2df
             if 'temp' == sp['map']:
-                obs = galaxyObsResDef()
+                obs = rl.galaxyObsColorDefs()
                 obs.remove('papastergis_SDSS')
                 obs_match = op['gal_res'] in obs and op['color_cut'] in obs
                 return obs_match

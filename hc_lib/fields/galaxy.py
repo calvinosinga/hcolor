@@ -5,131 +5,14 @@
 from hc_lib.grid.grid import Grid
 from hc_lib.grid.grid_props import galaxy_grid_props
 from hc_lib.fields.field_super import Field
+from hc_lib.fields.run_lib import galaxyColorDefs
+from hc_lib.fields.run_lib import galaxyResDefs
+from hc_lib.fields.run_lib import galaxyColorMasks
+from hc_lib.fields.run_lib import galaxyResolvedMask
 import h5py as hp
 import numpy as np
 import copy
 
-def colorIndices(photo, stmass, color_cut):
-    if color_cut == 'visual_inspection':
-        x = stmass
-        y = photo['gr']
-        red_mask = y > 0.65 + 0.02 * (np.log10(x) - 10.28)
-        blue_mask = np.invert(red_mask)
-    elif color_cut == 'papastergis_SDSS':
-        x = photo['r']
-        y = photo['gi']
-        red_mask = y > 0.0571 * (x + 24) + 1.25
-        blue_mask = y < 0.0571 * (x + 24) + 1.1
-        # excludes green valley galaxies in between these two lines
-    elif color_cut == 'wolz_eBOSS_ELG':
-        
-        blue_mask = np.ones_like(stmass, dtype=bool)
-        red_mask = np.zeros_like(stmass, dtype=bool)
-
-    elif color_cut == 'wolz_eBOSS_LRG':
-        blue_mask = np.zeros_like(stmass, dtype=bool)
-        red_mask = np.ones_like(stmass, dtype=bool)
-    
-    elif color_cut == 'wolz_wiggleZ':
-        blue_mask = np.ones_like(stmass, dtype=bool)
-        red_mask = np.zeros_like(stmass, dtype=bool)
-
-    elif color_cut == 'anderson_2df':
-        x = photo['b_j']
-        y = photo['r_f']
-        red_mask = x - y > 1.07
-    else:
-        y = photo['gr']
-        x = float(color_cut)
-        red_mask = y > x
-        blue_mask = np.invert(red_mask)
-    return blue_mask, red_mask
-    
-
-
-def isResolved(stmass, photo, res_dict):
-    ################ HELPER METHODS #############################
-    def gr_elg():
-        mn = -0.068*photo['rz']+0.457
-        mx = 0.112*photo['rz']+1.901
-
-        return (photo['gr'] > mn) & (photo['gr'] < mx)
-    
-    def rz_elg():
-        mn = 0.218*photo['gr'] + 0.571
-        mx = -0.555*photo['gr']+1.901
-
-        return (photo['rz'] > mn) & (photo['rz'] < mx)
-    
-    ##############################################################
-
-
-    resolved = np.ones_like(stmass, dtype=bool)
-    for r in res_dict:
-        if r == 'stmass':
-            t = res_dict[r]
-            stmass_resolved = (stmass > t[0]) & (stmass < t[1])
-            resolved *= stmass_resolved
-        else:
-            t = res_dict[r]
-            if t == 'gr_elg':
-                photo_resolved = gr_elg()
-            elif t == 'rz_elg':
-                photo_resolved = rz_elg()
-            else:
-                photo_resolved = (photo[r] > t[0]) & (photo[r] < t[1])
-            resolved *= photo_resolved
-    
-    return resolved
-
-
-def getResolutionDefinitions(simname):
-    # taken from Pillepich et al 2018, table 1 (in solar masses)
-    mean_baryon_cell = {'tng100':1.4e6, 'tng100-2':11.2e6, 'tng100-3':89.2e6,
-            'tng300':11e6, 'tng300-2':88e6, 'tng300-3':703e6}
-    # papastergis: z=.0023-0.05
-    # wolz: z=0.6-1.0
-    # anderson: z ~ 0
-
-    # the different definitions of what makes a galaxy resolved
-    galaxy_min_resolution = {}
-    # from papastergis 2013, minimum for galaxies is r-band lum of -17 mag
-    galaxy_min_resolution['papastergis_SDSS'] = {'r':(-np.inf,-17)}
-    # papastergis makes an additional cut (i-z) > -0.25, but states that
-    # this cut eliminates a small number of misidentified galaxies by the 
-    # SDSS pipeline
-
-    # resolution to match hisubhalo
-    galaxy_min_resolution['diemer'] = {'stmass':(mean_baryon_cell[simname]*200, np.inf)}
-
-    # wigglez isn't a good comparison, TNG doesn't have any equivalent UV
-    # filters and wigglez has poor r definition (from wolz)
-    galaxy_min_resolution['wolz_wiggleZ'] = {'r':(20,22)}
-    
-    # eBOSS Emission line galaxies
-    galaxy_min_resolution['wolz_eBOSS_ELG'] = {'g':(21.825, 22.825), 'gr':'gr_elg',
-    'rz':'rz_elg'}
-    # since gr and rz depend on other values, use strings to indicate a method
-    # to use in the resolution definition
-    galaxy_min_resolution['wolz_eBOSS_LRG'] = {'i':(19.9,21.8), 'z':(-np.inf, 19.95),
-                'ri':(0.98, np.inf)}
-    # I still need to check if there is an equivalent band for IRACI in TNG
-
-    galaxy_min_resolution['anderson_2df'] = {'b_j':(19.45), 'r_f':(21)}
-    return galaxy_min_resolution
-
-def getColorDefinitions():
-    obs = getObservationalDefinitions()
-    implemented_color_defs = ['visual_inspection', '0.50', '0.55', 
-            '0.60', '0.65', '0.70']
-    
-    implemented_color_defs.extend(obs)
-    return implemented_color_defs
-
-
-def getObservationalDefinitions():
-    return ['papastergis_SDSS', 'wolz_eBOSS_ELG', 'wolz_eBOSS_LRG', 'anderson_2df',
-            'wolz_wiggleZ']
 
 class galaxy(Field):
 
@@ -152,8 +35,8 @@ class galaxy(Field):
     
     def getGridProps(self):
         colors = ['blue', 'red']
-        resolutions = list(getResolutionDefinitions(self.simname).keys())
-        colordefs = getColorDefinitions()
+        resolutions = list(galaxyResDefs(self.simname).keys())
+        colordefs = galaxyColorDefs()
         mass_type = ['stmass', 'total']
         MAS_type = ['CIC','CICW']
         spaces = ['redshift', 'real']
@@ -242,17 +125,17 @@ class galaxy(Field):
             # create the appropriate mask for the color
             gp = g.props
             if not gp['gal_res'] is None:
-                resolved_dict = getResolutionDefinitions(self.simname)[gp['gal_res']]
-                resolved_mask = isResolved(mass[:, 4], photo, resolved_dict)
+                resolved_dict = galaxyResDefs(self.simname)[gp['gal_res']]
+                resolved_mask = galaxyResolvedMask(mass[:, 4], photo, resolved_dict)
             else: # "all" does not have resdef -> so none are masked
                 resolved_mask = np.ones_like(mass[:, 4], dtype=bool)
             
 
             if gp['color'] == 'red':
-                blue_mask, red_mask = colorIndices(photo, mass[:, 4], gp['color_cut'])
+                blue_mask, red_mask = galaxyColorMasks(photo, mass[:, 4], gp['color_cut'])
                 mask = red_mask * resolved_mask
             elif gp['color'] == 'blue':
-                blue_mask, red_mask = colorIndices(photo, mass[:, 4], gp['color_cut'])
+                blue_mask, red_mask = galaxyColorMasks(photo, mass[:, 4], gp['color_cut'])
                 mask = blue_mask * resolved_mask
             elif gp['color'] == 'resolved':
                 mask = resolved_mask

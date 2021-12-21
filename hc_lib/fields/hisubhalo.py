@@ -6,52 +6,11 @@
 from hc_lib.grid.grid import Grid
 from hc_lib.fields.field_super import Field
 from hc_lib.grid.grid_props import hisubhalo_grid_props
+from hc_lib.fields.run_lib import getMolFracModelsGalH2, getMolFracModelsGalHI
+from hc_lib.fields.run_lib import HIResolutionDefinitions
 import copy
 import h5py as hp
 import numpy as np
-
-def getResolutionDefinitions():
-    # taken from Pillepich et al 2018, table 1 (in solar masses)
-    mean_baryon_cell = {'tng100':1.4e6, 'tng100-2':11.2e6, 'tng100-3':89.2e6,
-            'tng300':11e6, 'tng300-2':88e6, 'tng300-3':703e6}
-    res_defs = {}
-    res_defs['papastergis_ALFALFA'] = {'HI':(10**7.5, np.inf)} 
-    res_defs['diemer'] = {'HI':(0, np.inf)} # by default, already implemented on data
-    
-    # there is a linewidths restriction, unsure how to approach that in papastergis
-    # wolz is intensity map so no minimum threshold
-    return res_defs
-    
-
-def getMolFracModelsGalHI():
-    """
-    Returns a list of the molecular fraction models provided by Diemer+ 2018,
-    specifically the ones that respond to the subhalo catalog.
-    """
-    models = ['GD14','GK11','K13','S14']
-    proj = ['map','vol']
-    modelnames = []
-    for m in models:
-        for p in proj:
-            modelnames.append('m_hi_%s_%s'%(m,p))
-    modelnames.append('m_hi_L08_map')
-    return modelnames
-
-    
-def getMolFracModelsGalH2():
-    """
-    Returns a list of the molecular fraction models provided by Diemer+ 2018,
-    specifically the ones that correspond to the subhalo catalog.
-    """
-    models = ['GD14','GK11','K13','S14']
-    proj = ['map','vol']
-    gridnames = []
-    for m in models:
-        for p in proj:
-            gridnames.append('m_h2_%s_%s'%(m,p))
-    gridnames.append('m_h2_L08_map')
-    return gridnames
-
     
 class hisubhalo(Field):
 
@@ -73,7 +32,7 @@ class hisubhalo(Field):
         models = getMolFracModelsGalHI()
         mas = ['CIC', 'CICW']
         spaces = ['redshift', 'real']
-        res = list(getResolutionDefinitions().keys())
+        res = list(HIResolutionDefinitions().keys())
         grp = {}
         for m in models:
             for s in spaces:
@@ -141,7 +100,7 @@ class hisubhalo(Field):
         return
 
     def getResolvedSubhalos(self, mass, resdef):
-        resdict = getResolutionDefinitions()[resdef]
+        resdict = HIResolutionDefinitions()[resdef]
         mask = np.ones_like(mass, dtype=bool)
         for k, v in resdict.items():
             if k == 'HI':

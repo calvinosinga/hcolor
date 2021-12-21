@@ -8,9 +8,7 @@ from hc_lib.grid.grid import Chunk
 import copy
 import scipy.constants as sc
 from hc_lib.grid.grid_props import hiptl_grid_props
-
-def getMolFracModelsPtl():
-    return ['GD14', 'GK11', 'S14', 'K13']
+from hc_lib.fields.run_lib import getMolFracModelsPtl
 
 class hiptl(Field):
 
