@@ -90,14 +90,14 @@ class vn(Field):
     
     def _loadSnapshotData(self):
         pos, mass = vnhi(self.loadpath, self.TREECOOL)
-        pos = self._convertPos(pos)
-        mass = self._convertMass(mass)
+        pos = self._convertPos(pos) # now in Mpc/h
+        mass = self._convertMass(mass) # now in solar masses
         snap = hp.File(self.loadpath, 'r')
         vel = snap['PartType0']['Velocities'][:]
-        density = snap['PartType0']['Density'][:]
-        gas_mass = snap['PartType0']['Masses'][:]
+        density = snap['PartType0']['Density'][:] #10^10 SM / h /(ckpc/h)^3
+        gas_mass = snap['PartType0']['Masses'][:] #10^10 SM / h
 
-        volume = density / gas_mass
+        volume = gas_mass / density # in ckpc/h ^ 3
         volume *= (self.header["Time"]/1e3)**3
         snap.close()
         vel = self._convertVel(vel)

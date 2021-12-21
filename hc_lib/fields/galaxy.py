@@ -88,6 +88,11 @@ class galaxy(Field):
         photo_dict['ri'] = photo_dict['r'] - photo_dict['i']
         photo_dict['rz'] = photo_dict['r'] - photo_dict['z']
         photo_dict['gi'] = photo_dict['g'] - photo_dict['i']
+
+        # these conversions are from Y. Xu et al. 2007
+        photo_dict['b_j'] = 0.15 + 0.13 * photo_dict['gr']
+        photo_dict['r_f'] = photo_dict['r'] - 0.13
+
         mass = self._convertMass(mass)
         pos = self._convertPos(pos)
         vel = self._convertVel(vel)
@@ -190,7 +195,7 @@ class galaxy(Field):
 
     
     
-
+################################################################################################
     
 
 class galaxy_dust(galaxy):
@@ -224,6 +229,11 @@ class galaxy_dust(galaxy):
         photo_dict['ri'] = photo_dict['r'] - photo_dict['i']
         photo_dict['rz'] = photo_dict['r'] - photo_dict['z']
         photo_dict['gi'] = photo_dict['g'] - photo_dict['i']
+
+        # these conversions are from Y. Xu et al. 2007
+        photo_dict['b_j'] = 0.15 + 0.13 * photo_dict['gr']
+        photo_dict['r_f'] = photo_dict['r'] - 0.13
+
         dustfile.close()
         return pos, vel, mass, photo_dict
         
