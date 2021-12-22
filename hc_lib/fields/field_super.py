@@ -169,7 +169,7 @@ class Field():
         rc = ResultContainer(self, grid_props, runtime, pk.k3D, pk.Pk[:,0], 
                 Nmodes = pk.Nmodes3D)
         self.pks.append(rc)
-        if grid_props['space'] == 'redshift':
+        if grid_props.props['space'] == 'redshift':
             rc2D = ResultContainer(self, grid_props, runtime, pk.kpar, pk.kper,
                     pk.Pk2D[:], pk.Nmodes2D)
             self.tdpks.append(rc2D)
@@ -177,7 +177,7 @@ class Field():
         return
     
     def computeXi(self, grid, grid_props):
-        if grid_props['compute_xi']:
+        if grid_props.props['compute_xi']:
             start = time.time()
             arr = grid.getGrid()
             arr = self._toOverdensity(arr)
@@ -188,7 +188,7 @@ class Field():
         return
 
     def makeSlice(self, grid, grid_props, perc=0.1, mid=None, avg = False):
-        if grid_props['compute_slice']:
+        if grid_props.props['compute_slice']:
             start = time.time()
             arr = grid.getGrid()
             if avg:
