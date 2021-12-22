@@ -92,10 +92,17 @@ class galaxy_grid_props(grid_props):
     
     @classmethod
     def loadProps(cls, dct):
-        g = galaxy_grid_props(dct.pop('mas'), dct.pop('fieldname'), 
-                dct.pop('space'), dct.pop('color'), dct.pop('species'),
-                dct.pop('gal_res'), dct.pop('color_cut'))
-        return g
+        inputs = ['mas', 'fieldname', 'space', 'color', 'species', 'gal_res', 'color_cut']
+        prm = []
+        for i in inputs:
+            try:
+                val = dct.pop(i)
+            except KeyError:
+                val = None
+            
+            prm.append(val)
+        
+        return galaxy_grid_props(prm[0], prm[1], prm[2], prm[3], prm[4], prm[5], prm[6])
 
     def isCompatible(self, other):
         op = other.props
@@ -199,8 +206,18 @@ class hiptl_grid_props(grid_props):
     
     @classmethod
     def loadProps(cls, dct):
-        return hiptl_grid_props(dct.pop('mas'), dct.pop('fieldname'),
-                dct.pop('space'), dct.pop('model'), dct.pop('map'), dct.pop('nH_bin'))
+        inputs = ['mas', 'fieldname', 'space', 'model', 'map', 'nH_bin']
+        prm = []
+        for i in inputs:
+            try:
+                val = dct.pop(i)
+            except KeyError:
+                val = None
+            
+            prm.append(val)
+        
+        return hiptl_grid_props(prm[0], prm[1], prm[2], prm[3], prm[4], prm[5])
+    
     def isCompatible(self, other):
         sp = self.props
         op = other.props
@@ -250,8 +267,17 @@ class hisubhalo_grid_props(grid_props):
     
     @classmethod
     def loadProps(cls, dct):
-        return hisubhalo_grid_props(dct.pop('mas'), dct.pop('fieldname'),
-                dct.pop('space'), dct.pop('model'), dct.pop('HI_res'))
+        inputs = ['mas', 'fieldname', 'space', 'model', 'HI_res']
+        prm = []
+        for i in inputs:
+            try:
+                val = dct.pop(i)
+            except KeyError:
+                val = None
+            
+            prm.append(val)
+        
+        return hisubhalo_grid_props(prm[0], prm[1], prm[2], prm[3], prm[4])
     
     def isIncluded(self):
         def test(schts):
@@ -309,8 +335,17 @@ class ptl_grid_props(grid_props):
     
     @classmethod
     def loadProps(cls, dct):
-        return ptl_grid_props(dct.pop('mas'), dct.pop('fieldname'),
-                dct.pop('space'), dct.pop('species'))
+        inputs = ['mas', 'fieldname', 'space', 'species']
+        prm = []
+        for i in inputs:
+            try:
+                val = dct.pop(i)
+            except KeyError:
+                val = None
+            
+            prm.append(val)
+        
+        return ptl_grid_props(prm[0], prm[1], prm[2], prm[3])
 
 ################################################################################################################
 
@@ -323,8 +358,17 @@ class vn_grid_props(grid_props):
 
     @classmethod
     def loadProps(cls, dct):
-        return vn_grid_props(dct.pop('mas'), dct.pop('fieldname'),
-                dct.pop('space'), dct.pop('map'))
+        inputs = ['mas', 'fieldname', 'space', 'map']
+        prm = []
+        for i in inputs:
+            try:
+                val = dct.pop(i)
+            except KeyError:
+                val = None
+            
+            prm.append(val)
+        
+        return vn_grid_props(prm[0], prm[1], prm[2], prm[3])
     
     def isCompatible(self, other):
         sp = self.props

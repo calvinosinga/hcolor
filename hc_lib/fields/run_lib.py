@@ -30,6 +30,7 @@ def galaxyColorMasks(photo, stmass, color_cut):
         x = photo['b_j']
         y = photo['r_f']
         red_mask = x - y > 1.07
+        blue_mask = np.invert(red_mask)
     else:
         y = photo['gr']
         x = float(color_cut)
@@ -107,7 +108,7 @@ def galaxyResDefs(simname):
                 'ri':(0.98, np.inf)}
     # I still need to check if there is an equivalent band for IRACI in TNG
 
-    galaxy_min_resolution['anderson_2df'] = {'b_j':(19.45), 'r_f':(21)}
+    galaxy_min_resolution['anderson_2df'] = {'b_j':(-np.inf, 19.45), 'r_f':(-np.inf, 21)}
     return galaxy_min_resolution
 
 def galaxyColorDefs():

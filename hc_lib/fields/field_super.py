@@ -371,7 +371,7 @@ class Cross():
         rc1.addCrossedField(rc2)
         self.xpks.append(rc1)
 
-        do_2D = gp1['space'] == 'redshift' and gp2['space'] == 'redshift'
+        do_2D = gp1.props['space'] == 'redshift' and gp2.props['space'] == 'redshift'
         if do_2D:
             if not self.saved_xk2D:
                 self.kper = xpk.kper

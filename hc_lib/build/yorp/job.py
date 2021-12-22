@@ -20,15 +20,24 @@ class Job():
             self.dependencies.append(dep_jobID)
         return
     
+    def getCmd(self):
+        return self.args
+    
     def getID(self):
         return self.id
 
     def getJobName(self):
         return "%s_%s"%(self.fn, self.id)
+    
+    def getPklName(self, run_params):
+        rp = run_params
+        path = "%s_%sB_%03dS_%dA_%dR.pkl"%(self.fn, rp['sim'], rp['snap'], rp['axis'], rp['res'])
+        return path
 
-    # check when to add Cross Jobs?
-    def getCmd(self):
-        return
+    def getHdf5GridName(self, run_params):
+        rp = run_params
+        path = "%s_%sB_%03dS_%dA_%dR.hdf5"%(self.getJobName(), rp['sim'], rp['snap'], rp['axis'], rp['res'])
+        return path
     
     def getDep(self):
         return self.dependencies
@@ -76,10 +85,10 @@ class JobManager():
         
         return
 
-    def addCatJobs(self, fieldname, path_dict, run_params):
+    def addCatJobs(self, fieldname, path_dict, global_dict, run_params):
         pd = path_dict
-        #gd = global_dict
         rp = run_params
+        gd = global_dict
         # define the command line arguments for the two processes
         #TODO fill out the rest of the cmd line arguments
         create_args = ['python3',pd['create_grid'], fieldname, rp['sim'], rp['snap'],

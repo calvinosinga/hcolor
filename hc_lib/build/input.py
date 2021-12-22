@@ -13,6 +13,7 @@ class Input():
     matter_runs = ['galaxy', 'galaxy_dust', 'ptl']
     atomic_runs = ['hiptl', 'hisubhalo', 'vn', 'hiptl_nH']
     molecular_runs = ['h2subhalo', 'h2ptl']
+
     def __init__(self):
         self.rparams = self.getUserRunParams()
         self.runs = self.getFields()
