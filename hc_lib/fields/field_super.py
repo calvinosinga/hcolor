@@ -373,13 +373,6 @@ class Cross():
 
         do_2D = gp1.props['space'] == 'redshift' and gp2.props['space'] == 'redshift'
         if do_2D:
-            if not self.saved_xk2D:
-                self.kper = xpk.kper
-                self.kpar = xpk.kpar
-                self.saved_xk2D = True
-            if not self.saved_Nmodes2D:
-                self.Nmodes2D= xpk.Nmodes2D
-                self.saved_Nmodes2D = True
             rc1 = ResultContainer(self.field1, gp1, runtime, xpk.kpar, xpk.kper,
                     xpk.PkX2D[:,0], Nmodes= xpk.Nmodes2D)
             rc2 = ResultContainer(self.field2, gp2, runtime, xpk.kpar, xpk.kper, 
@@ -410,7 +403,7 @@ class Cross():
                 gp1 = gprops1[k1]
                 gp2 = gprops2[k2]
                 is_compatible = gp1.isCompatible(gp1) and gp2.isCompatible(gp2)
-                for_xi = gprops1['compute_xi'] and gprops2['compute_xi']
+                for_xi = gp1.props['compute_xi'] and gp2.props['compute_xi']
                 if is_compatible and for_xi:
                     grid1 = Grid.loadGrid(gf1[k1])
                     grid2 = Grid.loadGrid(gf2[k2])
@@ -423,9 +416,7 @@ class Cross():
                 self._toOverdensity(grid2.getGrid()))
         xxi = XXi(arrs[0], arrs[1], self.box, MAS=['CIC','CIC'], axis=self.axis)
         runtime = time.time() - start
-        if not self.saved_xr:
-            self.r = xxi.r3D
-            self.saved_xr = True
+
         
         rc1 = ResultContainer(self.field1, gp1, runtime, xxi.r3D, xxi.xi[:,0])
         rc2 = ResultContainer(self.field2, gp2, runtime, xxi.r3D, xxi.xi[:,0])

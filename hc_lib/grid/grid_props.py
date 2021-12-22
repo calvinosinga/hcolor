@@ -133,35 +133,43 @@ class galaxy_grid_props(grid_props):
             mastest = self.props['mas'] in schts
             return cdtest and mtest and mastest
         
+        def only_pk():
+            self.props['compute_xi'] = False
+            self.props['compute_slice'] = False
 
         if self.props['gal_res'] == 'papastergis_SDSS':
             cds = ['papastergis_SDSS']
             ms = ['stmass']
             schts = ['CIC']
+            only_pk()
             return test(cds, ms, schts)
         
         elif self.props['gal_res'] == 'wolz_wiggleZ':
             cds = ['wolz_wiggleZ']
             ms = ['stmass']
             schts = ['CIC']
+            only_pk()
             return test(cds, ms, schts) and self.props['color'] == 'red'
         
         elif self.props['gal_res'] == 'wolz_eBOSS_ELG':
             cds = ['wolz_eBOSS_ELG']
             ms = ['stmass']
             schts = ['CIC']
+            only_pk()
             return test(cds, ms, schts) and self.props['color'] == 'blue'
 
         elif self.props['gal_res'] == 'wolz_eBOSS_LRG':
             cds = ['wolz_eBOSS_LRG']
             ms = ['stmass']
             schts = ['CIC']
+            only_pk()
             return test(cds, ms, schts) and self.props['color'] == 'red'
 
         elif self.props['gal_res'] == 'anderson_2df':
             cds = ['anderson_2df']
             ms = ['stmass']
             schts = ['CIC']
+            only_pk()
             return test(cds, ms, schts)
 
         # everything that isn't a color definition associated with an observation is fine
@@ -242,7 +250,7 @@ class hiptl_grid_props(grid_props):
                 return op['color_cut'] in cols or is_resolved
             
             # ignore all papa resdefs -> hisubhalo is more comparable
-            elif op['gal_res'] == 'papa':
+            elif op['gal_res'] == 'papastergis_SDSS':
                 return False
             
             # if all = color, then include
@@ -283,10 +291,17 @@ class hisubhalo_grid_props(grid_props):
         def test(schts):
             mastest = self.props['mas'] in schts
             return mastest
-            
+        
+        def only_pk():
+            self.props['compute_xi'] = False
+            self.props['compute_slice'] = False
+            return
+        
+        
         sp = self.props
         if sp['HI_res'] == 'papastergis_ALFALFA':
             mas = ['CIC']
+            only_pk()
             return test(mas) and sp['fieldname'] == 'hisubhalo'
 
         return True
@@ -299,9 +314,11 @@ class hisubhalo_grid_props(grid_props):
         op = other.props
         # hisubhaloXgalaxy
         if 'galaxy' in op['fieldname']:
-            # if both have papa resolution definition, include only hisubhalo
+            # if both have papastergis resolution definition, include only hisubhalo
             if op['gal_res'] == 'papastergis_SDSS':
-                return sp['HI_res'] == 'papastergis_ALFALFA'
+                #return sp['HI_res'] == 'papastergis_ALFALFA'
+                return False # returning false because trying to compare to papastergis is
+                # going to be qualitatively difficult
             
             # if diemer resdef, include certain color definitions and resolved definition
             elif op['gal_res'] == 'diemer':
@@ -309,6 +326,19 @@ class hisubhalo_grid_props(grid_props):
                 is_resolved = op['color'] == 'resolved'
                 return op['color_cut'] in cdefs or is_resolved
             
+            # don't include other observational stuff temporarily
+            elif op['gal_res'] == 'wolz_eBOSS_ELG':
+                return False
+            
+            elif op['gal_res'] == 'wolz_eBOSS_LRG':
+                return False
+            
+            elif op['gal_res'] == 'wolz_wiggleZ':
+                return False
+            
+            elif op['gal_res'] == 'anderson_2df':
+                return False
+                
             # if all galaxies, also include
             elif op['color'] == 'all':
                 return True
@@ -321,7 +351,7 @@ class hisubhalo_grid_props(grid_props):
             elif sp['fieldname'] == 'h2subhalo':
                 models = rl.getMolFracModelsGalH2()
             
-            return sp['model'] == models[0]
+            return sp['model'] == models[0] # compute cross power with just one
         return True
 
 #############################################################################################################
