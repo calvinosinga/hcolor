@@ -4,6 +4,7 @@ from hc_lib.build.gd import IODict
 from hc_lib.build.input import Input
 from hc_lib.build.yorp.job import JobManager
 import h5py as hp
+import os
 
 OUTPATH = '/yorp16b/cosinga/'
 TNGPATH = '/net/nyx/nyx1/diemer/illustris/'
@@ -23,11 +24,6 @@ def main():
     pd = gdobj.getPathDict()
 
 
-    print('global dict:')
-    print(gd)
-
-    print('\n\npath dict:')
-    print(pd)
     prefix = rp['prefix']
     # load number of files
     f = hp.File(gd["load_header"],'r')
@@ -35,14 +31,23 @@ def main():
 
     numfiles = header['NumFilesPerSnapshot']
     jman = JobManager()
-
+    
     for r in runs:
         if ioobj.isPtl(r):
             jman.addPtlJobs(r, numfiles, pd)
         if ioobj.isCat(r):
-            jman.addCatJobs(r, gd, rp)
+            jman.addCatJobs(r, pd, gd, rp)
+
+
+    print('global dict:')
+    print(gd)
+
+    print('\n\npath dict:')
+    print(pd)
+
     pkl.dump(jman, open(prefix+'_job_manager.pkl', 'wb'), pkl.HIGHEST_PROTOCOL)
-    
+    pkl.dump(gd, open(pd['output']+'gd.pkl', 'wb'), pkl.HIGHEST_PROTOCOL)
+    os.environ['GDFILE'] = pd['output'] + 'gd.pkl'
     return
 
 main()

@@ -107,8 +107,8 @@ class hisubhalo(Field):
                 mask *= (mass >= v[0]) & (mass < v[1])
         return mask
 
-    def makeSlice(self, grid, perc=0.1, mid=None, avg=True):
-        return super().makeSlice(grid, perc=perc, mid=mid, avg=avg)
+    def makeSlice(self, grid, grid_props, perc=0.1, mid=None, avg=True):
+        return super().makeSlice(grid, grid_props, perc=perc, mid=mid, avg=avg)
 
     def _convertVel(self, vel):
         # subhalos' velocities are already in km/s

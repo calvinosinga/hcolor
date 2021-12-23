@@ -14,7 +14,6 @@ import h5py as hp
 gd = pickle.load(open(os.getenv('GDFILE'),'rb'))
 
 INGRIDKEY = sys.argv[1]
-PLOTDIRKEY = sys.argv[2]
 
 if gd['verbose']:
     print("auto.py called, given the command-line arguments" + str(sys.argv))
@@ -29,7 +28,6 @@ field = pickle.load(open(pkl_path, 'rb'))
 if gd['verbose']:
     print('The ingrid path:%s'%INGRIDPATH)
     print('The outfile path:%s'%pkl_path)
-    print('The plots path:%s'%PLOTDIR)
 
 klist = list(gridfile.keys())
 klist.remove('pickle')

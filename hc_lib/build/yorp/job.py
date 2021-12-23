@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 
-
 class Job():
-    def __init__(self, fieldname, jobID, cmdargs):
+    def __init__(self, fieldname, run_script_name, cmdargs):
         self.fn = fieldname
-        self.id = jobID
+        self.rsn = run_script_name
         self.args = cmdargs
         self.dependencies = []
         
@@ -12,22 +11,26 @@ class Job():
 
     def addDep(self, dep_job):
         if isinstance(dep_job, list):
-            for dj in dep_job:
-                dep_jobID = dj.getID()
+            for dj in range(len(dep_job)):
+                dep_jobID = dep_job[dj].getJobName()
                 self.dependencies.append(dep_jobID)
         else:
-            dep_jobID = dep_job.getID()
+            dep_jobID = dep_job.getJobName()
             self.dependencies.append(dep_jobID)
         return
     
+    def setCmd(self, args):
+        self.args = args
+        return
+
     def getCmd(self):
         return self.args
     
-    def getID(self):
-        return self.id
+    def getRunScriptName(self):
+        return self.rsn
 
     def getJobName(self):
-        return "%s_%s"%(self.fn, self.id)
+        return "%s_%s"%(self.fn, self.rsn)
     
     def getPklName(self, run_params):
         rp = run_params
@@ -44,14 +47,20 @@ class Job():
 
 class JobManager():
     def __init__(self):
-        self.jlist = []
+        self.jlist = [] # need a jlist that later gets tranformed into a queue because
+        # I can't
         return
     
     #TODO: create cross jobs
-    def addPtlJobs(self, fieldname, nfiles, pd):
+    def addPtlJobs(self, fieldname, path_dict, global_dict, run_params):
+        rp = run_params
+        pd = path_dict
+        gd = global_dict
+        nfiles = rp['nfiles']
         # define the command line arguments for the three processes
-        #TODO fill out the rest of the cmd line arguments
-        create_args = ['python3',pd['create_grid']]
+        
+        create_args = ['python3',pd['create_grid'], fieldname, rp['sim'], rp['snap'],
+                rp['axis'], rp['res']]
         combine_args = ['python3', pd['combine']]
         auto_args = ['python3', pd['auto_result']]
 
@@ -64,7 +73,6 @@ class JobManager():
         # make the combine jobs
         do_two_combines = nfiles > 20
         combineJoblist = []
-        #TODO check if this creates the right number of jobs
         for i in range(0, nfiles, 20):
             ijob = Job(fieldname, 'combine1.%d'%(i), combine_args)
             ijob.addDep(createJoblist)
@@ -85,22 +93,29 @@ class JobManager():
         
         return
 
+
     def addCatJobs(self, fieldname, path_dict, global_dict, run_params):
         pd = path_dict
         rp = run_params
         gd = global_dict
         # define the command line arguments for the two processes
-        #TODO fill out the rest of the cmd line arguments
+        
         create_args = ['python3',pd['create_grid'], fieldname, rp['sim'], rp['snap'],
                 rp['axis'], rp['res']]
         auto_args = ['python3', pd['auto_result']]
 
         createJob = Job(fieldname, "create", create_args)
         self.jlist.append(createJob)
+        
+        # where the grid for the create job is saved
+        auto_args.append(pd['grids'] + createJob.getHdf5GridName(rp))
 
         autoJob = Job(fieldname, "auto", auto_args)
         autoJob.addDep(createJob)
         self.jlist.append(autoJob)
+
+        # now adding pickle to gd
+        gd['pickles'][fieldname] = pd['results'] + autoJob.getPklName(rp)
         return
     
     def _getJob(self, jobname):
@@ -116,9 +131,10 @@ class JobManager():
         elif job in queue:
             return
         else:
-            dep = job.getDep()
-            depjob = self._getJob(dep.getJobName())
-            self._addRoot(depjob, queue)
+            depList = job.getDep()
+            for dj in depList:
+                djob = self._getJob(dj)
+                self._addRoot(djob, queue)
             queue.append(job)
             return
         
