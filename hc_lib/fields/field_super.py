@@ -353,8 +353,10 @@ class Cross():
                 if gp1.isCompatible(gp2) and gp2.isCompatible(gp1):
                     grid1 = Grid.loadGrid(gf1[k1])
                     grid2 = Grid.loadGrid(gf2[k2])
-                    
-                    self._xpk(grid1, grid2, gp1, gp2)
+                    print('Would be calculating xpk between: ')
+                    print('\t %s'%k1)
+                    print('\t %s'%k2)
+                    # self._xpk(grid1, grid2, gp1, gp2)
         return
     
     def _xpk(self, grid1, grid2, gp1, gp2):
