@@ -19,7 +19,6 @@ if gd['verbose']:
     print("auto.py called, given the command-line arguments" + str(sys.argv))
 
 INGRIDPATH = gd['grids'] + gd[INGRIDKEY]
-PLOTDIR = gd[PLOTDIRKEY]
 
 gridfile = hp.File(INGRIDPATH, 'r')
 pkl_path = gridfile['pickle'].attrs['path']
