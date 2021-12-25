@@ -29,12 +29,13 @@ class ResultLibrary():
             paths = self.getPaths(directory)
             for p in paths:
                 obj = pkl.load(open(p, 'rb'))
-                self.slices.extend(obj.getSlices())
+                if not obj.getSlices() is None:
+                    self.slices.extend(obj.getSlices())
                 self.pks.extend(obj.getPks())
                 self.xis.extend(obj.getXis())
                 self.tdpks.extend(obj.get2Dpks())
-                if 'galaxy' in obj.fieldname:
-                    self.hists.extend(obj.hists)
+                #if 'galaxy' == obj.fieldname:
+                    #self.hists.extend(obj.hists)
 
         elif not pkl_file == '':
             obj = pkl.load(open(pkl_file, 'rb'))

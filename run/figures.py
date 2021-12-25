@@ -9,7 +9,7 @@ def main():
     rlib = ResultLibrary()
     rlib.addResults(directory=OUTPATH)
 
-    
+    hiptl_auto(rlib)    
     return
 
 # Do this part later
@@ -26,7 +26,7 @@ def hiptl_auto(rl):
     ip['axis'] = 0
     ip['grid_resolution'] = 800
     ip['is_auto'] = True
-
+    ip['map'] = 'mass'
     HIfig.redshiftR_spaceC_model(rl, ip)
      
     

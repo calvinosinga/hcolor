@@ -65,4 +65,12 @@ class FigureLibrary():
                     x, y, z = r.getValues()
                     lines_for_panel.append(plt.plot(x, y))
                 lines[i, j] = lines_for_panel
+        self.lines = lines
+        self.figArr = figArr
         return lines
+    
+    def addRowLabels(self, rowlabels, pos = (0.05, 0.05)):
+        dim = figArr.shape
+        for i in range(dim[0]):
+            plt.sca(self.panels[i][0])
+            plt.
