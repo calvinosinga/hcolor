@@ -7,8 +7,8 @@ def redshiftR_spaceC_model(rlib, iprops, savefig = True, panel_length = 3, panel
     
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, 'redshift', 'space', 'pk')
     
-    rowlabels = ['z=%.1f'%i for i in rowlabels]
-    collabels = [i.capitalize() for i in collabels]
+    rowlabels = [r'z=%.1f'%i for i in rowlabels]
+    collabels = [r'%s'%i.capitalize() for i in collabels]
 
     dim = figArr.shape
     flib = FigureLibrary()

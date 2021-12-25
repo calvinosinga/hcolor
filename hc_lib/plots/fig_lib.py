@@ -103,10 +103,10 @@ class FigureLibrary():
         return self.lines
     
     def printIprops(self, iprops, fsize=6):
-        outstr = ''
+        outstr = r''
         for k, v in iprops.items():
             outstr += k + ': ' + str(v) + '; '
-        self.fig.suptitle(outstr, fontsize = fsize, wrap = True)
+        self.fig.suptitle(outstr, fontsize = fsize, wrap = True, usetex = False)
         return
         
     def addRowLabels(self, rowlabels, pos = (0.05, 0.05), fsize = 16):
