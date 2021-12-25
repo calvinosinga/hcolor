@@ -102,7 +102,7 @@ class FigureLibrary():
     def getLines(self):
         return self.lines
     
-    
+
     def addRowLabels(self, rowlabels, pos = (0.05, 0.05), fsize = 16):
         dim = self.dim
         for i in range(dim[0]):
@@ -118,7 +118,7 @@ class FigureLibrary():
             p = self.panels[0][j]
             plt.sca(p)
             p.xaxis.set_label_position('top')
-            plt.xlabel(collabels[j])
+            plt.xlabel(collabels[j], fontsize = fsize)
         return
     
     def removeYTickLabels(self, panel_exceptions = []):

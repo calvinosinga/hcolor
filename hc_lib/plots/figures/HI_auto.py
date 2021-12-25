@@ -3,13 +3,13 @@ import matplotlib as mpl
 from hc_lib.plots.fig_lib import FigureLibrary
 
 def redshiftR_spaceC_model(rlib, iprops, savefig = True, panel_length = 3, panel_bt = 0.25,
-            border = 1, fsize = 16):
+            border = 1):
     
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, 'redshift', 'space', 'pk')
     
-    #for i in figArr[0, 0]:
-    #    print(i.props)
-    # make the figure
+    rowlabels = ['z=%.1f'%i for i in rowlabels]
+    collabels = [i.capitalize() for i in collabels]
+
     dim = figArr.shape
     flib = FigureLibrary()
     flib.createFig(panel_length, dim[0], dim[1], panel_bt, border, border)
