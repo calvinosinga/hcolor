@@ -7,11 +7,6 @@ def redshiftR_spaceC_model(rlib, iprops, savefig = True, panel_length = 3, panel
     
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, 'redshift', 'space', 'pk')
     
-    print(figArr.shape)
-    print(rowlabels)
-    print(collabels)
-
-    print(len(figArr[0, 0]))
     #for i in figArr[0, 0]:
     #    print(i.props)
     # make the figure
@@ -20,7 +15,15 @@ def redshiftR_spaceC_model(rlib, iprops, savefig = True, panel_length = 3, panel
     flib.createFig(panel_length, dim[0], dim[1], panel_bt, border, border)
     # if savefig, then save it, otherwise return it
 
-    lines = flib.plotLines(figArr)
+    flib.plotLines(figArr, 'model')
+    flib.addRowLabels(rowlabels)
+    flib.addColLabels(collabels)
+    flib.logAxis()
+    flib.removeDefaultTickLabels()
+    flib.xLimAdjustToNyquist()
+    flib.matchAxisLimits()
+    flib.defaultPKAxesLabels()
+    flib.addLegend()
     plt.savefig('trial_run.png')
     return
 
