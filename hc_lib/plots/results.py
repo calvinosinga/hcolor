@@ -9,6 +9,7 @@ class ResultLibrary():
         self.pks = []
         self.xis = []
         self.tdpks = []
+        self.hists = []
         return
     
     """
@@ -36,6 +37,9 @@ class ResultLibrary():
                 self.pks.extend(obj.getPks())
                 self.xis.extend(obj.getXis())
                 self.tdpks.extend(obj.get2Dpks())
+                if 'galaxy' in obj.fieldname:
+                    self.hists.extend(obj.hists)
+
         elif not pkl_file == '':
             obj = pkl.load(open(pkl_file, 'rb'))
             self.slices.extend(obj.getSlices())
@@ -45,16 +49,7 @@ class ResultLibrary():
         
         return
 
-
-    def organizeFigure(self, includep, rowp, colp, result_type):
-        """
-        includep is dict that stores a property and the value that it should have.
-        rowp is the property that separates each row
-        colp is the property that separates each column
-        """
-        rowLabels = []
-        colLabels = []
-        forFig = []
+    def _getResultType(self, result_type):
         if result_type == 'pk':
             result = self.pks
         elif result_type == '2Dpk':
@@ -65,6 +60,20 @@ class ResultLibrary():
             result = self.slices
         else:
             raise ValueError('unsupported result type given')
+        return result
+        
+
+    def organizeFigure(self, includep, rowp, colp, result_type):
+        """
+        includep is dict that stores a property and the value that it should have.
+        rowp is the property that separates each row
+        colp is the property that separates each column
+        """
+        rowLabels = []
+        colLabels = []
+        forFig = []
+        
+        result = self._getResultType(result_type)
 
         for r in result:
             if r.matchProps(includep):

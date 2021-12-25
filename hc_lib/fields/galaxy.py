@@ -9,6 +9,8 @@ from hc_lib.fields.run_lib import galaxyColorDefs
 from hc_lib.fields.run_lib import galaxyResDefs
 from hc_lib.fields.run_lib import galaxyColorMasks
 from hc_lib.fields.run_lib import galaxyResolvedMask
+from hc_lib.fields.field_super import ResultContainer
+import time
 import h5py as hp
 import numpy as np
 import copy
@@ -27,8 +29,8 @@ class galaxy(Field):
         # use a different resolution definition.
         
         self.loadpath = catshpath
-        self.grsm_hists = {}
-        self.gir_hists = {}
+        self.hists = []
+        self.hists_done = []
 
         super().__init__(simname, snapshot, axis, resolution, pkl_path, verbose)
         return
@@ -160,13 +162,13 @@ class galaxy(Field):
                 total_mass = np.sum(mass, axis = 1)
                 grid = computeGal(pos_arr[mask, :], total_mass[mask], g)
 
-            if gp['gal_res'] not in self.gir_hists.keys() and gp['gal_res'] == 'papastergis_SDSS':
-                gir = self.make_gi_r(photo['gi'][resolved_mask], photo['r'][resolved_mask])
-                self.gir_hists[gp['gal_res']] = gir
+            # commenting out because comparisons to Papastergis will be difficult
+            # if gp['gal_res'] not in self.gir_hists.keys() and gp['gal_res'] == 'papastergis_SDSS':
+            #     gir = self.make_gi_r(photo['gi'][resolved_mask], photo['r'][resolved_mask])
+            #     self.gir_hists[gp['gal_res']] = gir
             
-            if gp['gal_res'] not in self.grsm_hists.keys() and not gp['gal_res'] is None:
-                grsm = self.make_gr_stmass(photo['gr'][resolved_mask], mass[resolved_mask, 4])
-                self.grsm_hists[gp['gal_res']] = grsm
+            if gp['gal_res'] not in self.hists_done and not gp['gal_res'] is None:
+                self.make_gr_stmass(photo['gr'][resolved_mask], mass[resolved_mask, 4])
             
             self.saveData(outfile, grid, g)
             del grid
@@ -176,10 +178,16 @@ class galaxy(Field):
     def setupGrids(self, outfile):
         return super().setupGrids(outfile)
         
-    def make_gr_stmass(self, gr, stmass):
+    def make_gr_stmass(self, grid_props, gr, stmass):
+        start = time.time()
         stmass = np.ma.masked_equal(stmass, 0)
         gr_stmass = np.histogram2d(np.log10(stmass), gr, bins=50)
-        return gr_stmass
+        runtime = time.time() - start
+        rc = ResultContainer(self, grid_props, runtime, gr_stmass[1],
+                    yvalues=gr_stmass[2], zvalues=gr_stmass[0])
+        self.hists.append(rc)
+        self.hists_done.append(grid_props['gal_res'])
+        return
     
     def make_gi_r(self, gi, r):
         gi_r = np.histogram2d(r, gi, bins=50)
