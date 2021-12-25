@@ -246,7 +246,7 @@ class FigureLibrary():
                     
 
     def matchAxisLimits(self, which = 'both', panel_exceptions = []):
-        xlim, ylim = self._getLimits(self, panel_exceptions)
+        xlim, ylim = self._getLimits(panel_exceptions)
         dim = self.dim
             
         for i in range(dim[0]):
