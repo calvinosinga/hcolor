@@ -24,6 +24,7 @@ def redshiftR_spaceC_model(rlib, iprops, savefig = True, panel_length = 3, panel
     flib.matchAxisLimits()
     flib.defaultPKAxesLabels()
     flib.addLegend()
+    flib.printIprops(iprops)
     plt.savefig('trial_run.png')
     return
 

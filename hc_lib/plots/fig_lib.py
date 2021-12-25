@@ -102,7 +102,13 @@ class FigureLibrary():
     def getLines(self):
         return self.lines
     
-
+    def printIprops(self, iprops, fsize=6):
+        outstr = ''
+        for k, v in iprops.items():
+            outstr += k + ': ' + str(v) + '; '
+        self.fig.suptitle(outstr, fontsize = fsize, wrap = True)
+        return
+        
     def addRowLabels(self, rowlabels, pos = (0.05, 0.05), fsize = 16):
         dim = self.dim
         for i in range(dim[0]):
@@ -124,7 +130,7 @@ class FigureLibrary():
     def removeYTickLabels(self, panel_exceptions = []):
         dim = self.dim
         if not panel_exceptions:
-            panel_exceptions = [(i, dim[1]-1) for i in range(dim[0])]
+            panel_exceptions = [(i, 0) for i in range(dim[0])]
         
         self._removeTickLabels('y', panel_exceptions)
         return
