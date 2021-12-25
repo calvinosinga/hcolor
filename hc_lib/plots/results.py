@@ -12,10 +12,6 @@ class ResultLibrary():
         self.hists = []
         return
     
-    """
-    Needs to make figure descriptor
-    Find the results that match some given row/column properties
-    """
 
     def getPaths(self, directory):
         paths = []
@@ -102,3 +98,16 @@ class ResultLibrary():
                         temp.append(forFig[f])
                 figArr[i, j] = temp
         return figArr, rowLabels, colLabels
+
+    def getVals(self, result_type, propname):
+        """
+        Returns all of the unique instances of that property within
+        the ResultLibrary
+        """
+        results = self._getResultType(result_type)
+        vals = []
+        for r in results:
+            if r.props[propname] not in vals:
+                vals.append(r.props[propname])
+        
+        return vals

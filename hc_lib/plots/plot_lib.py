@@ -353,3 +353,5 @@ def compare_slices(fields, idx_array, key_array, row_labels, col_labels, bar_tex
             va='center', fontsize = 16, rotation='vertical')
     return fig, panels
 
+def makeFig(resultArr, fig, panels):
+    for 

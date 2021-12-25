@@ -1,8 +1,6 @@
-import matplotlib.pyplot as plt
-import matplotlib as mpl
 import pickle as pkl
 from hc_lib.plots.results import ResultLibrary
-import hc_lib.plots.figures.hiptl as fighiptl
+import hc_lib.plots.figures.HI_auto as HIfig
 import sys
 
 OUTPATH = sys.argv[1]
@@ -24,8 +22,15 @@ def main():
 def hiptl_auto(rl):
     ip = {}
     ip['fieldname'] = 'hiptl'
+    ip['simname'] = 'tng100'
+    ip['axis'] = 0
+    ip['grid_resolution'] = 800
+    ip['is_auto'] = True
+
+    HIfig.redshiftR_spaceC_model(rl, ip)
+     
     
-    # 
+     
     return
 
 
