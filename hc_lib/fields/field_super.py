@@ -338,6 +338,7 @@ class Cross():
     def getXis(self):
         return self.xxis
     
+    # current version for testing hisubhaloXgalaxy
     def computeXpks(self):
         if self.v:
             print("starting process of computing xpks...")

@@ -1,6 +1,7 @@
 import os
 import pickle as pkl
 import numpy as np
+from hc_lib.fields.field_super import ResultContainer
 
 class ResultLibrary():
 
@@ -58,7 +59,6 @@ class ResultLibrary():
         else:
             raise ValueError('unsupported result type given')
         return result
-        
 
     def organizeFigure(self, includep, rowp, colp, result_type):
         """
@@ -69,7 +69,6 @@ class ResultLibrary():
         rowLabels = []
         colLabels = []
         forFig = []
-        
         result = self._getResultType(result_type)
 
         for r in result:
@@ -88,6 +87,9 @@ class ResultLibrary():
         colLabels.sort()
         nrows = len(rowLabels)
         ncols = len(colLabels)
+
+        # saves an array of lists of result containers, each element corresponds
+        # to a panel in the final figure
         figArr = np.empty((nrows, ncols), dtype=object)
         for i in range(nrows):
             for j in range(ncols):
@@ -112,3 +114,48 @@ class ResultLibrary():
                 vals.append(r.props[propname])
         
         return vals
+    
+    def printLib(self, result_type = ''):
+        print('######## RESULT LIBRARY #################\n')
+        rts = ['pk', '2Dpk', 'xi', 'slice']
+        rtitle = ['1D power spectra', '2D power spectra',
+                '1D correlation', 'slices']
+        rdict = {rts[i]:rtitle[i] for i in range(len(rts))}
+
+        if result_type == '':
+            for r in rdict:
+                rnames= []
+                print('list of result names for %s:'%rdict[r])
+
+                res_list = self._getResultType(r)
+
+                for result in res_list:
+                    fn = result.fieldname
+                    sn = result.simname
+                    ss = result.snapshot
+                    ax = result.axis
+                    greso = result.grid_resolution
+                    rstr = '%s_%sB_%03dS_%dA_%dR'%(fn,sn,ss,ax,greso)
+                    rnames.append(rstr)
+                print(rnames)
+
+                print()
+        
+        else:
+
+            res_list = self._getResultType(result_type)
+
+            print('list of result names for %s:'%rdict[result_type])
+            rnames = []
+
+            for result in res_list:
+                fn = result.fieldname
+                sn = result.simname
+                ss = result.snapshot
+                ax = result.axis
+                greso = result.grid_resolution
+                rstr = '%s_%sB_%03dS_%dA_%dR'%(fn,sn,ss,ax,greso)
+                rnames.append(rstr)
+            print(rnames)
+            print()
+        return
