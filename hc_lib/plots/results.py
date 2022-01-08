@@ -130,11 +130,11 @@ class ResultLibrary():
                 res_list = self._getResultType(r)
 
                 for result in res_list:
-                    fn = result.fieldname
-                    sn = result.simname
-                    ss = result.snapshot
-                    ax = result.axis
-                    greso = result.grid_resolution
+                    fn = result.props['fieldname']
+                    sn = result.props['simname']
+                    ss = result.props['snapshot']
+                    ax = result.props['axis']
+                    greso = result.props['grid_resolution']
                     rstr = '%s_%sB_%03dS_%dA_%dR'%(fn,sn,ss,ax,greso)
                     rnames.append(rstr)
                 print(rnames)

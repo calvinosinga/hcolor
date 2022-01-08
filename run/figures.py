@@ -27,9 +27,9 @@ def main():
 #             plt.
 
 def hiptlAuto(rl):
-    print('_____________ MAKING HIPTL AUTO POWER SPECTRA PLOTS ______________')
+    print('_________ MAKING HIPTL AUTO POWER SPECTRA PLOTS ______\n')
     cc = copy.copy # used often, so just made shortcut
-    rl.printLib()
+    #rl.printLib()
     # create directory to save figures in
     saveDirPath = SAVEPATH+'hiptl_auto/'
     if not os.path.isdir(saveDirPath):
@@ -44,11 +44,11 @@ def hiptlAuto(rl):
 
     ip = cc(baseIncludeProps)
     ip['map'] = 'mass'
-    hiptlFig.redshiftR_spaceC_model(rl, baseIncludeProps, saveDirPath)
+    hiptlFig.redshiftR_spaceC_model(rl, ip, saveDirPath)
      
     ip = cc(baseIncludeProps)
     ip['snapshot'] = 99
-    hiptlFig.modelR_spaceC_map(rl, ip, saveDirPath)
+    #hiptlFig.modelR_spaceC_map(rl, ip, saveDirPath)
     
     
     return

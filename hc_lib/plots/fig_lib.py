@@ -103,7 +103,7 @@ class FigureLibrary():
             step was completed, like calculating redshift distortion.
             """
             lines_for_panel = []
-            keys = dict_panel.keys()
+            keys = list(dict_panel.keys())
             for r in range(len(dict_panel)):
 
                 x = dict_panel[keys[r]][0]
@@ -165,13 +165,8 @@ class FigureLibrary():
         real_results = self.figArr[real_slc]
         redshift_results = self.figArr[redshift_slc]
 
-        print('real results dimensions: %s'%str(real_results.shape))
-        print('redshift results dimensions: %s'%str(redshift_results.shape))
-
         distArr = np.empty_like(real_results, dtype=object)
         
-        print('figure array dimensions: %s'%str(self.figArr.shape))
-        print('distortion array dimensions: %s'%str(distArr.shape))
         # iterate over each panel in the results
         for i in range(len(real_results)):
             
@@ -194,21 +189,27 @@ class FigureLibrary():
             
             distArr[i] = temp
         
-        # find which axis to concatenate along (should only be two options, for 2D array)
-        if distArr.shape[0] == self.dim[0]:
-            concat_ax = 1
-        else:
-            concat_ax = 0
         
-        self.figArr = np.concatenate((self.figArr, distArr), axis=concat_ax, 
-                dtype=object)
+        # find which axis to concatenate along (should only be two options, for 2D array)
+        
+        
+        if distArr.shape == self.dim[0]:
+            concat_ax = 0
+        else:
+            concat_ax = 1
+
+        concat_dim = [-1, -1]
+        concat_dim[concat_ax] = 1 
+        
+        distArr = np.reshape(distArr, concat_dim)
+        self.figArr = np.concatenate((self.figArr, distArr), axis=concat_ax)
         self.dim = self.figArr.shape
 
         # making a list of the indices that the distortion panels are at
         if concat_ax == 0:
-            dist_idx_list = [(self.dim[0]-1,i) for i in self.dim[1]]
+            dist_idx_list = [(self.dim[0]-1,i) for i in range(self.dim[1])]
         else:
-            dist_idx_list = [(i, self.dim[1]-1) for i in self.dim[0]]
+            dist_idx_list = [(i, self.dim[1]-1) for i in range(self.dim[0])]
             
         return dist_idx_list
 
@@ -245,7 +246,6 @@ class FigureLibrary():
     def removeYTickLabels(self, panel_exceptions = []):
         if not panel_exceptions:
             panel_exceptions = self._defaultTickLabelPanelExceptions('y')
-        
         self._removeTickLabels('y', panel_exceptions)
         return
     
@@ -299,14 +299,17 @@ class FigureLibrary():
         
         return
     
-    def axisLabel(self, text, axis, pos = [], fsize = 16):
+    def axisLabel(self, text, axis, pos = [], fsize = 16, rotation = ''):
         posdict = {}
         if axis == 'x':
-            rotation = 'horizontal'
-            posdict['x'] = [0.5, self.yborder[1]/3/self.figsize[0]]
+            if rotation == '':
+                rotation = 'horizontal'
+            posdict['x'] = [0.5, self.yborder[1]/3/self.figsize[1]]
         elif axis == 'y':
-            rotation = 'vertical'
-            posdict['y'] = [self.xborder[0]/3/self.figsize[1], 0.5]
+            if rotation == '':
+                rotation = 'vertical'
+            
+            posdict['y'] = [self.xborder[0]/3/self.figsize[0], 0.5]
         
         if not pos:
             pos = posdict[axis]
@@ -324,24 +327,65 @@ class FigureLibrary():
     
     def xLimAdjustToNyquist(self, panel_exceptions = []):
         dim = self.dim
-
+        
         for i in range(dim[0]):
             for j in range(dim[1]):
                 if (i, j) not in panel_exceptions:
                     p = self.panels[i][j]
                     plt.sca(p)
                     res_container_list = self.figArr[i, j]
-                    nyq = np.inf
-                    for r in res_container_list:
-                        nyq_temp = r.props['grid_resolution'] * np.pi / r.props['box']
-                        if nyq_temp < nyq:
-                            nyq = nyq_temp
-
                     xmin, xmax = plt.xlim()
-                    plt.xlim(xmin, nyq)
-                        
+                    nyq = xmax
+                    mink = np.inf
+                    for r in res_container_list:
+                        if not isinstance(res_container_list, dict):
+                            
+                            nyq_temp = r.props['grid_resolution'] * np.pi / r.props['box']
+                            if nyq_temp < nyq:
+                                nyq = nyq_temp
+                            wavenum, pk, z = r.getValues()
+
+                            if mink > np.min(wavenum):
+                                mink = np.min(wavenum)
+
+                    if not mink == np.inf:
+                        plt.xlim(mink, nyq)
+                    
+                    else:
+                        plt.xlim(xmin, nyq)
+        self.matchAxisLimits(which='x', panel_exceptions=panel_exceptions)
         return
     
+    def flushYAxisToData(self, result_type = 'pk'):
+        for i in range(self.dim[0]):
+            for j in range(self.dim[1]):
+                p = self.panels[i][j]
+                ylim = [np.inf, -np.inf]
+                plt.sca(p)
+                res_container_list = self.figArr[i, j]
+                xmin, xmax = plt.xlim()
+
+                if result_type == 'pk':
+                    for r in res_container_list:
+                        if not isinstance(res_container_list, dict):
+                            wavenum, pk, z = r.getValues()
+                        else:
+                            wavenum = res_container_list[r][0]
+                            pk = res_container_list[r][1]
+
+                        max_idx = np.argmax(wavenum > xmax)
+                        min_idx = np.argmax(wavenum < xmin)
+                        
+                        ymin = np.min(pk[min_idx:max_idx])
+                        ymax = np.max(pk[min_idx:max_idx])
+                        
+                        if ymin < ylim[0]:
+                            ylim[0] = ymin
+                        if ymax > ylim[1]:
+                            ylim[1] = ymax
+                    plt.ylim(ylim[0], ylim[1])
+        return
+
     def defaultPKAxesLabels(self):
         xlab = r'k (Mpc/h)$^{-1}$'
         ylab = r'P(k) (Mpc/h)$^{-3}$'
@@ -352,7 +396,7 @@ class FigureLibrary():
     def _getLimits(self, panel_exceptions = []):
         dim = self.dim
         ylims = [np.inf, -np.inf]
-        xlims = [np.inf, -np.inf]
+        xlims = [-np.inf, np.inf]
         for i in range(dim[0]):
             for j in range(dim[1]):
                 if not (i, j) in panel_exceptions:
@@ -360,17 +404,21 @@ class FigureLibrary():
                     plt.sca(p)
                     ymin, ymax = plt.ylim()
                     xmin, xmax = plt.xlim()
+                    # for the y-axis, we want the largest max, smallest min
+                    # in order to encompass the most data
                     if ymin < ylims[0]:
                         ylims[0] = ymin
                     if ymax > ylims[1]:
                         ylims[1] = ymax
-                    if xmin < xlims[0]:
+                    # for the x-axis, we want the smallest max, largest min
+                    # so no panel includes bad data
+                    if xmin > xlims[0]:
                         xlims[0] = xmin
-                    if xmax > xlims[1]:
+                    if xmax < xlims[1]:
                         xlims[1] = xmax
         
         return xlims, ylims
-                    
+    
     def matchAxisLimits(self, which = 'both', panel_exceptions = []):
         xlim, ylim = self._getLimits(panel_exceptions)
         dim = self.dim
@@ -388,6 +436,8 @@ class FigureLibrary():
         return
             
     def saveFig(self, dir_path, rowp, colp, panelp, suffix = ''):
-        outstr = '%sR_%sC_%s_%s_'%(rowp, colp, panelp, suffix)
-        plt.savefig(dir_path + outstr[:-1] + '.png')
+        outstr = '%sR_%sC_%s'%(rowp, colp, panelp)
+        if not suffix == '':
+            outstr += '_' + suffix 
+        plt.savefig(dir_path + outstr + '.png')
         return
