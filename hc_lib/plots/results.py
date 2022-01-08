@@ -70,8 +70,11 @@ class ResultLibrary():
         colLabels = []
         forFig = []
         result = self._getResultType(result_type)
-
+        #print(includep)
         for r in result:
+            #if r.props['fieldname'] == 'galaxy':
+                #print(r.props)
+            
             if r.matchProps(includep):
                 forFig.append(r)
                 rowlab = r.getProp(rowp)

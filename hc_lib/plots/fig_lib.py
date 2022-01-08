@@ -61,6 +61,11 @@ class FigureLibrary():
     def getFig(self):
         return self.fig, self.panels
     
+    def texStr(self, instr):
+        if isinstance(instr, str):
+            instr = instr.replace('_','\_')
+        return instr
+
     def plotLines(self, panel_prop, labels = None, colors = None, linestyles = None,
             exclude_lines = []):
         dim = self.dim
@@ -93,7 +98,7 @@ class FigureLibrary():
                 else:
                     l_ls = linestyles[r.props[pprop]]
                 
-                lines_for_panel.append(plt.plot(x, y, label = l_lab, color = l_c, 
+                lines_for_panel.append(plt.plot(x, y, label = self.texStr(l_lab), color = l_c, 
                         linestyle = l_ls))
             
             return lines_for_panel
@@ -125,7 +130,7 @@ class FigureLibrary():
                 else:
                     l_ls = linestyles[keys[r]]
                 
-                lines_for_panel.append(plt.plot(x, y, label = l_lab, color = l_c, 
+                lines_for_panel.append(plt.plot(x, y, label = self.texStr(l_lab), color = l_c, 
                         linestyle = l_ls))
             
             return lines_for_panel
@@ -228,10 +233,12 @@ class FigureLibrary():
         
     def addRowLabels(self, rowlabels, pos = (0.05, 0.05), fsize = 16):
         dim = self.dim
+        print(rowlabels)
         for i in range(dim[0]):
             p = self.panels[i][0]
             plt.sca(p)
-            plt.text(pos[0], pos[1], rowlabels[i], fontsize = fsize,
+            print(self.texStr(rowlabels[i]))
+            plt.text(pos[0], pos[1], self.texStr(rowlabels[i]), fontsize = fsize,
                         ha = 'left', va = 'bottom', transform = p.transAxes)
         return
     
@@ -241,7 +248,7 @@ class FigureLibrary():
             p = self.panels[0][j]
             plt.sca(p)
             p.xaxis.set_label_position('top')
-            plt.xlabel(collabels[j], fontsize = fsize)
+            plt.xlabel(self.texStr(collabels[j]), fontsize = fsize)
         return
     
     def removeYTickLabels(self, panel_exceptions = []):
@@ -315,8 +322,7 @@ class FigureLibrary():
         if not pos:
             pos = posdict[axis]
         
-
-        self.fig.text(pos[0], pos[1], text, ha = 'center', va = 'center',
+        self.fig.text(pos[0], pos[1], self.texStr(text), ha = 'center', va = 'center',
                     fontsize = fsize, rotation = rotation)
         return
     
