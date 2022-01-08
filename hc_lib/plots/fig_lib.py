@@ -61,7 +61,8 @@ class FigureLibrary():
     def getFig(self):
         return self.fig, self.panels
     
-    def plotLines(self, panel_prop, labels = None, colors = None, linestyles = None):
+    def plotLines(self, panel_prop, labels = None, colors = None, linestyles = None,
+            exclude_lines = []):
         dim = self.dim
         default_color_cycle = plt.rcParams['axes.prop_cycle'].by_key()['color']
         pprop = panel_prop
@@ -93,7 +94,7 @@ class FigureLibrary():
                     l_ls = linestyles[r.props[pprop]]
                 
                 lines_for_panel.append(plt.plot(x, y, label = l_lab, color = l_c, 
-                            linestyle = l_ls))
+                        linestyle = l_ls))
             
             return lines_for_panel
         
@@ -123,7 +124,7 @@ class FigureLibrary():
                     l_ls = '-'
                 else:
                     l_ls = linestyles[keys[r]]
-
+                
                 lines_for_panel.append(plt.plot(x, y, label = l_lab, color = l_c, 
                         linestyle = l_ls))
             

@@ -28,6 +28,12 @@ class ResultContainer():
     def _extract_field_properties(self, f):
         self.props['box'] = f.box
         self.props['simname'] = f.simname
+        if '-2' in f.simname:
+            self.props['sim_resolution'] = 'medium'
+        elif '-3' in f.simname:
+            self.props['sim_resolution'] = 'low'
+        else:
+            self.props['sim_resolution'] = 'high'
         self.props['num_part'] = f.numDMpart
         self.props['grid_resolution'] = f.grid_resolution
         self.props['snapshot'] = f.snapshot
