@@ -1,11 +1,8 @@
-import pickle as pkl
-import os
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.gridspec as gspec
 import copy
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 mpl.rcParams['text.usetex'] = True
 
 class FigureLibrary():
@@ -16,9 +13,13 @@ class FigureLibrary():
         self.dim = figArr.shape
         return
 
-    def createFig(self, panel_length, panel_bt, xborder, yborder):
+    def createFig(self, panel_length, panel_bt, xborder, yborder,
+                colorbar = False):
         nrows = self.dim[0]
         ncols = self.dim[1]
+
+        if colorbar:
+            ncols += 1
         # border input can be either a list or single number
         if isinstance(xborder, float) or isinstance(xborder, int):
             xborder = [xborder, xborder]
@@ -39,16 +40,21 @@ class FigureLibrary():
         gs = gspec.GridSpec(nrows, ncols)
         plt.subplots_adjust(left= xborder[0]/figwidth, right=1-xborder[1]/figwidth,
                 top=1-yborder[1]/figheight, bottom=yborder[0]/figheight,
-                wspace=panel_bt[0], hspace=panel_bt[1])
+                wspace=panel_bt[0]*ncols/figwidth, hspace=panel_bt[1]*nrows/figheight)
         
         # making panels list
         panels = []
-        for i in range(nrows):
+        for i in range(self.dim[0]):
             col_panels = []
-            for j in range(ncols):
-                col_panels.append(fig.add_subplot(gs[i,j]))
+            for j in range(self.dim[1]):
+                col_panels.append(fig.add_subplot(gs[i, j]))
+                    
             panels.append(col_panels)
         
+        if colorbar:
+            self.cax = fig.add_subplot(gs[:, -1])
+        else:
+            self.cax = np.empty_like(self.figArr, dtype=object)
         self.fig = fig
         self.panels = panels
         self.panel_length = panel_length
@@ -66,19 +72,16 @@ class FigureLibrary():
             instr = instr.replace('_','\_')
         return instr
 
-    def plotLines(self, panel_prop, labels = None, colors = None, linestyles = None,
-            exclude_lines = []):
+    def plotLines(self, panel_prop, labels = None, colors = None, linestyles = None):
         dim = self.dim
         default_color_cycle = plt.rcParams['axes.prop_cycle'].by_key()['color']
         pprop = panel_prop
-        lines = np.empty_like(self.figArr, dtype=object)
 
         def _plot_one_panel_rc(rc_panel):
             """
             Plots a panel when the results to be plotted (rc_panel)
             is a list of ResultContainer objects. This is default.
             """
-            lines_for_panel = []
             for r in range(len(rc_panel)):
                 r_container = rc_panel[r]
                 x, y, z = r_container.getValues()
@@ -98,17 +101,16 @@ class FigureLibrary():
                 else:
                     l_ls = linestyles[r.props[pprop]]
                 
-                lines_for_panel.append(plt.plot(x, y, label = self.texStr(l_lab), color = l_c, 
-                        linestyle = l_ls))
+                plt.plot(x, y, label = self.texStr(l_lab), color = l_c, 
+                        linestyle = l_ls)
             
-            return lines_for_panel
+            return
         
         def _plot_one_panel_dict(dict_panel):
             """
             Makes plots for a panel if given a dictionary - expected to occur when some post-analysis
             step was completed, like calculating redshift distortion.
             """
-            lines_for_panel = []
             keys = list(dict_panel.keys())
             for r in range(len(dict_panel)):
 
@@ -130,15 +132,14 @@ class FigureLibrary():
                 else:
                     l_ls = linestyles[keys[r]]
                 
-                lines_for_panel.append(plt.plot(x, y, label = self.texStr(l_lab), color = l_c, 
-                        linestyle = l_ls))
+                plt.plot(x, y, label = self.texStr(l_lab), color = l_c, 
+                        linestyle = l_ls)
             
-            return lines_for_panel
+            return
 
         for i in range(dim[0]):
             for j in range(dim[1]):
                 p = self.panels[i][j]
-                p.tick_params(which='both', direction = 'in')
 
                 results_for_panel = self.figArr[i, j]
                 plt.sca(p)
@@ -148,13 +149,132 @@ class FigureLibrary():
                 # rather than a list of ResultContainers.
                 # Thus, it requires a different way to plot them
                 if not isinstance(results_for_panel, dict):
-                    lines[i, j] = _plot_one_panel_rc(results_for_panel)
+                    _plot_one_panel_rc(results_for_panel)
                 else:
-                    lines[i, j] = _plot_one_panel_dict(results_for_panel)
-                
-        self.lines = lines
-        return lines
+                    _plot_one_panel_dict(results_for_panel)
+
+        return
     
+    def fillLines(self, match_label, label = '', color = 'blue', 
+                opacity = 0.55, dark_edges = False, except_panels = []):
+        """
+        For each line that has a label that is in match_label, the area between
+        the lines is filled in and then the lines are removed from the plot.
+        """
+        
+        for i in range(self.dim[0]):
+            for j in range(self.dim[1]):
+                if (i, j) not in except_panels:
+                    p = self.panels[i][j]
+                    plt.sca(p)
+                    lines = p.get_lines()
+                    # get the ymax/ymin of the lines
+                    ymin = None
+                    ymax = None
+                    xdata = None
+                    for l in lines:
+                        if l.get_label() in match_label:
+                            temp = l.get_ydata()
+                            
+                            if ymin is None:
+                                ymin = temp
+                                ymax = temp
+                                xdata = l.get_xdata()
+                            else:
+                                ymin = np.minimum(ymin, temp)
+                                ymax = np.maximum(ymax, temp)
+                                if not xdata == l.get_xdata():
+                                    print('failed xdata check, not the same')
+                                    print(xdata)
+                                    print(l.get_xdata())
+                            
+                            # since this will now be included in the
+                            # filled area, remove it from the plot
+                            l.set_visible(False)
+                            
+                    
+                    # now make the plot
+                    plt.fill_between(xdata, ymin, ymax, color=color, label=label,
+                                alpha = opacity)
+                            
+                    if dark_edges:
+                        plt.plot(xdata, ymin, color=color)
+                        plt.plot(xdata, ymax, color=color)
+                                        
+        return
+
+    def plotSlices(self):
+        slices = np.empty_like(self.figArr, dtype=object)
+        for i in range(self.dim[0]):
+            for j in range(self.dim[1]):
+                p = self.panels[i][j]
+
+                if len(self.figArr[i, j]) == 1:
+                    print('needs only one slice in order to plot...')
+                pslice = self.figArr[i, j][0]
+
+                plt.sca(p)
+
+                x, y, mass = pslice.getValues()
+                extent=(np.min(x), np.max(x), np.min(y), np.max(y))
+
+                im = plt.imshow(mass, extent=extent, origin='lower')
+                slices[i, j] = [im]
+
+        
+        self.plots = slices
+        return
+    
+    def plot2D(self, maxks = [5, 5]):
+        
+        for i in range(self.dim[0]):
+            for j in range(self.dim[1]):
+                p = self.panels[i, j]
+                plt.sca(p)
+                # should only be one result in list
+                result = self.figArr[i, j][0]
+                kpar, kper, pk = result.getValues()
+                kpar = np.unique(kpar)
+                kper = np.unique(kper)
+                paridx = np.where(kpar>maxks[0])[0][0]
+                peridx = np.where(kper>maxks[1])[0][0]
+
+                KPAR, KPER = np.meshgrid(kpar[:paridx], kper[:peridx])
+                extent = (0,kpar[paridx-1],0,kper[peridx-1])
+                plt.imshow(pk[:paridx, :peridx], extent=extent, origin='lower')
+                
+        return
+    
+    def addContours(self, color = 'k', maxks = [5,5], has_cax = False):
+        for i in range(self.dim[0]):
+            for j in range(self.dim[1]):
+                p = self.panels[i, j]
+                plt.sca(p)
+                result = self.figArr[i, j][0]
+
+                kpar, kper, pk = result.getValues()
+                kpar = np.unique(kpar)
+                kper = np.unique(kper)
+                paridx = np.where(kpar>maxks[0])[0][0]
+                peridx = np.where(kper>maxks[1])[0][0]
+
+                KPAR, KPER = np.meshgrid(kpar[:paridx], kper[:peridx])
+
+                if has_cax:
+                    ticks = self.cax.get_yticks()
+                    ylim = self.cax.get_ylim()
+
+
+                else:
+                    cbar = self.cax[i, j][0]
+                    ticks = cbar.get_yticks()
+                    ylim = cbar.get_ylim()
+                
+                plt.contour(KPAR, KPER, pk[:paridx,:peridx], vmin=ylim[0],
+                        vmax=ylim[1], levels = ticks, colors=color, linestyle='-')
+
+        return 
+             
     def addRedshiftDistortion(self, real_slc, redshift_slc, panel_prop):
         """
         Adds a column or row that displays the redshift distortion
@@ -220,10 +340,77 @@ class FigureLibrary():
         return dist_idx_list
 
     # TODO: add variance
+    def makeColorbars(self, shared_cax = False, cbar_label = '', except_panels = []):
+        if shared_cax:
+            self.matchColorbarLimits()
+            self.logNormColorbar()
+            self.assignColormaps('plasma', under='w')
+            cbar = plt.colorbar(cax=self.cax)
+            self.cax.set_aspect(8, anchor='W')
+            cbar.set_label(cbar_label, rotation=270)
+        else:
+            for i in range(self.dim[0]):
+                for j in range(self.dim[1]):
+                    if (i,j) not in except_panels:
+                        plt.sca(self.panels[i][j])
+                        cbar = plt.colorbar(fraction=0.046, pad=0.04)
+                        cbar.set_label(cbar_label, rotation=270)
+                        self.cax[i, j] = [cbar]
+                        
+
+        return
     
-    def getLines(self):
-        return self.lines
-    
+    def assignColormaps(self, cmap_array, under = None, over = None):
+
+        for i in range(self.dim[0]):
+            for j in range(self.dim[1]):
+                im = self.plots[i, j][0]
+                ca = cmap_array[i, j]
+                if isinstance(ca, str):
+                    cmap = copy.copy(mpl.cm.get_cmap(ca))
+                else:
+                    cmap = ca
+                
+                if not under is None:
+                    cmap.set_under(under)
+                if not over is None:
+                    cmap.set_over(over)
+                
+                im.set_cmap(cmap)
+        
+        return
+
+    def logNormColorbar(self, vlim = [], panel_exceptions = []):
+        for i in range(self.dim[0]):
+            for j in range(self.dim[1]):
+                if (i, j) not in panel_exceptions:
+                    im = self.plots[i, j][0]
+                    clim = im.get_clim()
+                    if vlim:
+                        im.set_norm(mpl.colors.LogNorm(vmin=vlim[0], vmax=vlim[1]))
+                    else:
+                        im.set_norm(mpl.colors.LogNorm(vmin=clim[0], vmax=clim[1]))
+                    
+        return
+      
+    def matchColorbarLimits(self, panel_exceptions = []):
+        # get the limits
+        vlim = [np.inf, -np.inf]
+        for i in range(self.dim[0]):
+            for j in range(self.dim[1]):
+                if (i, j) not in panel_exceptions:
+                    im = self.plots[i, j][0]
+                    if vlim[0] > im.clim[0]: vlim[0]=im.clim[0] 
+                    if vlim[1] < im.clim[1]: vlim[1]=im.clim[1]
+                        
+        for i in range(self.dim[0]):
+            for j in range(self.dim[1]):
+                if (i, j) not in panel_exceptions:
+                    im = self.plots[i, j][0]
+                    im.set_clim(tuple(vlim))
+
+        return
+
     def printIprops(self, iprops, fsize=6):
         outstr = r''
         for k, v in iprops.items():
@@ -288,6 +475,13 @@ class FigureLibrary():
                         p.yaxis.set_ticklabels([])
                     elif axis == 'x':
                         p.xaxis.set_ticklabels([])
+        return
+
+    def changeTickDirection(self, which = 'both', direction = 'in', panel_exceptions=[]):
+        for i in range(self.dim[0]):
+            for j in range(self.dim[1]):
+                if (i,j) not in panel_exceptions:
+                    self.panels[i][j].tick_params(which=which, direction = direction)
         return
 
     def logAxis(self, which = 'both', panel_exceptions = []):
@@ -393,9 +587,13 @@ class FigureLibrary():
                     plt.ylim(ylim[0], ylim[1])
         return
 
-    def defaultPKAxesLabels(self):
-        xlab = r'k (Mpc/h)$^{-1}$'
-        ylab = r'P(k) (Mpc/h)$^{-3}$'
+    def defaultPKAxesLabels(self, dim = 1):
+        if dim == 1:
+            xlab = r'k (Mpc/h)$^{-1}$'
+            ylab = r'P(k) (Mpc/h)$^{-3}$'
+        elif dim == 2:
+            xlab = r"kpar (h/Mpc)"
+            ylab = r"kper (h/Mpc)"
         self.axisLabel(xlab, 'x')
         self.axisLabel(ylab, 'y')
         return

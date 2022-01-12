@@ -207,3 +207,39 @@ def redshiftR_colorC_fieldname(rlib, iprops, savePath = '', panel_length = 3, pa
     else:
         return flib
 
+def color_cutR_colorC_gal_res(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
+            border = 1):
+    """
+    Visualize how the color_cut used affects the pk for the color.
+    """
+    row_prop = 'color_cut'
+    column_prop = 'color'
+    panel_prop = 'gal_res'
+    
+    print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
+    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
+    collabels = [i.capitalize() for i in collabels]
+
+    flib = FigureLibrary(figArr)
+
+    flib.createFig(panel_length, panel_bt, border, border)
+    flib.plotLines(panel_prop)
+    flib.addRowLabels(rowlabels)
+    flib.addColLabels(collabels)
+    flib.logAxis('both')
+
+    flib.removeDefaultTickLabels()
+    flib.xLimAdjustToNyquist()
+    flib.flushYAxisToData()
+    flib.matchAxisLimits(which = 'both')
+    flib.defaultPKAxesLabels()
+    flib.addLegend()
+    flib.printIprops(iprops)
+
+    # if savefig, then save it, otherwise return it
+
+    if not savePath == '':
+        flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+        return
+    else:
+        return flib

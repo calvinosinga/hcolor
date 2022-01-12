@@ -80,11 +80,11 @@ class ResultContainer():
             if isinstance(v, list) and isinstance(self_val, list):
                 matchone = v[0] == self_val[0] and v[1] == self_val[1]
                 matchtwo = v[0] == self_val[1] and v[1] == self_val[0]
-                isMatch = isMatch and (matchone or matchtwo)
+                isMatch = (isMatch and (matchone or matchtwo))
             elif isinstance(self_val, list):
-                isMatch = isMatch and v in self_val
+                isMatch = (isMatch and v in self_val)
             else:
-                isMatch = isMatch and v == self_val
+                isMatch = (isMatch and v == self_val)
 
 
         return isMatch

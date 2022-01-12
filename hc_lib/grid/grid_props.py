@@ -269,13 +269,14 @@ class hisubhalo_grid_props(grid_props):
     def __init__(self, mas, field, space, model, HI_res):
         other = {}
         other['model'] = model
-        
+        splt = model.split('_')
+        other['projection'] = splt[1]
         other['HI_res'] = HI_res
         super().__init__(mas, field, space, other)
     
     @classmethod
     def loadProps(cls, dct):
-        inputs = ['mas', 'fieldname', 'space', 'model', 'HI_res']
+        inputs = ['mas', 'fieldname', 'space', 'model', 'projection', 'HI_res']
         prm = []
         for i in inputs:
             try:

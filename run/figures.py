@@ -1,6 +1,9 @@
 from hc_lib.plots.results import ResultLibrary
 import hc_lib.plots.figures.hiptl_auto as hiptlFig
 import hc_lib.plots.figures.galaxy_auto as galFig
+import hc_lib.plots.figures.hisubhalo_auto as hisubFig
+import hc_lib.plots.figures.ptl_auto as ptlFig
+import hc_lib.plots.figures.vn_auto as vnFig
 import sys
 import os
 import copy
@@ -19,6 +22,9 @@ def main():
 
 #    hiptlAuto(rlib)
     galaxyAuto(rlib)
+    hisubhaloAuto(rlib)
+    ptlAuto(rlib)
+    vnAuto(rlib)
     return
 
 # Do this part later
@@ -151,5 +157,97 @@ def galaxyAuto(rl):
     galFig.redshiftR_colorC_fieldname(rl, ip, saveDirPath)
     
     return
+
+def hisubhaloAuto(rl):
+    print('_________ MAKING D18-SUBHALO AUTO POWER SPECTRA PLOTS ______\n')
+    cc = copy.copy # used often, so just made shortcut
+    # rl.printLib()
+    # create directory to save figures in
+    saveDirPath = SAVEPATH+'hisubhalo_auto/'
+    if not os.path.isdir(saveDirPath):
+        os.mkdir(saveDirPath)
+    
+    baseIncludeProps = {}
+    baseIncludeProps['fieldname'] = 'hisubhalo'
+    baseIncludeProps['simname'] = 'tng100'
+    baseIncludeProps['snapshot'] = 99
+    baseIncludeProps['axis'] = 0
+    baseIncludeProps['grid_resolution'] = 800
+    baseIncludeProps['HI_res'] = 'diemer'
+    baseIncludeProps['is_auto'] = True
+    baseIncludeProps['mas'] = 'CICW'
+    baseIncludeProps['space'] = 'real'
+
+    ip = cc(baseIncludeProps)
+    del ip['space']
+    del ip['HI_res']
+    hisubFig.modelR_spaceC_HI_res(rl, ip, saveDirPath)
+
+    ip = cc(baseIncludeProps)
+    del ip['space']
+    del ip['mas']
+    hisubFig.modelR_spaceC_mas(rl, ip, saveDirPath)
+
+    ip = cc(baseIncludeProps)
+    del ip['snapshot']
+    del ip['space']
+    hisubFig.redshiftR_spaceC_model(rl, ip, saveDirPath)
+    return
+
+def ptlAuto(rl):
+    print('_________ MAKING PARTICLE AUTO POWER SPECTRA PLOTS ______\n')
+    cc = copy.copy # used often, so just made shortcut
+    # rl.printLib()
+    # create directory to save figures in
+    saveDirPath = SAVEPATH+'ptl_auto/'
+    if not os.path.isdir(saveDirPath):
+        os.mkdir(saveDirPath)
+    
+    baseIncludeProps = {}
+    baseIncludeProps['fieldname'] = 'ptl'
+    baseIncludeProps['simname'] = 'tng100'
+    #baseIncludeProps['snapshot'] = 99
+    baseIncludeProps['axis'] = 0
+    baseIncludeProps['grid_resolution'] = 800
+    #baseIncludeProps['species'] = 'ptl'
+    baseIncludeProps['is_auto'] = True
+    baseIncludeProps['mas'] = 'CICW'
+    # baseIncludeProps['space'] = 'real'
+
+
+    ip = cc(baseIncludeProps)
+    ptlFig.redshiftR_spaceC_species(rl, ip, saveDirPath)
+
+    ptlFig.redshiftR_speciesC_space(rl, ip, saveDirPath)
+    return
+
+def vnAuto(rl):
+    print('_________ MAKING VN18-PARTICLE AUTO POWER SPECTRA PLOTS ______\n')
+    cc = copy.copy # used often, so just made shortcut
+    # rl.printLib()
+    # create directory to save figures in
+    saveDirPath = SAVEPATH+'vn_auto/'
+    if not os.path.isdir(saveDirPath):
+        os.mkdir(saveDirPath)
+    
+    baseIncludeProps = {}
+    baseIncludeProps['fieldname'] = 'vn'
+    baseIncludeProps['simname'] = 'tng100'
+    #baseIncludeProps['snapshot'] = 99
+    baseIncludeProps['axis'] = 0
+    baseIncludeProps['grid_resolution'] = 800
+    #baseIncludeProps['species'] = 'ptl'
+    baseIncludeProps['is_auto'] = True
+    baseIncludeProps['mas'] = 'CICW'
+    # baseIncludeProps['space'] = 'real'
+
+
+    ip = cc(baseIncludeProps)
+    vnFig.redshiftR_mapC_space(rl, ip, saveDirPath)
+
+    vnFig.redshiftR_spaceC_map(rl, ip, saveDirPath)
+    return
+
+
 main()
 
