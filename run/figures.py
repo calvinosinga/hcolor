@@ -4,6 +4,9 @@ import hc_lib.plots.figures.galaxy_auto as galFig
 import hc_lib.plots.figures.hisubhalo_auto as hisubFig
 import hc_lib.plots.figures.ptl_auto as ptlFig
 import hc_lib.plots.figures.vn_auto as vnFig
+import hc_lib.plots.figures.HI_auto as HIFig
+import hc_lib.plots.figures.HIXgalaxy as HIxgal
+import hc_lib.plots.figures.HIXptl as HIxptl
 import sys
 import os
 import copy
@@ -25,19 +28,76 @@ def main():
 
     printlib('fieldname')
     
-#    hiptlAuto(rlib)
-#    galaxyAuto(rlib)
-#    hisubhaloAuto(rlib)
-#    ptlAuto(rlib)
-#    vnAuto(rlib)
+    hiptlAuto(rlib)
+    galaxyAuto(rlib)
+    hisubhaloAuto(rlib)
+    ptlAuto(rlib)
+    vnAuto(rlib)
+    HIAuto(rlib)
+    HI_galaxy_cross_power(rlib)
+    HI_ptl_cross_power(rlib)
+
     return
 
-# Do this part later
-# def histograms(rl):
-#     hists = rl
-#     for run in hists:
-#         for gal_res in run:
-#             plt.
+def HIAuto(rl):
+    print('_________ MAKING HI AUTO POWER SPECTRA PLOTS ______\n')
+    cc = copy.copy # used often, so just made shortcut
+    # rl.printLib()
+    # create directory to save figures in
+    saveDirPath = SAVEPATH+'HI_auto/'
+    if not os.path.isdir(saveDirPath):
+        os.mkdir(saveDirPath)
+    
+    baseIncludeProps = {}
+    baseIncludeProps['simname'] = 'tng100'
+    baseIncludeProps['snapshot'] = 99
+    baseIncludeProps['axis'] = 0
+    baseIncludeProps['grid_resolution'] = 800
+    baseIncludeProps['is_auto'] = True
+
+    ip = cc(baseIncludeProps)
+    HIFig.redshiftR_spaceC_fieldname(rl, ip, saveDirPath)
+    return
+
+def HI_galaxy_cross_power(rl):
+    print('_________ MAKING HI-GALAXY CROSS POWER SPECTRA PLOTS ______\n')
+    cc = copy.copy # used often, so just made shortcut
+    #rl.printLib()
+    # create directory to save figures in
+    saveDirPath = SAVEPATH+'HIXgalaxy/'
+    if not os.path.isdir(saveDirPath):
+        os.mkdir(saveDirPath)
+    
+    baseIncludeProps = {}
+    baseIncludeProps['fieldname'] = 'galaxy'
+    baseIncludeProps['simname'] = 'tng100'
+    baseIncludeProps['axis'] = 0
+    baseIncludeProps['grid_resolution'] = 800
+    baseIncludeProps['is_auto'] = False
+
+    ip = cc(baseIncludeProps)
+    HIxgal.redshiftR_spaceC_fieldname(rl, ip, saveDirPath)
+    return
+
+def HI_ptl_cross_power(rl):
+    print('_________ MAKING HI-PTL CROSS POWER SPECTRA PLOTS ______\n')
+    cc = copy.copy # used often, so just made shortcut
+    #rl.printLib()
+    # create directory to save figures in
+    saveDirPath = SAVEPATH+'HIXptl/'
+    if not os.path.isdir(saveDirPath):
+        os.mkdir(saveDirPath)
+    
+    baseIncludeProps = {}
+    baseIncludeProps['fieldname'] = 'ptl'
+    baseIncludeProps['simname'] = 'tng100'
+    baseIncludeProps['axis'] = 0
+    baseIncludeProps['grid_resolution'] = 800
+    baseIncludeProps['is_auto'] = False
+
+    ip = cc(baseIncludeProps)
+    HIxptl.redshiftR_spaceC_fieldname(rl, ip, saveDirPath)
+    return
 
 def hiptlAuto(rl):
     print('_________ MAKING HIPTL AUTO POWER SPECTRA PLOTS ______\n')
@@ -83,6 +143,16 @@ def hiptlAuto(rl):
     del ip['axis']
     ip['model'] = 'GD14'
     hiptlFig.redshiftR_spaceC_axis(rl, ip, saveDirPath)
+
+    ip = cc(baseIncludeProps)
+    ip['model'] = 'GD14'
+    ip['snapshot'] = 99
+    hiptlFig.mapR_spaceC_2D(rl, ip, saveDirPath)
+
+    ip = cc(baseIncludeProps)
+    ip['model'] = 'GD14'
+    ip['map'] = 'mass'
+    hiptlFig.redshiftR_spaceC_slice(rl, ip, saveDirPath)
     return
 
 def galaxyAuto(rl):
@@ -125,16 +195,18 @@ def galaxyAuto(rl):
     #ip['color'] = ['red', 'blue']
     del ip['species']
     del ip['color']
-    del ip['fieldname']
-    galFig.fieldnameR_colorC_species(rl, ip, saveDirPath)
+    del ip['color_cut']
+    del ip['space']
+    galFig.spaceR_colorC_species(rl, ip, saveDirPath)
 
     ip = cc(baseIncludeProps)
     #ip['fieldname'] = ['galaxy', 'galaxy_dust']
     #ip['color'] = ['red', 'blue']
     del ip['mas']
-    del ip['fieldname']
+    del ip['space']
     del ip['color']
-    galFig.fieldnameR_colorC_mas(rl, ip, saveDirPath)
+    del ip['color_cut']
+    galFig.spaceR_colorC_mas(rl, ip, saveDirPath)
 
     #ip = cc(baseIncludeProps)
     #ip['fieldname'] = ['galaxy', 'galaxy_dust']
@@ -161,6 +233,13 @@ def galaxyAuto(rl):
     del ip['snapshot']
     galFig.redshiftR_colorC_fieldname(rl, ip, saveDirPath)
     
+    ip = cc(baseIncludeProps)
+    del ip['axis']
+    del ip['color']
+    del ip['fieldname']
+    galFig.axisR_colorC_fieldname(rl, ip, saveDirPath)
+
+    galFig.make_histograms(rl, saveDirPath)
     return
 
 def hisubhaloAuto(rl):
@@ -222,7 +301,6 @@ def ptlAuto(rl):
     ip = cc(baseIncludeProps)
     ptlFig.redshiftR_spaceC_species(rl, ip, saveDirPath)
 
-    ptlFig.redshiftR_speciesC_space(rl, ip, saveDirPath)
     return
 
 def vnAuto(rl):
@@ -247,9 +325,11 @@ def vnAuto(rl):
 
 
     ip = cc(baseIncludeProps)
-    vnFig.redshiftR_mapC_space(rl, ip, saveDirPath)
+    vnFig.redshiftR_fieldnameC_space(rl, ip, saveDirPath)
+    # vnFig.redshiftR_mapC_space(rl, ip, saveDirPath)
 
-    vnFig.redshiftR_spaceC_map(rl, ip, saveDirPath)
+    # vnFig.redshiftR_spaceC_map(rl, ip, saveDirPath)
+    
     return
 
 

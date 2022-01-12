@@ -55,8 +55,10 @@ class FigureLibrary():
         
         if colorbar:
             self.cax = fig.add_subplot(gs[:, -1])
+            self.has_cbar_panel = True
         else:
             self.cax = np.empty_like(self.figArr, dtype=object)
+            self.has_cbar_panel = False
         self.fig = fig
         self.panels = panels
         self.panel_length = panel_length
@@ -241,13 +243,12 @@ class FigureLibrary():
                 paridx = np.where(kpar>maxks[0])[0][0]
                 peridx = np.where(kper>maxks[1])[0][0]
 
-                KPAR, KPER = np.meshgrid(kpar[:paridx], kper[:peridx])
                 extent = (0,kpar[paridx-1],0,kper[peridx-1])
                 plt.imshow(pk[:paridx, :peridx], extent=extent, origin='lower')
                 
         return
     
-    def addContours(self, color = 'k', maxks = [5,5], has_cax = False):
+    def addContours(self, color = 'k', maxks = [5,5]):
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
                 p = self.panels[i, j]
@@ -262,7 +263,7 @@ class FigureLibrary():
 
                 KPAR, KPER = np.meshgrid(kpar[:paridx], kper[:peridx])
 
-                if has_cax:
+                if self.has_cbar_panel:
                     ticks = self.cax.get_yticks()
                     ylim = self.cax.get_ylim()
 
@@ -342,8 +343,8 @@ class FigureLibrary():
         return dist_idx_list
 
     # TODO: add variance
-    def makeColorbars(self, shared_cax = False, cbar_label = '', except_panels = []):
-        if shared_cax:
+    def makeColorbars(self, cbar_label = '', except_panels = []):
+        if self.has_cbar_panel:
             self.matchColorbarLimits()
             self.logNormColorbar()
             self.assignColormaps('plasma', under='w')
@@ -422,11 +423,9 @@ class FigureLibrary():
         
     def addRowLabels(self, rowlabels, pos = (0.05, 0.05), fsize = 16):
         dim = self.dim
-        print(rowlabels)
         for i in range(dim[0]):
             p = self.panels[i][0]
             plt.sca(p)
-            print(self.texStr(rowlabels[i]))
             plt.text(pos[0], pos[1], self.texStr(rowlabels[i]), fontsize = fsize,
                         ha = 'left', va = 'bottom', transform = p.transAxes)
         return
@@ -441,7 +440,7 @@ class FigureLibrary():
         return
     
     def removeYTickLabels(self, panel_exceptions = []):
-        if not panel_exceptions:
+        if not panel_exceptions and isinstance():
             panel_exceptions = self._defaultTickLabelPanelExceptions('y')
         self._removeTickLabels('y', panel_exceptions)
         return
@@ -503,7 +502,7 @@ class FigureLibrary():
         
         return
     
-    def axisLabel(self, text, axis, pos = [], fsize = 16, rotation = ''):
+    def axisLabel(self, text, axis, pos = [], fsize = 16, rotation = '', usetex=True):
         posdict = {}
         if axis == 'x':
             if rotation == '':
@@ -518,7 +517,10 @@ class FigureLibrary():
         if not pos:
             pos = posdict[axis]
         
-        self.fig.text(pos[0], pos[1], self.texStr(text), ha = 'center', va = 'center',
+        if not usetex:
+            text= self.texStr(text)
+        
+        self.fig.text(pos[0], pos[1], text, ha = 'center', va = 'center',
                     fontsize = fsize, rotation = rotation)
         return
     
@@ -589,16 +591,20 @@ class FigureLibrary():
                     plt.ylim(ylim[0], ylim[1])
         return
 
-    def defaultPKAxesLabels(self, dim = 1):
-        if dim == 1:
+    def defaultAxesLabels(self, dtype = 1):
+        if dtype == 1:
             xlab = r'k (Mpc/h)$^{-1}$'
             ylab = r'P(k) (Mpc/h)$^{-3}$'
-        elif dim == 2:
-            xlab = r"kpar (h/Mpc)"
-            ylab = r"kper (h/Mpc)"
+        elif dtype == 2:
+            xlab = r"k_{\parallel} (h/Mpc)"
+            ylab = r"k_{\perp} (h/Mpc)"
+        elif dtype == 'slice':
+            xlab = 'x (Mpc/h)'
+            ylab = 'y (Mpc/h)'
         self.axisLabel(xlab, 'x')
         self.axisLabel(ylab, 'y')
         return
+
     
     def _getLimits(self, panel_exceptions = []):
         dim = self.dim

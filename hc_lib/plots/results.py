@@ -1,7 +1,6 @@
 import os
 import pickle as pkl
 import numpy as np
-from hc_lib.fields.field_super import ResultContainer
 
 class ResultLibrary():
 

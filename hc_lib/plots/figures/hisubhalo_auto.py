@@ -34,7 +34,7 @@ def redshiftR_spaceC_model(rlib, iprops, savePath = '', panel_length = 3, panel_
     flib.flushYAxisToData()
     flib.matchAxisLimits(which = 'x')
     flib.matchAxisLimits(which = 'y', panel_exceptions = dist_panels_idx_list)
-    flib.defaultPKAxesLabels()
+    flib.defaultAxesLabels()
     flib.axisLabel('P$_x$(k)/P$_v$(k)', 'y', pos = [1 - border/3/flib.figsize[1], 0.5], rotation = 270)
     flib.addLegend()
     flib.printIprops(iprops)
@@ -72,7 +72,7 @@ def modelR_spaceC_mas(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 
     flib.xLimAdjustToNyquist()
     flib.flushYAxisToData()
     flib.matchAxisLimits(which = 'both')
-    flib.defaultPKAxesLabels()
+    flib.defaultAxesLabels()
     flib.addLegend()
     flib.printIprops(iprops)
 
@@ -109,7 +109,7 @@ def modelR_spaceC_HI_res(rlib, iprops, savePath = '', panel_length = 3, panel_bt
     flib.xLimAdjustToNyquist()
     flib.flushYAxisToData()
     flib.matchAxisLimits(which = 'both')
-    flib.defaultPKAxesLabels()
+    flib.defaultAxesLabels()
     flib.addLegend()
     flib.printIprops(iprops)
 
