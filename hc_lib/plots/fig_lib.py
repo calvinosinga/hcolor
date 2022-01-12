@@ -11,6 +11,7 @@ class FigureLibrary():
         self.figArr = figArr
         self.panels = None
         self.dim = figArr.shape
+        print(self.dim)
         return
 
     def createFig(self, panel_length, panel_bt, xborder, yborder,
@@ -20,6 +21,7 @@ class FigureLibrary():
 
         if colorbar:
             ncols += 1
+        
         # border input can be either a list or single number
         if isinstance(xborder, float) or isinstance(xborder, int):
             xborder = [xborder, xborder]

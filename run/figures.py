@@ -19,12 +19,17 @@ def main():
     rlib = ResultLibrary()
     for OUTPATH in OUTPATHS:
         rlib.addResults(directory=OUTPATH)
+    
+    def printlib(pname):
+        print(rlib.getVals('pk',pname))
 
+    printlib('fieldname')
+    
 #    hiptlAuto(rlib)
-    galaxyAuto(rlib)
-    hisubhaloAuto(rlib)
-    ptlAuto(rlib)
-    vnAuto(rlib)
+#    galaxyAuto(rlib)
+#    hisubhaloAuto(rlib)
+#    ptlAuto(rlib)
+#    vnAuto(rlib)
     return
 
 # Do this part later
@@ -175,8 +180,7 @@ def hisubhaloAuto(rl):
     baseIncludeProps['grid_resolution'] = 800
     baseIncludeProps['HI_res'] = 'diemer'
     baseIncludeProps['is_auto'] = True
-    baseIncludeProps['mas'] = 'CICW'
-    baseIncludeProps['space'] = 'real'
+    
 
     ip = cc(baseIncludeProps)
     del ip['space']

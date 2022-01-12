@@ -61,7 +61,7 @@ def modelR_spaceC_mas(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 
     collabels = [i.capitalize() for i in collabels]
 
     flib = FigureLibrary(figArr)
-
+    
     flib.createFig(panel_length, panel_bt, border, border)
     flib.plotLines(panel_prop)
     flib.addRowLabels(rowlabels)
