@@ -91,7 +91,7 @@ def modelR_spaceC_HI_res(rlib, iprops, savePath = '', panel_length = 3, panel_bt
     """
     row_prop = 'model'
     column_prop = 'space'
-    panel_prop = 'mas'
+    panel_prop = 'HI_res'
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')

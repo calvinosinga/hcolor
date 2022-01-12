@@ -28,12 +28,12 @@ def main():
 
     printlib('fieldname')
     
-    hiptlAuto(rlib)
-    galaxyAuto(rlib)
-    hisubhaloAuto(rlib)
-    ptlAuto(rlib)
-    vnAuto(rlib)
-    HIAuto(rlib)
+    #hiptlAuto(rlib)
+    #galaxyAuto(rlib)
+    #hisubhaloAuto(rlib)
+    #ptlAuto(rlib)
+    #vnAuto(rlib)
+    #HIAuto(rlib)
     HI_galaxy_cross_power(rlib)
     HI_ptl_cross_power(rlib)
 
@@ -54,6 +54,7 @@ def HIAuto(rl):
     baseIncludeProps['axis'] = 0
     baseIncludeProps['grid_resolution'] = 800
     baseIncludeProps['is_auto'] = True
+    baseIncludeProps['is_hydrogen'] = True
 
     ip = cc(baseIncludeProps)
     HIFig.redshiftR_spaceC_fieldname(rl, ip, saveDirPath)
@@ -117,19 +118,15 @@ def hiptlAuto(rl):
 
     ip = cc(baseIncludeProps)
     ip['map'] = 'mass'
-    hiptlFig.redshiftR_spaceC_model(rl, ip, saveDirPath)
+    #hiptlFig.redshiftR_spaceC_model(rl, ip, saveDirPath)
      
     ip = cc(baseIncludeProps)
     ip['snapshot'] = 99
-    hiptlFig.modelR_spaceC_map(rl, ip, saveDirPath)
-    
-    ip = cc(baseIncludeProps)
-    ip['space'] = 'real'
-    hiptlFig.redshiftR_mapC_model(rl, ip, saveDirPath)
+    #hiptlFig.modelR_spaceC_map(rl, ip, saveDirPath)
 
     ip = cc(baseIncludeProps)
     ip['map'] = 'mass'
-    hiptlFig.redshiftR_modelC_space(rl, ip, saveDirPath)
+    #hiptlFig.redshiftR_modelC_space(rl, ip, saveDirPath)
 
     # ip = cc(baseIncludeProps)
     # ip['snapshot'] = 99
@@ -142,7 +139,7 @@ def hiptlAuto(rl):
     ip['map'] = 'mass'
     del ip['axis']
     ip['model'] = 'GD14'
-    hiptlFig.redshiftR_spaceC_axis(rl, ip, saveDirPath)
+    #hiptlFig.redshiftR_spaceC_axis(rl, ip, saveDirPath)
 
     ip = cc(baseIncludeProps)
     ip['model'] = 'GD14'
@@ -188,7 +185,7 @@ def galaxyAuto(rl):
     del ip['snapshot']
     del ip['space']
     del ip['color']
-    galFig.redshiftR_spaceC_color(rl, ip, saveDirPath)
+    #galFig.redshiftR_spaceC_color(rl, ip, saveDirPath)
     
     ip = cc(baseIncludeProps)
     #ip['fieldname'] = ['galaxy', 'galaxy_dust']
@@ -197,7 +194,7 @@ def galaxyAuto(rl):
     del ip['color']
     del ip['color_cut']
     del ip['space']
-    galFig.spaceR_colorC_species(rl, ip, saveDirPath)
+    #galFig.spaceR_colorC_species(rl, ip, saveDirPath)
 
     ip = cc(baseIncludeProps)
     #ip['fieldname'] = ['galaxy', 'galaxy_dust']
@@ -206,7 +203,7 @@ def galaxyAuto(rl):
     del ip['space']
     del ip['color']
     del ip['color_cut']
-    galFig.spaceR_colorC_mas(rl, ip, saveDirPath)
+    #galFig.spaceR_colorC_mas(rl, ip, saveDirPath)
 
     #ip = cc(baseIncludeProps)
     #ip['fieldname'] = ['galaxy', 'galaxy_dust']
@@ -257,14 +254,19 @@ def hisubhaloAuto(rl):
     baseIncludeProps['snapshot'] = 99
     baseIncludeProps['axis'] = 0
     baseIncludeProps['grid_resolution'] = 800
-    baseIncludeProps['HI_res'] = 'diemer'
+    #baseIncludeProps['HI_res'] = 'diemer'
     baseIncludeProps['is_auto'] = True
+    baseIncludeProps['space'] = 'real'
+    baseIncludeProps['mas']='CICW'
     
+    ip = {}
+    ip['fieldname'] = 'hisubhalo'
+    #rl.printLib(ip, 'pk')
 
     ip = cc(baseIncludeProps)
     del ip['space']
-    del ip['HI_res']
-    hisubFig.modelR_spaceC_HI_res(rl, ip, saveDirPath)
+    #del ip['HI_res']
+    #hisubFig.modelR_spaceC_HI_res(rl, ip, saveDirPath)
 
     ip = cc(baseIncludeProps)
     del ip['space']

@@ -148,11 +148,13 @@ def fieldnameR_colorC_color_cut(rlib, iprops, savePath = '', panel_length = 3, p
             rowlabels[r] = 'Dust Model'
 
     collabels = [i.capitalize() for i in collabels]
-    colcuts = rlib.getVals('pk', 'color_cut')
+    colcuts = rlib.getVals('pk', 'color_cut', iprops)
     linelabels = {}
     linests = {}
     for c in colcuts:
-        if '0' == c[0]:
+        if c is None:
+            continue
+        elif '0' == c[0]:
             linelabels[c] = 'g-r = %s'%c
             if '0.50' == c or '0.70' == c:
                 linests[c] = ':'
@@ -166,7 +168,7 @@ def fieldnameR_colorC_color_cut(rlib, iprops, savePath = '', panel_length = 3, p
 
     flib.createFig(panel_length, panel_bt, border, border)
     flib.plotLines(panel_prop, linelabels, linestyles=linests)
-    flib.addRowLabels(rowlabels[:-1])
+    flib.addRowLabels(rowlabels)
     flib.addColLabels(collabels[:-1])
     flib.logAxis('both')
 

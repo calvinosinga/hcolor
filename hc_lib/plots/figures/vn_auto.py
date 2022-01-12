@@ -56,7 +56,9 @@ def redshiftR_mapC_space(rlib, iprops, savePath = '', panel_length = 3, panel_bt
     row_prop = 'redshift'
     column_prop = 'map'
     panel_prop = 'space'
-
+    
+    print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
+    
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
     collabels = [i.capitalize() for i in collabels]
     rowlabels = [r'z=%.1f'%i for i in rowlabels]

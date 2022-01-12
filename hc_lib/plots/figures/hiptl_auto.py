@@ -419,7 +419,7 @@ def redshiftR_spaceC_slice(rlib, iprops, savePath = '', panel_length = 3, panel_
     flib.createFig(panel_length, panel_bt, border, border, False)
     flib.plotSlices()
 
-    flib.logNormColorbar()
+    
     flib.matchColorbarLimits()
     flib.assignColormaps(cmap_arr, under='w')
     flib.makeColorbars('Mass (M$_*$)')

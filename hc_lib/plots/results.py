@@ -1,6 +1,7 @@
 import os
 import pickle as pkl
 import numpy as np
+from collections.abc import Iterable
 
 class ResultLibrary():
 
@@ -75,15 +76,16 @@ class ResultLibrary():
                 forFig.append(r)
                 rowlab = r.getProp(rowp)
                 collab = r.getProp(colp)
-
+                
                 if not rowlab in rowLabels:
-                    rowLabels.append(rowlab)
+                    rowLabels.append(str(rowlab))
                 
                 if not collab in colLabels:
-                    colLabels.append(collab)
+                    colLabels.append(str(collab))
                 
         rowLabels.sort()
         colLabels.sort()
+
         nrows = len(rowLabels)
         ncols = len(colLabels)
 
@@ -101,7 +103,7 @@ class ResultLibrary():
                 figArr[i, j] = temp
         return figArr, rowLabels, colLabels
 
-    def getVals(self, result_type, propname):
+    def getVals(self, result_type, propname, include_props = None):
         """
         Returns all of the unique instances of that property within
         the ResultLibrary
@@ -109,12 +111,19 @@ class ResultLibrary():
         results = self._getResultType(result_type)
         vals = []
         for r in results:
-            if r.props[propname] not in vals:
-                vals.append(r.props[propname])
+            try:
+                if r.props[propname] not in vals:
+                    if include_props is None:
+                        vals.append(r.props[propname])
+                    elif r.matchProps(include_props):
+                        vals.append(r.props[propname])
+            except KeyError:
+                continue
+
         
         return vals
     
-    def printLib(self, result_type = ''):
+    def printLib(self, include_props, result_type = ''):
         print('######## RESULT LIBRARY #################\n')
         rts = ['pk', '2Dpk', 'xi', 'slice']
         rtitle = ['1D power spectra', '2D power spectra',
@@ -145,16 +154,11 @@ class ResultLibrary():
             res_list = self._getResultType(result_type)
 
             print('list of result names for %s:'%rdict[result_type])
-            rnames = []
+            
 
             for result in res_list:
-                fn = result.fieldname
-                sn = result.simname
-                ss = result.snapshot
-                ax = result.axis
-                greso = result.grid_resolution
-                rstr = '%s_%sB_%03dS_%dA_%dR'%(fn,sn,ss,ax,greso)
-                rnames.append(rstr)
-            print(rnames)
+                if result.matchProps(include_props):
+                    print(result.props)
+            
             print()
         return

@@ -30,8 +30,8 @@ def redshiftR_spaceC_fieldname(rlib, iprops, savePath = '', panel_length = 3, pa
     # combining the lines
     hiptl_models = getMolFracModelsPtl()
     hisub_models = getMolFracModelsGalHI()
-    flib.fillLines(hiptl_models, label='D18-Particle', color='blue')
-    flib.fillLines(hisub_models, label='D18-Subhalo', color='orange')
+    flib.fillLines(['hiptl'], label='D18-Particle', color='blue')
+    flib.fillLines(['hisubhalo'], label='D18-Subhalo', color='orange')
     flib.addRowLabels(rowlabels)
     flib.addColLabels(collabels)
     flib.logAxis('y', panel_exceptions = dist_panels_idx_list)

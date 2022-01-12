@@ -92,18 +92,24 @@ class FigureLibrary():
 
                 if labels is None:
                     l_lab = r_container.props[pprop]
+                elif not r_container.props[pprop] in labels:
+                    l_lab = r_container.props[pprop]
                 else:
                     l_lab = labels[r_container.props[pprop]]
 
                 if colors is None:
-                    l_c = default_color_cycle[r]
+                    l_c = default_color_cycle[r%len(default_color_cycle)]
+                elif not r_container.props[pprop] in colors:
+                    l_c = default_color_cycle[r%len(default_color_cycle)]
                 else:
-                    l_c = colors[r.props[pprop]]
+                    l_c = colors[r_container.props[pprop]]
 
                 if linestyles is None:    
                     l_ls = '-'
+                elif not r_container.props[pprop] in linestyles:
+                    l_ls = '-'
                 else:
-                    l_ls = linestyles[r.props[pprop]]
+                    l_ls = linestyles[r_container.props[pprop]]
                 
                 plt.plot(x, y, label = self.texStr(l_lab), color = l_c, 
                         linestyle = l_ls)
@@ -123,15 +129,21 @@ class FigureLibrary():
 
                 if labels is None:
                     l_lab = keys[r]
+                elif not keys[r] in labels:
+                    l_lab = keys[r] 
                 else:
                     l_lab = labels[keys[r]]
 
                 if colors is None:
-                    l_c = default_color_cycle[r]
+                    l_c = default_color_cycle[r%len(default_color_cycle)]
+                elif not keys[r] in colors:
+                    l_c = default_color_cycle[r%len(default_color_cycle)]
                 else:
                     l_c = colors[keys[r]]
 
                 if linestyles is None:    
+                    l_ls = '-'
+                elif not keys[r] in linestyles:
                     l_ls = '-'
                 else:
                     l_ls = linestyles[keys[r]]
@@ -187,16 +199,11 @@ class FigureLibrary():
                             else:
                                 ymin = np.minimum(ymin, temp)
                                 ymax = np.maximum(ymax, temp)
-                                if not xdata == l.get_xdata():
-                                    print('failed xdata check, not the same')
-                                    print(xdata)
-                                    print(l.get_xdata())
                             
                             # since this will now be included in the
                             # filled area, remove it from the plot
                             l.set_visible(False)
-                            
-                    
+                                                
                     # now make the plot
                     plt.fill_between(xdata, ymin, ymax, color=color, label=label,
                                 alpha = opacity)
@@ -208,32 +215,35 @@ class FigureLibrary():
         return
 
     def plotSlices(self):
-        slices = np.empty_like(self.figArr, dtype=object)
+        
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
                 p = self.panels[i][j]
 
-                if len(self.figArr[i, j]) == 1:
+                if not len(self.figArr[i, j]) == 1:
                     print('needs only one slice in order to plot...')
                 pslice = self.figArr[i, j][0]
 
                 plt.sca(p)
 
-                x, y, mass = pslice.getValues()
-                extent=(np.min(x), np.max(x), np.min(y), np.max(y))
-
+                mass, _, _ = pslice.getValues()
+                extent=(0, 110.7, 0, 110.7)
+                
+                # x_bound, y_bound, mass = pslice.getValues()
+                # extent=(x_bound[0], x_bound[1], y_bound[0], y_bound[1])
+                
                 im = plt.imshow(mass, extent=extent, origin='lower')
-                slices[i, j] = [im]
+                
 
         
-        self.plots = slices
+        
         return
     
     def plot2D(self, maxks = [5, 5]):
         
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
-                p = self.panels[i, j]
+                p = self.panels[i][j]
                 plt.sca(p)
                 # should only be one result in list
                 result = self.figArr[i, j][0]
@@ -242,7 +252,7 @@ class FigureLibrary():
                 kper = np.unique(kper)
                 paridx = np.where(kpar>maxks[0])[0][0]
                 peridx = np.where(kper>maxks[1])[0][0]
-
+                pk = np.reshape(pk, (len(kpar), len(kper)))
                 extent = (0,kpar[paridx-1],0,kper[peridx-1])
                 plt.imshow(pk[:paridx, :peridx], extent=extent, origin='lower')
                 
@@ -251,7 +261,7 @@ class FigureLibrary():
     def addContours(self, color = 'k', maxks = [5,5]):
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
-                p = self.panels[i, j]
+                p = self.panels[i][j]
                 plt.sca(p)
                 result = self.figArr[i, j][0]
 
@@ -261,6 +271,7 @@ class FigureLibrary():
                 paridx = np.where(kpar>maxks[0])[0][0]
                 peridx = np.where(kper>maxks[1])[0][0]
 
+                pk = np.reshape(pk, (len(kpar), len(kper)))
                 KPAR, KPER = np.meshgrid(kpar[:paridx], kper[:peridx])
 
                 if self.has_cbar_panel:
@@ -343,11 +354,13 @@ class FigureLibrary():
         return dist_idx_list
 
     # TODO: add variance
-    def makeColorbars(self, cbar_label = '', except_panels = []):
+    def makeColorbars(self, cbar_label = '', def_cmap = 'plasma',except_panels = []):
         if self.has_cbar_panel:
             self.matchColorbarLimits()
             self.logNormColorbar()
-            self.assignColormaps('plasma', under='w')
+            cmap_arr = np.empty(self.dim, dtype=object)
+            cmap_arr[:,:] = def_cmap
+            self.assignColormaps(cmap_arr, under='w')
             cbar = plt.colorbar(cax=self.cax)
             self.cax.set_aspect(8, anchor='W')
             cbar.set_label(cbar_label, rotation=270)
@@ -367,7 +380,7 @@ class FigureLibrary():
 
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
-                im = self.plots[i, j][0]
+                im = self.panels[i][j].get_images()[0]
                 ca = cmap_array[i, j]
                 if isinstance(ca, str):
                     cmap = copy.copy(mpl.cm.get_cmap(ca))
@@ -387,7 +400,7 @@ class FigureLibrary():
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
                 if (i, j) not in panel_exceptions:
-                    im = self.plots[i, j][0]
+                    im = self.panels[i][j].get_images()[0]
                     clim = im.get_clim()
                     if vlim:
                         im.set_norm(mpl.colors.LogNorm(vmin=vlim[0], vmax=vlim[1]))
@@ -402,15 +415,18 @@ class FigureLibrary():
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
                 if (i, j) not in panel_exceptions:
-                    im = self.plots[i, j][0]
-                    if vlim[0] > im.clim[0]: vlim[0]=im.clim[0] 
-                    if vlim[1] < im.clim[1]: vlim[1]=im.clim[1]
+                    im = self.panels[i][j].get_images()[0]
+                    cmin = im.norm.vmin
+                    cmax = im.norm.vmax
+                    if vlim[0] > cmin: vlim[0]=cmin 
+                    if vlim[1] < cmax: vlim[1]=cmax
                         
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
                 if (i, j) not in panel_exceptions:
-                    im = self.plots[i, j][0]
-                    im.set_clim(tuple(vlim))
+                    im = self.panels[i][j].get_images()[0]
+                    im.norm.vmin = vlim[0]
+                    im.norm.vmax = vlim[1]
 
         return
 
@@ -440,7 +456,7 @@ class FigureLibrary():
         return
     
     def removeYTickLabels(self, panel_exceptions = []):
-        if not panel_exceptions and isinstance():
+        if not panel_exceptions:
             panel_exceptions = self._defaultTickLabelPanelExceptions('y')
         self._removeTickLabels('y', panel_exceptions)
         return
@@ -596,8 +612,8 @@ class FigureLibrary():
             xlab = r'k (Mpc/h)$^{-1}$'
             ylab = r'P(k) (Mpc/h)$^{-3}$'
         elif dtype == 2:
-            xlab = r"k_{\parallel} (h/Mpc)"
-            ylab = r"k_{\perp} (h/Mpc)"
+            xlab = r"k$_{\parallel}$ (h/Mpc)"
+            ylab = r"k$_{\perp}$ (h/Mpc)"
         elif dtype == 'slice':
             xlab = 'x (Mpc/h)'
             ylab = 'y (Mpc/h)'
