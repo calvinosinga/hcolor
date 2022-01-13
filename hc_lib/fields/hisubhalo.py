@@ -30,9 +30,11 @@ class hisubhalo(Field):
     
     def getGridProps(self):
         models = getMolFracModelsGalHI()
-        mas = ['CIC', 'CICW']
+        # mas = ['CIC', 'CICW']
+        mas = ['CICW']
         spaces = ['redshift', 'real']
-        res = list(HIResolutionDefinitions().keys())
+        # res = list(HIResolutionDefinitions().keys())
+        res = ['diemer']
         grp = {}
         for m in models:
             for s in spaces:

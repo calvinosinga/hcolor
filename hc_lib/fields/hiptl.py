@@ -26,7 +26,8 @@ class hiptl(Field):
     
     def getGridProps(self):
         models = getMolFracModelsPtl()
-        mass_or_temp = ['mass', 'temp']
+        # mass_or_temp = ['mass', 'temp']
+        mass_or_temp = ['mass']
         spaces = ['redshift', 'real']
         grp = {}
         for s in spaces:

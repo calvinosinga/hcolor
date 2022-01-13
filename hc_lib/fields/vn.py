@@ -26,7 +26,8 @@ class vn(Field):
         return
     
     def getGridProps(self):
-        MorT = ['mass', 'temp']
+        # MorT = ['mass', 'temp']
+        MorT = ['mass']
         spaces = ['real', 'redshift']
         grp = {}
         for s in spaces:

@@ -95,9 +95,11 @@ class ResultContainer():
         failed_list = []
         for k,v in desired_props.items():
             self_val = self.getProp(k)
-
+            if not isinstance(v, list):
+                v = [v]
+            
             if self.props['is_auto']:
-                if self_val == v:
+                if self_val in v:
                     isMatch = (isMatch and True)
                 elif verbose:
                     failed_list.append([k, v, self_val])
