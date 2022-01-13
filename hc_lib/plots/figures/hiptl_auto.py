@@ -14,7 +14,7 @@ def redshiftR_spaceC_model(rlib, iprops, savePath = '', panel_length = 3, panel_
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
     rowlabels = [r'z=%.1f'%i for i in rowlabels]
-    collabels = [i.capitalize() for i in collabels]
+    collabels = [i.capitalize() + ' Space' for i in collabels]
 
     flib = FigureLibrary(figArr)
     # add distortion panels
@@ -432,7 +432,7 @@ def redshiftR_spaceC_slice(rlib, iprops, savePath = '', panel_length = 3, panel_
     
     
     if not savePath == '':
-        flib.saveFig(savePath, row_prop, column_prop, '2D')
+        flib.saveFig(savePath, row_prop, column_prop, 'slice')
         return None
     else:
         return flib    

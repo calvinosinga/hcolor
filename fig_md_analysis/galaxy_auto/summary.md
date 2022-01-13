@@ -14,11 +14,7 @@ This shows how the real and redshift-space power spectra of the blue and red gal
 
 I am unsure as to why blue galaxies would experience a stronger Kaiser Effect, but it makes sense that red galaxies experience a stronger fingers-of-god effect since there should be a larger range of velocities for virialized matter in the larger red galaxies. I am also curious as to why the k at which the distortions from the fingers-of-god effect are the strongest would be around k ~ 1 h/Mpc.
 
-### Cosmetic Issues:
-- change legend labels to Blue Galaxies, Red Galaxies
-- change the colors of the power spectrum to match the galaxies' colors
-- underscores are in the y-axis label
-- mathrm the letters in subscripts on leftside y-axis label
+<img src='redshiftR_colorC_space.png'>
 
 ### Further Investigation
 - Why do blue galaxies experience a stronger Kaiser Effect?
@@ -26,30 +22,30 @@ I am unsure as to why blue galaxies would experience a stronger Kaiser Effect, b
 
 # Dust Sensitivity
 
+## 
 <img src='redshiftR_colorC_fieldname.png'>
 
-Shows how sensitive the power spectra for the galaxies are to excluding dust from the calculation. Including dust tends to make galaxies appear more red than they actually are, which is why both the red and blue power spectra see less clustering. The red population is infected by previously classified 'blue' galaxies, which would be its most isolated subgroup, bringing the clustering of the whole population down. Whereas, the blue populations become more blue than before by removing more of their fringe cases.
+Shows how sensitive the power spectra for the galaxies are to excluding dust from the calculation at different redshifts. Including dust tends to make galaxies appear more red than they actually are, which is why both the red and blue power spectra see less clustering. The red population is infected by previously classified 'blue' galaxies, which would be its most isolated subgroup, bringing the clustering of the whole population down. Whereas, the blue populations become more blue than before by removing more of their fringe cases.
 
 In both cases, it is evident that dust has a small effect on the power spectrum as a whole. The behavior of the power spectrum does not change due to dust. A small vertical translation happens in both red and blue galaxies, which I estimate to only reduce their power by less than a factor of 2 at all scales, and even less than that at most k.
 
-### Cosmetic Issues:
-- remove the distortion panels
-- change legend to Fiducial, With Dust
-- repeat this plot but with different line of sights
+<img src='axisR_colorC_fieldname.png'>
+
+After I run this with different lines of sight, will show whether there's any dependency on the relationship between galaxy and galaxy-dust.
+
+### Cosmetics
+- capitalize the row label
+
+### Further Investigation:
 - confirm the magnitude of the vertical translation
 
 # Particle Species
 
-<img src='fieldnameR_colorC_species.png'>
+<img src='spaceR_colorC_species.png'>
 
 This plot shows how excluding gas, dark matter and black holes affect the clustering of the red and blue galaxies in real-space for both cases with and without a dust prescription. If we use all mass, we see much stronger clustering on smaller scales with negligible differences on larger scales. My initial guess is that there might be a lot of smaller dark matter dominated halos as satellites that add power at high k as compared to just stellar mass.
 
 In terms of the shapes, the total mass for blue galaxies doesn't make a ton of sense. At high k, it has an oscillating shape and it's not clear why that is the case. Waves like this arise from delta functions in the position space, so maybe there is some characteristic separation that contributes a bunch of mass at these scales? Unsure if it's worth looking into.
-
-### Cosmetic Issues:
-- Change the row labels to 'Fiducial', 'With Dust'
-- Change the legend to Stellar, All
-- Remove galaxy_dust
 
 ### Further Investigation
 - Why do the blue galaxies' all mass have the strange oscillations?
@@ -62,20 +58,14 @@ In terms of the shapes, the total mass for blue galaxies doesn't make a ton of s
 
 Shows the sensitivity of the clustering to the color cut used. Red is extremely insensitive in its behavior, only resulting in vertical translations that are likely due to the changing sample size. Blue galaxies get small changes in behavior at the largest k values, but mostly see similar types of changes.
 
-### Cosmetic Issues
-- Change the linestyles to make the plots a bit less busy
-- Change the linewidths - make the fidicial one more thicc
-- Remove the resolved column
-- Change the row labels to 'Fiducial', and 'With Dust'
-- Change the names of the lines to g-r = and D18
-
 ### Further Investigation
 - Add histograms to this section
 - In the blue galaxies, at the smaller g-r thresholds, the oscillations manifest again
+- Galaxy_dust the fiducial cut is not straddled by outside thresholds
 
 # Mass Assignment Scheme
 
-<img src='fieldnameR_colorC_mas.png'>
+<img src='spaceR_colorC_mas.png'>
 
 This plot compares the effect of using a mass-weighted assignment scheme as compared to a number density-weighted assignment scheme. I did this plot because Papastergis did not weight the clustering based on mass (as far as I can tell), so it would be important to understand the difference between the two.
 
@@ -83,10 +73,6 @@ Blue galaxies with CIC have a steeper depencency on k. My reasoning is that we r
 
 Red galaxies have a much stranger shape when using CIC. On large distances, red looks about the same using either number or mass density, and then transitions around k~2 h/Mpc, corresponding to d ~ 3 Mpc/h or about the size of the Local Group. I make sense of this in this way: the same locations where red galaxies contribute a lot of large-scale power in the mass-weighted scheme will also be where clusters of galaxies lie. This means that the cluster of red galaxies "replaces" the contribution of the massive central. Within clusters, the same reasoning outlined in the blue galaxies paragraph should apply.
 
-### Cosmetic Issues
-- Remove galaxy_dust, I don't think anything should really change between them.
-- Change figure to be colorR_spaceC_mas
-- Add resolved as well
 
 ### Further Investigation
 - Does Papastergis13 explain why they chose to weight it this way?

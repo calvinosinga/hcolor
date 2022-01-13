@@ -205,7 +205,7 @@ class Field():
                 mid = int(dim/2)
             slc = np.log10(np.sum(arr[:, mid-slcidx:mid+slcidx, :], axis=(self.axis+1)%3))
             runtime = time.time()-start
-            rc = ResultContainer(self, grid_props, runtime, slc)
+            rc = ResultContainer(self, grid_props, runtime, [0, self.box], [0, self.box], slc)
             self.slices.append(rc)
         return
     

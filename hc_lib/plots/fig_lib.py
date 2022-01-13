@@ -577,33 +577,40 @@ class FigureLibrary():
         self.matchAxisLimits(which='x', panel_exceptions=panel_exceptions)
         return
     
-    def flushYAxisToData(self, result_type = 'pk'):
+    def flushYAxisToData(self, result_type = 'pk', except_panels = []):
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
-                p = self.panels[i][j]
-                ylim = [np.inf, -np.inf]
-                plt.sca(p)
-                res_container_list = self.figArr[i, j]
-                xmin, xmax = plt.xlim()
+                if (i, j) not in except_panels:
+                    p = self.panels[i][j]
+                    ylim = [np.inf, -np.inf]
+                    plt.sca(p)
+                    res_container_list = self.figArr[i, j]
+                    xmin, xmax = plt.xlim()
 
-                if result_type == 'pk':
-                    for r in res_container_list:
-                        if not isinstance(res_container_list, dict):
-                            wavenum, pk, z = r.getValues()
-                        else:
-                            wavenum = res_container_list[r][0]
-                            pk = res_container_list[r][1]
+                    if result_type == 'pk':
+                        for r in res_container_list:
+                            if not isinstance(res_container_list, dict):
+                                wavenum, pk, z = r.getValues()
+                            else:
+                                wavenum = res_container_list[r][0]
+                                pk = res_container_list[r][1]
 
-                        max_idx = np.argmax(wavenum > xmax)
-                        min_idx = np.argmax(wavenum < xmin)
-                        
-                        ymin = np.min(pk[min_idx:max_idx])
-                        ymax = np.max(pk[min_idx:max_idx])
-                        
-                        if ymin < ylim[0]:
-                            ylim[0] = ymin
-                        if ymax > ylim[1]:
-                            ylim[1] = ymax
+                            max_idx = np.argmax(wavenum > xmax)
+                            min_idx = np.argmax(wavenum < xmin)
+                            
+                            ymin = np.min(pk[min_idx:max_idx])
+                            ymax = np.max(pk[min_idx:max_idx])
+                            
+                            if ymin < ylim[0]:
+                                ylim[0] = ymin
+                            if ymax > ylim[1]:
+                                ylim[1] = ymax
+        
+        for i in range(self.dim[0]):
+            for j in range(self.dim[1]):
+                if (i, j) not in except_panels:
+                    p = self.panels[i][j]
+                    plt.sca(p)
                     plt.ylim(ylim[0], ylim[1])
         return
 

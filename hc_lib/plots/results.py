@@ -103,6 +103,19 @@ class ResultLibrary():
                 figArr[i, j] = temp
         return figArr, rowLabels, colLabels
 
+    def removeResults(self, figArr, include_dict):
+        dim = figArr.shape
+        for i in range(dim[0]):
+            for j in range(dim[1]):
+                rpanel = figArr[i, j]
+                for r in rpanel:
+                    for prop in include_dict:
+                        if not r.getProp(prop) in include_dict[prop]:
+                            rpanel.remove(r)
+                figArr[i, j] = rpanel
+
+        return figArr
+    
     def getVals(self, result_type, propname, include_props = None):
         """
         Returns all of the unique instances of that property within

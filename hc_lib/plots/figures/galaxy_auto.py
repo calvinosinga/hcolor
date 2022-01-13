@@ -12,10 +12,13 @@ def redshiftR_spaceC_color(rlib, iprops, savePath = '', panel_length = 3, panel_
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
+
+    only_props = {'color_cut':[None, '0.60']}
+    figArr = rlib.removeResults(figArr, only_props)
     rowlabels = [r'z=%.1f'%i for i in rowlabels]
     collabels = [i.capitalize() for i in collabels]
-    linelabels = {'blue' : 'Blue Galaxies', 'red' : 'Red Galaxies'}
-    colors = {'blue':'blue', 'red':'red'}
+    linelabels = {'blue' : 'Blue Galaxies', 'red' : 'Red Galaxies', 'resolved':'All Galaxies'}
+    colors = {'blue':'blue', 'red':'red', 'resolved':'green'}
     #print(figArr.shape)
     flib = FigureLibrary(figArr)
     # add distortion panels
@@ -51,6 +54,54 @@ def redshiftR_spaceC_color(rlib, iprops, savePath = '', panel_length = 3, panel_
     else:
         return flib
 
+def redshiftR_colorC_space(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 1,
+            border = 1):
+    """
+    Basic plot, shows how the pk of the red and blue galaxies change over time in both redshift
+    and real space.
+    """
+    row_prop = 'redshift'
+    column_prop = 'color'
+    panel_prop = 'space'
+    
+    print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
+    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
+    rowlabels = [r'z=%.1f'%i for i in rowlabels]
+    collabels = [i.capitalize() for i in collabels]
+    collabels = ['Resolved' if x == 'resolved' else x for x in collabels]
+    collabels = [i + ' Galaxies' for i in collabels]
+
+    linelabels = {'real':'Real Space', 'redshift':'Redshift Space'}
+    linecolors = {'real':'blue', 'redshift':'red'}
+    only_props = {'color_cut':[None, '0.60']}
+    figArr = rlib.removeResults(figArr, only_props)
+    #print(figArr.shape)
+    flib = FigureLibrary(figArr)
+    # add distortion panels
+
+    flib.createFig(panel_length, panel_bt, border, border)
+    flib.plotLines(panel_prop, linelabels, linecolors)
+    flib.addRowLabels(rowlabels)
+    flib.addColLabels(collabels)
+    flib.logAxis('both')
+
+    flib.changeTickDirection()
+    flib.removeDefaultTickLabels()
+    flib.xLimAdjustToNyquist()
+    flib.flushYAxisToData()
+    flib.matchAxisLimits()
+    flib.defaultAxesLabels()
+    flib.addLegend()
+    flib.printIprops(iprops)
+
+    # if savefig, then save it, otherwise return it
+
+    if not savePath == '':
+        flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+        return
+    else:
+        return flib
+
 def spaceR_colorC_species(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
             border = 1):
     """
@@ -62,10 +113,11 @@ def spaceR_colorC_species(rlib, iprops, savePath = '', panel_length = 3, panel_b
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
-    collabels = [i.capitalize() for i in collabels]
-    rowlabels = [i.capitalize() for i in rowlabels]
+    collabels = [i.capitalize() + ' Galaxies' for i in collabels]
+    rowlabels = [i.capitalize() + ' Space' for i in rowlabels]
     linelabels = {'stmass':'Stellar Particles', 'total':'All Particles'}
-
+    only_props = {'color_cut':[None, '0.60']}
+    figArr = rlib.removeResults(figArr, only_props)
     flib = FigureLibrary(figArr)
 
     flib.createFig(panel_length, panel_bt, border, border)
@@ -102,8 +154,11 @@ def spaceR_colorC_mas(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
-    collabels = [i.capitalize() for i in collabels]
-    rowlabels = [i.capitalize() for i in rowlabels]
+    collabels = [i.capitalize() + ' Galaxies' for i in collabels]
+    rowlabels = [i.capitalize() + ' Space' for i in rowlabels]
+
+    only_props = {'color_cut':[None, '0.60']}
+    figArr = rlib.removeResults(figArr, only_props)
     flib = FigureLibrary(figArr)
 
     flib.createFig(panel_length, panel_bt, border, border)
@@ -129,7 +184,6 @@ def spaceR_colorC_mas(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 
     else:
         return flib
     
-
 def fieldnameR_colorC_color_cut(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
             border = 1):
     """
@@ -147,7 +201,7 @@ def fieldnameR_colorC_color_cut(rlib, iprops, savePath = '', panel_length = 3, p
         if rowlabels[r] == 'galaxy_dust':
             rowlabels[r] = 'Dust Model'
 
-    collabels = [i.capitalize() for i in collabels]
+    collabels = [i.capitalize() + ' Galaxies' for i in collabels]
     colcuts = rlib.getVals('pk', 'color_cut', iprops)
     linelabels = {}
     linests = {}
@@ -200,7 +254,7 @@ def redshiftR_colorC_fieldname(rlib, iprops, savePath = '', panel_length = 3, pa
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
-    collabels = [i.capitalize() for i in collabels]
+    collabels = [i.capitalize() + ' Galaxies' for i in collabels]
     rowlabels = [r'z=%.1f'%i for i in rowlabels]
     linelabels = {'galaxy_dust':'Dust Model', 'galaxy':'Fiducial'}
     linestyles = {'galaxy_dust':'--', 'galaxy':'-'}
@@ -241,8 +295,8 @@ def axisR_colorC_fieldname(rlib, iprops, savePath = '', panel_length = 3, panel_
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
-    collabels = [i.capitalize() for i in collabels]
-    rowlabels = [r'axis=%d'%i for i in rowlabels]
+    collabels = [i.capitalize() + ' Galaxies' for i in collabels]
+    rowlabels = [r'Axis=%d'%i for i in rowlabels]
     linelabels = {'galaxy_dust':'Dust Model', 'galaxy':'Fiducial'}
     linestyles = {'galaxy_dust':'--', 'galaxy':'-'}
     flib = FigureLibrary(figArr)
