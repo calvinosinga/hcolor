@@ -15,11 +15,9 @@ if gd['verbose']:
 
 INGRIDKEY1 = sys.argv[1]
 INGRIDKEY2 = sys.argv[2]
-PLOTDIRKEY = sys.argv[3]
 
 INGRIDPATH1 = gd['grids'] + gd[INGRIDKEY1]
 INGRIDPATH2 = gd['grids']+ gd[INGRIDKEY2]
-PLOTDIR = gd[PLOTDIRKEY]
 
 pkl_paths = []
 gridpaths = []
@@ -41,7 +39,6 @@ if gd['verbose']:
     print('The first ingrid path:%s'%INGRIDPATH1)
     print('The second ingrid path:%s'%INGRIDPATH2)
     print('The outfile path:%s'%OUTFILEPATH)
-    print('The plots path:%s'%PLOTDIR)
 
 res = Cross(field1, field2, gridpaths[0], gridpaths[1])
 res.computeXpks()

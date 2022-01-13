@@ -64,16 +64,13 @@ class IODict():
         create_subdirectory("sbatch")
         create_subdirectory("sbatch/logs")
         create_subdirectory("results")
-        create_subdirectory("results/plots")
 
         for i in self.runs:
-            create_subdirectory("results/plots/"+i, 1)
             create_subdirectory("sbatch/logs/"+i, 2)
         return
 
     def getGlobalDict(self):
         gd = copy.copy(self.input_dict)
-        gd['plots'] = self.path_dict['plots']
         gd['grids'] = self.path_dict['grids']
         for i in self.runs:
             k = i+'_plots'

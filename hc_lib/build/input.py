@@ -61,7 +61,7 @@ class Input():
                 print("resolution given is not an integer \n")
             else:
                 compatible = True
-        rp['res'] = res
+        rp['res'] = res        
         return rp
 
     def getFields(self):

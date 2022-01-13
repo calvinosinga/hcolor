@@ -54,41 +54,65 @@ class ResultContainer():
 
     def addCrossedField(self, other_rc):
         temp = {}
-        for k,v in self.props.items():
-            skip = ['is_auto']
+        oprop = other_rc.props
+        skip = ['is_auto']
+        for k,v in oprop.items():
+            self_val = self.getProp(k)
+
             if not k in skip:
-                othprop = other_rc.getProp(k)
-                if v == othprop:
-                    temp[k] = v
+                if self_val is None:
+                    temp[k] = [v]
                 else:
-                    temp[k] = [v, othprop]
+                    temp[k] = [v, self_val]
+        
+        for k,v in self.props:
+            if not k in temp:
+                temp[k] = [v]
+
         self.props = temp
         self.props['is_auto'] = False
         return
 
     def getProp(self, prop_key):
         try:
-            return self.props[prop_key]
+            v = self.props[prop_key]
+            if self.props['is_auto']:
+                return v
+            elif len(v) == 1:
+                return v[0]
+            else:
+                return v
+                
         except KeyError:
             return None
     
-    def matchProps(self, desired_props):
+    def matchProps(self, desired_props, verbose=False):
+        """
+        a match is defined to be when each of the desired props is equal
+        to the value in self.props when auto, otherwise is in the list.
+        """
         isMatch = True
+        failed_list = []
         for k,v in desired_props.items():
             self_val = self.getProp(k)
 
-            if isinstance(v, list) and isinstance(self_val, list):
-                matchone = v[0] == self_val[0] and v[1] == self_val[1]
-                matchtwo = v[0] == self_val[1] and v[1] == self_val[0]
-                isMatch = (isMatch and (matchone or matchtwo))
-            elif isinstance(self_val, list):
-                isMatch = (isMatch and v in self_val)
+            if self.props['is_auto']:
+                if self_val == v:
+                    isMatch = (isMatch and True)
+                elif verbose:
+                    failed_list.append([k, v, self_val])
             else:
-                isMatch = (isMatch and v == self_val)
+                if v in self_val:
+                    isMatch = (isMatch and True)
+                elif verbose:
+                    failed_list.append([k, v, self_val])
 
+        if verbose:
+            print('Match Failed:')
+            print(failed_list)
 
         return isMatch
-    
+                
     def addProp(self, key, val):
         self.props[key] = val
         return
@@ -416,7 +440,7 @@ class Cross():
                 if is_compatible and for_xi:
                     grid1 = Grid.loadGrid(gf1[k1])
                     grid2 = Grid.loadGrid(gf2[k2])
-                    self._xxi(grid1, grid2, gp1, gp2)
+                    # self._xxi(grid1, grid2, gp1, gp2)
         return
     
     def _xxi(self, grid1, grid2, gp1, gp2):
