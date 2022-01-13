@@ -72,9 +72,6 @@ class IODict():
     def getGlobalDict(self):
         gd = copy.copy(self.input_dict)
         gd['grids'] = self.path_dict['grids']
-        for i in self.runs:
-            k = i+'_plots'
-            gd[k] = self.path_dict[k]
         return gd
     
     def getInputDict(self):
