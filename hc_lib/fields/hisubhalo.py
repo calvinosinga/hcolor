@@ -124,6 +124,23 @@ class h2subhalo(hisubhalo):
                 shcatpath, hih2filepath, 'h2subhalo')
         return
     
+    def getGridProps(self):
+        models = getMolFracModelsGalH2()
+        # mas = ['CIC', 'CICW']
+        mas = ['CICW']
+        spaces = ['redshift', 'real']
+        # res = list(HIResolutionDefinitions().keys())
+        res = ['diemer']
+        grp = {}
+        for m in models:
+            for s in spaces:
+                for r in res:
+                    for M in mas:
+                        gp = hisubhalo_grid_props(M, self.fieldname, s, m, r)
+                        if gp.isIncluded():
+                            grp[gp.getH5DsetName()] = gp
+        return grp
+    
     def computeGrids(self, outfile):
         super().setupGrids(outfile)
 

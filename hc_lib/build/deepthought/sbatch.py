@@ -48,7 +48,7 @@ class Sbatch():
         return varnames, sbatches, dependencies, savefiles
     
     @staticmethod
-    def makeCrossSbatch(first_sbatch, second_sbatch, plotkey):
+    def makeCrossSbatch(first_sbatch, second_sbatch):
         fn1 = first_sbatch.fieldname
         fn2 = second_sbatch.fieldname
 
@@ -69,7 +69,7 @@ class Sbatch():
         crossdir['mem-per-cpu'] = first_sbatch._compute_xpk_memory()
         first_sbatch._sbatch_lines(crossjob, crossdir)
 
-        cmd_args = [first_sbatch.cross_path, last_jobs[0], last_jobs[1], plotkey]
+        cmd_args = [first_sbatch.cross_path, last_jobs[0], last_jobs[1]]
         
         first_sbatch._write_python_line(crossjob, cmd_args)
 
@@ -184,7 +184,7 @@ class Sbatch():
         resdir['mem-per-cpu'] = self._compute_pk_memory()
         self._sbatch_lines(resjob, resdir)
 
-        cmd_args = [self.auto_results_path, dependencies[auto_var_name][0], self.plots_key]
+        cmd_args = [self.auto_results_path, dependencies[auto_var_name][0]]
         self._write_python_line(resjob, cmd_args)
 
         resjob.close()
@@ -251,8 +251,6 @@ class Sbatch():
         self.combine_path = gd['combine']
         self.simpath = gd["load_header"]
         self.auto_results_path = gd["auto_result"]
-        self.plot_path = gd['plots'] + self.fieldname+'/'
-        self.plots_key = self.fieldname + '_plots'
         return
     
     def _default_cmd_line(self, name):

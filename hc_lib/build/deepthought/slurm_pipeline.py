@@ -54,11 +54,7 @@ for i in range(len(fields)):
         galXgal = (fn1 == 'galaxy' and fn2 == 'galaxy') or (fn1 == 'galaxy_dust' \
                 and fn2 == 'galaxy_dust')
         if (ioobj.isHyd(fn1) and ioobj.isMat(fn2)) or galXgal:
-            xplotpath = pd['plots'] + '%sX%s/'%(fn1,fn2)
-            os.mkdir(xplotpath)
-            xplotkey = '%sX%s_plots'%(fn1,fn2)
-            gd[xplotkey]=xplotpath
-            cvar, csb, cdep, csave = Sbatch.makeCrossSbatch(fields[i], fields[j], xplotkey)
+            cvar, csb, cdep, csave = Sbatch.makeCrossSbatch(fields[i], fields[j])
             jobnames.extend(csb)
             dependencies.update(cdep)
             varnames.extend(cvar)
