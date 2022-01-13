@@ -42,7 +42,7 @@ class galaxy(Field):
         colordefs = galaxyColorDefs()
         mass_type = ['stmass', 'total']
         # MAS_type = ['CIC','CICW']
-        MAS_type = ['CIC']
+        MAS_type = ['CICW']
         spaces = ['redshift', 'real']
         gridnames = {}
 

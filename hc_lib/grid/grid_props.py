@@ -199,7 +199,7 @@ class galaxy_grid_props(grid_props):
 
 class hiptl_grid_props(grid_props):
 
-    def __init__(self, mas, field, space, model, mass_or_temp = None, nH = None):
+    def __init__(self, mas, field, space, model, mass_or_temp, nH = None):
         other = {}
         other['map'] = mass_or_temp
         other['model'] = model
@@ -242,12 +242,12 @@ class hiptl_grid_props(grid_props):
             # if a mass map, it is either diemer
             elif op['gal_res'] == 'diemer':
                 # the important color definitions
-                cols = ['0.60', '0.55', '0.65', 'visual_inspection']
+                # cols = ['0.60', '0.55', '0.65', 'visual_inspection']
 
                 # also include resolved
                 is_resolved = op['color'] == 'resolved'
 
-                return op['color_cut'] in cols or is_resolved
+                return op['color_cut'] == '0.60' or is_resolved
             
             # ignore all papa resdefs -> hisubhalo is more comparable
             elif op['gal_res'] == 'papastergis_SDSS':
@@ -323,9 +323,9 @@ class hisubhalo_grid_props(grid_props):
             
             # if diemer resdef, include certain color definitions and resolved definition
             elif op['gal_res'] == 'diemer':
-                cdefs = ['0.55','0.60','0.65', 'visual_inspection']
+                # cdefs = ['0.55','0.60','0.65', 'visual_inspection']
                 is_resolved = op['color'] == 'resolved'
-                return op['color_cut'] in cdefs or is_resolved
+                return op['color_cut'] in '0.60' or is_resolved
             
             # don't include other observational stuff temporarily
             elif op['gal_res'] == 'wolz_eBOSS_ELG':
@@ -346,13 +346,13 @@ class hisubhalo_grid_props(grid_props):
             
             return False
         
-        elif op['fieldname'] == 'ptl':
-            if sp['fieldname'] == 'hisubhalo':
-                models = rl.getMolFracModelsGalHI()
-            elif sp['fieldname'] == 'h2subhalo':
-                models = rl.getMolFracModelsGalH2()
+        # elif op['fieldname'] == 'ptl':
+        #     if sp['fieldname'] == 'hisubhalo':
+        #         models = rl.getMolFracModelsGalHI()
+        #     elif sp['fieldname'] == 'h2subhalo':
+        #         models = rl.getMolFracModelsGalH2()
             
-            return sp['model'] == models[0] # compute cross power with just one
+        #     return sp['model'] == models[0] # compute cross power with just one
         return True
 
 #############################################################################################################
@@ -417,12 +417,12 @@ class vn_grid_props(grid_props):
             # if a mass map, it is either diemer or papa
             elif op['gal_res'] == 'diemer':
                 # the important color definitions
-                cols = ['0.60', '0.55', '0.65', 'visual_inspection']
+                # cols = ['0.60', '0.55', '0.65', 'visual_inspection']
 
                 # also include resolved
                 is_resolved = op['color'] == 'resolved'
 
-                return op['color_cut'] in cols or is_resolved
+                return op['color_cut'] == '0.60' or is_resolved
             
             # ignore all papa resdefs -> hisubhalo is more comparable
             elif op['gal_res'] == 'papastergis_SDSS':
