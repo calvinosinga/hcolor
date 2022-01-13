@@ -5,7 +5,7 @@ import sys
 import os
 import pickle
 import h5py as hp
-from hc_lib.fields.hiptl import hiptl, hiptl_nH, h2ptl
+from hc_lib.fields.hiptl import hiptl, h2ptl
 from hc_lib.fields.hisubhalo import hisubhalo, h2subhalo
 from hc_lib.fields.vn import vn
 

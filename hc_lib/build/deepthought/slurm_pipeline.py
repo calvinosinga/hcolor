@@ -51,8 +51,7 @@ for i in range(len(fields)):
     for j in range(len(fields)):
         fn1 = fields[i].fieldname
         fn2 = fields[j].fieldname
-        galXgal = (fn1 == 'galaxy' and fn2 == 'galaxy') or (fn1 == 'galaxy_dust' \
-                and fn2 == 'galaxy_dust')
+        galXgal = (fn1 == 'galaxy' and fn2 == 'galaxy')
         if (ioobj.isHyd(fn1) and ioobj.isMat(fn2)) or galXgal:
             cvar, csb, cdep, csave = Sbatch.makeCrossSbatch(fields[i], fields[j])
             jobnames.extend(csb)
