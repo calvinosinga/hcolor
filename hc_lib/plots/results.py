@@ -35,8 +35,8 @@ class ResultLibrary():
                 self.pks.extend(obj.getPks())
                 self.xis.extend(obj.getXis())
                 self.tdpks.extend(obj.get2Dpks())
-                #if 'galaxy' == obj.fieldname:
-                    #self.hists.extend(obj.hists)
+                if 'galaxy' in obj.fieldname:
+                    self.hists.extend(obj.hists)
 
         elif not pkl_file == '':
             obj = pkl.load(open(pkl_file, 'rb'))
@@ -60,7 +60,7 @@ class ResultLibrary():
             raise ValueError('unsupported result type given')
         return result
 
-    def organizeFigure(self, includep, rowp, colp, result_type):
+    def organizeFigure(self, includep, rowp, colp, result_type, check = None):
         """
         includep is dict that stores a property and the value that it should have.
         rowp is the property that separates each row
@@ -101,8 +101,33 @@ class ResultLibrary():
                     if rowres == rowLabels[i] and colres == colLabels[j]:
                         temp.append(forFig[f])
                 figArr[i, j] = temp
+        
+        if not check is None:
+            self._checkPanel(figArr[check[0], check[1]], includep, rowp, colp)
         return figArr, rowLabels, colLabels
 
+    def _checkPanel(self, results, includep, rowp, colp):
+        
+        vals = {}
+        for rc in results:
+            rprops = rc.props
+            for k,v in rprops.items():
+                not_include = not k in includep
+                not_row_col = not (k == rowp or k == colp)
+                if not_include and not_row_col:
+                    if not k in vals:
+                        vals[k] = [v]
+                    else:
+                        vals[k].append(v)
+                
+        for v in vals:
+            if len(vals[v]) > 1:
+                print('more than one value for prop %s'%v)
+                print(vals[v])
+                print()
+                    
+        return
+        
     def removeResults(self, figArr, include_dict):
         dim = figArr.shape
         for i in range(dim[0]):

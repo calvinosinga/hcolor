@@ -11,7 +11,6 @@ class FigureLibrary():
         self.figArr = figArr
         self.panels = None
         self.dim = figArr.shape
-        print(self.dim)
         return
 
     def createFig(self, panel_length, panel_bt, xborder, yborder,

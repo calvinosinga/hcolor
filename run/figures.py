@@ -28,12 +28,12 @@ def main():
 
     printlib('fieldname')
     
-    #hiptlAuto(rlib)
-    #galaxyAuto(rlib)
-    #hisubhaloAuto(rlib)
-    #ptlAuto(rlib)
-    #vnAuto(rlib)
-    #HIAuto(rlib)
+    hiptlAuto(rlib)
+    galaxyAuto(rlib)
+    hisubhaloAuto(rlib)
+    ptlAuto(rlib)
+    vnAuto(rlib)
+    HIAuto(rlib)
     HI_galaxy_cross_power(rlib)
     HI_ptl_cross_power(rlib)
 
