@@ -181,6 +181,7 @@ class galaxy(Field):
         return super().setupGrids(outfile)
         
     def make_gr_stmass(self, grid_props, gr, stmass):
+        gp = grid_props.props
         start = time.time()
         stmass = np.ma.masked_equal(stmass, 0)
         gr_stmass = np.histogram2d(np.log10(stmass), gr, bins=50)
@@ -188,7 +189,7 @@ class galaxy(Field):
         rc = ResultContainer(self, grid_props, runtime, gr_stmass[1],
                     yvalues=gr_stmass[2], zvalues=gr_stmass[0])
         self.hists.append(rc)
-        self.hists_done.append(grid_props['gal_res'])
+        self.hists_done.append(gp['gal_res'])
         return
     
     def make_gi_r(self, gi, r):

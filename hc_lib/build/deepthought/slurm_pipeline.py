@@ -7,7 +7,7 @@ from hc_lib.build.deepthought.sbatch import Sbatch
 
 OUT_PATH = '/lustre/cosinga/hcolor/output/'
 TNG_PATH = '/lustre/cosinga/'
-HIH2 = '/lustre/diemer/illustris/hih2/'
+#HIH2 = '/lustre/cosinga/tng100/'
 HCOLOR = '/lustre/cosinga/hcolor/'
 
 tng_dict = {'tng100':'tng100'}
@@ -17,7 +17,7 @@ runs = ioobj.getRuns()
 TNG_PATH += tng_dict[rp['sim']] + '/'
 gdobj = IODict(rp, runs, OUT_PATH, TNG_PATH, HCOLOR)
 #the hih2 particles are in Benedikt's lustre directory
-gdobj.add('hih2ptl', HIH2 + "hih2_particles_%03d"%rp['snap'] + ".%d.hdf5")
+#gdobj.add('hih2ptl', HIH2 + "hih2_particles_%03d"%rp['snap'] + ".%d.hdf5")
 gdobj.add('TREECOOL', TNG_PATH + 'TREECOOL_fg_dec11')
 gd = gdobj.getGlobalDict()
 pd = gdobj.getPathDict()
