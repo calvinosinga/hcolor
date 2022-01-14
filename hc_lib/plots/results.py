@@ -35,7 +35,7 @@ class ResultLibrary():
                 self.pks.extend(obj.getPks())
                 self.xis.extend(obj.getXis())
                 self.tdpks.extend(obj.get2Dpks())
-                if 'galaxy' in obj.fieldname:
+                if obj.fieldname == 'galaxy' or obj.fieldname == 'galaxy_dust':
                     self.hists.extend(obj.hists)
 
         elif not pkl_file == '':
