@@ -1,4 +1,5 @@
 from hc_lib.plots.fig_lib import FigureLibrary
+import numpy as np
 
 def redshiftR_spaceC_color(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 1,
             border = 1):
@@ -13,10 +14,8 @@ def redshiftR_spaceC_color(rlib, iprops, savePath = '', panel_length = 3, panel_
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
 
-    only_props = {'color_cut':[None, '0.60']}
-    figArr = rlib.removeResults(figArr, only_props)
-    rowlabels = [r'z=%.1f'%i for i in rowlabels]
-    collabels = [i.capitalize() for i in collabels]
+    # only_props = {'color_cut':[None, '0.60']}
+    # figArr = rlib.removeResults(figArr, only_props)
     linelabels = {'blue' : 'Blue Galaxies', 'red' : 'Red Galaxies', 'resolved':'All Galaxies'}
     colors = {'blue':'blue', 'red':'red', 'resolved':'green'}
     #print(figArr.shape)
@@ -359,6 +358,121 @@ def color_cutR_colorC_gal_res(rlib, iprops, savePath = '', panel_length = 3, pan
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, panel_prop)
         return
+    else:
+        return flib
+
+def colorR_spaceC_axis(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
+            border = 1):
+    row_prop = 'color'
+    column_prop = 'space'
+    panel_prop = 'axis'
+    
+    print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
+    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
+
+    # only_props = {'color_cut':[None, '0.60']}
+    # figArr = rlib.removeResults(figArr, only_props)
+    linelabels = {0 : 'x-axis', 1 : 'y-axis', 2:'z-axis'}
+    #print(figArr.shape)
+    flib = FigureLibrary(figArr)
+    # add distortion panels
+    dist_panels_idx_list = flib.addRedshiftDistortion((slice(None), 0), 
+            (slice(None), 1), panel_prop)
+    collabels.append('Distortion')
+
+    flib.createFig(panel_length, panel_bt, border, border)
+    flib.plotLines(panel_prop, labels=linelabels)
+    flib.addRowLabels(rowlabels)
+    flib.addColLabels(collabels)
+    flib.logAxis('y', panel_exceptions = dist_panels_idx_list)
+    flib.logAxis('x')
+
+    flib.removeXTickLabels()
+    flib.changeTickDirection()
+    def_ytick_except = flib._defaultTickLabelPanelExceptions('y')
+    flib.removeYTickLabels(panel_exceptions = dist_panels_idx_list + def_ytick_except)
+    flib.xLimAdjustToNyquist()
+    flib.flushYAxisToData()
+    flib.matchAxisLimits(which = 'x')
+    flib.matchAxisLimits(which = 'y', panel_exceptions = dist_panels_idx_list)
+    flib.defaultAxesLabels()
+    flib.axisLabel('P$_\mathrm{x}$(k)/P$_\mathrm{v}$(k)', 'y', pos = [1 - border/3/flib.figsize[1], 0.5], rotation = 270, usetex=True)
+    flib.addLegend()
+    flib.printIprops(iprops)
+
+    # if savefig, then save it, otherwise return it
+
+    if not savePath == '':
+        flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+        return
+    else:
+        return flib
+
+def colorR_spaceC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
+            border = 1):
+    row_prop = 'color'
+    column_prop = 'space'
+    print('making %sR_%sC_%s figure...'%(row_prop, column_prop, '2D'))
+    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, '2Dpk')
+
+    cmap_arr = np.empty_like(figArr, dtype=object)
+    cmap_arr[:,:] = 'plasma'
+    flib = FigureLibrary(figArr)
+
+    flib.createFig(panel_length, panel_bt, border, border, True)
+    flib.plot2D()
+    flib.makeColorbars('P(k) (Mpc/h)$^{-3}$')
+
+    # flib.logNormColorbar()
+    # flib.matchColorbarLimits()
+    # flib.assignColormaps(cmap_arr, under='w')
+
+    flib.addContours()
+
+    flib.changeTickDirection()
+    flib.addColLabels(collabels)
+    flib.addRowLabels(rowlabels, is2D=True)
+    
+    flib.removeDefaultTickLabels()
+    flib.defaultAxesLabels(2)
+    
+    if not savePath == '':
+        flib.saveFig(savePath, row_prop, column_prop, '2D')
+        return None
+    else:
+        return flib
+    
+def axisR_spaceC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
+            border = 1):
+    row_prop = 'axis'
+    column_prop = 'space'
+    print('making %sR_%sC_%s figure...'%(row_prop, column_prop, '2D'))
+    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, '2Dpk')
+
+    cmap_arr = np.empty_like(figArr, dtype=object)
+    cmap_arr[:,:] = 'plasma'
+    flib = FigureLibrary(figArr)
+
+    flib.createFig(panel_length, panel_bt, border, border, True)
+    flib.plot2D()
+    flib.makeColorbars('P(k) (Mpc/h)$^{-3}$')
+
+    # flib.logNormColorbar()
+    # flib.matchColorbarLimits()
+    # flib.assignColormaps(cmap_arr, under='w')
+
+    flib.addContours()
+
+    flib.changeTickDirection()
+    flib.addColLabels(collabels)
+    flib.addRowLabels(rowlabels, is2D=True)
+    
+    flib.removeDefaultTickLabels()
+    flib.defaultAxesLabels(2)
+    
+    if not savePath == '':
+        flib.saveFig(savePath, row_prop, column_prop, '2D')
+        return None
     else:
         return flib
 

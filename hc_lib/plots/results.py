@@ -60,7 +60,8 @@ class ResultLibrary():
             raise ValueError('unsupported result type given')
         return result
 
-    def organizeFigure(self, includep, rowp, colp, result_type, check = None):
+    def organizeFigure(self, includep, rowp, colp, result_type, check = None,
+                default_labels = True):
         """
         includep is dict that stores a property and the value that it should have.
         rowp is the property that separates each row
@@ -104,7 +105,24 @@ class ResultLibrary():
         
         if not check is None:
             self._checkPanel(figArr[check[0], check[1]], includep, rowp, colp)
+        
+        if default_labels:
+            rowLabels =  self._defaultLabels(rowp, rowLabels)
+            colLabels = self._defaultLabels(colp, colLabels)
         return figArr, rowLabels, colLabels
+
+    def _defaultLabels(self, prop, labels):
+        if prop == 'redshift':
+            return [r'z=%.1f'%i for i in labels]
+        elif prop == 'space':
+            return [i.capitalize() + ' Space' for i in labels]
+        elif prop == 'color':
+            return [i.capitalize() + ' Galaxies' for i in labels]
+        elif prop == 'axis':
+            return [r'Axis=%d'%i for i in labels]
+        else:
+            return labels
+            
 
     def _checkPanel(self, results, includep, rowp, colp):
         

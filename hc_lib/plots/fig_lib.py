@@ -436,13 +436,20 @@ class FigureLibrary():
         self.fig.suptitle(outstr, fontsize = fsize, wrap = True, usetex = False)
         return
         
-    def addRowLabels(self, rowlabels, pos = (0.05, 0.05), fsize = 16):
+    def addRowLabels(self, rowlabels, pos = (0.05, 0.05), fsize = 16, is2D = False):
         dim = self.dim
-        for i in range(dim[0]):
-            p = self.panels[i][0]
-            plt.sca(p)
-            plt.text(pos[0], pos[1], self.texStr(rowlabels[i]), fontsize = fsize,
-                        ha = 'left', va = 'bottom', transform = p.transAxes)
+        if not is2D:
+            
+            for i in range(dim[0]):
+                p = self.panels[i][0]
+                plt.sca(p)
+                plt.text(pos[0], pos[1], self.texStr(rowlabels[i]), fontsize = fsize,
+                            ha = 'left', va = 'bottom', transform = p.transAxes)
+        else:
+            for i in range(dim[0]):
+                p = self.panels[i][0]
+                plt.sca(p)
+                plt.ylabel(rowlabels[i])
         return
     
     def addColLabels(self, collabels, fsize = 16):
@@ -617,9 +624,11 @@ class FigureLibrary():
         if dtype == 1:
             xlab = r'k (Mpc/h)$^{-1}$'
             ylab = r'P(k) (Mpc/h)$^{-3}$'
+            
         elif dtype == 2:
             xlab = r"k$_{\parallel}$ (h/Mpc)"
             ylab = r"k$_{\perp}$ (h/Mpc)"
+            
         elif dtype == 'slice':
             xlab = 'x (Mpc/h)'
             ylab = 'y (Mpc/h)'
