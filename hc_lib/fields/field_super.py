@@ -389,7 +389,7 @@ class Cross():
                     print('Would be calculating xpk between: ')
                     print('\t %s'%k1)
                     print('\t %s'%k2)
-                    # self._xpk(grid1, grid2, gp1, gp2)
+                    self._xpk(grid1, grid2, gp1, gp2)
         return
     
     def _xpk(self, grid1, grid2, gp1, gp2):

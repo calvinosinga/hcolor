@@ -325,7 +325,7 @@ class hisubhalo_grid_props(grid_props):
             elif op['gal_res'] == 'diemer':
                 # cdefs = ['0.55','0.60','0.65', 'visual_inspection']
                 is_resolved = op['color'] == 'resolved'
-                return op['color_cut'] in '0.60' or is_resolved
+                return op['color_cut'] in ['0.60'] or is_resolved
             
             # don't include other observational stuff temporarily
             elif op['gal_res'] == 'wolz_eBOSS_ELG':
