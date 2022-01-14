@@ -59,6 +59,33 @@ class ResultLibrary():
         else:
             raise ValueError('unsupported result type given')
         return result
+    
+    def matchProps(self, rc, desired_props, verbose=False):
+        isMatch = True
+        failed_list = []
+        for k,v in desired_props.items():
+            self_val = rc.getProp(k)
+            if not isinstance(v, list):
+                v = [v]
+            
+
+            if rc.props['is_auto'] or self_val is None:
+                if self_val in v:
+                    isMatch = (isMatch and True)
+                elif verbose:
+                    failed_list.append([k, v, self_val])
+            
+            else: # self_val is a list
+                if v in self_val:
+                    isMatch = (isMatch and True)
+                elif verbose:
+                    failed_list.append([k, v, self_val])
+
+        if verbose:
+            print('Match Failed:')
+            print(failed_list)
+
+        return isMatch
 
     def organizeFigure(self, includep, rowp, colp, result_type, check = None,
                 default_labels = True):
@@ -73,7 +100,7 @@ class ResultLibrary():
         result = self._getResultType(result_type)
         for r in result:
            
-            if r.matchProps(includep):
+            if self.matchProps(r, includep, True):
                 forFig.append(r)
                 rowlab = r.getProp(rowp)
                 collab = r.getProp(colp)
@@ -171,7 +198,7 @@ class ResultLibrary():
                 if r.props[propname] not in vals:
                     if include_props is None:
                         vals.append(r.props[propname])
-                    elif r.matchProps(include_props):
+                    elif self.matchProps(r,include_props):
                         vals.append(r.props[propname])
             except KeyError:
                 continue
@@ -213,7 +240,7 @@ class ResultLibrary():
             
 
             for result in res_list:
-                if result.matchProps(include_props):
+                if self.matchProps(result, include_props):
                     print(result.props)
             
             print()
