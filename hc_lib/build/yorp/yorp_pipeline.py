@@ -6,7 +6,7 @@ from hc_lib.build.yorp.job import JobManager
 import h5py as hp
 import os
 
-OUTPATH = '/yorp16b/cosinga/'
+OUTPATH = '/yorp08a/cosinga/'
 TNGPATH = '/net/nyx/nyx1/diemer/illustris/'
 HCOLOR = '/home/cosinga/hcolor/'
 

@@ -170,7 +170,7 @@ class galaxy(Field):
             #     self.gir_hists[gp['gal_res']] = gir
             
             if gp['gal_res'] not in self.hists_done and not gp['gal_res'] is None:
-                self.make_gr_stmass(photo['gr'][resolved_mask], mass[resolved_mask, 4])
+                self.make_gr_stmass(g, photo['gr'][resolved_mask], mass[resolved_mask, 4])
             
             self.saveData(outfile, grid, g)
             del grid
