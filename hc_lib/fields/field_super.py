@@ -65,7 +65,7 @@ class ResultContainer():
                 else:
                     temp[k] = [v, self_val]
         
-        for k,v in self.props:
+        for k,v in self.props.items():
             if not k in temp:
                 temp[k] = [v]
 
