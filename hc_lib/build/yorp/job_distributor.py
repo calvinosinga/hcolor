@@ -66,6 +66,7 @@ while complete < n_commands:
         logName = "%s.log" % (queue[i].getJobName())
         fLog = open(logName, 'w')
         arguments = queue[i].getCmd()
+        arguments = [str(i) for i in arguments]
         pipes[i] = subprocess.Popen(arguments, stdout = fLog, stderr=subprocess.STDOUT)
         dt = time.time() - start_time
         print("[%4d s] Started    %3d  %s" % (dt, i, queue[i].getJobName()))
