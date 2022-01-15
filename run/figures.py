@@ -237,17 +237,17 @@ def galaxyAuto(rl):
     del ip['snapshot']
     galFig.redshiftR_colorC_fieldname(rl, ip, saveDirPath)
     
-    ip = cc(baseIncludeProps)
-    del ip['axis']
-    del ip['color']
-    del ip['fieldname']
-    galFig.axisR_colorC_fieldname(rl, ip, saveDirPath)
+#    ip = cc(baseIncludeProps)
+#    del ip['axis']
+#    del ip['color']
+#    del ip['fieldname']
+#    galFig.axisR_colorC_fieldname(rl, ip, saveDirPath)
 
     ip = cc(baseIncludeProps)
     del ip['axis']
     del ip['color']
     del ip['space']
-    galFig.colorR_spaceC_axis(rl, ip, saveDirPath)
+    galFig.fieldnameR_colorC_axis(rl, ip, saveDirPath)
 
     ip = cc(baseIncludeProps)
     del ip['color']

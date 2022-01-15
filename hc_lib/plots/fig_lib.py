@@ -253,7 +253,12 @@ class FigureLibrary():
                 peridx = np.where(kper>maxks[1])[0][0]
                 pk = np.reshape(pk, (len(kpar), len(kper)))
                 extent = (0,kpar[paridx-1],0,kper[peridx-1])
-                plt.imshow(pk[:paridx, :peridx], extent=extent, origin='lower')
+                plotpk = pk[:paridx, :peridx]
+                vmin = np.min(plotpk)
+                vmax = np.max(plotpk)
+                print(vmin, vmax)
+                plt.imshow(pk[:paridx, :peridx], extent=extent, vmin = vmin, vmax = vmax, 
+                            origin='lower')
                 
         return
     
@@ -353,7 +358,7 @@ class FigureLibrary():
         return dist_idx_list
 
     # TODO: add variance
-    def makeColorbars(self, cbar_label = '', def_cmap = 'plasma',except_panels = []):
+    def makeColorbars(self, cbar_label = '', def_cmap = 'plasma', fsize = 16, except_panels = []):
         if self.has_cbar_panel:
             self.matchColorbarLimits()
             self.logNormColorbar()
@@ -361,15 +366,15 @@ class FigureLibrary():
             cmap_arr[:,:] = def_cmap
             self.assignColormaps(cmap_arr, under='w')
             cbar = plt.colorbar(cax=self.cax)
-            self.cax.set_aspect(8, anchor='W')
-            cbar.set_label(cbar_label, rotation=270)
+            self.cax.set_aspect(10, anchor='W')
+            cbar.set_label(cbar_label, fontsize = fsize, rotation=270)
         else:
             for i in range(self.dim[0]):
                 for j in range(self.dim[1]):
                     if (i,j) not in except_panels:
                         plt.sca(self.panels[i][j])
                         cbar = plt.colorbar(fraction=0.046, pad=0.04)
-                        cbar.set_label(cbar_label, rotation=270)
+                        cbar.set_label(cbar_label, rotation=270, fontsize=fsize)
                         self.cax[i, j] = [cbar]
                         
 
@@ -401,6 +406,7 @@ class FigureLibrary():
                 if (i, j) not in panel_exceptions:
                     im = self.panels[i][j].get_images()[0]
                     clim = im.get_clim()
+                    print(clim)
                     if vlim:
                         im.set_norm(mpl.colors.LogNorm(vmin=vlim[0], vmax=vlim[1]))
                     else:
@@ -419,7 +425,7 @@ class FigureLibrary():
                     cmax = im.norm.vmax
                     if vlim[0] > cmin: vlim[0]=cmin 
                     if vlim[1] < cmax: vlim[1]=cmax
-                        
+        print(vlim)                
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
                 if (i, j) not in panel_exceptions:
@@ -449,7 +455,7 @@ class FigureLibrary():
             for i in range(dim[0]):
                 p = self.panels[i][0]
                 plt.sca(p)
-                plt.ylabel(rowlabels[i])
+                plt.ylabel(rowlabels[i], fontsize=fsize)
         return
     
     def addColLabels(self, collabels, fsize = 16):
@@ -612,12 +618,12 @@ class FigureLibrary():
                             if ymax > ylim[1]:
                                 ylim[1] = ymax
         
-        for i in range(self.dim[0]):
-            for j in range(self.dim[1]):
-                if (i, j) not in except_panels:
-                    p = self.panels[i][j]
-                    plt.sca(p)
-                    plt.ylim(ylim[0], ylim[1])
+        #for i in range(self.dim[0]):
+        #    for j in range(self.dim[1]):
+        #        if (i, j) not in except_panels:
+        #            p = self.panels[i][j]
+        #            plt.sca(p)
+        #            plt.ylim(ylim[0], ylim[1])
         return
 
     def defaultAxesLabels(self, dtype = 1):
@@ -674,7 +680,7 @@ class FigureLibrary():
                     plt.sca(p)
                     if which == 'x' or which == 'both':
                         plt.xlim(xlim[0], xlim[1])
-                    elif which == 'y' or which == 'both':
+                    if which == 'y' or which == 'both':
                         plt.ylim(ylim[0], ylim[1])
         
         return

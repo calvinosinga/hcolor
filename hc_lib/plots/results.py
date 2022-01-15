@@ -60,31 +60,42 @@ class ResultLibrary():
             raise ValueError('unsupported result type given')
         return result
     
+    def getProp(self, rc, key):
+        try:
+            return rc.props[key]
+        except KeyError:
+            return None
+
     def matchProps(self, rc, desired_props, verbose=False):
         isMatch = True
         failed_list = []
         for k,v in desired_props.items():
-            self_val = rc.getProp(k)
-            if not isinstance(v, list):
-                v = [v]
+            self_val = self.getProp(rc, k)
             
+            #print(v, self_val)
+            # if we don't have a list of desired values, check if the property
+            # of the result has the the desired value. Auto powers only have one
+            # property to check
+            if not isinstance(v, list) and not isinstance(self_val, list):
+                isMatch = (isMatch and v == self_val)
+            # if we do have a list of desired values, but the result is still an
+            # auto power spectrum, check if self_val is in v
+            elif isinstance(v, list) and not isinstance(self_val, list):
+                isMatch = (isMatch and self_val in v)
 
-            if rc.props['is_auto'] or self_val is None:
-                if self_val in v:
-                    isMatch = (isMatch and True)
-                elif verbose:
-                    failed_list.append([k, v, self_val])
-            
-            else: # self_val is a list
-                if v in self_val:
-                    isMatch = (isMatch and True)
-                elif verbose:
-                    failed_list.append([k, v, self_val])
-
-        if verbose:
-            print('Match Failed:')
-            print(failed_list)
-
+            # if both are lists, we need to know if at least one value from self_val
+            # is in the desired properties
+            elif isinstance(v, list) and isinstance(self_val, list):
+                one_val = False
+                for i in range(len(self_val)):
+                    if self_val[i] in v:
+                        one_val = True
+                isMatch = (isMatch and one_val)
+            # the last case where v is not a list but self_val is
+            elif not isinstance(v, list) and isinstance(self_val, list):
+                isMatch = (isMatch and v in self_val)
+            else:
+                print('not all cases handled')
         return isMatch
 
     def organizeFigure(self, includep, rowp, colp, result_type, check = None,
@@ -102,14 +113,14 @@ class ResultLibrary():
            
             if self.matchProps(r, includep, True):
                 forFig.append(r)
-                rowlab = r.getProp(rowp)
-                collab = r.getProp(colp)
+                rowlab = self.getProp(r, rowp)
+                collab = self.getProp(r, colp)
                 
                 if not rowlab in rowLabels:
-                    rowLabels.append(str(rowlab))
+                    rowLabels.append(rowlab)
                 
                 if not collab in colLabels:
-                    colLabels.append(str(collab))
+                    colLabels.append(collab)
                 
         rowLabels.sort()
         colLabels.sort()
@@ -124,8 +135,8 @@ class ResultLibrary():
             for j in range(ncols):
                 temp = []
                 for f in range(len(forFig)):
-                    rowres = forFig[f].getProp(rowp)
-                    colres = forFig[f].getProp(colp)
+                    rowres = self.getProp(forFig[f],rowp)
+                    colres = self.getProp(forFig[f],colp)
                     if rowres == rowLabels[i] and colres == colLabels[j]:
                         temp.append(forFig[f])
                 figArr[i, j] = temp
@@ -180,7 +191,7 @@ class ResultLibrary():
                 rpanel = figArr[i, j]
                 for r in rpanel:
                     for prop in include_dict:
-                        if not r.getProp(prop) in include_dict[prop]:
+                        if not self.getProp(r,prop) in include_dict[prop]:
                             rpanel.remove(r)
                 figArr[i, j] = rpanel
 

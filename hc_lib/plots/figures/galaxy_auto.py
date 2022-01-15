@@ -65,10 +65,6 @@ def redshiftR_colorC_space(rlib, iprops, savePath = '', panel_length = 3, panel_
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
-    rowlabels = [r'z=%.1f'%i for i in rowlabels]
-    collabels = [i.capitalize() for i in collabels]
-    collabels = ['Resolved' if x == 'resolved' else x for x in collabels]
-    collabels = [i + ' Galaxies' for i in collabels]
 
     linelabels = {'real':'Real Space', 'redshift':'Redshift Space'}
     linecolors = {'real':'blue', 'redshift':'red'}
@@ -112,8 +108,6 @@ def spaceR_colorC_species(rlib, iprops, savePath = '', panel_length = 3, panel_b
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
-    collabels = [i.capitalize() + ' Galaxies' for i in collabels]
-    rowlabels = [i.capitalize() + ' Space' for i in rowlabels]
     linelabels = {'stmass':'Stellar Particles', 'total':'All Particles'}
     only_props = {'color_cut':[None, '0.60']}
     figArr = rlib.removeResults(figArr, only_props)
@@ -153,8 +147,6 @@ def spaceR_colorC_mas(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
-    collabels = [i.capitalize() + ' Galaxies' for i in collabels]
-    rowlabels = [i.capitalize() + ' Space' for i in rowlabels]
 
     only_props = {'color_cut':[None, '0.60']}
     figArr = rlib.removeResults(figArr, only_props)
@@ -253,8 +245,6 @@ def redshiftR_colorC_fieldname(rlib, iprops, savePath = '', panel_length = 3, pa
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
-    collabels = [i.capitalize() + ' Galaxies' for i in collabels]
-    rowlabels = [r'z=%.1f'%i for i in rowlabels]
     linelabels = {'galaxy_dust':'Dust Model', 'galaxy':'Fiducial'}
     linestyles = {'galaxy_dust':'--', 'galaxy':'-'}
     flib = FigureLibrary(figArr)
@@ -294,8 +284,6 @@ def axisR_colorC_fieldname(rlib, iprops, savePath = '', panel_length = 3, panel_
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
-    collabels = [i.capitalize() + ' Galaxies' for i in collabels]
-    rowlabels = [r'Axis=%d'%i for i in rowlabels]
     linelabels = {'galaxy_dust':'Dust Model', 'galaxy':'Fiducial'}
     linestyles = {'galaxy_dust':'--', 'galaxy':'-'}
     flib = FigureLibrary(figArr)
@@ -335,7 +323,6 @@ def color_cutR_colorC_gal_res(rlib, iprops, savePath = '', panel_length = 3, pan
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
-    collabels = [i.capitalize() for i in collabels]
 
     flib = FigureLibrary(figArr)
 
@@ -361,10 +348,11 @@ def color_cutR_colorC_gal_res(rlib, iprops, savePath = '', panel_length = 3, pan
     else:
         return flib
 
-def colorR_spaceC_axis(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
+def fieldnameR_colorC_axis(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
             border = 1):
-    row_prop = 'color'
-    column_prop = 'space'
+    iprops['space'] = 'redshift'
+    row_prop = 'fieldname'
+    column_prop = 'color'
     panel_prop = 'axis'
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
