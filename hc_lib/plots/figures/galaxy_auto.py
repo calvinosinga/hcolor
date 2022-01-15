@@ -14,10 +14,9 @@ def redshiftR_spaceC_color(rlib, iprops, savePath = '', panel_length = 3, panel_
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
 
-    # only_props = {'color_cut':[None, '0.60']}
-    # figArr = rlib.removeResults(figArr, only_props)
-    linelabels = {'blue' : 'Blue Galaxies', 'red' : 'Red Galaxies', 'resolved':'All Galaxies'}
-    colors = {'blue':'blue', 'red':'red', 'resolved':'green'}
+    linelabels = {'blue' : 'Blue Galaxies', 'red' : 'Red Galaxies', 'resolved':'All Galaxies',
+            'all':'All Subhalos'}
+    colors = {'blue':'blue', 'red':'red', 'resolved':'green', 'all':'black'}
     #print(figArr.shape)
     flib = FigureLibrary(figArr)
     # add distortion panels
@@ -358,33 +357,30 @@ def fieldnameR_colorC_axis(rlib, iprops, savePath = '', panel_length = 3, panel_
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
 
-    # only_props = {'color_cut':[None, '0.60']}
-    # figArr = rlib.removeResults(figArr, only_props)
+    for r in range(len(rowlabels)):
+        if rowlabels[r] == 'galaxy':
+            rowlabels[r] = 'Fiducial'
+        if rowlabels[r] == 'galaxy_dust':
+            rowlabels[r] = 'Dust Model'
+
     linelabels = {0 : 'x-axis', 1 : 'y-axis', 2:'z-axis'}
     #print(figArr.shape)
     flib = FigureLibrary(figArr)
-    # add distortion panels
-    dist_panels_idx_list = flib.addRedshiftDistortion((slice(None), 0), 
-            (slice(None), 1), panel_prop)
-    collabels.append('Distortion')
+
 
     flib.createFig(panel_length, panel_bt, border, border)
     flib.plotLines(panel_prop, labels=linelabels)
     flib.addRowLabels(rowlabels)
     flib.addColLabels(collabels)
-    flib.logAxis('y', panel_exceptions = dist_panels_idx_list)
-    flib.logAxis('x')
+    flib.logAxis()
 
     flib.removeXTickLabels()
     flib.changeTickDirection()
-    def_ytick_except = flib._defaultTickLabelPanelExceptions('y')
-    flib.removeYTickLabels(panel_exceptions = dist_panels_idx_list + def_ytick_except)
+    flib.removeDefaultTickLabels()
     flib.xLimAdjustToNyquist()
     flib.flushYAxisToData()
-    flib.matchAxisLimits(which = 'x')
-    flib.matchAxisLimits(which = 'y', panel_exceptions = dist_panels_idx_list)
+    flib.matchAxisLimits()
     flib.defaultAxesLabels()
-    flib.axisLabel('P$_\mathrm{x}$(k)/P$_\mathrm{v}$(k)', 'y', pos = [1 - border/3/flib.figsize[1], 0.5], rotation = 270, usetex=True)
     flib.addLegend()
     flib.printIprops(iprops)
 
@@ -396,10 +392,10 @@ def fieldnameR_colorC_axis(rlib, iprops, savePath = '', panel_length = 3, panel_
     else:
         return flib
 
-def colorR_spaceC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
+def colorR_redshiftC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
             border = 1):
     row_prop = 'color'
-    column_prop = 'space'
+    column_prop = 'redshift'
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, '2D'))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, '2Dpk')
 
@@ -409,11 +405,8 @@ def colorR_spaceC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0
 
     flib.createFig(panel_length, panel_bt, border, border, True)
     flib.plot2D()
-    flib.makeColorbars('P(k) (Mpc/h)$^{-3}$')
-
-    # flib.logNormColorbar()
-    # flib.matchColorbarLimits()
-    # flib.assignColormaps(cmap_arr, under='w')
+    flib.makeColorbars('P(k$_\parallel$, k$_\perp$) (Mpc/h)$^{-3}$')
+    flib.logNormColorbar(vlim=[10**-2, 10**4])
 
     flib.addContours()
 
@@ -430,7 +423,7 @@ def colorR_spaceC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0
     else:
         return flib
     
-def axisR_spaceC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
+def axisR_colorC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
             border = 1):
     row_prop = 'axis'
     column_prop = 'space'

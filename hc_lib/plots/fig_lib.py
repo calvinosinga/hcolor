@@ -256,8 +256,8 @@ class FigureLibrary():
                 plotpk = pk[:paridx, :peridx]
                 vmin = np.min(plotpk)
                 vmax = np.max(plotpk)
-                print(vmin, vmax)
-                plt.imshow(pk[:paridx, :peridx], extent=extent, vmin = vmin, vmax = vmax, 
+                print(plotpk)
+                plt.imshow(plotpk, extent=extent, vmin = vmin, vmax = vmax, 
                             origin='lower')
                 
         return
@@ -366,8 +366,8 @@ class FigureLibrary():
             cmap_arr[:,:] = def_cmap
             self.assignColormaps(cmap_arr, under='w')
             cbar = plt.colorbar(cax=self.cax)
-            self.cax.set_aspect(10, anchor='W')
-            cbar.set_label(cbar_label, fontsize = fsize, rotation=270)
+            self.cax.set_aspect(12, anchor='W')
+            cbar.set_label(cbar_label, labelpad = 8, fontsize = fsize, rotation=270)
         else:
             for i in range(self.dim[0]):
                 for j in range(self.dim[1]):
@@ -406,7 +406,7 @@ class FigureLibrary():
                 if (i, j) not in panel_exceptions:
                     im = self.panels[i][j].get_images()[0]
                     clim = im.get_clim()
-                    print(clim)
+                    # print(clim)
                     if vlim:
                         im.set_norm(mpl.colors.LogNorm(vmin=vlim[0], vmax=vlim[1]))
                     else:
@@ -425,7 +425,7 @@ class FigureLibrary():
                     cmax = im.norm.vmax
                     if vlim[0] > cmin: vlim[0]=cmin 
                     if vlim[1] < cmax: vlim[1]=cmax
-        print(vlim)                
+
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
                 if (i, j) not in panel_exceptions:

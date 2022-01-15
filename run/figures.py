@@ -185,63 +185,38 @@ def galaxyAuto(rl):
     baseIncludeProps['species'] = 'stmass'
     baseIncludeProps['space'] = 'real'
     baseIncludeProps['color'] = 'resolved'
+
+    # make plots with just resolved galaxies
     ip = cc(baseIncludeProps)
-    #ip['color'] = ['red', 'blue', 'resolved']
     del ip['snapshot']
     del ip['space']
     del ip['color']
+    ip['color_cut'] = ['0.60', None]
     galFig.redshiftR_spaceC_color(rl, ip, saveDirPath)
     
     galFig.redshiftR_colorC_space(rl, ip, saveDirPath)
     
+    # make plots with everything
+    ip['gal_res'] = ['diemer', None]
+    flib = galFig.redshiftR_spaceC_color(rl, ip)
+    flib.saveFig(saveDirPath, 'redshift', 'space', 'color', '_withall')
+    flib = galFig.redshiftR_colorC_space(rl, ip)
+    flib.saveFig(saveDirPath, 'redshift', 'color', 'space', '_withall')
+
+
     ip = cc(baseIncludeProps)
-    #ip['fieldname'] = ['galaxy', 'galaxy_dust']
-    #ip['color'] = ['red', 'blue']
     del ip['species']
     del ip['color']
-    del ip['color_cut']
+    ip['color_cut'] = ['0.60', None]
     del ip['space']
     galFig.spaceR_colorC_species(rl, ip, saveDirPath)
-
-    # ip = cc(baseIncludeProps)
-    # #ip['fieldname'] = ['galaxy', 'galaxy_dust']
-    # #ip['color'] = ['red', 'blue']
-    # del ip['mas']
-    # del ip['space']
-    # del ip['color']
-    # del ip['color_cut']
-    # galFig.spaceR_colorC_mas(rl, ip, saveDirPath)
-
-    #ip = cc(baseIncludeProps)
-    #ip['fieldname'] = ['galaxy', 'galaxy_dust']
-    #ip['color'] = ['red', 'blue']
-    #ip['color_cut'] = ['0.50', '0.55','0.60', '0.65', '0.70']
-    #straight_fig = galFig.fieldnameR_colorC_color_cut(rl, ip)
-    #straight_fig.saveFig(saveDirPath, 'fieldname','color','color_cut', 'straight')
-
-    # ip = cc(baseIncludeProps)
-    # #ip['fieldname'] = ['galaxy', 'galaxy_dust']
-    # #ip['color'] = ['red', 'blue']
-    # #ip['color_cut'] = ['visual_inspection','0.60', 'anderson_2df', 'papastergis_SDSS']
-    # del ip['fieldname']
-    # del ip['color']
-    # del ip['color_cut']
-    # obs_fig = galFig.fieldnameR_colorC_color_cut(rl, ip)
-    # obs_fig.saveFig(saveDirPath, 'fieldname','color','color_cut', 'obs')
 
     ip = cc(baseIncludeProps)
     del ip['fieldname']
     del ip['color']
-    #ip['fieldname'] = ['galaxy', 'galaxy_dust']
-    #ip['color'] = ['red', 'blue']
     del ip['snapshot']
     galFig.redshiftR_colorC_fieldname(rl, ip, saveDirPath)
     
-#    ip = cc(baseIncludeProps)
-#    del ip['axis']
-#    del ip['color']
-#    del ip['fieldname']
-#    galFig.axisR_colorC_fieldname(rl, ip, saveDirPath)
 
     ip = cc(baseIncludeProps)
     del ip['axis']
@@ -251,13 +226,16 @@ def galaxyAuto(rl):
 
     ip = cc(baseIncludeProps)
     del ip['color']
-    del ip['space']
-    galFig.colorR_spaceC_2D(rl, ip, saveDirPath)
+    ip['color_cut'] = [None, '0.60']
+    del ip['snapshot']
+
+    galFig.colorR_redshiftC_2D(rl, ip, saveDirPath)
 
     ip = cc(baseIncludeProps)
     del ip['axis']
-    del ip['space']
-    galFig.axisR_spaceC_2D(rl, ip, saveDirPath)
+    ip['color_cut'] = ['0.60', None]
+    del ip['color']
+    galFig.axisR_colorC_2D(rl, ip, saveDirPath)
 
     galFig.make_histograms(rl, saveDirPath)
     return
