@@ -392,10 +392,10 @@ def fieldnameR_colorC_axis(rlib, iprops, savePath = '', panel_length = 3, panel_
     else:
         return flib
 
-def colorR_redshiftC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
+def redshiftR_colorC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
             border = 1):
-    row_prop = 'color'
-    column_prop = 'redshift'
+    row_prop = 'redshift'
+    column_prop = 'color'
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, '2D'))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, '2Dpk')
 
@@ -405,8 +405,7 @@ def colorR_redshiftC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt 
     
     flib.createFig(panel_length, panel_bt, border, border, True)
     flib.plot2D()
-    flib.makeColorbars('P(k$_\parallel$, k$_\perp$) (Mpc/h)$^{-3}$')
-    flib.logNormColorbar(vlim=[10**-2, 10**4])
+    flib.makeColorbars('P(k$_\parallel$, k$_\perp$) (Mpc/h)$^{-3}$', vlim=[10**2,10**4])
 
     flib.addContours()
 
@@ -426,7 +425,7 @@ def colorR_redshiftC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt 
 def axisR_colorC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
             border = 1):
     row_prop = 'axis'
-    column_prop = 'space'
+    column_prop = 'color'
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, '2D'))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, '2Dpk')
 
@@ -436,7 +435,7 @@ def axisR_colorC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.
 
     flib.createFig(panel_length, panel_bt, border, border, True)
     flib.plot2D()
-    flib.makeColorbars('P(k) (Mpc/h)$^{-3}$')
+    flib.makeColorbars('P(k) (Mpc/h)$^{-3}$', vlim=[10**2, 10**4])
 
     # flib.logNormColorbar()
     # flib.matchColorbarLimits()
@@ -457,6 +456,21 @@ def axisR_colorC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.
     else:
         return flib
 
-def make_histograms(rlib, savePath=''):
-    print(rlib.hists)
+def make_histograms(rlib, iprops, savePath='', panel_length = 3, panel_bt = 0.25,
+            border = 1):
+    rowp = 'redshift'
+    colp = 'fieldname'
+    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, rowp, colp, 'hist')
+    flib = FigureLibrary(figArr)
+    
+    flib.createFig(panel_length, panel_bt, border, border)
+    flib.plotHists()
+    flib.addRowLabels(rowlabels)
+    flib.addColLabels(collabels)
+    flib.changeTickDirection()
+    flib.axisLabel('Log (M$_*$/M$_\odot$)', 'x')
+    flib.axisLabel('g-r', 'y')
+    flib.makeColorbars()
+    flib.logNormColorbar()
+    
     return

@@ -238,6 +238,24 @@ class FigureLibrary():
         
         return
     
+    def plotHists(self, make_lines = True):
+        for i in range(self.dim[0]):
+            for j in range(self.dim[1]):
+                p = self.panels[i][j]
+                plt.sca(p)
+                hist = self.figArr[i,j][0]
+                xbins, ybins, counts = hist.getValues()
+                extent = (xbins[0], xbins[-1], ybins[0], ybins[-1])
+                plt.imshow(counts, origin='lower', extent=extent)
+                if make_lines:
+                    plt.plot([xbins[0], xbins[-1]], [0.6, 0.6], color='red')
+                    plt.plot([xbins[0], xbins[-1]], [0.55, 0.55], color='red')
+                    plt.plot([xbins[0], xbins[-1]], [0.5, 0.5], color='red', linestyle = ':')
+                    plt.plot([xbins[0], xbins[-1]], [0.65, 0.65], color='red')
+                    plt.plot([xbins[0], xbins[-1]], [0.7, 0.7], color='red', linestyle = ':')
+                    plt.plot(xbins, 0.65 + 0.02 * (np.log10(xbins) - 10.28), color='white')
+        return
+    
     def plot2D(self, maxks = [5, 5]):
         
         for i in range(self.dim[0]):
@@ -288,8 +306,9 @@ class FigureLibrary():
                     ticks = cbar.get_yticks()
                     ylim = cbar.get_ylim()
                 
+                print(ticks)
                 plt.contour(KPAR, KPER, pk[:paridx,:peridx], vmin=ylim[0],
-                        vmax=ylim[1], levels = ticks, colors=color, linestyle='-')
+                        vmax=ylim[1], levels = ticks, colors=color)
 
         return 
              
@@ -358,16 +377,18 @@ class FigureLibrary():
         return dist_idx_list
 
     # TODO: add variance
-    def makeColorbars(self, cbar_label = '', def_cmap = 'plasma', fsize = 16, except_panels = []):
+    def makeColorbars(self, cbar_label = '', def_cmap = 'plasma', fsize = 16, vlim=[],
+                except_panels = []):
+        
         if self.has_cbar_panel:
-            self.matchColorbarLimits()
-            self.logNormColorbar()
+            self.matchColorbarLimits(vlim=vlim)
+            self.logNormColorbar(vlim=vlim)
             cmap_arr = np.empty(self.dim, dtype=object)
             cmap_arr[:,:] = def_cmap
             self.assignColormaps(cmap_arr, under='w')
             cbar = plt.colorbar(cax=self.cax)
             self.cax.set_aspect(12, anchor='W')
-            cbar.set_label(cbar_label, labelpad = 8, fontsize = fsize, rotation=270)
+            cbar.set_label(cbar_label, labelpad = 16, fontsize = fsize, rotation=270)
         else:
             for i in range(self.dim[0]):
                 for j in range(self.dim[1]):
@@ -414,17 +435,18 @@ class FigureLibrary():
                     
         return
       
-    def matchColorbarLimits(self, panel_exceptions = []):
+    def matchColorbarLimits(self, vlim = [], panel_exceptions = []):
         # get the limits
-        vlim = [np.inf, -np.inf]
-        for i in range(self.dim[0]):
-            for j in range(self.dim[1]):
-                if (i, j) not in panel_exceptions:
-                    im = self.panels[i][j].get_images()[0]
-                    cmin = im.norm.vmin
-                    cmax = im.norm.vmax
-                    if vlim[0] > cmin: vlim[0]=cmin 
-                    if vlim[1] < cmax: vlim[1]=cmax
+        if not vlim:
+            vlim = [np.inf, -np.inf]
+            for i in range(self.dim[0]):
+                for j in range(self.dim[1]):
+                    if (i, j) not in panel_exceptions:
+                        im = self.panels[i][j].get_images()[0]
+                        cmin = im.norm.vmin
+                        cmax = im.norm.vmax
+                        if vlim[0] > cmin: vlim[0]=cmin 
+                        if vlim[1] < cmax: vlim[1]=cmax
 
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):

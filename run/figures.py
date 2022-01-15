@@ -221,8 +221,24 @@ def galaxyAuto(rl):
     ip = cc(baseIncludeProps)
     del ip['axis']
     del ip['color']
+    del ip['snapshot']
+    ip['color_cut'] = ['0.60', None]
+    ip['space'] = 'redshift'
+    galFig.redshiftR_colorC_axis(rl, ip, saveDirPath)
+
+    ip = cc(baseIncludeProps)
+    del ip['fieldname']
+    del ip['color']
+    del ip['color_cut']
+    galFig.fieldnameR_colorC_color_cut(rl, ip, saveDirPath)
+
+    ip = cc(baseIncludeProps)
+    del ip['axis']
+    del ip['color']
     del ip['space']
-    galFig.fieldnameR_colorC_axis(rl, ip, saveDirPath)
+    ip['fieldname'] = 'galaxy_dust'
+    flib = galFig.colorR_spaceC_axis(rl, ip)
+    flib.saveFig(saveDirPath, 'color', 'space', 'axis', '_dust_axis_test')
 
     ip = cc(baseIncludeProps)
     del ip['color']
@@ -238,7 +254,9 @@ def galaxyAuto(rl):
     ip['space'] = 'redshift'
     galFig.axisR_colorC_2D(rl, ip, saveDirPath)
 
-    galFig.make_histograms(rl, saveDirPath)
+    del ip['snapshot']
+    del ip['fieldname']
+    galFig.make_histograms(rl, ip, saveDirPath)
     return
 
 def hisubhaloAuto(rl):

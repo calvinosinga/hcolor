@@ -56,6 +56,8 @@ class ResultLibrary():
             result = self.xis
         elif result_type == 'slice':
             result = self.slices
+        elif result_type == 'hist':
+            result = self.hists
         else:
             raise ValueError('unsupported result type given')
         return result
