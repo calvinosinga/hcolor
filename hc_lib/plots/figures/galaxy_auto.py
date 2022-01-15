@@ -473,4 +473,9 @@ def make_histograms(rlib, iprops, savePath='', panel_length = 3, panel_bt = 0.25
     flib.makeColorbars()
     flib.logNormColorbar()
     
+    if not savePath == '':
+        flib.saveFig(savePath, row_prop, column_prop, '2D')
+        return None
+    else:
+        return flib
     return
