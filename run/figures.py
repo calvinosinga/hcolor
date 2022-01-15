@@ -228,13 +228,14 @@ def galaxyAuto(rl):
     del ip['color']
     ip['color_cut'] = [None, '0.60']
     del ip['snapshot']
-
+    ip['space'] = 'redshift'
     galFig.colorR_redshiftC_2D(rl, ip, saveDirPath)
 
     ip = cc(baseIncludeProps)
     del ip['axis']
     ip['color_cut'] = ['0.60', None]
     del ip['color']
+    ip['space'] = 'redshift'
     galFig.axisR_colorC_2D(rl, ip, saveDirPath)
 
     galFig.make_histograms(rl, saveDirPath)

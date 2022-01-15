@@ -402,7 +402,7 @@ def colorR_redshiftC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt 
     cmap_arr = np.empty_like(figArr, dtype=object)
     cmap_arr[:,:] = 'plasma'
     flib = FigureLibrary(figArr)
-
+    
     flib.createFig(panel_length, panel_bt, border, border, True)
     flib.plot2D()
     flib.makeColorbars('P(k$_\parallel$, k$_\perp$) (Mpc/h)$^{-3}$')
