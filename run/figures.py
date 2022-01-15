@@ -221,10 +221,11 @@ def galaxyAuto(rl):
     ip = cc(baseIncludeProps)
     del ip['axis']
     del ip['color']
-    del ip['snapshot']
     ip['color_cut'] = ['0.60', None]
     ip['space'] = 'redshift'
-    galFig.redshiftR_colorC_axis(rl, ip, saveDirPath)
+    del ip['snapshot']
+    flib = galFig.redshiftR_colorC_axis(rl, ip)
+    flib.saveFig(saveDirPath, 'redshift', 'color', 'axis', '_redshift_axis_test')
 
     ip = cc(baseIncludeProps)
     del ip['fieldname']
@@ -235,17 +236,19 @@ def galaxyAuto(rl):
     ip = cc(baseIncludeProps)
     del ip['axis']
     del ip['color']
-    del ip['space']
     ip['fieldname'] = 'galaxy_dust'
-    flib = galFig.colorR_spaceC_axis(rl, ip)
-    flib.saveFig(saveDirPath, 'color', 'space', 'axis', '_dust_axis_test')
+    del ip['snapshot']
+    ip['space'] = 'redshift'
+    flib = galFig.redshiftR_colorC_axis(rl, ip)
+
+    flib.saveFig(saveDirPath, 'redshift', 'color', 'axis', '_dust_axis_test')
 
     ip = cc(baseIncludeProps)
     del ip['color']
     ip['color_cut'] = [None, '0.60']
     del ip['snapshot']
     ip['space'] = 'redshift'
-    galFig.colorR_redshiftC_2D(rl, ip, saveDirPath)
+    galFig.redshiftR_colorC_2D(rl, ip, saveDirPath)
 
     ip = cc(baseIncludeProps)
     del ip['axis']
@@ -253,9 +256,9 @@ def galaxyAuto(rl):
     del ip['color']
     ip['space'] = 'redshift'
     galFig.axisR_colorC_2D(rl, ip, saveDirPath)
-
-    del ip['snapshot']
-    del ip['fieldname']
+    
+    ip = {}
+    ip['fieldname'] = ['galaxy', 'galaxy_dust']
     galFig.make_histograms(rl, ip, saveDirPath)
     return
 

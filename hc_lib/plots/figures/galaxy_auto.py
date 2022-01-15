@@ -347,21 +347,24 @@ def color_cutR_colorC_gal_res(rlib, iprops, savePath = '', panel_length = 3, pan
     else:
         return flib
 
-def fieldnameR_colorC_axis(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
+def redshiftR_colorC_axis(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
             border = 1):
+    """
+    Measuring the effect of the line of sight on the redshift-space power spectrum
+    """
     iprops['space'] = 'redshift'
-    row_prop = 'fieldname'
+    row_prop = 'redshift'
     column_prop = 'color'
     panel_prop = 'axis'
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
 
-    for r in range(len(rowlabels)):
-        if rowlabels[r] == 'galaxy':
-            rowlabels[r] = 'Fiducial'
-        if rowlabels[r] == 'galaxy_dust':
-            rowlabels[r] = 'Dust Model'
+    #for r in range(len(rowlabels)):
+    #    if rowlabels[r] == 'galaxy':
+    #        rowlabels[r] = 'Fiducial'
+    #    if rowlabels[r] == 'galaxy_dust':
+    #        rowlabels[r] = 'Dust Model'
 
     linelabels = {0 : 'x-axis', 1 : 'y-axis', 2:'z-axis'}
     #print(figArr.shape)
@@ -469,12 +472,15 @@ def make_histograms(rlib, iprops, savePath='', panel_length = 3, panel_bt = 0.25
     flib.addColLabels(collabels)
     flib.changeTickDirection()
     flib.axisLabel('Log (M$_*$/M$_\odot$)', 'x')
-    flib.axisLabel('g-r', 'y')
-    flib.makeColorbars()
-    flib.logNormColorbar()
+    flib.axisLabel('g-r (magnitude)', 'y')
+    flib.makeColorbars(cbar_label = 'Count (Galaxies)')
+    cmap_arr = np.empty_like(figArr, dtype=object)
+    cmap_arr[:,:]= 'viridis'
+    flib.assignColormaps(cmap_arr, 'w')
+    flib.logNormColorbar(vlim=[1,5e2])
     
     if not savePath == '':
-        flib.saveFig(savePath, row_prop, column_prop, '2D')
+        flib.saveFig(savePath, rowp, colp, 'hist')
         return None
     else:
         return flib
