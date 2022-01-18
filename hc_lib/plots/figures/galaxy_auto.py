@@ -96,6 +96,178 @@ def redshiftR_colorC_space(rlib, iprops, savePath = '', panel_length = 3, panel_
     else:
         return flib
 
+def colorR_spaceC_redshift(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 1,
+            border = 1):
+    """
+    More easily visualize the redshift evolution of the power spectrum.
+    """
+    row_prop = 'color'
+    column_prop = 'space'
+    panel_prop = 'redshift'
+    
+    print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
+    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
+
+    linelabels = {'real':'Real Space', 'redshift':'Redshift Space'}
+    linecolors = {'real':'blue', 'redshift':'red'}
+    only_props = {'color_cut':[None, '0.60']}
+    figArr = rlib.removeResults(figArr, only_props)
+    #print(figArr.shape)
+    flib = FigureLibrary(figArr)
+    # add distortion panels
+
+    flib.createFig(panel_length, panel_bt, border, border)
+    flib.plotLines(panel_prop, linelabels, linecolors)
+    flib.addRowLabels(rowlabels)
+    flib.addColLabels(collabels)
+    flib.logAxis('both')
+
+    flib.changeTickDirection()
+    flib.removeDefaultTickLabels()
+    flib.xLimAdjustToNyquist()
+    flib.flushYAxisToData()
+    flib.matchAxisLimits()
+    flib.defaultAxesLabels()
+    flib.addLegend()
+    flib.printIprops(iprops)
+
+    # if savefig, then save it, otherwise return it
+
+    if not savePath == '':
+        flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+        return
+    else:
+        return flib
+
+def colorR_spaceC_grid_resolution(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 1,
+            border = 1):
+    """
+    Comparing different grid resolutions.
+    """
+    row_prop = 'color'
+    column_prop = 'space'
+    panel_prop = 'grid_resolution'
+    
+    print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
+    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
+
+    linelabels = {'real':'Real Space', 'redshift':'Redshift Space'}
+    linecolors = {'real':'blue', 'redshift':'red'}
+    only_props = {'color_cut':[None, '0.60']}
+    figArr = rlib.removeResults(figArr, only_props)
+    #print(figArr.shape)
+    flib = FigureLibrary(figArr)
+    # add distortion panels
+
+    flib.createFig(panel_length, panel_bt, border, border)
+    flib.plotLines(panel_prop, linelabels, linecolors)
+    flib.addRowLabels(rowlabels)
+    flib.addColLabels(collabels)
+    flib.logAxis('both')
+
+    flib.changeTickDirection()
+    flib.removeDefaultTickLabels()
+    flib.xLimAdjustToNyquist()
+    flib.flushYAxisToData()
+    flib.matchAxisLimits()
+    flib.defaultAxesLabels()
+    flib.addLegend()
+    flib.printIprops(iprops)
+
+    # if savefig, then save it, otherwise return it
+
+    if not savePath == '':
+        flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+        return
+    else:
+        return flib
+
+def colorR_spaceC_sim_resolution(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 1,
+            border = 1):
+    """
+    Comparing simulation resolution
+    """
+    row_prop = 'color'
+    column_prop = 'space'
+    panel_prop = 'sim_resolution'
+    
+    print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
+    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
+
+    linelabels = {'real':'Real Space', 'redshift':'Redshift Space'}
+    linecolors = {'real':'blue', 'redshift':'red'}
+    only_props = {'color_cut':[None, '0.60']}
+    figArr = rlib.removeResults(figArr, only_props)
+    #print(figArr.shape)
+    flib = FigureLibrary(figArr)
+    # add distortion panels
+
+    flib.createFig(panel_length, panel_bt, border, border)
+    flib.plotLines(panel_prop, linelabels, linecolors)
+    flib.addRowLabels(rowlabels)
+    flib.addColLabels(collabels)
+    flib.logAxis('both')
+
+    flib.changeTickDirection()
+    flib.removeDefaultTickLabels()
+    flib.xLimAdjustToNyquist()
+    flib.flushYAxisToData()
+    flib.matchAxisLimits()
+    flib.defaultAxesLabels()
+    flib.addLegend()
+    flib.printIprops(iprops)
+
+    # if savefig, then save it, otherwise return it
+
+    if not savePath == '':
+        flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+        return
+    else:
+        return flib
+
+def colorR_spaceC_box(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 1,
+            border = 1):
+    """
+    Compare Box volume
+    """
+    row_prop = 'color'
+    column_prop = 'space'
+    panel_prop = 'box'
+    
+    print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
+    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
+
+    linelabels = {'real':'Real Space', 'redshift':'Redshift Space'}
+    linecolors = {'real':'blue', 'redshift':'red'}
+    only_props = {'color_cut':[None, '0.60']}
+    figArr = rlib.removeResults(figArr, only_props)
+    #print(figArr.shape)
+    flib = FigureLibrary(figArr)
+    # add distortion panels
+
+    flib.createFig(panel_length, panel_bt, border, border)
+    flib.plotLines(panel_prop, linelabels, linecolors)
+    flib.addRowLabels(rowlabels)
+    flib.addColLabels(collabels)
+    flib.logAxis('both')
+
+    flib.changeTickDirection()
+    flib.removeDefaultTickLabels()
+    flib.xLimAdjustToNyquist()
+    flib.flushYAxisToData()
+    flib.matchAxisLimits()
+    flib.defaultAxesLabels()
+    flib.addLegend()
+    flib.printIprops(iprops)
+
+    # if savefig, then save it, otherwise return it
+
+    if not savePath == '':
+        flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+        return
+    else:
+        return flib
+        
 def spaceR_colorC_species(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
             border = 1):
     """
@@ -134,50 +306,12 @@ def spaceR_colorC_species(rlib, iprops, savePath = '', panel_length = 3, panel_b
         return
     else:
         return flib
-
-def spaceR_colorC_mas(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
-            border = 1):
-    """
-    Visualize the effect of using CIC or CICW for the mass-assignment scheme.
-    """
-    row_prop = 'space'
-    column_prop = 'color'
-    panel_prop = 'mas'
-    
-    print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
-    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
-
-    only_props = {'color_cut':[None, '0.60']}
-    figArr = rlib.removeResults(figArr, only_props)
-    flib = FigureLibrary(figArr)
-
-    flib.createFig(panel_length, panel_bt, border, border)
-    flib.plotLines(panel_prop)
-    flib.addRowLabels(rowlabels)
-    flib.addColLabels(collabels)
-    flib.logAxis('both')
-
-    flib.changeTickDirection()
-    flib.removeDefaultTickLabels()
-    flib.xLimAdjustToNyquist()
-    flib.flushYAxisToData()
-    flib.matchAxisLimits(which = 'both')
-    flib.defaultAxesLabels()
-    flib.addLegend()
-    flib.printIprops(iprops)
-
-    # if savefig, then save it, otherwise return it
-
-    if not savePath == '':
-        flib.saveFig(savePath, row_prop, column_prop, panel_prop)
-        return
-    else:
-        return flib
     
 def fieldnameR_colorC_color_cut(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
             border = 1):
     """
-    Visualize how the color_cut used affects the pk for the color.
+    Visualize how the color_cut used affects the pk for the color, with and without
+    dust.
     """
     row_prop = 'fieldname'
     column_prop = 'color'
@@ -311,41 +445,6 @@ def axisR_colorC_fieldname(rlib, iprops, savePath = '', panel_length = 3, panel_
     else:
         return flib
         
-def color_cutR_colorC_gal_res(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
-            border = 1):
-    """
-    Visualize how the color_cut used affects the pk for the color.
-    """
-    row_prop = 'color_cut'
-    column_prop = 'color'
-    panel_prop = 'gal_res'
-    
-    print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
-    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
-
-    flib = FigureLibrary(figArr)
-
-    flib.createFig(panel_length, panel_bt, border, border)
-    flib.plotLines(panel_prop)
-    flib.addRowLabels(rowlabels)
-    flib.addColLabels(collabels)
-    flib.logAxis('both')
-
-    flib.removeDefaultTickLabels()
-    flib.xLimAdjustToNyquist()
-    flib.flushYAxisToData()
-    flib.matchAxisLimits(which = 'both')
-    flib.defaultAxesLabels()
-    flib.addLegend()
-    flib.printIprops(iprops)
-
-    # if savefig, then save it, otherwise return it
-
-    if not savePath == '':
-        flib.saveFig(savePath, row_prop, column_prop, panel_prop)
-        return
-    else:
-        return flib
 
 def redshiftR_colorC_axis(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
             border = 1):
@@ -397,6 +496,10 @@ def redshiftR_colorC_axis(rlib, iprops, savePath = '', panel_length = 3, panel_b
 
 def redshiftR_colorC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
             border = 1):
+    """
+    Visualize how the redshift space distortions change with redshift for different
+    galaxy colors.
+    """
     row_prop = 'redshift'
     column_prop = 'color'
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, '2D'))
@@ -427,6 +530,9 @@ def redshiftR_colorC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt 
     
 def axisR_colorC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
             border = 1):
+    """
+    Visualize how different line-of-sight affects the redshift space distortion.
+    """
     row_prop = 'axis'
     column_prop = 'color'
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, '2D'))
@@ -472,7 +578,7 @@ def make_histograms(rlib, iprops, savePath='', panel_length = 3, panel_bt = 1.25
             collabels[c] = 'With Dust'
     flib.createFig(panel_length, panel_bt, border, border)
     flib.plotHists()
-    flib.addRowLabels(rowlabels, pos = (0.9, 0.05) color = 'black')
+    flib.addRowLabels(rowlabels, pos = (0.9, 0.05), color = 'black')
     flib.addColLabels(collabels)
     flib.changeTickDirection()
     flib.axisLabel('Log (M$_*$/M$_\odot$)', 'x')
@@ -489,3 +595,81 @@ def make_histograms(rlib, iprops, savePath='', panel_length = 3, panel_bt = 1.25
     else:
         return flib
     return
+
+####################SAVE FOR LATER#######################################
+def spaceR_colorC_mas(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
+            border = 1):
+    """
+    Visualize the effect of using CIC or CICW for the mass-assignment scheme.
+    (Ignore for now)
+    """
+    row_prop = 'space'
+    column_prop = 'color'
+    panel_prop = 'mas'
+    
+    print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
+    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
+
+    only_props = {'color_cut':[None, '0.60']}
+    figArr = rlib.removeResults(figArr, only_props)
+    flib = FigureLibrary(figArr)
+
+    flib.createFig(panel_length, panel_bt, border, border)
+    flib.plotLines(panel_prop)
+    flib.addRowLabels(rowlabels)
+    flib.addColLabels(collabels)
+    flib.logAxis('both')
+
+    flib.changeTickDirection()
+    flib.removeDefaultTickLabels()
+    flib.xLimAdjustToNyquist()
+    flib.flushYAxisToData()
+    flib.matchAxisLimits(which = 'both')
+    flib.defaultAxesLabels()
+    flib.addLegend()
+    flib.printIprops(iprops)
+
+    # if savefig, then save it, otherwise return it
+
+    if not savePath == '':
+        flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+        return
+    else:
+        return flib
+
+def color_cutR_colorC_gal_res(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
+            border = 1):
+    """
+    Visualize how the color_cut used affects the pk for the color.
+    (Ignore for now)
+    """
+    row_prop = 'color_cut'
+    column_prop = 'color'
+    panel_prop = 'gal_res'
+    
+    print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
+    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
+
+    flib = FigureLibrary(figArr)
+
+    flib.createFig(panel_length, panel_bt, border, border)
+    flib.plotLines(panel_prop)
+    flib.addRowLabels(rowlabels)
+    flib.addColLabels(collabels)
+    flib.logAxis('both')
+
+    flib.removeDefaultTickLabels()
+    flib.xLimAdjustToNyquist()
+    flib.flushYAxisToData()
+    flib.matchAxisLimits(which = 'both')
+    flib.defaultAxesLabels()
+    flib.addLegend()
+    flib.printIprops(iprops)
+
+    # if savefig, then save it, otherwise return it
+
+    if not savePath == '':
+        flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+        return
+    else:
+        return flib

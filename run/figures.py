@@ -115,41 +115,37 @@ def hiptlAuto(rl):
     baseIncludeProps['axis'] = 0
     baseIncludeProps['grid_resolution'] = 800
     baseIncludeProps['is_auto'] = True
+    baseIncludeProps['map'] = 'mass'
 
     ip = cc(baseIncludeProps)
-    ip['map'] = 'mass'
     hiptlFig.redshiftR_spaceC_model(rl, ip, saveDirPath)
-     
-    ip = cc(baseIncludeProps)
-    ip['snapshot'] = 99
-    hiptlFig.modelR_spaceC_map(rl, ip, saveDirPath)
-
-    ip = cc(baseIncludeProps)
-    ip['map'] = 'mass'
+    
+    hiptlFig.modelR_spaceC_redshift(rl, ip, saveDirPath)
+    
     hiptlFig.redshiftR_modelC_space(rl, ip, saveDirPath)
 
     ip = cc(baseIncludeProps)
-    ip['snapshot'] = 99
-    hiptlFig.mapR_spaceC_model(rl, ip, saveDirPath)
+    del ip['simname']
+    ip['model'] = 'GD14'
+    hiptlFig.redshiftR_spaceC_box(rl, ip, saveDirPath)
 
-
-    # ip = cc(baseIncludeProps)
-    # ip['snapshot'] = 99
-    # ip['map'] = 'mass'
-    # del ip['simname']
-    # hiptlFig.modelR_spaceC_simResolution(rl, ip, saveDirPath)
+    hiptlFig.redshiftR_spaceC_simResolution(rl, ip, saveDirPath)
     
+    ip['simname'] = 'tng100'
+    del ip['grid_resolution']
+    hiptlFig.redshiftR_spaceC_gridResolution(rl, ip, saveDirPath)
 
     ip = cc(baseIncludeProps)
-    ip['map'] = 'mass'
     del ip['axis']
-    ip['model'] = 'GD14'
     hiptlFig.redshiftR_spaceC_axis(rl, ip, saveDirPath)
 
     ip = cc(baseIncludeProps)
-    ip['model'] = 'GD14'
     ip['snapshot'] = 99
-    hiptlFig.mapR_spaceC_2D(rl, ip, saveDirPath)
+    hiptlFig.redshiftR_modelC_2D(rl, ip, saveDirPath)
+
+    ip = cc(baseIncludeProps)
+    del ip['axis']
+    hiptlFig.axisR_modelC_2D(rl, ip, saveDirPath)
 
     ip = cc(baseIncludeProps)
     ip['model'] = 'GD14'
@@ -196,14 +192,32 @@ def galaxyAuto(rl):
     
     galFig.redshiftR_colorC_space(rl, ip, saveDirPath)
     
+    galFig.colorR_spaceC_redshift(rl, ip, saveDirPath)
     # make plots with everything
     ip['gal_res'] = ['diemer', None]
     flib = galFig.redshiftR_spaceC_color(rl, ip)
-    flib.saveFig(saveDirPath, 'redshift', 'space', 'color', '_withall')
+    flib.saveFig(saveDirPath, 'redshift', 'space', 'color', 'withall')
     flib = galFig.redshiftR_colorC_space(rl, ip)
-    flib.saveFig(saveDirPath, 'redshift', 'color', 'space', '_withall')
+    flib.saveFig(saveDirPath, 'redshift', 'color', 'space', 'withall')
+    flib = galFig.colorR_spaceC_redshift(rl, ip)
+    flib.saveFig(saveDirPath, 'color', 'space', 'redshift', 'withall')
 
+    ip = cc(baseIncludeProps)
+    del ip['grid_resolution']
+    del ip['space']
+    del ip['color']
+    ip['color_cut'] = ['0.60', None]
+    galFig.colorR_spaceC_grid_resolution(rl, ip, saveDirPath)
 
+    ip['grid_resolution'] = 800
+    del ip['sim_resolution']
+    galFig.colorR_spaceC_sim_resolution(rl, ip, saveDirPath)
+    
+    ip['sim_resolution'] = 'high'
+    del ip['box']
+    galFig.colorR_spaceC_box(rl, ip, saveDirPath)
+
+    
     ip = cc(baseIncludeProps)
     del ip['species']
     del ip['color']
@@ -225,7 +239,7 @@ def galaxyAuto(rl):
     ip['space'] = 'redshift'
     del ip['snapshot']
     flib = galFig.redshiftR_colorC_axis(rl, ip)
-    flib.saveFig(saveDirPath, 'redshift', 'color', 'axis', '_redshift_axis_test')
+    flib.saveFig(saveDirPath, 'redshift', 'color', 'axis', 'redshift_axis_test')
 
     ip = cc(baseIncludeProps)
     del ip['fieldname']
@@ -241,7 +255,7 @@ def galaxyAuto(rl):
     ip['space'] = 'redshift'
     flib = galFig.redshiftR_colorC_axis(rl, ip)
 
-    flib.saveFig(saveDirPath, 'redshift', 'color', 'axis', '_dust_axis_test')
+    flib.saveFig(saveDirPath, 'redshift', 'color', 'axis', 'dust_axis_test')
 
     ip = cc(baseIncludeProps)
     del ip['color']
