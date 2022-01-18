@@ -459,16 +459,20 @@ def axisR_colorC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.
     else:
         return flib
 
-def make_histograms(rlib, iprops, savePath='', panel_length = 3, panel_bt = 0.25,
+def make_histograms(rlib, iprops, savePath='', panel_length = 3, panel_bt = 1.25,
             border = 1):
     rowp = 'redshift'
     colp = 'fieldname'
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, rowp, colp, 'hist')
     flib = FigureLibrary(figArr)
-    
+    for c in range(len(collabels)):
+        if collabels[c] == 'galaxy':
+            collabels[c] = 'Fiducial'
+        elif collabels[c] == 'galaxy_dust':
+            collabels[c] = 'With Dust'
     flib.createFig(panel_length, panel_bt, border, border)
     flib.plotHists()
-    flib.addRowLabels(rowlabels)
+    flib.addRowLabels(rowlabels, pos = (0.9, 0.05) color = 'black')
     flib.addColLabels(collabels)
     flib.changeTickDirection()
     flib.axisLabel('Log (M$_*$/M$_\odot$)', 'x')

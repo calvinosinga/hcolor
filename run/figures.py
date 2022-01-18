@@ -28,8 +28,8 @@ def main():
 
     printlib('fieldname')
     
-    # hiptlAuto(rlib)
-    galaxyAuto(rlib)
+    hiptlAuto(rlib)
+    # galaxyAuto(rlib)
     # hisubhaloAuto(rlib)
     # ptlAuto(rlib)
     # vnAuto(rlib)

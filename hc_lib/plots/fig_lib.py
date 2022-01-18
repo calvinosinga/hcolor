@@ -231,7 +231,7 @@ class FigureLibrary():
                 # x_bound, y_bound, mass = pslice.getValues()
                 # extent=(x_bound[0], x_bound[1], y_bound[0], y_bound[1])
                 
-                im = plt.imshow(mass, extent=extent, origin='lower')
+                im = plt.imshow(mass, aspect = 'auto', extent=extent, origin='lower')
                 
 
         
@@ -245,8 +245,9 @@ class FigureLibrary():
                 plt.sca(p)
                 hist = self.figArr[i,j][0]
                 xbins, ybins, counts = hist.getValues()
+                counts = np.rot90(np.flip(counts, axis=0), 3)
                 extent = (xbins[0], xbins[-1], ybins[0], ybins[-1])
-                plt.imshow(counts, origin='lower', extent=extent)
+                plt.imshow(counts, origin='lower', extent=extent, aspect = 'auto')
                 if make_lines:
                     plt.plot([xbins[0], xbins[-1]], [0.6, 0.6], color='red')
                     plt.plot([xbins[0], xbins[-1]], [0.55, 0.55], color='red')
@@ -276,7 +277,7 @@ class FigureLibrary():
                 vmax = np.max(plotpk)
                 print(plotpk)
                 plt.imshow(plotpk, extent=extent, vmin = vmin, vmax = vmax, 
-                            origin='lower')
+                            origin='lower', aspect = 'auto')
                 
         return
     
@@ -378,7 +379,7 @@ class FigureLibrary():
 
     # TODO: add variance
     def makeColorbars(self, cbar_label = '', def_cmap = 'plasma', fsize = 16, vlim=[],
-                except_panels = []):
+                label_pad = 16, except_panels = []):
         
         if self.has_cbar_panel:
             self.matchColorbarLimits(vlim=vlim)
@@ -388,14 +389,15 @@ class FigureLibrary():
             self.assignColormaps(cmap_arr, under='w')
             cbar = plt.colorbar(cax=self.cax)
             self.cax.set_aspect(12, anchor='W')
-            cbar.set_label(cbar_label, labelpad = 16, fontsize = fsize, rotation=270)
+            cbar.set_label(cbar_label, labelpad = label_pad, fontsize = fsize, rotation=270)
         else:
             for i in range(self.dim[0]):
                 for j in range(self.dim[1]):
                     if (i,j) not in except_panels:
                         plt.sca(self.panels[i][j])
                         cbar = plt.colorbar(fraction=0.046, pad=0.04)
-                        cbar.set_label(cbar_label, rotation=270, fontsize=fsize)
+                        if j == self.dim[1] - 1:
+                            cbar.set_label(cbar_label, labelpad = label_pad, rotation=270, fontsize=fsize)
                         self.cax[i, j] = [cbar]
                         
 
@@ -464,7 +466,8 @@ class FigureLibrary():
         self.fig.suptitle(outstr, fontsize = fsize, wrap = True, usetex = False)
         return
         
-    def addRowLabels(self, rowlabels, pos = (0.05, 0.05), fsize = 16, is2D = False):
+    def addRowLabels(self, rowlabels, pos = (0.05, 0.05), fsize = 16, is2D = False,
+                    color = 'black'):
         dim = self.dim
         if not is2D:
             
@@ -472,21 +475,22 @@ class FigureLibrary():
                 p = self.panels[i][0]
                 plt.sca(p)
                 plt.text(pos[0], pos[1], self.texStr(rowlabels[i]), fontsize = fsize,
-                            ha = 'left', va = 'bottom', transform = p.transAxes)
+                            ha = 'left', va = 'bottom', color = color, 
+                            transform = p.transAxes)
         else:
             for i in range(dim[0]):
                 p = self.panels[i][0]
                 plt.sca(p)
-                plt.ylabel(rowlabels[i], fontsize=fsize)
+                plt.ylabel(rowlabels[i], color=color, fontsize=fsize)
         return
     
-    def addColLabels(self, collabels, fsize = 16):
+    def addColLabels(self, collabels, fsize = 16, color='black'):
         dim = self.dim
         for j in range(dim[1]):
             p = self.panels[0][j]
             plt.sca(p)
             p.xaxis.set_label_position('top')
-            plt.xlabel(self.texStr(collabels[j]), fontsize = fsize)
+            plt.xlabel(self.texStr(collabels[j]), color = color, fontsize = fsize)
         return
     
     def removeYTickLabels(self, panel_exceptions = []):
