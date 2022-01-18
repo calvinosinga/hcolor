@@ -29,7 +29,7 @@ def main():
     printlib('fieldname')
     
     hiptlAuto(rlib)
-    # galaxyAuto(rlib)
+    galaxyAuto(rlib)
     # hisubhaloAuto(rlib)
     # ptlAuto(rlib)
     # vnAuto(rlib)
@@ -137,6 +137,7 @@ def hiptlAuto(rl):
 
     ip = cc(baseIncludeProps)
     del ip['axis']
+    ip['model'] = 'GD14'
     hiptlFig.redshiftR_spaceC_axis(rl, ip, saveDirPath)
 
     ip = cc(baseIncludeProps)
@@ -210,11 +211,11 @@ def galaxyAuto(rl):
     galFig.colorR_spaceC_grid_resolution(rl, ip, saveDirPath)
 
     ip['grid_resolution'] = 800
-    del ip['sim_resolution']
+    del ip['simname']
     galFig.colorR_spaceC_sim_resolution(rl, ip, saveDirPath)
     
     ip['sim_resolution'] = 'high'
-    del ip['box']
+    #del ip['simname']
     galFig.colorR_spaceC_box(rl, ip, saveDirPath)
 
     

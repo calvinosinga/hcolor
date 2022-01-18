@@ -36,7 +36,7 @@ def redshiftR_spaceC_color(rlib, iprops, savePath = '', panel_length = 3, panel_
     def_ytick_except = flib._defaultTickLabelPanelExceptions('y')
     flib.removeYTickLabels(panel_exceptions = dist_panels_idx_list + def_ytick_except)
     flib.xLimAdjustToNyquist()
-    flib.flushYAxisToData()
+    flib.flushYAxisToData(panel_exceptions = dist_panels_idx_list)
     flib.matchAxisLimits(which = 'x')
     flib.matchAxisLimits(which = 'y', panel_exceptions = dist_panels_idx_list)
     flib.defaultAxesLabels()
@@ -578,7 +578,7 @@ def make_histograms(rlib, iprops, savePath='', panel_length = 3, panel_bt = 1.25
             collabels[c] = 'With Dust'
     flib.createFig(panel_length, panel_bt, border, border)
     flib.plotHists()
-    flib.addRowLabels(rowlabels, pos = (0.9, 0.05), color = 'black')
+    flib.addRowLabels(rowlabels, is2D = True)
     flib.addColLabels(collabels)
     flib.changeTickDirection()
     flib.axisLabel('Log (M$_*$/M$_\odot$)', 'x')

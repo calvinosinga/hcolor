@@ -13,8 +13,6 @@ def redshiftR_spaceC_model(rlib, iprops, savePath = '', panel_length = 3, panel_
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
-    rowlabels = [r'z=%.1f'%i for i in rowlabels]
-    collabels = [i.capitalize() + ' Space' for i in collabels]
 
     flib = FigureLibrary(figArr)
     # add distortion panels
@@ -61,7 +59,7 @@ def redshiftR_modelC_space(rlib, iprops, savePath = '', panel_length = 3, panel_
     panel_prop = 'space'
 
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
-    rowlabels = [r'z=%.1f'%i for i in rowlabels]
+    
     linelabels = {'real':'Real Space', 'redshift':'Redshift Space'}
     colors = {'real':'blue', 'redshift':'red'}
     flib = FigureLibrary(figArr)
@@ -93,11 +91,14 @@ def modelR_spaceC_redshift(rlib, iprops, savePath = '', panel_length = 3, panel_
     row_prop = 'model'
     column_prop = 'space'
     panel_prop = 'redshift'
-    
+
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
-    rowlabels = [r'z=%.1f'%i for i in rowlabels]
-    collabels = [i.capitalize() + ' Space' for i in collabels]
+    linelabels = {}
+    pres = figArr[0, 0]
+    for i in pres:
+        z = i.getProp('redshift')
+        linelabels[z] = '%.1f'%z
 
     flib = FigureLibrary(figArr)
     # add distortion panels
@@ -106,7 +107,7 @@ def modelR_spaceC_redshift(rlib, iprops, savePath = '', panel_length = 3, panel_
     collabels.append('Distortion')
 
     flib.createFig(panel_length, panel_bt, border, border)
-    flib.plotLines(panel_prop)
+    flib.plotLines(panel_prop, linelabels)
     flib.addRowLabels(rowlabels)
     flib.addColLabels(collabels)
     flib.logAxis('y', panel_exceptions = dist_panels_idx_list)
@@ -145,9 +146,11 @@ def redshiftR_spaceC_box(rlib, iprops, savePath = '', panel_length = 3, panel_bt
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
-    rowlabels = [i.replace('_', '') for i in rowlabels]
-
-    collabels = [i.capitalize() for i in collabels]
+    pres = figArr[0,0]
+    linelabels = {}
+    for i in pres:
+        box = i.getProp('box')
+        linelabels[box] = '%d$^3$ Mpc/h'%box 
 
     flib = FigureLibrary(figArr)
     # add distortion panels
@@ -156,7 +159,7 @@ def redshiftR_spaceC_box(rlib, iprops, savePath = '', panel_length = 3, panel_bt
     collabels.append('Distortion')
 
     flib.createFig(panel_length, panel_bt, border, border)
-    flib.plotLines(panel_prop)
+    flib.plotLines(panel_prop, linelabels)
     flib.addRowLabels(rowlabels)
     flib.addColLabels(collabels)
     flib.logAxis('y', panel_exceptions = dist_panels_idx_list)
@@ -190,9 +193,12 @@ def redshiftR_spaceC_gridResolution(rlib, iprops, savePath = '', panel_length = 
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
-    rowlabels = [i.replace('_', '') for i in rowlabels]
-    collabels = [i.capitalize() for i in collabels]
-
+    
+    linelabels = {}
+    pres = figArr[0,0]
+    for i in pres:
+        gr = i.getProp('grid_resolution')
+        linelabels[gr] = '%d$^3$'%gr
     flib = FigureLibrary(figArr)
     # add distortion panels
     dist_panels_idx_list = flib.addRedshiftDistortion((slice(None), 0), 
@@ -200,7 +206,7 @@ def redshiftR_spaceC_gridResolution(rlib, iprops, savePath = '', panel_length = 
     collabels.append('Distortion')
 
     flib.createFig(panel_length, panel_bt, border, border)
-    flib.plotLines(panel_prop)
+    flib.plotLines(panel_prop, linelabels)
     flib.addRowLabels(rowlabels)
     flib.addColLabels(collabels)
     flib.logAxis('y', panel_exceptions = dist_panels_idx_list)
@@ -235,10 +241,7 @@ def redshiftR_spaceC_simResolution(rlib, iprops, savePath = '', panel_length = 3
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
-    rowlabels = [i.replace('_', '') for i in rowlabels]
-
-    collabels = [i.capitalize() for i in collabels]
-
+    linelabels = {'high':'High', 'medium':'Medium', 'low':'Low'}
     flib = FigureLibrary(figArr)
     # add distortion panels
     dist_panels_idx_list = flib.addRedshiftDistortion((slice(None), 0), 
@@ -281,8 +284,6 @@ def redshiftR_spaceC_axis(rlib, iprops, savePath = '', panel_length = 3, panel_b
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
-    rowlabels = [r'z=%.1f'%i for i in rowlabels]
-    collabels = [i.capitalize() for i in collabels]
 
     flib = FigureLibrary(figArr)
     # add distortion panels
@@ -334,7 +335,7 @@ def redshiftR_modelC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt 
     
     flib.createFig(panel_length, panel_bt, border, border, True)
     flib.plot2D()
-    flib.makeColorbars('P(k$_\parallel$, k$_\perp$) (Mpc/h)$^{-3}$', vlim=[10**2,10**4])
+    flib.makeColorbars('P(k$_\parallel$, k$_\perp$) (Mpc/h)$^{-3}$')
 
     flib.addContours()
 
@@ -365,7 +366,7 @@ def axisR_modelC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.
     
     flib.createFig(panel_length, panel_bt, border, border, True)
     flib.plot2D()
-    flib.makeColorbars('P(k$_\parallel$, k$_\perp$) (Mpc/h)$^{-3}$', vlim=[10**2,10**4])
+    flib.makeColorbars('P(k$_\parallel$, k$_\perp$) (Mpc/h)$^{-3}$')
 
     flib.addContours()
 

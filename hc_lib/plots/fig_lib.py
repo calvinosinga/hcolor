@@ -225,8 +225,8 @@ class FigureLibrary():
 
                 plt.sca(p)
 
-                mass, _, _ = pslice.getValues()
-                extent=(0, 110.7, 0, 110.7)
+                xlim, ylim, mass = pslice.getValues()
+                extent=(xlim[0], xlim[1], ylim[0], ylim[1])
                 
                 # x_bound, y_bound, mass = pslice.getValues()
                 # extent=(x_bound[0], x_bound[1], y_bound[0], y_bound[1])
@@ -615,12 +615,12 @@ class FigureLibrary():
         self.matchAxisLimits(which='x', panel_exceptions=panel_exceptions)
         return
     
-    def flushYAxisToData(self, result_type = 'pk', except_panels = []):
+    def flushYAxisToData(self, result_type = 'pk', panel_exceptions = []):
+        ylim = [np.inf, -np.inf]
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
-                if (i, j) not in except_panels:
+                if (i, j) not in panel_exceptions:
                     p = self.panels[i][j]
-                    ylim = [np.inf, -np.inf]
                     plt.sca(p)
                     res_container_list = self.figArr[i, j]
                     xmin, xmax = plt.xlim()
@@ -644,12 +644,12 @@ class FigureLibrary():
                             if ymax > ylim[1]:
                                 ylim[1] = ymax
         
-        #for i in range(self.dim[0]):
-        #    for j in range(self.dim[1]):
-        #        if (i, j) not in except_panels:
-        #            p = self.panels[i][j]
-        #            plt.sca(p)
-        #            plt.ylim(ylim[0], ylim[1])
+        for i in range(self.dim[0]):
+            for j in range(self.dim[1]):
+                if (i, j) not in panel_exceptions:
+                    p = self.panels[i][j]
+                    plt.sca(p)
+                    plt.ylim(ylim[0], ylim[1])
         return
 
     def defaultAxesLabels(self, dtype = 1):
