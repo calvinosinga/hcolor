@@ -15,7 +15,9 @@ def redshiftR_spaceC_fieldname_distortion(rlib, iprops, savePath = '', panel_len
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk', check=[0,0])
     linelabels = {'vn':'VN18-Particle'}
     colors = {'vn':'green'}
-
+    for i in range(figArr.shape[0]):
+        for j in range(figArr.shape[1]):
+            print(len(figArr[i,j]))
     flib = FigureLibrary(figArr)
     # add distortion panels
     dist_panels_idx_list = flib.addRedshiftDistortion((slice(None), 0), 

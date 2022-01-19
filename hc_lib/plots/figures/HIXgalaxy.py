@@ -67,17 +67,17 @@ def redshiftR_spaceC_fieldname_no_distortion(rlib, iprops, savePath = '', panel_
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
-    linelabels = {'vn':'VN18-Particle'}
-    colors = {'vn':'green'}
+    #linelabels = {'[\'vn\', \'galaxy\']':'VN18-Particle'}
+    #colors = {'[\'vn\', \'galaxy\']':'green'}
 
     flib = FigureLibrary(figArr)
 
     flib.createFig(panel_length, panel_bt, border, border)
-    flib.plotLines(panel_prop, linelabels, colors)
+    flib.plotLines(panel_prop)
 
     # combining the lines
-    flib.fillLines(['hiptl'], label='D18-Particle', color='blue')
-    flib.fillLines(['hisubhalo'], label='D18-Subhalo', color='orange')
+    flib.fillLines(['[\'hisubhalo\', \'galaxy\']'], label='D18-Subhalo X All Galaxies', color='orange')
+    flib.fillLines(['[\'hiptl\', \'galaxy\']'], label='D18-Particle X All Galaxies', color='blue')
     flib.addRowLabels(rowlabels)
     flib.addColLabels(collabels)
     flib.logAxis('both')

@@ -22,8 +22,8 @@ def getBIP():
     baseIncludeProps['axis'] = 0
     baseIncludeProps['grid_resolution'] = 800
     baseIncludeProps['is_auto'] = True
-    baseIncludeProps['model'] = 'm_hi_GD14_map'
-    baseIncludeProps['projection'] = 'map'
+    #baseIncludeProps['model'] = 'm_hi_GD14_map'
+    #baseIncludeProps['projection'] = 'map'
     baseIncludeProps['snapshot'] = 99
     baseIncludeProps['mas'] = 'CICW'
     baseIncludeProps['space'] = 'real'
@@ -43,12 +43,12 @@ def main():
 
     printlib('fieldname')
     
-    hiptlAuto(rlib)
-    galaxyAuto(rlib)
-    hisubhaloAuto(rlib)
-    ptlAuto(rlib)
-    vnAuto(rlib)
-    allAuto(rlib)
+    #hiptlAuto(rlib)
+    #galaxyAuto(rlib)
+    #hisubhaloAuto(rlib)
+    #ptlAuto(rlib)
+    #vnAuto(rlib)
+    #allAuto(rlib)
     HI_galaxy_cross_power(rlib)
     HI_ptl_cross_power(rlib)
 
@@ -68,15 +68,15 @@ def HI_galaxy_cross_power(rl):
     bip['is_auto'] = False
     bip['color'] = 'resolved'
     bip['map'] = 'mass'
-    bip['HI_res'] = 'diemer'
+    bip['HI_res'] = 'hi'
     bip['gal_res'] = 'diemer'
-    bip['color_cut'] = '0.60'
+    bip['color_cut'] = None
     bip['species'] = 'stmass'
     bip['fieldname'] = ['galaxy', 'hisubhalo', 'hiptl', 'vn']
     
     ip = cc(bip)
     del ip['snapshot'], ip['space']
-    HIxgal.redshiftR_spaceC_fieldname_distortion(rl, ip, saveDirPath)
+    #HIxgal.redshiftR_spaceC_fieldname_distortion(rl, ip, saveDirPath)
     
     HIxgal.redshiftR_spaceC_fieldname_no_distortion(rl, ip, saveDirPath)
     HIxgal.fieldnameR_spaceC_redshift(rl, ip, saveDirPath)
@@ -100,10 +100,10 @@ def HI_ptl_cross_power(rl):
     bip['is_auto'] = False
     bip['color'] = 'resolved'
     bip['map'] = 'mass'
-    bip['HI_res'] = 'diemer'
+    bip['HI_res'] = 'hi'
     bip['gal_res'] = 'diemer'
-    bip['color_cut'] = '0.60'
-    bip['species'] = 'stmass'
+    bip['color_cut'] = None
+    bip['species'] = 'ptl'
     bip['fieldname'] = ['ptl', 'hisubhalo', 'hiptl', 'vn']
 
     ip = cc(bip)
@@ -250,7 +250,7 @@ def galaxyAuto(rl):
     flib.saveFig(saveDirPath, 'redshift', 'color', 'axis', 'redshift_axis_test')
 
     ip = cc(bip)
-    del ip['fieldname']
+    ip['fieldname'] = ['galaxy', 'galaxy_dust']
     del ip['color']
     ip['color_cut'] = ['visual_inspection', '0.60', '0.55', '0.50', '0.65', '0.70']
     galFig.fieldnameR_colorC_color_cut(rl, ip, saveDirPath)
@@ -287,15 +287,17 @@ def hisubhaloAuto(rl):
     cc = copy.copy # used often, so just made shortcut
     #rl.printLib()
     # create directory to save figures in
-    saveDirPath = SAVEPATH+'hiptl_auto/'
+    saveDirPath = SAVEPATH+'hisubhalo_auto/'
     if not os.path.isdir(saveDirPath):
         os.mkdir(saveDirPath)
     
     bip = getBIP()
-    bip['HI_res'] = 'diemer'
-    bip['projection'] = ['map', 'vol']
+    bip['HI_res'] = 'hi' # needs fixing later
+    bip['projection'] = 'hi' # needs fixing later
     bip['model'] = 'm_hi_GD14_map'
     bip['fieldname'] = 'hisubhalo'
+    
+    #rl.printLib({'fieldname':'hisubhalo'}, 'pk')
 
     ip = cc(bip)
     del ip['snapshot']
@@ -325,10 +327,12 @@ def hisubhaloAuto(rl):
 
     ip=cc(bip)
     del ip['snapshot'], ip['model'], ip['projection']
+    ip['space'] = 'redshift'
     hisubFig.redshiftR_modelC_2D(rl, ip, saveDirPath)
 
     ip = cc(bip)
     del ip['axis'], ip['model'], ip['projection']
+    ip['space']= 'redshift'
     hisubFig.axisR_modelC_2D(rl, ip, saveDirPath)
 
     return
@@ -405,7 +409,8 @@ def allAuto(rl):
     # HI auto power spectra
     ip = cc(bip)
     del ip['snapshot'], ip['space']
-    ip['is_atomic'] = True
+    ip['fieldname'] = ['vn', 'hiptl', 'hisubhalo']
+     
     autoFig.redshiftR_spaceC_fieldname_distortion(rl, ip, saveDirPath)
     autoFig.redshiftR_spaceC_fieldname_no_distortion(rl, ip, saveDirPath)
 
@@ -417,7 +422,7 @@ def allAuto(rl):
     ip['model'] = ['GD14', 'f_hi_GD14_map']
     ip['color'] = ['resolved']
     ip['map'] = ['mass']
-    autoFig.fieldnameR_spaceC_slice(rl, ip, saveDirPath)
+    #autoFig.fieldnameR_spaceC_slice(rl, ip, saveDirPath)
 
     ip = cc(bip)
     del ip['axis'], ip['snapshot']

@@ -76,7 +76,7 @@ class FigureLibrary():
         return instr
 
     def clf(self):
-        self.fig.clear()
+        plt.clf()
         return
     
     def plotLines(self, panel_prop, labels = None, colors = None, linestyles = None):
@@ -92,24 +92,25 @@ class FigureLibrary():
             for r in range(len(rc_panel)):
                 r_container = rc_panel[r]
                 x, y, z = r_container.getValues()
-
+                
+                
                 if labels is None:
                     l_lab = r_container.props[pprop]
-                elif not r_container.props[pprop] in labels:
+                elif not str(r_container.props[pprop]) in labels:
                     l_lab = r_container.props[pprop]
                 else:
                     l_lab = labels[r_container.props[pprop]]
 
                 if colors is None:
                     l_c = default_color_cycle[r%len(default_color_cycle)]
-                elif not r_container.props[pprop] in colors:
+                elif not str(r_container.props[pprop]) in colors:
                     l_c = default_color_cycle[r%len(default_color_cycle)]
                 else:
                     l_c = colors[r_container.props[pprop]]
 
                 if linestyles is None:    
                     l_ls = '-'
-                elif not r_container.props[pprop] in linestyles:
+                elif not str(r_container.props[pprop]) in linestyles:
                     l_ls = '-'
                 else:
                     l_ls = linestyles[r_container.props[pprop]]
@@ -192,6 +193,7 @@ class FigureLibrary():
                     ymax = None
                     xdata = None
                     for l in lines:
+                        
                         if l.get_label() in match_label:
                             temp = l.get_ydata()
                             
@@ -206,7 +208,9 @@ class FigureLibrary():
                             # since this will now be included in the
                             # filled area, remove it from the plot
                             l.set_visible(False)
-                                                
+                    #print(ymin)
+                    #print(ymax)
+                    #print(xdata)
                     # now make the plot
                     plt.fill_between(xdata, ymin, ymax, color=color, label=label,
                                 alpha = opacity)

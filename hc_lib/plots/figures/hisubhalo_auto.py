@@ -7,12 +7,13 @@ def redshiftR_spaceC_model(rlib, iprops, savePath = '', panel_length = 3, panel_
     This plot is intended to compare how differently the models behave, and replicates the main plot
     intended for the paper between the different HI auto power spectra.
     """
+
     row_prop = 'redshift'
     column_prop = 'space'
     panel_prop = 'model'
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
-    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk', check = [0,0])
+    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
     
 
     flib = FigureLibrary(figArr)

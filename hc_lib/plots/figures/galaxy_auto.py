@@ -368,8 +368,6 @@ def fieldnameR_colorC_color_cut(rlib, iprops, savePath = '', panel_length = 3, p
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk', check = [0,0])
-
-
     colcuts = rlib.getVals('pk', 'color_cut', iprops)
     linelabels = {}
     linests = {}
