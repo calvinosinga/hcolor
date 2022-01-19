@@ -279,7 +279,7 @@ def colorR_boxC_simResolution(rlib, iprops, savePath = '', panel_length = 3, pan
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
-    collabels = ['%d$^3$ (Mpc/h)$^3$'%round(i) for i in collabels]
+    # collabels = ['%d$^3$ (Mpc/h)$^3$'%round(i) for i in collabels]
     linelabels = {'high':'High', 'medium':'Medium', 'low':'Low'}
 
     #print(figArr.shape)
@@ -321,8 +321,8 @@ def spaceR_colorC_species(rlib, iprops, savePath = '', panel_length = 3, panel_b
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
     linelabels = {'stmass':'Stellar Particles', 'total':'All Particles'}
-    only_props = {'color_cut':[None, '0.60']}
-    figArr = rlib.removeResults(figArr, only_props)
+
+
     flib = FigureLibrary(figArr)
 
     flib.createFig(panel_length, panel_bt, border, border)

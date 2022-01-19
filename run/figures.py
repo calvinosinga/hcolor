@@ -43,14 +43,14 @@ def main():
 
     printlib('fieldname')
     
-    hiptlAuto(rlib)
-    galaxyAuto(rlib)
-    hisubhaloAuto(rlib)
+    # hiptlAuto(rlib)
+    # galaxyAuto(rlib)
+    # hisubhaloAuto(rlib)
     # ptlAuto(rlib)
     # vnAuto(rlib)
-    # HIAuto(rlib)
-    # HI_galaxy_cross_power(rlib)
-    # HI_ptl_cross_power(rlib)
+    # allAuto(rlib)
+    HI_galaxy_cross_power(rlib)
+    HI_ptl_cross_power(rlib)
 
     return
 
@@ -152,10 +152,12 @@ def hiptlAuto(rl):
 
     ip = cc(bip)
     del ip['model'], ip['snapshot']
+    ip['space'] = 'redshift'
     hiptlFig.redshiftR_modelC_2D(rl, ip, saveDirPath)
 
     ip = cc(bip)
     del ip['axis'], ip['model']
+    ip['space'] = 'redshift'
     hiptlFig.axisR_modelC_2D(rl, ip, saveDirPath)
 
     ip = cc(bip)
@@ -249,8 +251,8 @@ def galaxyAuto(rl):
     ip = cc(bip)
     del ip['fieldname']
     del ip['color']
-    del ip['color_cut']
-    galFig.fieldnameR_colorC_color_cut(rl, ip, saveDirPath)
+    ip['color_cut'] = ['visual_inspection', '0.60', '0.55', '0.50', '0.65', '0.70']
+    #galFig.fieldnameR_colorC_color_cut(rl, ip, saveDirPath)
 
     ip = cc(bip)
     del ip['axis']
@@ -292,6 +294,7 @@ def hisubhaloAuto(rl):
     bip['HI_res'] = 'diemer'
     bip['projection'] = ['map', 'vol']
     bip['model'] = 'm_hi_GD14_map'
+    bip['fieldname'] = 'hisubhalo'
 
     ip = cc(bip)
     del ip['snapshot']
@@ -358,10 +361,12 @@ def ptlAuto(rl):
 
     ip = cc(bip)
     del ip['axis'], ip['species']
+    ip['space'] = 'redshift'
     ptlFig.axisR_speciesC_2D(rl, ip, saveDirPath)
 
     ip = cc(bip)
     del ip['snapshot'], ip['species']
+    ip['space'] = 'redshift'
     ptlFig.redshiftR_speciesC_2D(rl, ip, saveDirPath)
 
     return

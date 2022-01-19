@@ -374,7 +374,7 @@ class FigureLibrary():
         
         if self.has_cbar_panel:
             self.matchColorbarLimits(vlim=vlim)
-            self.logNormColorbar(vlim=vlim)
+            # self.logNormColorbar(vlim=vlim)
             cmap_arr = np.empty(self.dim, dtype=object)
             cmap_arr[:,:] = def_cmap
             self.assignColormaps(cmap_arr, under='w')
@@ -630,9 +630,9 @@ class FigureLibrary():
                         ymin = np.min(pk[min_idx:max_idx])
                         ymax = np.max(pk[min_idx:max_idx])
                         
-                        if ymin < ylim[0]:
+                        if ymin < ylim[0] and (i,j) not in panel_exceptions:
                             ylim[0] = ymin
-                        if ymax > ylim[1]:
+                        if ymax > ylim[1] and (i,j) not in panel_exceptions:
                             ylim[1] = ymax
         
         for i in range(self.dim[0]):
