@@ -75,6 +75,10 @@ class FigureLibrary():
             instr = instr.replace('_','\_')
         return instr
 
+    def clf(self):
+        self.fig.clear()
+        return
+    
     def plotLines(self, panel_prop, labels = None, colors = None, linestyles = None):
         dim = self.dim
         default_color_cycle = plt.rcParams['axes.prop_cycle'].by_key()['color']
@@ -231,7 +235,7 @@ class FigureLibrary():
                 # x_bound, y_bound, mass = pslice.getValues()
                 # extent=(x_bound[0], x_bound[1], y_bound[0], y_bound[1])
                 
-                im = plt.imshow(mass, aspect = 'auto', extent=extent, origin='lower')
+                plt.imshow(mass, aspect = 'auto', extent=extent, origin='lower')
                 
 
         
@@ -257,7 +261,7 @@ class FigureLibrary():
                     plt.plot(xbins, 0.65 + 0.02 * (xbins - 10.28), color='white') #stmass bins already log
         return
     
-    def plot2D(self, maxks = [5, 5]):
+    def plot2D(self, vlim = [-2, 4], maxks = [5, 5]):
         
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
@@ -273,15 +277,13 @@ class FigureLibrary():
                 pk = np.reshape(pk, (len(kpar), len(kper)))
                 extent = (0,kpar[paridx-1],0,kper[peridx-1])
                 plotpk = np.log10(pk[:paridx, :peridx])
-                vmin = np.min(plotpk)
-                vmax = np.max(plotpk)
                 
-                plt.imshow(plotpk, extent=extent, vmin = vmin, vmax = vmax, 
+                plt.imshow(plotpk, extent=extent, vmin = vlim[0], vmax = vlim[1], 
                             origin='lower', aspect = 'auto')
                 
         return
     
-    def addContours(self, color = 'k', maxks = [5,5]):
+    def addContours(self, color = 'k', maxks = [5,5], vlim = [-2, 4]):
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
                 p = self.panels[i][j]
@@ -297,7 +299,7 @@ class FigureLibrary():
                 pk = np.reshape(pk, (len(kpar), len(kper)))
                 plotpk = np.log10(pk[:paridx, :peridx])
                 KPAR, KPER = np.meshgrid(kpar[:paridx], kper[:peridx])
-                levels = np.linspace(np.min(plotpk), np.max(plotpk))
+                levels = np.arange(vlim[0], vlim[1], 0.5)
                 plt.contour(KPAR, KPER, plotpk, vmin=np.min(plotpk),
                         vmax=np.max(plotpk), levels = levels, colors=color,
                         linestyles='solid')
@@ -607,40 +609,39 @@ class FigureLibrary():
         return
     
     def flushYAxisToData(self, result_type = 'pk', panel_exceptions = []):
-        ylim = [np.inf, -np.inf]
-        for i in range(self.dim[0]):
-            for j in range(self.dim[1]):
-                
-                p = self.panels[i][j]
-                plt.sca(p)
-                res_container_list = self.figArr[i, j]
-                xmin, xmax = plt.xlim()
-
-                if result_type == 'pk':
-                    for r in res_container_list:
-                        if not isinstance(res_container_list, dict):
-                            wavenum, pk, z = r.getValues()
-                        else:
-                            wavenum = res_container_list[r][0]
-                            pk = res_container_list[r][1]
-
-                        max_idx = np.argmax(wavenum > xmax)
-                        min_idx = np.argmax(wavenum < xmin)
-                        
-                        ymin = np.min(pk[min_idx:max_idx])
-                        ymax = np.max(pk[min_idx:max_idx])
-                        
-                        if ymin < ylim[0] and (i,j) not in panel_exceptions:
-                            ylim[0] = ymin
-                        if ymax > ylim[1] and (i,j) not in panel_exceptions:
-                            ylim[1] = ymax
         
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
                 if (i, j) not in panel_exceptions:
                     p = self.panels[i][j]
                     plt.sca(p)
-                    plt.ylim(ylim[0], ylim[1])
+                    res_container_list = self.figArr[i, j]
+                    xmin, xmax = plt.xlim()
+                    ylim = [np.inf, -np.inf] # each panel is flushed individually, reset ylim vals
+                    if result_type == 'pk':
+                        for r in res_container_list:
+                            # iterate through all the plots to find the data plotted
+                            if not isinstance(res_container_list, dict):
+                                wavenum, pk, z = r.getValues()
+                            else:
+                                wavenum = res_container_list[r][0]
+                                pk = res_container_list[r][1]
+
+                            max_idx = np.argmax(wavenum > xmax)
+                            min_idx = np.argmax(wavenum < xmin)
+                            
+                            ymin = np.min(pk[min_idx:max_idx])
+                            ymax = np.max(pk[min_idx:max_idx])
+                            
+                            if ymin < ylim[0] and (i,j) not in panel_exceptions:
+                                ylim[0] = ymin
+                            if ymax > ylim[1] and (i,j) not in panel_exceptions:
+                                ylim[1] = ymax
+                        
+                        # after the loop, we have the new ylims for the panel. Set them
+                        plt.ylim(ylim[0], ylim[1])
+        
+
         return
 
     def defaultAxesLabels(self, dtype = 1):
@@ -707,4 +708,5 @@ class FigureLibrary():
         if not suffix == '':
             outstr += '_' + suffix 
         plt.savefig(dir_path + outstr + '.png')
+        self.clf()
         return

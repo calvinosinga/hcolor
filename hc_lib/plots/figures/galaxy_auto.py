@@ -36,7 +36,7 @@ def redshiftR_spaceC_color(rlib, iprops, savePath = '', panel_length = 3, panel_
     def_ytick_except = flib._defaultTickLabelPanelExceptions('y')
     flib.removeYTickLabels(panel_exceptions = dist_panels_idx_list + def_ytick_except)
     flib.xLimAdjustToNyquist()
-    flib.flushYAxisToData(panel_exceptions = dist_panels_idx_list)
+    flib.flushYAxisToData()
     flib.matchAxisLimits(which = 'x')
     flib.matchAxisLimits(which = 'y', panel_exceptions = dist_panels_idx_list)
     flib.defaultAxesLabels()
@@ -48,6 +48,7 @@ def redshiftR_spaceC_color(rlib, iprops, savePath = '', panel_length = 3, panel_
 
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+         
         return
     else:
         return flib
@@ -90,6 +91,7 @@ def redshiftR_colorC_space(rlib, iprops, savePath = '', panel_length = 3, panel_
 
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+         
         return
     else:
         return flib
@@ -134,6 +136,7 @@ def colorR_spaceC_redshift(rlib, iprops, savePath = '', panel_length = 3, panel_
 
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+         
         return
     else:
         return flib
@@ -179,6 +182,7 @@ def colorR_spaceC_grid_resolution(rlib, iprops, savePath = '', panel_length = 3,
 
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+         
         return
     else:
         return flib
@@ -219,6 +223,7 @@ def colorR_spaceC_sim_resolution(rlib, iprops, savePath = '', panel_length = 3, 
 
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+         
         return
     else:
         return flib
@@ -264,6 +269,7 @@ def colorR_spaceC_box(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 
 
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+         
         return
     else:
         return flib
@@ -305,6 +311,7 @@ def colorR_boxC_simResolution(rlib, iprops, savePath = '', panel_length = 3, pan
 
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+         
         return
     else:
         return flib
@@ -344,6 +351,7 @@ def spaceR_colorC_species(rlib, iprops, savePath = '', panel_length = 3, panel_b
 
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+         
         return
     else:
         return flib
@@ -359,7 +367,7 @@ def fieldnameR_colorC_color_cut(rlib, iprops, savePath = '', panel_length = 3, p
     panel_prop = 'color_cut'
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
-    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
+    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk', check = [0,0])
 
 
     colcuts = rlib.getVals('pk', 'color_cut', iprops)
@@ -399,6 +407,7 @@ def fieldnameR_colorC_color_cut(rlib, iprops, savePath = '', panel_length = 3, p
 
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+         
         return
     else:
         return flib
@@ -438,6 +447,7 @@ def redshiftR_colorC_fieldname(rlib, iprops, savePath = '', panel_length = 3, pa
 
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+         
         return
     else:
         return flib
@@ -477,6 +487,7 @@ def axisR_colorC_fieldname(rlib, iprops, savePath = '', panel_length = 3, panel_
 
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+         
         return
     else:
         return flib
@@ -526,6 +537,7 @@ def redshiftR_colorC_axis(rlib, iprops, savePath = '', panel_length = 3, panel_b
 
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+         
         return
     else:
         return flib
@@ -560,6 +572,7 @@ def redshiftR_colorC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt 
     
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, '2D')
+         
         return None
     else:
         return flib
@@ -597,6 +610,7 @@ def axisR_colorC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.
     
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, '2D')
+         
         return None
     else:
         return flib
@@ -627,6 +641,7 @@ def make_histograms(rlib, iprops, savePath='', panel_length = 3, panel_bt = 1.25
     
     if not savePath == '':
         flib.saveFig(savePath, rowp, colp, 'hist')
+         
         return None
     else:
         return flib
@@ -669,6 +684,7 @@ def spaceR_colorC_mas(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 
 
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+         
         return
     else:
         return flib
@@ -706,6 +722,7 @@ def color_cutR_colorC_gal_res(rlib, iprops, savePath = '', panel_length = 3, pan
 
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+         
         return
     else:
         return flib

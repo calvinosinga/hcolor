@@ -12,7 +12,7 @@ def redshiftR_spaceC_fieldname_distortion(rlib, iprops, savePath = '', panel_len
     panel_prop = 'fieldname'
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
-    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
+    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk', check=[0,0])
     linelabels = {'vn':'VN18-Particle'}
     colors = {'vn':'green'}
 
@@ -51,6 +51,7 @@ def redshiftR_spaceC_fieldname_distortion(rlib, iprops, savePath = '', panel_len
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, panel_prop, 
                 'distortion_panel')
+         
         return
     else:
         return flib
@@ -97,6 +98,7 @@ def redshiftR_spaceC_fieldname_no_distortion(rlib, iprops, savePath = '', panel_
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, panel_prop, 
                 'no_distortion')
+         
         return
     else:
         return flib
@@ -138,6 +140,7 @@ def fieldnameR_spaceC_slice(rlib, iprops, savePath = '', panel_length = 3, panel
     
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, 'slice')
+         
         return None
     else:
         return flib
@@ -187,6 +190,7 @@ def fieldnameR_redshiftC_axis(rlib, iprops, savePath = '', panel_length = 3, pan
 
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+         
         return
     else:
         return flib
@@ -228,6 +232,7 @@ def fieldnameR_simResolutionC_box(rlib, iprops, savePath = '', panel_length = 3,
 
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+         
         return
     else:
         return flib
@@ -265,6 +270,7 @@ def fieldnameR_boxC_simResolution(rlib, iprops, savePath = '', panel_length = 3,
 
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+         
         return
     else:
         return flib
@@ -308,6 +314,7 @@ def fieldnameR_spaceC_gridResolution(rlib, iprops, savePath = '', panel_length =
 
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+         
         return
     else:
         return flib

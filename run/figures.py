@@ -43,12 +43,12 @@ def main():
 
     printlib('fieldname')
     
-    # hiptlAuto(rlib)
-    # galaxyAuto(rlib)
-    # hisubhaloAuto(rlib)
-    # ptlAuto(rlib)
-    # vnAuto(rlib)
-    # allAuto(rlib)
+    hiptlAuto(rlib)
+    galaxyAuto(rlib)
+    hisubhaloAuto(rlib)
+    ptlAuto(rlib)
+    vnAuto(rlib)
+    allAuto(rlib)
     HI_galaxy_cross_power(rlib)
     HI_ptl_cross_power(rlib)
 
@@ -77,6 +77,7 @@ def HI_galaxy_cross_power(rl):
     ip = cc(bip)
     del ip['snapshot'], ip['space']
     HIxgal.redshiftR_spaceC_fieldname_distortion(rl, ip, saveDirPath)
+    
     HIxgal.redshiftR_spaceC_fieldname_no_distortion(rl, ip, saveDirPath)
     HIxgal.fieldnameR_spaceC_redshift(rl, ip, saveDirPath)
     HIxgal.redshiftR_fieldnameC_space(rl, ip, saveDirPath)
@@ -252,7 +253,7 @@ def galaxyAuto(rl):
     del ip['fieldname']
     del ip['color']
     ip['color_cut'] = ['visual_inspection', '0.60', '0.55', '0.50', '0.65', '0.70']
-    #galFig.fieldnameR_colorC_color_cut(rl, ip, saveDirPath)
+    galFig.fieldnameR_colorC_color_cut(rl, ip, saveDirPath)
 
     ip = cc(bip)
     del ip['axis']

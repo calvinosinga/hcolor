@@ -33,7 +33,7 @@ def redshiftR_spaceC_model(rlib, iprops, savePath = '', panel_length = 3, panel_
     def_ytick_except = flib._defaultTickLabelPanelExceptions('y')
     flib.removeYTickLabels(panel_exceptions = dist_panels_idx_list + def_ytick_except)
     flib.xLimAdjustToNyquist()
-    flib.flushYAxisToData(panel_exceptions=dist_panels_idx_list)
+    flib.flushYAxisToData()
     flib.matchAxisLimits(which = 'x')
     flib.matchAxisLimits(which = 'y', panel_exceptions = dist_panels_idx_list)
     flib.defaultAxesLabels()
@@ -46,6 +46,7 @@ def redshiftR_spaceC_model(rlib, iprops, savePath = '', panel_length = 3, panel_
 
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+         
         return
     else:
         return flib
@@ -83,6 +84,7 @@ def redshiftR_modelC_space(rlib, iprops, savePath = '', panel_length = 3, panel_
 
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+         
         return
     else:
         return flib
@@ -174,7 +176,7 @@ def redshiftR_spaceC_box(rlib, iprops, savePath = '', panel_length = 3, panel_bt
     flib.matchAxisLimits(which = 'x')
     flib.matchAxisLimits(which = 'y', panel_exceptions = dist_panels_idx_list)
     flib.defaultAxesLabels()
-    flib.axisLabel('P$_x$(k)/P$_v$(k)', 'y', pos = [1 - border/3/flib.figsize[1], 0.5], rotation = 270)
+    flib.axisLabel('P$_\mathrm{x}$(k)/P$_\mathrm{v}$(k)', 'y', pos = [1 - border/3/flib.figsize[1], 0.5], rotation = 270)
     flib.addLegend()
     flib.printIprops(iprops)
 
@@ -182,6 +184,7 @@ def redshiftR_spaceC_box(rlib, iprops, savePath = '', panel_length = 3, panel_bt
 
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+         
         return
     else:
         return flib
@@ -221,7 +224,7 @@ def redshiftR_spaceC_gridResolution(rlib, iprops, savePath = '', panel_length = 
     flib.matchAxisLimits(which = 'x')
     flib.matchAxisLimits(which = 'y', panel_exceptions = dist_panels_idx_list)
     flib.defaultAxesLabels()
-    flib.axisLabel('P$_x$(k)/P$_v$(k)', 'y', pos = [1 - border/3/flib.figsize[1], 0.5], rotation = 270,
+    flib.axisLabel('P$_\mathrm{x}$(k)/P$_\mathrm{v}$(k)', 'y', pos = [1 - border/3/flib.figsize[1], 0.5], rotation = 270,
                 usetex=True)
     flib.addLegend()
     flib.printIprops(iprops)
@@ -230,6 +233,7 @@ def redshiftR_spaceC_gridResolution(rlib, iprops, savePath = '', panel_length = 
 
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+         
         return
     else:
         return flib
@@ -264,7 +268,7 @@ def redshiftR_spaceC_simResolution(rlib, iprops, savePath = '', panel_length = 3
     flib.matchAxisLimits(which = 'x')
     flib.matchAxisLimits(which = 'y', panel_exceptions = dist_panels_idx_list)
     flib.defaultAxesLabels()
-    flib.axisLabel('P$_x$(k)/P$_v$(k)', 'y', pos = [1 - border/3/flib.figsize[1], 0.5], rotation = 270,
+    flib.axisLabel('P$_\mathrm{x}$(k)/P$_\mathrm{v}$(k)', 'y', pos = [1 - border/3/flib.figsize[1], 0.5], rotation = 270,
                 usetex=True)
     flib.addLegend()
     flib.printIprops(iprops)
@@ -303,11 +307,11 @@ def redshiftR_spaceC_axis(rlib, iprops, savePath = '', panel_length = 3, panel_b
     def_ytick_except = flib._defaultTickLabelPanelExceptions('y')
     flib.removeYTickLabels(panel_exceptions = dist_panels_idx_list + def_ytick_except)
     flib.xLimAdjustToNyquist()
-    flib.flushYAxisToData(panel_exceptions=dist_panels_idx_list)
+    flib.flushYAxisToData()
     flib.matchAxisLimits(which = 'x')
     flib.matchAxisLimits(which = 'y', panel_exceptions = dist_panels_idx_list)
     flib.defaultAxesLabels()
-    flib.axisLabel('P$_x$(k)/P$_v$(k)', 'y', pos = [1 - border/3/flib.figsize[1], 0.5], rotation = 270,
+    flib.axisLabel('P$_\mathrm{x}$(k)/P$_\mathrm{v}$(k)', 'y', pos = [1 - border/3/flib.figsize[1], 0.5], rotation = 270,
                 usetex=True)
     flib.addLegend()
     flib.printIprops(iprops)

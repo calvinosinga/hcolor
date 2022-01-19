@@ -154,24 +154,58 @@ class ResultLibrary():
 
     def _defaultLabels(self, prop, labels):
         if prop == 'redshift':
-            return [r'z=%.1f'%i for i in labels]
+            newl = []
+            for i in labels:
+                if isinstance(i, list):
+                    newl.append(r'z=%.1f'%i[0])
+                else:
+                    newl.append(r'z=%.1f'%i)
+            return newl
         elif prop == 'space':
-            return [i.capitalize() + ' Space' for i in labels]
+            newl = []
+            for i in labels:
+                if isinstance(i, list):
+                    newl.append(i[0].capitalize() + ' Space')
+                else:
+                    newl.append(i.capitalize() + ' Space')
+            return newl
         elif prop == 'color':
-            return [i.capitalize() + ' Galaxies' for i in labels]
+            newl = []
+            for i in labels:
+                if isinstance(i, list):
+                    c1 = i[0].capitalize()
+                    c2 = i[1].capitalize()
+                    if not c1 == c2:
+                        newl.append('%s-%s'%(c1,c2))
+                    else:
+                        newl.append(i[0].capitalize() + ' Galaxies')
+                else:
+                    newl.append(i.capitalize() + ' Galaxies')
+            return newl
         elif prop == 'axis':
-            return [r'Axis=%d'%i for i in labels]
+            
+            if isinstance(labels[0], list):
+                return ['Axis=%d'%i[0] for i in labels]
+            else:
+                return [r'Axis=%d'%i for i in labels]
         elif prop == 'box':
-            return ['%d$^3$ (Mpc/h)$^3$'%round(i) for i in labels]
+            if isinstance(labels[0], list):
+                return ['%d$^3$ (Mpc/h)$^3$'%round(i[0]) for i in labels]
+            else:
+                return ['%d$^3$ (Mpc/h)$^3$'%round(i) for i in labels]
         elif prop == 'sim_resolution':
-            return [i.capitalize() for i in labels]
+            if isinstance(labels[0], list):
+                return [i[0].capitalize() + ' Resolution' for i in labels]
+            else:
+                return [i.capitalize() + ' Resolution' for i in labels]
         elif prop == 'grid_resolution':
-            return ['%d$^3$ Bins'%i for i in labels]
-        
+            if isinstance(labels[0], list):
+                return ['%d$^3$ Bins'%i[0] for i in labels]
+            else:
+                return ['%d$^3$ Bins'%i for i in labels]
         else:
             return labels
             
-
     def _checkPanel(self, results, includep, rowp, colp):
         
         vals = {}
