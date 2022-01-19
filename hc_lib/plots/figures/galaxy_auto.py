@@ -67,8 +67,6 @@ def redshiftR_colorC_space(rlib, iprops, savePath = '', panel_length = 3, panel_
 
     linelabels = {'real':'Real Space', 'redshift':'Redshift Space'}
     linecolors = {'real':'blue', 'redshift':'red'}
-    only_props = {'color_cut':[None, '0.60']}
-    figArr = rlib.removeResults(figArr, only_props)
     #print(figArr.shape)
     flib = FigureLibrary(figArr)
     # add distortion panels
@@ -108,16 +106,17 @@ def colorR_spaceC_redshift(rlib, iprops, savePath = '', panel_length = 3, panel_
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
 
-    linelabels = {'real':'Real Space', 'redshift':'Redshift Space'}
-    linecolors = {'real':'blue', 'redshift':'red'}
-    only_props = {'color_cut':[None, '0.60']}
-    figArr = rlib.removeResults(figArr, only_props)
+    linelabels = {}
+    pres = figArr[0, 0]
+    for i in pres:
+        z = i.getProp('redshift')
+        linelabels[z] = '%.1f'%z
     #print(figArr.shape)
     flib = FigureLibrary(figArr)
     # add distortion panels
 
     flib.createFig(panel_length, panel_bt, border, border)
-    flib.plotLines(panel_prop, linelabels, linecolors)
+    flib.plotLines(panel_prop, linelabels)
     flib.addRowLabels(rowlabels)
     flib.addColLabels(collabels)
     flib.logAxis('both')
@@ -151,16 +150,18 @@ def colorR_spaceC_grid_resolution(rlib, iprops, savePath = '', panel_length = 3,
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
 
-    linelabels = {'real':'Real Space', 'redshift':'Redshift Space'}
-    linecolors = {'real':'blue', 'redshift':'red'}
-    only_props = {'color_cut':[None, '0.60']}
-    figArr = rlib.removeResults(figArr, only_props)
+    linelabels = {}
+    pres = figArr[0,0]
+    for i in pres:
+        gr = i.getProp('grid_resolution')
+        linelabels[gr] = '%d$^3$ Bins'%gr
+
     #print(figArr.shape)
     flib = FigureLibrary(figArr)
     # add distortion panels
 
     flib.createFig(panel_length, panel_bt, border, border)
-    flib.plotLines(panel_prop, linelabels, linecolors)
+    flib.plotLines(panel_prop, linelabels)
     flib.addRowLabels(rowlabels)
     flib.addColLabels(collabels)
     flib.logAxis('both')
@@ -194,16 +195,13 @@ def colorR_spaceC_sim_resolution(rlib, iprops, savePath = '', panel_length = 3, 
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
 
-    linelabels = {'real':'Real Space', 'redshift':'Redshift Space'}
-    linecolors = {'real':'blue', 'redshift':'red'}
-    only_props = {'color_cut':[None, '0.60']}
-    figArr = rlib.removeResults(figArr, only_props)
+    linelabels = {'high':'High', 'medium':'Medium', 'low':'Low'}
     #print(figArr.shape)
     flib = FigureLibrary(figArr)
     # add distortion panels
 
     flib.createFig(panel_length, panel_bt, border, border)
-    flib.plotLines(panel_prop, linelabels, linecolors)
+    flib.plotLines(panel_prop, linelabels)
     flib.addRowLabels(rowlabels)
     flib.addColLabels(collabels)
     flib.logAxis('both')
@@ -237,16 +235,18 @@ def colorR_spaceC_box(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
 
-    linelabels = {'real':'Real Space', 'redshift':'Redshift Space'}
-    linecolors = {'real':'blue', 'redshift':'red'}
-    only_props = {'color_cut':[None, '0.60']}
-    figArr = rlib.removeResults(figArr, only_props)
+    pres = figArr[0,0]
+    linelabels = {}
+    for i in pres:
+        box = i.getProp('box')
+        linelabels[box] = '%d$^3$ (Mpc/h)$^3$'%round(box) 
+
     #print(figArr.shape)
     flib = FigureLibrary(figArr)
     # add distortion panels
 
     flib.createFig(panel_length, panel_bt, border, border)
-    flib.plotLines(panel_prop, linelabels, linecolors)
+    flib.plotLines(panel_prop, linelabels)
     flib.addRowLabels(rowlabels)
     flib.addColLabels(collabels)
     flib.logAxis('both')
@@ -267,7 +267,48 @@ def colorR_spaceC_box(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 
         return
     else:
         return flib
-        
+
+def colorR_boxC_simResolution(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 1,
+            border = 1):
+    """
+    Compare Box volume
+    """
+    row_prop = 'color'
+    column_prop = 'box'
+    panel_prop = 'sim_resolution'
+    
+    print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
+    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
+    collabels = ['%d$^3$ (Mpc/h)$^3$'%round(i) for i in collabels]
+    linelabels = {'high':'High', 'medium':'Medium', 'low':'Low'}
+
+    #print(figArr.shape)
+    flib = FigureLibrary(figArr)
+    # add distortion panels
+
+    flib.createFig(panel_length, panel_bt, border, border)
+    flib.plotLines(panel_prop, linelabels)
+    flib.addRowLabels(rowlabels)
+    flib.addColLabels(collabels)
+    flib.logAxis('both')
+
+    flib.changeTickDirection()
+    flib.removeDefaultTickLabels()
+    flib.xLimAdjustToNyquist()
+    flib.flushYAxisToData()
+    flib.matchAxisLimits()
+    flib.defaultAxesLabels()
+    flib.addLegend()
+    flib.printIprops(iprops)
+
+    # if savefig, then save it, otherwise return it
+
+    if not savePath == '':
+        flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+        return
+    else:
+        return flib
+
 def spaceR_colorC_species(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
             border = 1):
     """
@@ -319,13 +360,8 @@ def fieldnameR_colorC_color_cut(rlib, iprops, savePath = '', panel_length = 3, p
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
-    for r in range(len(rowlabels)):
-        if rowlabels[r] == 'galaxy':
-            rowlabels[r] = 'Fiducial'
-        if rowlabels[r] == 'galaxy_dust':
-            rowlabels[r] = 'Dust Model'
 
-    collabels = [i.capitalize() + ' Galaxies' for i in collabels]
+
     colcuts = rlib.getVals('pk', 'color_cut', iprops)
     linelabels = {}
     linests = {}
@@ -465,7 +501,7 @@ def redshiftR_colorC_axis(rlib, iprops, savePath = '', panel_length = 3, panel_b
     #    if rowlabels[r] == 'galaxy_dust':
     #        rowlabels[r] = 'Dust Model'
 
-    linelabels = {0 : 'x-axis', 1 : 'y-axis', 2:'z-axis'}
+    linelabels = {0 : 'X-axis', 1 : 'Y-axis', 2:'Z-axis'}
     #print(figArr.shape)
     flib = FigureLibrary(figArr)
 

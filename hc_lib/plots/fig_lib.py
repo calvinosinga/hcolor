@@ -173,7 +173,7 @@ class FigureLibrary():
     def fillLines(self, match_label, label = '', color = 'blue', 
                 opacity = 0.55, dark_edges = False, except_panels = []):
         """
-        For each line that has a label that is in match_label, the area between
+        For each line that has a panel_label that is in match_label, the area between
         the lines is filled in and then the lines are removed from the plot.
         """
         
@@ -254,7 +254,7 @@ class FigureLibrary():
                     plt.plot([xbins[0], xbins[-1]], [0.5, 0.5], color='red', linestyle = ':')
                     plt.plot([xbins[0], xbins[-1]], [0.65, 0.65], color='red')
                     plt.plot([xbins[0], xbins[-1]], [0.7, 0.7], color='red', linestyle = ':')
-                    plt.plot(xbins, 0.65 + 0.02 * (np.log10(xbins) - 10.28), color='white')
+                    plt.plot(xbins, 0.65 + 0.02 * (xbins - 10.28), color='white') #stmass bins already log
         return
     
     def plot2D(self, maxks = [5, 5]):
@@ -272,10 +272,10 @@ class FigureLibrary():
                 peridx = np.where(kper>maxks[1])[0][0]
                 pk = np.reshape(pk, (len(kpar), len(kper)))
                 extent = (0,kpar[paridx-1],0,kper[peridx-1])
-                plotpk = pk[:paridx, :peridx]
+                plotpk = np.log10(pk[:paridx, :peridx])
                 vmin = np.min(plotpk)
                 vmax = np.max(plotpk)
-                print(plotpk)
+                
                 plt.imshow(plotpk, extent=extent, vmin = vmin, vmax = vmax, 
                             origin='lower', aspect = 'auto')
                 
@@ -295,21 +295,12 @@ class FigureLibrary():
                 peridx = np.where(kper>maxks[1])[0][0]
 
                 pk = np.reshape(pk, (len(kpar), len(kper)))
+                plotpk = np.log10(pk[:paridx, :peridx])
                 KPAR, KPER = np.meshgrid(kpar[:paridx], kper[:peridx])
-
-                if self.has_cbar_panel:
-                    ticks = self.cax.get_yticks()
-                    ylim = self.cax.get_ylim()
-
-
-                else:
-                    cbar = self.cax[i, j][0]
-                    ticks = cbar.get_yticks()
-                    ylim = cbar.get_ylim()
-                
-                print(ticks)
-                plt.contour(KPAR, KPER, pk[:paridx,:peridx], vmin=ylim[0],
-                        vmax=ylim[1], levels = ticks, colors=color)
+                levels = np.linspace(np.min(plotpk), np.max(plotpk))
+                plt.contour(KPAR, KPER, plotpk, vmin=np.min(plotpk),
+                        vmax=np.max(plotpk), levels = levels, colors=color,
+                        linestyles='solid')
 
         return 
              
@@ -378,8 +369,8 @@ class FigureLibrary():
         return dist_idx_list
 
     # TODO: add variance
-    def makeColorbars(self, cbar_label = '', def_cmap = 'plasma', fsize = 16, vlim=[],
-                label_pad = 16, except_panels = []):
+    def makeColorbars(self, cbar_label = '', def_cmap = 'plasma', fsize = 12, vlim=[],
+                except_panels = []):
         
         if self.has_cbar_panel:
             self.matchColorbarLimits(vlim=vlim)
@@ -389,7 +380,7 @@ class FigureLibrary():
             self.assignColormaps(cmap_arr, under='w')
             cbar = plt.colorbar(cax=self.cax)
             self.cax.set_aspect(12, anchor='W')
-            cbar.set_label(cbar_label, labelpad = label_pad, fontsize = fsize, rotation=270)
+            cbar.set_label(cbar_label, fontsize = fsize, rotation=270)
         else:
             for i in range(self.dim[0]):
                 for j in range(self.dim[1]):
@@ -397,7 +388,7 @@ class FigureLibrary():
                         plt.sca(self.panels[i][j])
                         cbar = plt.colorbar(fraction=0.046, pad=0.04)
                         if j == self.dim[1] - 1:
-                            cbar.set_label(cbar_label, labelpad = label_pad, rotation=270, fontsize=fsize)
+                            cbar.set_label(cbar_label, rotation=270, fontsize=fsize)
                         self.cax[i, j] = [cbar]
                         
 
@@ -619,30 +610,30 @@ class FigureLibrary():
         ylim = [np.inf, -np.inf]
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
-                if (i, j) not in panel_exceptions:
-                    p = self.panels[i][j]
-                    plt.sca(p)
-                    res_container_list = self.figArr[i, j]
-                    xmin, xmax = plt.xlim()
+                
+                p = self.panels[i][j]
+                plt.sca(p)
+                res_container_list = self.figArr[i, j]
+                xmin, xmax = plt.xlim()
 
-                    if result_type == 'pk':
-                        for r in res_container_list:
-                            if not isinstance(res_container_list, dict):
-                                wavenum, pk, z = r.getValues()
-                            else:
-                                wavenum = res_container_list[r][0]
-                                pk = res_container_list[r][1]
+                if result_type == 'pk':
+                    for r in res_container_list:
+                        if not isinstance(res_container_list, dict):
+                            wavenum, pk, z = r.getValues()
+                        else:
+                            wavenum = res_container_list[r][0]
+                            pk = res_container_list[r][1]
 
-                            max_idx = np.argmax(wavenum > xmax)
-                            min_idx = np.argmax(wavenum < xmin)
-                            
-                            ymin = np.min(pk[min_idx:max_idx])
-                            ymax = np.max(pk[min_idx:max_idx])
-                            
-                            if ymin < ylim[0]:
-                                ylim[0] = ymin
-                            if ymax > ylim[1]:
-                                ylim[1] = ymax
+                        max_idx = np.argmax(wavenum > xmax)
+                        min_idx = np.argmax(wavenum < xmin)
+                        
+                        ymin = np.min(pk[min_idx:max_idx])
+                        ymax = np.max(pk[min_idx:max_idx])
+                        
+                        if ymin < ylim[0]:
+                            ylim[0] = ymin
+                        if ymax > ylim[1]:
+                            ylim[1] = ymax
         
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
@@ -658,8 +649,8 @@ class FigureLibrary():
             ylab = r'P(k) (Mpc/h)$^{-3}$'
             
         elif dtype == 2:
-            xlab = r"k$_{\parallel}$ (h/Mpc)"
-            ylab = r"k$_{\perp}$ (h/Mpc)"
+            ylab = r"k$_{\parallel}$ (h/Mpc)"
+            xlab = r"k$_{\perp}$ (h/Mpc)"
             
         elif dtype == 'slice':
             xlab = 'x (Mpc/h)'

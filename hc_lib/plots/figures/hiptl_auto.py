@@ -32,7 +32,7 @@ def redshiftR_spaceC_model(rlib, iprops, savePath = '', panel_length = 3, panel_
     def_ytick_except = flib._defaultTickLabelPanelExceptions('y')
     flib.removeYTickLabels(panel_exceptions = dist_panels_idx_list + def_ytick_except)
     flib.xLimAdjustToNyquist()
-    flib.flushYAxisToData()
+    flib.flushYAxisToData(panel_exceptions=dist_panels_idx_list)
     flib.matchAxisLimits(which = 'x')
     flib.matchAxisLimits(which = 'y', panel_exceptions = dist_panels_idx_list)
     flib.defaultAxesLabels()
@@ -150,7 +150,7 @@ def redshiftR_spaceC_box(rlib, iprops, savePath = '', panel_length = 3, panel_bt
     linelabels = {}
     for i in pres:
         box = i.getProp('box')
-        linelabels[box] = '%d$^3$ Mpc/h'%box 
+        linelabels[box] = '%d$^3$ (Mpc/h)$^3$'%round(box) 
 
     flib = FigureLibrary(figArr)
     # add distortion panels
@@ -198,7 +198,7 @@ def redshiftR_spaceC_gridResolution(rlib, iprops, savePath = '', panel_length = 
     pres = figArr[0,0]
     for i in pres:
         gr = i.getProp('grid_resolution')
-        linelabels[gr] = '%d$^3$'%gr
+        linelabels[gr] = '%d$^3$ Bins'%gr
     flib = FigureLibrary(figArr)
     # add distortion panels
     dist_panels_idx_list = flib.addRedshiftDistortion((slice(None), 0), 
@@ -249,7 +249,7 @@ def redshiftR_spaceC_simResolution(rlib, iprops, savePath = '', panel_length = 3
     collabels.append('Distortion')
 
     flib.createFig(panel_length, panel_bt, border, border)
-    flib.plotLines(panel_prop)
+    flib.plotLines(panel_prop, linelabels)
     flib.addRowLabels(rowlabels)
     flib.addColLabels(collabels)
     flib.logAxis('y', panel_exceptions = dist_panels_idx_list)
@@ -290,9 +290,9 @@ def redshiftR_spaceC_axis(rlib, iprops, savePath = '', panel_length = 3, panel_b
     dist_panels_idx_list = flib.addRedshiftDistortion((slice(None), 0), 
             (slice(None), 1), panel_prop)
     collabels.append('Distortion')
-
+    linelabels = {0:'X-axis'}
     flib.createFig(panel_length, panel_bt, border, border)
-    flib.plotLines(panel_prop)
+    flib.plotLines(panel_prop, linelabels)
     flib.addRowLabels(rowlabels)
     flib.addColLabels(collabels)
     flib.logAxis('y', panel_exceptions = dist_panels_idx_list)
@@ -302,7 +302,7 @@ def redshiftR_spaceC_axis(rlib, iprops, savePath = '', panel_length = 3, panel_b
     def_ytick_except = flib._defaultTickLabelPanelExceptions('y')
     flib.removeYTickLabels(panel_exceptions = dist_panels_idx_list + def_ytick_except)
     flib.xLimAdjustToNyquist()
-    flib.flushYAxisToData()
+    flib.flushYAxisToData(panel_exceptions=dist_panels_idx_list)
     flib.matchAxisLimits(which = 'x')
     flib.matchAxisLimits(which = 'y', panel_exceptions = dist_panels_idx_list)
     flib.defaultAxesLabels()
@@ -334,10 +334,9 @@ def redshiftR_modelC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt 
     flib = FigureLibrary(figArr)
     
     flib.createFig(panel_length, panel_bt, border, border, True)
+    flib.addContours()
     flib.plot2D()
     flib.makeColorbars('P(k$_\parallel$, k$_\perp$) (Mpc/h)$^{-3}$')
-
-    flib.addContours()
 
     flib.changeTickDirection()
     flib.addColLabels(collabels)
@@ -365,11 +364,11 @@ def axisR_modelC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.
     flib = FigureLibrary(figArr)
     
     flib.createFig(panel_length, panel_bt, border, border, True)
+    flib.addContours()
     flib.plot2D()
     flib.makeColorbars('P(k$_\parallel$, k$_\perp$) (Mpc/h)$^{-3}$')
 
-    flib.addContours()
-
+    
     flib.changeTickDirection()
     flib.addColLabels(collabels)
     flib.addRowLabels(rowlabels, is2D=True)
@@ -383,7 +382,7 @@ def axisR_modelC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.
     else:
         return flib
 
-def redshiftR_spaceC_slice(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
+def redshiftR_spaceC_slice(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.5,
             border = 1):
     
     row_prop = 'redshift'
@@ -401,7 +400,7 @@ def redshiftR_spaceC_slice(rlib, iprops, savePath = '', panel_length = 3, panel_
     
     flib.matchColorbarLimits()
     flib.assignColormaps(cmap_arr, under='w')
-    flib.makeColorbars('Mass (M$_*$)')
+    flib.makeColorbars('log((M$_*$/M$_\odot$)')
 
     flib.changeTickDirection()
     flib.addColLabels(collabels)

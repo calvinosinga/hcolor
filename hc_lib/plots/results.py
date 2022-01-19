@@ -66,19 +66,20 @@ class ResultLibrary():
         try:
             return rc.props[key]
         except KeyError:
-            return None
+            return 'no key'
 
     def matchProps(self, rc, desired_props, verbose=False):
         isMatch = True
-        failed_list = []
         for k,v in desired_props.items():
             self_val = self.getProp(rc, k)
             
-            #print(v, self_val)
+            if self_val == 'no key':
+                continue
+
             # if we don't have a list of desired values, check if the property
             # of the result has the the desired value. Auto powers only have one
             # property to check
-            if not isinstance(v, list) and not isinstance(self_val, list):
+            elif not isinstance(v, list) and not isinstance(self_val, list):
                 isMatch = (isMatch and v == self_val)
             # if we do have a list of desired values, but the result is still an
             # auto power spectrum, check if self_val is in v
@@ -160,6 +161,13 @@ class ResultLibrary():
             return [i.capitalize() + ' Galaxies' for i in labels]
         elif prop == 'axis':
             return [r'Axis=%d'%i for i in labels]
+        elif prop == 'box':
+            return ['%d$^3$ (Mpc/h)$^3$'%round(i) for i in labels]
+        elif prop == 'sim_resolution':
+            return [i.capitalize() for i in labels]
+        elif prop == 'grid_resolution':
+            return ['%d$^3$ Bins'%i for i in labels]
+        
         else:
             return labels
             

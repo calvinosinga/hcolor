@@ -4,7 +4,7 @@ import hc_lib.plots.figures.galaxy_auto as galFig
 import hc_lib.plots.figures.hisubhalo_auto as hisubFig
 import hc_lib.plots.figures.ptl_auto as ptlFig
 import hc_lib.plots.figures.vn_auto as vnFig
-import hc_lib.plots.figures.HI_auto as HIFig
+import hc_lib.plots.figures.all_auto as autoFig
 import hc_lib.plots.figures.HIXgalaxy as HIxgal
 import hc_lib.plots.figures.HIXptl as HIxptl
 import sys
@@ -14,6 +14,21 @@ import copy
 sys.argv.pop(0)
 SAVEPATH = sys.argv.pop(0)
 OUTPATHS = sys.argv
+
+
+def getBIP():
+    baseIncludeProps = {}
+    baseIncludeProps['simname'] = 'tng100'
+    baseIncludeProps['axis'] = 0
+    baseIncludeProps['grid_resolution'] = 800
+    baseIncludeProps['is_auto'] = True
+    baseIncludeProps['model'] = 'm_hi_GD14_map'
+    baseIncludeProps['projection'] = 'map'
+    baseIncludeProps['snapshot'] = 99
+    baseIncludeProps['mas'] = 'CICW'
+    baseIncludeProps['space'] = 'real'
+    baseIncludeProps['sim_resolution'] = 'high'
+    return baseIncludeProps
 
 def main():
     if not os.path.isdir(SAVEPATH):
@@ -30,7 +45,7 @@ def main():
     
     hiptlAuto(rlib)
     galaxyAuto(rlib)
-    # hisubhaloAuto(rlib)
+    hisubhaloAuto(rlib)
     # ptlAuto(rlib)
     # vnAuto(rlib)
     # HIAuto(rlib)
@@ -39,26 +54,6 @@ def main():
 
     return
 
-def HIAuto(rl):
-    print('_________ MAKING HI AUTO POWER SPECTRA PLOTS ______\n')
-    cc = copy.copy # used often, so just made shortcut
-    # rl.printLib()
-    # create directory to save figures in
-    saveDirPath = SAVEPATH+'HI_auto/'
-    if not os.path.isdir(saveDirPath):
-        os.mkdir(saveDirPath)
-    
-    baseIncludeProps = {}
-    baseIncludeProps['simname'] = 'tng100'
-    baseIncludeProps['snapshot'] = 99
-    baseIncludeProps['axis'] = 0
-    baseIncludeProps['grid_resolution'] = 800
-    baseIncludeProps['is_auto'] = True
-    baseIncludeProps['is_hydrogen'] = True
-
-    ip = cc(baseIncludeProps)
-    HIFig.redshiftR_spaceC_fieldname(rl, ip, saveDirPath)
-    return
 
 def HI_galaxy_cross_power(rl):
     print('_________ MAKING HI-GALAXY CROSS POWER SPECTRA PLOTS ______\n')
@@ -69,15 +64,25 @@ def HI_galaxy_cross_power(rl):
     if not os.path.isdir(saveDirPath):
         os.mkdir(saveDirPath)
     
-    baseIncludeProps = {}
-    baseIncludeProps['fieldname'] = 'galaxy'
-    baseIncludeProps['simname'] = 'tng100'
-    baseIncludeProps['axis'] = 0
-    baseIncludeProps['grid_resolution'] = 800
-    baseIncludeProps['is_auto'] = False
+    bip = getBIP()
+    bip['is_auto'] = False
+    bip['color'] = 'resolved'
+    bip['map'] = 'mass'
+    bip['HI_res'] = 'diemer'
+    bip['gal_res'] = 'diemer'
+    bip['color_cut'] = '0.60'
+    bip['species'] = 'stmass'
+    bip['fieldname'] = ['galaxy', 'hisubhalo', 'hiptl', 'vn']
+    
+    ip = cc(bip)
+    del ip['snapshot'], ip['space']
+    HIxgal.redshiftR_spaceC_fieldname_distortion(rl, ip, saveDirPath)
+    HIxgal.redshiftR_spaceC_fieldname_no_distortion(rl, ip, saveDirPath)
+    HIxgal.fieldnameR_spaceC_redshift(rl, ip, saveDirPath)
+    HIxgal.redshiftR_fieldnameC_space(rl, ip, saveDirPath)
 
-    ip = cc(baseIncludeProps)
-    HIxgal.redshiftR_spaceC_fieldname(rl, ip, saveDirPath)
+
+
     return
 
 def HI_ptl_cross_power(rl):
@@ -88,16 +93,24 @@ def HI_ptl_cross_power(rl):
     saveDirPath = SAVEPATH+'HIXptl/'
     if not os.path.isdir(saveDirPath):
         os.mkdir(saveDirPath)
-    
-    baseIncludeProps = {}
-    baseIncludeProps['fieldname'] = 'ptl'
-    baseIncludeProps['simname'] = 'tng100'
-    baseIncludeProps['axis'] = 0
-    baseIncludeProps['grid_resolution'] = 800
-    baseIncludeProps['is_auto'] = False
 
-    ip = cc(baseIncludeProps)
-    HIxptl.redshiftR_spaceC_fieldname(rl, ip, saveDirPath)
+
+    bip = getBIP()
+    bip['is_auto'] = False
+    bip['color'] = 'resolved'
+    bip['map'] = 'mass'
+    bip['HI_res'] = 'diemer'
+    bip['gal_res'] = 'diemer'
+    bip['color_cut'] = '0.60'
+    bip['species'] = 'stmass'
+    bip['fieldname'] = ['ptl', 'hisubhalo', 'hiptl', 'vn']
+
+    ip = cc(bip)
+    del ip['space'], ip['snapshot']
+    HIxptl.redshiftR_spaceC_fieldname_no_distortion(rl, ip, saveDirPath)
+    HIxptl.redshiftR_spaceC_fieldname_distortion(rl, ip, saveDirPath)
+    HIxptl.fieldnameR_spaceC_redshift(rl, ip, saveDirPath)
+    HIxptl.redshiftR_fieldnameC_space(rl, ip, saveDirPath)
     return
 
 def hiptlAuto(rl):
@@ -109,48 +122,44 @@ def hiptlAuto(rl):
     if not os.path.isdir(saveDirPath):
         os.mkdir(saveDirPath)
     
-    baseIncludeProps = {}
-    baseIncludeProps['fieldname'] = 'hiptl'
-    baseIncludeProps['simname'] = 'tng100'
-    baseIncludeProps['axis'] = 0
-    baseIncludeProps['grid_resolution'] = 800
-    baseIncludeProps['is_auto'] = True
-    baseIncludeProps['map'] = 'mass'
+    bip = getBIP()
+    bip['fieldname'] = 'hiptl'
+    bip['model'] = 'GD14'
+    bip['map'] = 'mass'
 
-    ip = cc(baseIncludeProps)
+    ip = cc(bip)
+    del ip['snapshot'], ip['space'], ip['model']
     hiptlFig.redshiftR_spaceC_model(rl, ip, saveDirPath)
     
     hiptlFig.modelR_spaceC_redshift(rl, ip, saveDirPath)
     
     hiptlFig.redshiftR_modelC_space(rl, ip, saveDirPath)
 
-    ip = cc(baseIncludeProps)
-    del ip['simname']
-    ip['model'] = 'GD14'
+    ip = cc(bip)
+    del ip['simname'], ip['space'], ip['snapshot']
     hiptlFig.redshiftR_spaceC_box(rl, ip, saveDirPath)
 
+    del ip['sim_resolution']
     hiptlFig.redshiftR_spaceC_simResolution(rl, ip, saveDirPath)
     
-    ip['simname'] = 'tng100'
-    del ip['grid_resolution']
+    ip = cc(bip)
+    del ip['grid_resolution'], ip['space'], ip['snapshot']
     hiptlFig.redshiftR_spaceC_gridResolution(rl, ip, saveDirPath)
 
-    ip = cc(baseIncludeProps)
-    del ip['axis']
-    ip['model'] = 'GD14'
+    ip = cc(bip)
+    del ip['axis'], ip['snapshot'], ip['space']
     hiptlFig.redshiftR_spaceC_axis(rl, ip, saveDirPath)
 
-    ip = cc(baseIncludeProps)
-    ip['snapshot'] = 99
+    ip = cc(bip)
+    del ip['model'], ip['snapshot']
     hiptlFig.redshiftR_modelC_2D(rl, ip, saveDirPath)
 
-    ip = cc(baseIncludeProps)
-    del ip['axis']
+    ip = cc(bip)
+    del ip['axis'], ip['model']
     hiptlFig.axisR_modelC_2D(rl, ip, saveDirPath)
 
-    ip = cc(baseIncludeProps)
-    ip['model'] = 'GD14'
-    ip['map'] = 'mass'
+    ip = cc(bip)
+    del ip['snapshot'], ip['space']
     hiptlFig.redshiftR_spaceC_slice(rl, ip, saveDirPath)
     return
 
@@ -169,31 +178,25 @@ def galaxyAuto(rl):
     if not os.path.isdir(saveDirPath):
         os.mkdir(saveDirPath)
     
-    baseIncludeProps = {}
-    baseIncludeProps['fieldname'] = 'galaxy'
-    baseIncludeProps['simname'] = 'tng100'
-    baseIncludeProps['snapshot'] = 99
-    baseIncludeProps['axis'] = 0
-    baseIncludeProps['grid_resolution'] = 800
-    baseIncludeProps['gal_res'] = 'diemer'
-    baseIncludeProps['is_auto'] = True
-    baseIncludeProps['mas'] = 'CICW'
-    baseIncludeProps['color_cut'] = '0.60'
-    baseIncludeProps['species'] = 'stmass'
-    baseIncludeProps['space'] = 'real'
-    baseIncludeProps['color'] = 'resolved'
+    bip = getBIP()
+    bip['fieldname'] = 'galaxy'
+    bip['color'] = 'resolved'
+    bip['color_cut'] = ['0.60', None] #includes both red, blue, resovled
+    bip['species'] = 'stmass'
+    bip['gal_res'] = 'diemer'
+
 
     # make plots with just resolved galaxies
-    ip = cc(baseIncludeProps)
+    ip = cc(bip)
     del ip['snapshot']
     del ip['space']
     del ip['color']
-    ip['color_cut'] = ['0.60', None]
     galFig.redshiftR_spaceC_color(rl, ip, saveDirPath)
     
     galFig.redshiftR_colorC_space(rl, ip, saveDirPath)
     
     galFig.colorR_spaceC_redshift(rl, ip, saveDirPath)
+
     # make plots with everything
     ip['gal_res'] = ['diemer', None]
     flib = galFig.redshiftR_spaceC_color(rl, ip)
@@ -203,52 +206,53 @@ def galaxyAuto(rl):
     flib = galFig.colorR_spaceC_redshift(rl, ip)
     flib.saveFig(saveDirPath, 'color', 'space', 'redshift', 'withall')
 
-    ip = cc(baseIncludeProps)
+    ip = cc(bip)
     del ip['grid_resolution']
     del ip['space']
     del ip['color']
-    ip['color_cut'] = ['0.60', None]
     galFig.colorR_spaceC_grid_resolution(rl, ip, saveDirPath)
 
-    ip['grid_resolution'] = 800
-    del ip['simname']
+    ip = cc(bip)
+    del ip['color'], ip['space'], ip['sim_resolution'], ip['simname']
     galFig.colorR_spaceC_sim_resolution(rl, ip, saveDirPath)
     
-    ip['sim_resolution'] = 'high'
-    #del ip['simname']
+    ip = cc(bip)
+    del ip['color'], ip['simname'], ip['sim_resolution']
+    galFig.colorR_boxC_simResolution(rl, ip, saveDirPath)
+
+    ip = cc(bip)
+    del ip['color'], ip['space'], ip['simname']
     galFig.colorR_spaceC_box(rl, ip, saveDirPath)
 
     
-    ip = cc(baseIncludeProps)
+    ip = cc(bip)
     del ip['species']
     del ip['color']
-    ip['color_cut'] = ['0.60', None]
     del ip['space']
     galFig.spaceR_colorC_species(rl, ip, saveDirPath)
 
-    ip = cc(baseIncludeProps)
+    ip = cc(bip)
     del ip['fieldname']
     del ip['color']
     del ip['snapshot']
     galFig.redshiftR_colorC_fieldname(rl, ip, saveDirPath)
     
 
-    ip = cc(baseIncludeProps)
+    ip = cc(bip)
     del ip['axis']
     del ip['color']
-    ip['color_cut'] = ['0.60', None]
     ip['space'] = 'redshift'
     del ip['snapshot']
     flib = galFig.redshiftR_colorC_axis(rl, ip)
     flib.saveFig(saveDirPath, 'redshift', 'color', 'axis', 'redshift_axis_test')
 
-    ip = cc(baseIncludeProps)
+    ip = cc(bip)
     del ip['fieldname']
     del ip['color']
     del ip['color_cut']
     galFig.fieldnameR_colorC_color_cut(rl, ip, saveDirPath)
 
-    ip = cc(baseIncludeProps)
+    ip = cc(bip)
     del ip['axis']
     del ip['color']
     ip['fieldname'] = 'galaxy_dust'
@@ -258,16 +262,14 @@ def galaxyAuto(rl):
 
     flib.saveFig(saveDirPath, 'redshift', 'color', 'axis', 'dust_axis_test')
 
-    ip = cc(baseIncludeProps)
+    ip = cc(bip)
     del ip['color']
-    ip['color_cut'] = [None, '0.60']
     del ip['snapshot']
     ip['space'] = 'redshift'
     galFig.redshiftR_colorC_2D(rl, ip, saveDirPath)
 
-    ip = cc(baseIncludeProps)
+    ip = cc(bip)
     del ip['axis']
-    ip['color_cut'] = ['0.60', None]
     del ip['color']
     ip['space'] = 'redshift'
     galFig.axisR_colorC_2D(rl, ip, saveDirPath)
@@ -278,43 +280,53 @@ def galaxyAuto(rl):
     return
 
 def hisubhaloAuto(rl):
-    print('_________ MAKING D18-SUBHALO AUTO POWER SPECTRA PLOTS ______\n')
+    print('_________ MAKING HISUBHALO AUTO POWER SPECTRA PLOTS ______\n')
     cc = copy.copy # used often, so just made shortcut
-    # rl.printLib()
+    #rl.printLib()
     # create directory to save figures in
-    saveDirPath = SAVEPATH+'hisubhalo_auto/'
+    saveDirPath = SAVEPATH+'hiptl_auto/'
     if not os.path.isdir(saveDirPath):
         os.mkdir(saveDirPath)
     
-    baseIncludeProps = {}
-    baseIncludeProps['fieldname'] = 'hisubhalo'
-    baseIncludeProps['simname'] = 'tng100'
-    baseIncludeProps['snapshot'] = 99
-    baseIncludeProps['axis'] = 0
-    baseIncludeProps['grid_resolution'] = 800
-    #baseIncludeProps['HI_res'] = 'diemer'
-    baseIncludeProps['is_auto'] = True
-    baseIncludeProps['space'] = 'real'
-    baseIncludeProps['mas']='CICW'
-    
-    ip = {}
-    ip['fieldname'] = 'hisubhalo'
-    #rl.printLib(ip, 'pk')
+    bip = getBIP()
+    bip['HI_res'] = 'diemer'
+    bip['projection'] = ['map', 'vol']
+    bip['model'] = 'm_hi_GD14_map'
 
-    ip = cc(baseIncludeProps)
-    del ip['space']
-    #del ip['HI_res']
-    #hisubFig.modelR_spaceC_HI_res(rl, ip, saveDirPath)
-
-    ip = cc(baseIncludeProps)
-    del ip['space']
-    del ip['mas']
-    hisubFig.modelR_spaceC_mas(rl, ip, saveDirPath)
-
-    ip = cc(baseIncludeProps)
+    ip = cc(bip)
     del ip['snapshot']
+    del ip['model'], ip['projection']
     del ip['space']
     hisubFig.redshiftR_spaceC_model(rl, ip, saveDirPath)
+    
+    hisubFig.modelR_spaceC_redshift(rl, ip, saveDirPath)
+    
+    hisubFig.redshiftR_modelC_space(rl, ip, saveDirPath)
+
+    ip = cc(bip)
+    del ip['simname'], ip['snapshot'], ip['space']
+    hisubFig.redshiftR_spaceC_box(rl, ip, saveDirPath)
+
+    ip = cc(bip)
+    del ip['simname'], ip['snapshot'], ip['space'], ip['sim_resolution']
+    hisubFig.redshiftR_spaceC_simResolution(rl, ip, saveDirPath)
+    
+    ip = cc(bip)
+    del ip['snapshot'], ip['space'], ip['grid_resolution']
+    hisubFig.redshiftR_spaceC_gridResolution(rl, ip, saveDirPath)
+
+    ip = cc(bip)
+    del ip['axis'], ip['snapshot'], ip['space']
+    hisubFig.redshiftR_spaceC_axis(rl, ip, saveDirPath)
+
+    ip=cc(bip)
+    del ip['snapshot'], ip['model'], ip['projection']
+    hisubFig.redshiftR_modelC_2D(rl, ip, saveDirPath)
+
+    ip = cc(bip)
+    del ip['axis'], ip['model'], ip['projection']
+    hisubFig.axisR_modelC_2D(rl, ip, saveDirPath)
+
     return
 
 def ptlAuto(rl):
@@ -326,20 +338,31 @@ def ptlAuto(rl):
     if not os.path.isdir(saveDirPath):
         os.mkdir(saveDirPath)
     
-    baseIncludeProps = {}
-    baseIncludeProps['fieldname'] = 'ptl'
-    baseIncludeProps['simname'] = 'tng100'
-    #baseIncludeProps['snapshot'] = 99
-    baseIncludeProps['axis'] = 0
-    baseIncludeProps['grid_resolution'] = 800
-    #baseIncludeProps['species'] = 'ptl'
-    baseIncludeProps['is_auto'] = True
-    baseIncludeProps['mas'] = 'CICW'
-    # baseIncludeProps['space'] = 'real'
+    bip = getBIP()
+    bip['fieldname'] = 'ptl'
+    bip['species'] = 'ptl'
+    
 
 
-    ip = cc(baseIncludeProps)
+    ip = cc(bip)
+    del ip['snapshot'], ip['space'], ip['species']
     ptlFig.redshiftR_spaceC_species(rl, ip, saveDirPath)
+
+    ptlFig.redshiftR_speciesC_space(rl, ip, saveDirPath)
+
+    ptlFig.speciesR_spaceC_redshift(rl, ip, saveDirPath)
+
+    ip = cc(bip)
+    del ip['species'], ip['space']
+    ptlFig.speciesR_spaceC_slice(rl, ip, saveDirPath)
+
+    ip = cc(bip)
+    del ip['axis'], ip['species']
+    ptlFig.axisR_speciesC_2D(rl, ip, saveDirPath)
+
+    ip = cc(bip)
+    del ip['snapshot'], ip['species']
+    ptlFig.redshiftR_speciesC_2D(rl, ip, saveDirPath)
 
     return
 
@@ -352,26 +375,52 @@ def vnAuto(rl):
     if not os.path.isdir(saveDirPath):
         os.mkdir(saveDirPath)
     
-    baseIncludeProps = {}
-    baseIncludeProps['fieldname'] = 'vn'
-    baseIncludeProps['simname'] = 'tng100'
-    #baseIncludeProps['snapshot'] = 99
-    baseIncludeProps['axis'] = 0
-    baseIncludeProps['grid_resolution'] = 800
-    #baseIncludeProps['species'] = 'ptl'
-    baseIncludeProps['is_auto'] = True
-    baseIncludeProps['mas'] = 'CICW'
-    # baseIncludeProps['space'] = 'real'
-
-
-    ip = cc(baseIncludeProps)
-    vnFig.redshiftR_fieldnameC_space(rl, ip, saveDirPath)
-    # vnFig.redshiftR_mapC_space(rl, ip, saveDirPath)
-
-    # vnFig.redshiftR_spaceC_map(rl, ip, saveDirPath)
+    bip =getBIP()
+    bip['map'] = 'mass'
+    bip['fieldname'] = 'vn'
+    ip = cc(bip)
+    del ip['snapshot'], ip['space']
+    vnFig.fieldnameR_redshiftC_space(rl, ip, saveDirPath)
+    vnFig.fieldnameR_spaceC_redshift(rl, ip, saveDirPath)
     
     return
 
+def allAuto(rl):
+    print('_________ MAKING ALL AUTO POWER SPECTRA PLOTS ______\n')
+    cc = copy.copy # used often, so just made shortcut
+    # rl.printLib()
+    # create directory to save figures in
+    saveDirPath = SAVEPATH+'all_auto/'
+    if not os.path.isdir(saveDirPath):
+        os.mkdir(saveDirPath)
+
+    bip = getBIP()
+
+    # HI auto power spectra
+    ip = cc(bip)
+    del ip['snapshot'], ip['space']
+    ip['is_atomic'] = True
+    autoFig.redshiftR_spaceC_fieldname_distortion(rl, ip, saveDirPath)
+    autoFig.redshiftR_spaceC_fieldname_no_distortion(rl, ip, saveDirPath)
+
+    
+    ip = cc(bip)
+    del ip['space']
+    ip['fieldname'] = ['vn', 'ptl','hiptl', 'hisubhalo', 'galaxy']
+    ip['species'] = ['stmass', 'gas']
+    ip['model'] = ['GD14', 'f_hi_GD14_map']
+    ip['color'] = ['resolved']
+    ip['map'] = ['mass']
+    autoFig.fieldnameR_spaceC_slice(rl, ip, saveDirPath)
+
+    ip = cc(bip)
+    del ip['axis'], ip['snapshot']
+    ip['fieldname'] = ['vn', 'ptl','hiptl', 'hisubhalo', 'galaxy']
+    ip['species'] = ['stmass', 'gas']
+    ip['model'] = ['GD14', 'f_hi_GD14_map']
+    ip['color'] = ['resolved']
+    ip['map'] = ['mass']
+    autoFig.fieldnameR_redshiftC_axis(rl, ip, saveDirPath)
+
 
 main()
-
