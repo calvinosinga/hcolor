@@ -59,7 +59,8 @@ class FigureLibrary():
                 caxlist.append(fig.add_subplot(gs[i, -1]))
             self.cax = caxlist
             self.has_cbar_col = True
-
+        else:
+            self.has_cbar_col = False
         self.fig = fig
         self.panels = panels
         self.panel_length = panel_length
@@ -198,16 +199,19 @@ class FigureLibrary():
 
                 xlim, ylim, mass = pslice.getValues()
                 extent=(xlim[0], xlim[1], ylim[0], ylim[1])
-                
+                cmap = self.cmap_arr[i, j]
+                norm = self.norm_arr[i, j]
                 # x_bound, y_bound, mass = pslice.getValues()
                 # extent=(x_bound[0], x_bound[1], y_bound[0], y_bound[1])
                 
-                plt.imshow(mass, aspect = 'auto', extent=extent, origin='lower')
+                plt.imshow(mass, cmap = cmap, norm = norm, aspect = 'auto', extent=extent, 
+                            origin='lower')
             
             if self.has_cbar_col:
                 p = self.cax[i]
                 cmap = self.cmap_arr[i,0]
                 norm = self.norm_arr[i,0]
+                p.set_aspect(12,anchor = 'W')
                 self.fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), cax=p)
         return
     
@@ -216,11 +220,15 @@ class FigureLibrary():
             for j in range(self.dim[1]):
                 p = self.panels[i][j]
                 plt.sca(p)
+                cmap = self.cmap_arr[i, j]
+                norm = self.norm_arr[i, j]
+
                 hist = self.figArr[i,j][0]
                 xbins, ybins, counts = hist.getValues()
                 counts = np.rot90(np.flip(counts, axis=0), 3)
                 extent = (xbins[0], xbins[-1], ybins[0], ybins[-1])
-                plt.imshow(counts, origin='lower', extent=extent, aspect = 'auto')
+                plt.imshow(counts, cmap = cmap, norm = norm, origin='lower', extent=extent, 
+                            aspect = 'auto')
                 if make_lines:
                     plt.plot([xbins[0], xbins[-1]], [0.6, 0.6], color='red')
                     plt.plot([xbins[0], xbins[-1]], [0.55, 0.55], color='red')
@@ -235,6 +243,8 @@ class FigureLibrary():
             cmap = self.cmap_arr[i,0]
             norm = self.norm_arr[i,0]
             self.fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), cax=p)
+            p.set_aspect(12, anchor='W')
+
         return
     
     def plot2D(self, maxks = [5, 5]):
@@ -260,10 +270,11 @@ class FigureLibrary():
                 cmap = self.cmap_arr[i,0]
                 norm = self.norm_arr[i,0]
                 self.fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), cax=p)
+                p.set_aspect(12, anchor = 'W')
         return
     
 
-    def addContours(self, color = 'k', maxks = [5,5]):
+    def addContours(self, color = 'k', maxks = [5,5], cstep = 0.5):
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
                 p = self.panels[i][j]
@@ -272,7 +283,7 @@ class FigureLibrary():
                 result = self.figArr[i, j][0]
                 KPAR, KPER, plotpk = self._get2DpkData(result, maxks)
 
-                levels = np.arange(int(norm.vmin), int(norm.vmax)+1, 0.5)
+                levels = np.arange(int(norm.vmin), int(norm.vmax)+1, cstep)
                 plt.contour(KPAR, KPER, plotpk, vmin=norm.vmin,
                         vmax=norm.vmax, levels = levels, colors=color,
                         linestyles='solid')
@@ -303,7 +314,7 @@ class FigureLibrary():
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
                 vlim = vlim_list[i]
-                norm_arr[i,j] = mpl.colors.normalize(vmin=vlim[0], vmax=vlim[1])
+                norm_arr[i,j] = mpl.colors.Normalize(vmin=vlim[0], vmax=vlim[1])
         self.norm_arr = norm_arr
         return
 
@@ -314,7 +325,7 @@ class FigureLibrary():
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
                 vlim = vlim_list[i]
-                norm_arr[i,j] = mpl.colors.normalize(vmin=vlim[0], vmax=vlim[1])
+                norm_arr[i,j] = mpl.colors.Normalize(vmin=vlim[0], vmax=vlim[1])
         self.norm_arr = norm_arr
         return
     
@@ -334,8 +345,8 @@ class FigureLibrary():
         self.norm_arr = norm_arr
         return
  
-    def setColorbarLabels(self, cbar_label, labelpad = 20, ha = 'left', va='center',
-                label_type = ''):
+    def setColorbarLabels(self, cbar_label='', labelpad = 20, ha = 'center', va='top',
+                label_type = '', fsize = 16):
         if label_type == '2dpk':
             cbar_label = 'log P(k$_\parallel$, k$_\perp$) (Mpc/h)$^{-3}$'
         if label_type == 'slice':
@@ -343,7 +354,7 @@ class FigureLibrary():
         for i in range(len(self.cax)):
             p = self.cax[i]
             plt.sca(p)
-            p.set_ylabel(cbar_label, labelpad = labelpad, ha = ha, va=va)
+            p.set_ylabel(cbar_label, fontsize = fsize, labelpad = labelpad, ha = ha, va=va)
         return
 
      
@@ -467,9 +478,10 @@ class FigureLibrary():
                 rotation = 'horizontal'
             if self.has_cbar_col:
                 ncols = self.dim[1] # does not include cbar panel
-                image_length = ncols * self.panel_length + self.xborder[0] + \
+                image_length = ncols * self.panel_length + \
                         self.panel_bt[0] * (ncols - 1)
-                hpos = 0.5 * image_length / self.figsize[0]
+                
+                hpos = (0.5 * image_length + self.xborder[0]) / self.figsize[0]
             else:
                 hpos = 0.5
             posdict['x'] = [hpos, self.yborder[1]/3/self.figsize[1]]
@@ -562,7 +574,7 @@ class FigureLibrary():
 
         return
 
-    def defaultAxesLabels(self, dtype = 1):
+    def defaultAxesLabels(self, xpos = [], ypos = [], dtype = 1):
         if dtype == 1:
             xlab = r'k (Mpc/h)$^{-1}$'
             ylab = r'P(k) (Mpc/h)$^{-3}$'
@@ -574,8 +586,8 @@ class FigureLibrary():
         elif dtype == 'slice':
             xlab = 'x (Mpc/h)'
             ylab = 'y (Mpc/h)'
-        self.axisLabel(xlab, 'x')
-        self.axisLabel(ylab, 'y')
+        self.axisLabel(xlab, 'x', pos=xpos)
+        self.axisLabel(ylab, 'y', pos=ypos)
         return
 
     

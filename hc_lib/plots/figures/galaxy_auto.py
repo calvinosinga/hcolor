@@ -104,7 +104,7 @@ def colorR_spaceC_redshift(rlib, iprops, savePath = '', panel_length = 3, panel_
     pres = figArr[0, 0]
     for i in pres:
         z = i.getProp('redshift')
-        linelabels[z] = '%.1f'%z
+        linelabels[z] = '%.1f'%round(z)
     #print(figArr.shape)
     flib = FigureLibrary(figArr)
     # add distortion panels
@@ -369,11 +369,11 @@ def redshiftR_colorC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt 
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, '2Dpk')
 
     flib = FigureLibrary(figArr)
-    
+    vlimlist = [[0, 4] for i in range(flib.dim[0])] 
     flib.createFig(panel_length, panel_bt, border, border, True)
     flib.assignColormaps()
-    flib.assign2DNorms()
-    flib.addContours()
+    flib.assign2DNorms(vlim_list = vlimlist)
+    flib.addContours(cstep = 0.25)
     flib.plot2D()
 
     flib.setColorbarLabels(label_type='2dpk')
@@ -382,7 +382,9 @@ def redshiftR_colorC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt 
     flib.addRowLabels(rowlabels, pos = [0.05, 0.9], color = 'white')
     
     flib.removeDefaultTickLabels()
-    flib.defaultAxesLabels(2)
+    ypos = flib.xborder[0]/2/flib.figsize[0]
+    flib.defaultAxesLabels(2, ypos = [ypos, 0.5])
+   
     
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, '2D')
@@ -403,10 +405,12 @@ def axisR_colorC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.
 
     flib = FigureLibrary(figArr)
 
+    vlimlist = [[0, 4] for i in range(flib.dim[0])] 
     flib.createFig(panel_length, panel_bt, border, border, True)
-    flib.addContours()
-    flib.assign2DNorms()
+    
+    flib.assign2DNorms(vlim_list = vlimlist)
     flib.assignColormaps()
+    flib.addContours(cstep = 0.25)
     flib.plot2D()
     flib.setColorbarLabels(label_type='2dpk')
 
@@ -415,7 +419,8 @@ def axisR_colorC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.
     flib.addRowLabels(rowlabels, pos = [0.05, 0.9], color = 'white')
     
     flib.removeDefaultTickLabels()
-    flib.defaultAxesLabels(2)
+    ypos = flib.xborder[0]/2/flib.figsize[0]
+    flib.defaultAxesLabels(2, ypos = [ypos, 0.5])
     
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, '2D')
@@ -439,7 +444,7 @@ def make_histograms(rlib, iprops, savePath='', panel_length = 3, panel_bt = 1.25
             collabels[c] = 'Fiducial'
         elif collabels[c] == 'galaxy_dust':
             collabels[c] = 'With Dust'
-    flib.createFig(panel_length, panel_bt, border, border)
+    flib.createFig(panel_length, panel_bt, border, border, True)
     flib.assignHistNorms()
     flib.assignColormaps('viridis', 'w')
     flib.plotHists()
