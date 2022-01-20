@@ -15,29 +15,21 @@ def redshiftR_spaceC_model(rlib, iprops, savePath = '', panel_length = 3, panel_
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
 
     flib = FigureLibrary(figArr)
-    # add distortion panels
-    dist_panels_idx_list = flib.addRedshiftDistortion((slice(None), 0), 
-            (slice(None), 1), panel_prop)
-    collabels.append('Distortion')
+
 
     flib.createFig(panel_length, panel_bt, border, border)
     flib.plotLines(panel_prop)
     flib.addRowLabels(rowlabels)
     flib.addColLabels(collabels)
-    flib.logAxis('y', panel_exceptions = dist_panels_idx_list)
-    flib.logAxis('x')
+    flib.logAxis('both')
 
     flib.removeXTickLabels()
     flib.changeTickDirection()
-    def_ytick_except = flib._defaultTickLabelPanelExceptions('y')
-    flib.removeYTickLabels(panel_exceptions = dist_panels_idx_list + def_ytick_except)
+    flib.removeYTickLabels()
     flib.xLimAdjustToNyquist()
     flib.flushYAxisToData()
-    flib.matchAxisLimits(which = 'x')
-    flib.matchAxisLimits(which = 'y', panel_exceptions = dist_panels_idx_list)
+    flib.matchAxisLimits()
     flib.defaultAxesLabels()
-    flib.axisLabel('P$_\mathrm{x}$(k)/P$_\mathrm{v}$(k)', 'y', pos = [1 - border/3/flib.figsize[1], 0.5], rotation = 270,
-                usetex=True)
     flib.addLegend()
     flib.printIprops(iprops)
 
@@ -127,195 +119,7 @@ def modelR_spaceC_redshift(rlib, iprops, savePath = '', panel_length = 3, panel_
         return
     else:
         return flib
-
-def redshiftR_spaceC_box(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
-            border = 1):
-    """
-    Show if there's any differences in box volume
-    """    
-    row_prop = 'redshift'
-    column_prop = 'space'
-    panel_prop = 'box'
-    
-    print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
-    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
-    pres = figArr[0,0]
-    linelabels = {}
-    for i in pres:
-        box = i.getProp('box')
-        linelabels[box] = '%d$^3$ (Mpc/h)$^3$'%round(box) 
-
-    flib = FigureLibrary(figArr)
-    # add distortion panels
-    dist_panels_idx_list = flib.addRedshiftDistortion((slice(None), 0), 
-            (slice(None), 1), panel_prop)
-    collabels.append('Distortion')
-
-    flib.createFig(panel_length, panel_bt, border, border)
-    flib.plotLines(panel_prop, linelabels)
-    flib.addRowLabels(rowlabels)
-    flib.addColLabels(collabels)
-    flib.logAxis('y', panel_exceptions = dist_panels_idx_list)
-    flib.logAxis('x')
-
-    flib.removeXTickLabels()
-    def_ytick_except = flib._defaultTickLabelPanelExceptions('y')
-    flib.removeYTickLabels(panel_exceptions = dist_panels_idx_list + def_ytick_except)
-    flib.xLimAdjustToNyquist()
-    flib.flushYAxisToData()
-    flib.matchAxisLimits(which = 'x')
-    flib.matchAxisLimits(which = 'y', panel_exceptions = dist_panels_idx_list)
-    flib.defaultAxesLabels()
-    flib.axisLabel('P$_\mathrm{x}$(k)/P$_\mathrm{v}$(k)', 'y', pos = [1 - border/3/flib.figsize[1], 0.5], rotation = 270)
-    flib.addLegend()
-    flib.printIprops(iprops)
-
-    # if savefig, then save it, otherwise return it
-
-    if not savePath == '':
-        flib.saveFig(savePath, row_prop, column_prop, panel_prop)
-         
-        return
-    else:
-        return flib
-    
-def redshiftR_spaceC_gridResolution(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
-            border = 1):
-    row_prop = 'redshift'
-    column_prop = 'space'
-    panel_prop = 'grid_resolution'
-    
-    print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
-    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
-    
-    linelabels = {}
-    pres = figArr[0,0]
-    for i in pres:
-        gr = i.getProp('grid_resolution')
-        linelabels[gr] = '%d$^3$ Bins'%gr
-    flib = FigureLibrary(figArr)
-    # add distortion panels
-    dist_panels_idx_list = flib.addRedshiftDistortion((slice(None), 0), 
-            (slice(None), 1), panel_prop)
-    collabels.append('Distortion')
-
-    flib.createFig(panel_length, panel_bt, border, border)
-    flib.plotLines(panel_prop, linelabels)
-    flib.addRowLabels(rowlabels)
-    flib.addColLabels(collabels)
-    flib.logAxis('y', panel_exceptions = dist_panels_idx_list)
-    flib.logAxis('x')
-
-    flib.removeXTickLabels()
-    def_ytick_except = flib._defaultTickLabelPanelExceptions('y')
-    flib.removeYTickLabels(panel_exceptions = dist_panels_idx_list + def_ytick_except)
-    flib.xLimAdjustToNyquist()
-    flib.flushYAxisToData()
-    flib.matchAxisLimits(which = 'x')
-    flib.matchAxisLimits(which = 'y', panel_exceptions = dist_panels_idx_list)
-    flib.defaultAxesLabels()
-    flib.axisLabel('P$_\mathrm{x}$(k)/P$_\mathrm{v}$(k)', 'y', pos = [1 - border/3/flib.figsize[1], 0.5], rotation = 270,
-                usetex=True)
-    flib.addLegend()
-    flib.printIprops(iprops)
-
-    # if savefig, then save it, otherwise return it
-
-    if not savePath == '':
-        flib.saveFig(savePath, row_prop, column_prop, panel_prop)
-         
-        return
-    else:
-        return flib
-    
-def redshiftR_spaceC_simResolution(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
-            border = 1):
-    row_prop = 'redshift'
-    column_prop = 'space'
-    panel_prop = 'sim_resolution'
-    
-    print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
-    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
-    linelabels = {'high':'High', 'medium':'Medium', 'low':'Low'}
-    flib = FigureLibrary(figArr)
-    # add distortion panels
-    dist_panels_idx_list = flib.addRedshiftDistortion((slice(None), 0), 
-            (slice(None), 1), panel_prop)
-    collabels.append('Distortion')
-
-    flib.createFig(panel_length, panel_bt, border, border)
-    flib.plotLines(panel_prop, linelabels)
-    flib.addRowLabels(rowlabels)
-    flib.addColLabels(collabels)
-    flib.logAxis('y', panel_exceptions = dist_panels_idx_list)
-    flib.logAxis('x')
-
-    flib.removeXTickLabels()
-    def_ytick_except = flib._defaultTickLabelPanelExceptions('y')
-    flib.removeYTickLabels(panel_exceptions = dist_panels_idx_list + def_ytick_except)
-    flib.xLimAdjustToNyquist()
-    flib.flushYAxisToData()
-    flib.matchAxisLimits(which = 'x')
-    flib.matchAxisLimits(which = 'y', panel_exceptions = dist_panels_idx_list)
-    flib.defaultAxesLabels()
-    flib.axisLabel('P$_\mathrm{x}$(k)/P$_\mathrm{v}$(k)', 'y', pos = [1 - border/3/flib.figsize[1], 0.5], rotation = 270,
-                usetex=True)
-    flib.addLegend()
-    flib.printIprops(iprops)
-
-    # if savefig, then save it, otherwise return it
-
-    if not savePath == '':
-        flib.saveFig(savePath, row_prop, column_prop, panel_prop)
-         
-        return
-    else:
-        return flib
-    
-def redshiftR_spaceC_axis(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
-            border = 1):
-    row_prop = 'redshift'
-    column_prop = 'space'
-    panel_prop = 'axis'
-    
-    print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
-    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
-
-    flib = FigureLibrary(figArr)
-    # add distortion panels
-    dist_panels_idx_list = flib.addRedshiftDistortion((slice(None), 0), 
-            (slice(None), 1), panel_prop)
-    collabels.append('Distortion')
-    linelabels = {0:'X-axis'}
-    flib.createFig(panel_length, panel_bt, border, border)
-    flib.plotLines(panel_prop, linelabels)
-    flib.addRowLabels(rowlabels)
-    flib.addColLabels(collabels)
-    flib.logAxis('y', panel_exceptions = dist_panels_idx_list)
-    flib.logAxis('x')
-
-    flib.removeXTickLabels()
-    def_ytick_except = flib._defaultTickLabelPanelExceptions('y')
-    flib.removeYTickLabels(panel_exceptions = dist_panels_idx_list + def_ytick_except)
-    flib.xLimAdjustToNyquist()
-    flib.flushYAxisToData()
-    flib.matchAxisLimits(which = 'x')
-    flib.matchAxisLimits(which = 'y', panel_exceptions = dist_panels_idx_list)
-    flib.defaultAxesLabels()
-    flib.axisLabel('P$_\mathrm{x}$(k)/P$_\mathrm{v}$(k)', 'y', pos = [1 - border/3/flib.figsize[1], 0.5], rotation = 270,
-                usetex=True)
-    flib.addLegend()
-    flib.printIprops(iprops)
-
-    # if savefig, then save it, otherwise return it
-
-    if not savePath == '':
-        flib.saveFig(savePath, row_prop, column_prop, panel_prop)
-         
-        return
-    else:
-        return flib
-    
+ 
 def redshiftR_modelC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
             border = 1):
     """
@@ -326,19 +130,17 @@ def redshiftR_modelC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt 
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, '2D'))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, '2Dpk')
     
-
-    cmap_arr = np.empty_like(figArr, dtype=object)
-    cmap_arr[:,:] = 'plasma'
     flib = FigureLibrary(figArr)
     
     flib.createFig(panel_length, panel_bt, border, border, True)
+    flib.assign2DNorms()
+    flib.assignColormaps()
     flib.addContours()
     flib.plot2D()
-    flib.makeColorbars('P(k$_\parallel$, k$_\perp$) (Mpc/h)$^{-3}$')
 
     flib.changeTickDirection()
     flib.addColLabels(collabels)
-    flib.addRowLabels(rowlabels, is2D=True)
+    flib.addRowLabels(rowlabels, pos = [0.05, 0.90], color='white')
     
     flib.removeDefaultTickLabels()
     flib.defaultAxesLabels(2)
@@ -549,3 +351,192 @@ def mapR_spaceC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.2
     else:
         return flib
 
+
+def redshiftR_spaceC_box(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
+            border = 1):
+    """
+    Show if there's any differences in box volume
+    """    
+    row_prop = 'redshift'
+    column_prop = 'space'
+    panel_prop = 'box'
+    
+    print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
+    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
+    pres = figArr[0,0]
+    linelabels = {}
+    for i in pres:
+        box = i.getProp('box')
+        linelabels[box] = '%d$^3$ (Mpc/h)$^3$'%round(box) 
+
+    flib = FigureLibrary(figArr)
+    # add distortion panels
+    dist_panels_idx_list = flib.addRedshiftDistortion((slice(None), 0), 
+            (slice(None), 1), panel_prop)
+    collabels.append('Distortion')
+
+    flib.createFig(panel_length, panel_bt, border, border)
+    flib.plotLines(panel_prop, linelabels)
+    flib.addRowLabels(rowlabels)
+    flib.addColLabels(collabels)
+    flib.logAxis('y', panel_exceptions = dist_panels_idx_list)
+    flib.logAxis('x')
+
+    flib.removeXTickLabels()
+    def_ytick_except = flib._defaultTickLabelPanelExceptions('y')
+    flib.removeYTickLabels(panel_exceptions = dist_panels_idx_list + def_ytick_except)
+    flib.xLimAdjustToNyquist()
+    flib.flushYAxisToData()
+    flib.matchAxisLimits(which = 'x')
+    flib.matchAxisLimits(which = 'y', panel_exceptions = dist_panels_idx_list)
+    flib.defaultAxesLabels()
+    flib.axisLabel('P$_\mathrm{x}$(k)/P$_\mathrm{v}$(k)', 'y', pos = [1 - border/3/flib.figsize[1], 0.5], rotation = 270)
+    flib.addLegend()
+    flib.printIprops(iprops)
+
+    # if savefig, then save it, otherwise return it
+
+    if not savePath == '':
+        flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+         
+        return
+    else:
+        return flib
+    
+def redshiftR_spaceC_gridResolution(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
+            border = 1):
+    row_prop = 'redshift'
+    column_prop = 'space'
+    panel_prop = 'grid_resolution'
+    
+    print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
+    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
+    
+    linelabels = {}
+    pres = figArr[0,0]
+    for i in pres:
+        gr = i.getProp('grid_resolution')
+        linelabels[gr] = '%d$^3$ Bins'%gr
+    flib = FigureLibrary(figArr)
+    # add distortion panels
+    dist_panels_idx_list = flib.addRedshiftDistortion((slice(None), 0), 
+            (slice(None), 1), panel_prop)
+    collabels.append('Distortion')
+
+    flib.createFig(panel_length, panel_bt, border, border)
+    flib.plotLines(panel_prop, linelabels)
+    flib.addRowLabels(rowlabels)
+    flib.addColLabels(collabels)
+    flib.logAxis('y', panel_exceptions = dist_panels_idx_list)
+    flib.logAxis('x')
+
+    flib.removeXTickLabels()
+    def_ytick_except = flib._defaultTickLabelPanelExceptions('y')
+    flib.removeYTickLabels(panel_exceptions = dist_panels_idx_list + def_ytick_except)
+    flib.xLimAdjustToNyquist()
+    flib.flushYAxisToData()
+    flib.matchAxisLimits(which = 'x')
+    flib.matchAxisLimits(which = 'y', panel_exceptions = dist_panels_idx_list)
+    flib.defaultAxesLabels()
+    flib.axisLabel('P$_\mathrm{x}$(k)/P$_\mathrm{v}$(k)', 'y', pos = [1 - border/3/flib.figsize[1], 0.5], rotation = 270,
+                usetex=True)
+    flib.addLegend()
+    flib.printIprops(iprops)
+
+    # if savefig, then save it, otherwise return it
+
+    if not savePath == '':
+        flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+         
+        return
+    else:
+        return flib
+    
+def redshiftR_spaceC_simResolution(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
+            border = 1):
+    row_prop = 'redshift'
+    column_prop = 'space'
+    panel_prop = 'sim_resolution'
+    
+    print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
+    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
+    linelabels = {'high':'High', 'medium':'Medium', 'low':'Low'}
+    flib = FigureLibrary(figArr)
+    # add distortion panels
+    dist_panels_idx_list = flib.addRedshiftDistortion((slice(None), 0), 
+            (slice(None), 1), panel_prop)
+    collabels.append('Distortion')
+
+    flib.createFig(panel_length, panel_bt, border, border)
+    flib.plotLines(panel_prop, linelabels)
+    flib.addRowLabels(rowlabels)
+    flib.addColLabels(collabels)
+    flib.logAxis('y', panel_exceptions = dist_panels_idx_list)
+    flib.logAxis('x')
+
+    flib.removeXTickLabels()
+    def_ytick_except = flib._defaultTickLabelPanelExceptions('y')
+    flib.removeYTickLabels(panel_exceptions = dist_panels_idx_list + def_ytick_except)
+    flib.xLimAdjustToNyquist()
+    flib.flushYAxisToData()
+    flib.matchAxisLimits(which = 'x')
+    flib.matchAxisLimits(which = 'y', panel_exceptions = dist_panels_idx_list)
+    flib.defaultAxesLabels()
+    flib.axisLabel('P$_\mathrm{x}$(k)/P$_\mathrm{v}$(k)', 'y', pos = [1 - border/3/flib.figsize[1], 0.5], rotation = 270,
+                usetex=True)
+    flib.addLegend()
+    flib.printIprops(iprops)
+
+    # if savefig, then save it, otherwise return it
+
+    if not savePath == '':
+        flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+         
+        return
+    else:
+        return flib
+    
+def redshiftR_spaceC_axis(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
+            border = 1):
+    row_prop = 'redshift'
+    column_prop = 'space'
+    panel_prop = 'axis'
+    
+    print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
+    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
+
+    flib = FigureLibrary(figArr)
+    # add distortion panels
+    dist_panels_idx_list = flib.addRedshiftDistortion((slice(None), 0), 
+            (slice(None), 1), panel_prop)
+    collabels.append('Distortion')
+    linelabels = {0:'X-axis'}
+    flib.createFig(panel_length, panel_bt, border, border)
+    flib.plotLines(panel_prop, linelabels)
+    flib.addRowLabels(rowlabels)
+    flib.addColLabels(collabels)
+    flib.logAxis('y', panel_exceptions = dist_panels_idx_list)
+    flib.logAxis('x')
+
+    flib.removeXTickLabels()
+    def_ytick_except = flib._defaultTickLabelPanelExceptions('y')
+    flib.removeYTickLabels(panel_exceptions = dist_panels_idx_list + def_ytick_except)
+    flib.xLimAdjustToNyquist()
+    flib.flushYAxisToData()
+    flib.matchAxisLimits(which = 'x')
+    flib.matchAxisLimits(which = 'y', panel_exceptions = dist_panels_idx_list)
+    flib.defaultAxesLabels()
+    flib.axisLabel('P$_\mathrm{x}$(k)/P$_\mathrm{v}$(k)', 'y', pos = [1 - border/3/flib.figsize[1], 0.5], rotation = 270,
+                usetex=True)
+    flib.addLegend()
+    flib.printIprops(iprops)
+
+    # if savefig, then save it, otherwise return it
+
+    if not savePath == '':
+        flib.saveFig(savePath, row_prop, column_prop, panel_prop)
+         
+        return
+    else:
+        return flib
+   

@@ -1,7 +1,7 @@
 import os
 import pickle as pkl
 import numpy as np
-from collections.abc import Iterable
+import copy
 
 class ResultLibrary():
 
@@ -170,17 +170,28 @@ class ResultLibrary():
                     newl.append(i.capitalize() + ' Space')
             return newl
         elif prop == 'color':
+            def _make_color_label(name):
+                l = name
+                if name == 'all':
+                    l = 'All Subhalos'
+                elif name == 'resolved':
+                    l = 'All Galaxies'
+                else:
+                    l = name.capitalize() + ' Galaxies'
+                return l
+            
             newl = []
             for i in labels:
                 if isinstance(i, list):
-                    c1 = i[0].capitalize()
-                    c2 = i[1].capitalize()
+                    c1 = _make_color_label(i[0])
+                    c2 = _make_color_label(i[1])
                     if not c1 == c2:
-                        newl.append('%s-%s'%(c1,c2))
+                        
+                        newl.append('%s - %s'%(c1,c2))
                     else:
-                        newl.append(i[0].capitalize() + ' Galaxies')
+                        newl.append(c1)
                 else:
-                    newl.append(i.capitalize() + ' Galaxies')
+                    newl.append(_make_color_label(i))
             return newl
         elif prop == 'axis':
             
@@ -227,7 +238,7 @@ class ResultLibrary():
                 print()
                     
         return
-        
+
     def removeResults(self, figArr, include_dict):
         dim = figArr.shape
         for i in range(dim[0]):

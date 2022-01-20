@@ -44,13 +44,13 @@ def main():
     printlib('fieldname')
     
     #hiptlAuto(rlib)
-    #galaxyAuto(rlib)
+    galaxyAuto(rlib)
     #hisubhaloAuto(rlib)
     #ptlAuto(rlib)
     #vnAuto(rlib)
     #allAuto(rlib)
-    HI_galaxy_cross_power(rlib)
-    HI_ptl_cross_power(rlib)
+    # HI_galaxy_cross_power(rlib)
+    # HI_ptl_cross_power(rlib)
 
     return
 
@@ -209,23 +209,7 @@ def galaxyAuto(rl):
     flib = galFig.colorR_spaceC_redshift(rl, ip)
     flib.saveFig(saveDirPath, 'color', 'space', 'redshift', 'withall')
 
-    ip = cc(bip)
-    del ip['grid_resolution']
-    del ip['space']
-    del ip['color']
-    galFig.colorR_spaceC_grid_resolution(rl, ip, saveDirPath)
 
-    ip = cc(bip)
-    del ip['color'], ip['space'], ip['sim_resolution'], ip['simname']
-    galFig.colorR_spaceC_sim_resolution(rl, ip, saveDirPath)
-    
-    ip = cc(bip)
-    del ip['color'], ip['simname'], ip['sim_resolution']
-    galFig.colorR_boxC_simResolution(rl, ip, saveDirPath)
-
-    ip = cc(bip)
-    del ip['color'], ip['space'], ip['simname']
-    galFig.colorR_spaceC_box(rl, ip, saveDirPath)
 
     
     ip = cc(bip)
@@ -263,8 +247,11 @@ def galaxyAuto(rl):
     ip['space'] = 'redshift'
     flib = galFig.redshiftR_colorC_axis(rl, ip)
 
-    flib.saveFig(saveDirPath, 'redshift', 'color', 'axis', 'dust_axis_test')
+    flib.saveFig(saveDirPath, 'redshift', 'color', 'axis', 'dust_rss_axis_test')
 
+    ip['space'] = 'real'
+    flib = galFig.redshiftR_colorC_axis(rl, ip)
+    flib.saveFig(saveDirPath, 'redshift', 'color', 'axis', 'dust_real_axis_test')
     ip = cc(bip)
     del ip['color']
     del ip['snapshot']

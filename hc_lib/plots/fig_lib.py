@@ -8,17 +8,18 @@ mpl.rcParams['text.usetex'] = True
 class FigureLibrary():
     def __init__(self, figArr):
         self.fig = None
-        self.figArr = figArr
         self.panels = None
+        self.figArr = figArr
+        
         self.dim = figArr.shape
         return
 
     def createFig(self, panel_length, panel_bt, xborder, yborder,
-                colorbar = False):
+                colorbar_col = False):
         nrows = self.dim[0]
         ncols = self.dim[1]
 
-        if colorbar:
+        if colorbar_col:
             ncols += 1
         
         # border input can be either a list or single number
@@ -52,12 +53,13 @@ class FigureLibrary():
                     
             panels.append(col_panels)
         
-        if colorbar:
-            self.cax = fig.add_subplot(gs[:, -1])
-            self.has_cbar_panel = True
-        else:
-            self.cax = np.empty_like(self.figArr, dtype=object)
-            self.has_cbar_panel = False
+        if colorbar_col:
+            caxlist = []
+            for i in range(nrows):
+                caxlist.append(fig.add_subplot(gs[i, -1]))
+            self.cax = caxlist
+            self.has_cbar_col = True
+
         self.fig = fig
         self.panels = panels
         self.panel_length = panel_length
@@ -119,43 +121,6 @@ class FigureLibrary():
                         linestyle = l_ls)
             
             return
-        
-        def _plot_one_panel_dict(dict_panel):
-            """
-            Makes plots for a panel if given a dictionary - expected to occur when some post-analysis
-            step was completed, like calculating redshift distortion.
-            """
-            keys = list(dict_panel.keys())
-            for r in range(len(dict_panel)):
-
-                x = dict_panel[keys[r]][0]
-                y = dict_panel[keys[r]][1]
-
-                if labels is None:
-                    l_lab = keys[r]
-                elif not keys[r] in labels:
-                    l_lab = keys[r] 
-                else:
-                    l_lab = labels[keys[r]]
-
-                if colors is None:
-                    l_c = default_color_cycle[r%len(default_color_cycle)]
-                elif not keys[r] in colors:
-                    l_c = default_color_cycle[r%len(default_color_cycle)]
-                else:
-                    l_c = colors[keys[r]]
-
-                if linestyles is None:    
-                    l_ls = '-'
-                elif not keys[r] in linestyles:
-                    l_ls = '-'
-                else:
-                    l_ls = linestyles[keys[r]]
-                
-                plt.plot(x, y, label = self.texStr(l_lab), color = l_c, 
-                        linestyle = l_ls)
-            
-            return
 
         for i in range(dim[0]):
             for j in range(dim[1]):
@@ -208,9 +173,7 @@ class FigureLibrary():
                             # since this will now be included in the
                             # filled area, remove it from the plot
                             l.set_visible(False)
-                    #print(ymin)
-                    #print(ymax)
-                    #print(xdata)
+
                     # now make the plot
                     plt.fill_between(xdata, ymin, ymax, color=color, label=label,
                                 alpha = opacity)
@@ -240,10 +203,12 @@ class FigureLibrary():
                 # extent=(x_bound[0], x_bound[1], y_bound[0], y_bound[1])
                 
                 plt.imshow(mass, aspect = 'auto', extent=extent, origin='lower')
-                
-
-        
-        
+            
+            if self.has_cbar_col:
+                p = self.cax[i]
+                cmap = self.cmap_arr[i,0]
+                norm = self.norm_arr[i,0]
+                self.fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), cax=p)
         return
     
     def plotHists(self, make_lines = True):
@@ -262,198 +227,140 @@ class FigureLibrary():
                     plt.plot([xbins[0], xbins[-1]], [0.5, 0.5], color='red', linestyle = ':')
                     plt.plot([xbins[0], xbins[-1]], [0.65, 0.65], color='red')
                     plt.plot([xbins[0], xbins[-1]], [0.7, 0.7], color='red', linestyle = ':')
-                    plt.plot(xbins, 0.65 + 0.02 * (xbins - 10.28), color='white') #stmass bins already log
+                    #stmass bins already log
+                    plt.plot(xbins, 0.65 + 0.02 * (xbins - 10.28), color='white', linestyle = '--')
+        
+        if self.has_cbar_col:
+            p = self.cax[i]
+            cmap = self.cmap_arr[i,0]
+            norm = self.norm_arr[i,0]
+            self.fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), cax=p)
         return
     
-    def plot2D(self, vlim = [-2, 4], maxks = [5, 5]):
+    def plot2D(self, maxks = [5, 5]):
         
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
                 p = self.panels[i][j]
+                cmap = self.cmap_arr[i,j]
+                norm = self.norm_arr[i,j]
                 plt.sca(p)
                 # should only be one result in list
                 result = self.figArr[i, j][0]
-                kpar, kper, pk = result.getValues()
-                kpar = np.unique(kpar)
-                kper = np.unique(kper)
-                paridx = np.where(kpar>maxks[0])[0][0]
-                peridx = np.where(kper>maxks[1])[0][0]
-                pk = np.reshape(pk, (len(kpar), len(kper)))
-                extent = (0,kpar[paridx-1],0,kper[peridx-1])
-                plotpk = np.log10(pk[:paridx, :peridx])
+                if len(self.figArr[i, j]) > 1:
+                    print('there are more 2dpk than there should be')
+                KPAR, KPER, plotpk = self._get2DpkData(result, maxks)
+                extent = (np.min(KPAR),np.max(KPAR),np.min(KPER),np.max(KPER))
                 
-                plt.imshow(plotpk, extent=extent, vmin = vlim[0], vmax = vlim[1], 
-                            origin='lower', aspect = 'auto')
-                
+                plt.imshow(plotpk, extent=extent, origin='lower', aspect = 'auto',
+                            norm=norm, cmap=cmap)
+
+            if self.has_cbar_col:
+                p = self.cax[i]
+                cmap = self.cmap_arr[i,0]
+                norm = self.norm_arr[i,0]
+                self.fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), cax=p)
         return
     
-    def addContours(self, color = 'k', maxks = [5,5], vlim = [-2, 4]):
+
+    def addContours(self, color = 'k', maxks = [5,5]):
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
                 p = self.panels[i][j]
+                norm = self.norm_arr[i,j]
                 plt.sca(p)
                 result = self.figArr[i, j][0]
+                KPAR, KPER, plotpk = self._get2DpkData(result, maxks)
 
-                kpar, kper, pk = result.getValues()
-                kpar = np.unique(kpar)
-                kper = np.unique(kper)
-                paridx = np.where(kpar>maxks[0])[0][0]
-                peridx = np.where(kper>maxks[1])[0][0]
-
-                pk = np.reshape(pk, (len(kpar), len(kper)))
-                plotpk = np.log10(pk[:paridx, :peridx])
-                KPAR, KPER = np.meshgrid(kpar[:paridx], kper[:peridx])
-                levels = np.arange(vlim[0], vlim[1], 0.5)
-                plt.contour(KPAR, KPER, plotpk, vmin=np.min(plotpk),
-                        vmax=np.max(plotpk), levels = levels, colors=color,
+                levels = np.arange(int(norm.vmin), int(norm.vmax)+1, 0.5)
+                plt.contour(KPAR, KPER, plotpk, vmin=norm.vmin,
+                        vmax=norm.vmax, levels = levels, colors=color,
                         linestyles='solid')
-
-        return 
-             
-    def addRedshiftDistortion(self, real_slc, redshift_slc, panel_prop):
-        """
-        Adds a column or row that displays the redshift distortion
-        of the results. The panel results are stored as dictionaries,
-        as the ResultContainers require input not accessible for figlib.
-
-        Changing the implementation of ResultContainers would mean that
-        I would need to rerun everything since these are created during
-        the analysis step, and I wanted to have figlib handle everything
-        in the post-analysis step.
-
-        This should be done BEFORE the create_fig method.
-        """
-        real_results = self.figArr[real_slc]
-        redshift_results = self.figArr[redshift_slc]
-
-        distArr = np.empty_like(real_results, dtype=object)
-        
-        # iterate over each panel in the results
-        for i in range(len(real_results)):
-            
-            real_panel = real_results[i]
-            red_panel = redshift_results[i]
-            temp = {}
-
-            # iterate over each result in the panel
-            for j in range(len(real_panel)):
-                
-                wavenum, realpk, z = real_panel[j].getValues()
-                line_prop = real_panel[j].props[panel_prop]
-                for k in range(len(red_panel)):
-                    # if the two have the same within-panel property, they
-                    # should be matched up and given a distortion value
-                    if line_prop == red_panel[j].props[panel_prop]:
-                        wavenum, redpk, z = red_panel[j].getValues()
-
-                temp[line_prop] = np.array([wavenum, realpk/redpk])
-            
-            distArr[i] = temp
-        
-        
-        # find which axis to concatenate along (should only be two options, for 2D array)
-        
-        
-        if distArr.shape == self.dim[0]:
-            concat_ax = 0
-        else:
-            concat_ax = 1
-
-        concat_dim = [-1, -1]
-        concat_dim[concat_ax] = 1 
-        
-        distArr = np.reshape(distArr, concat_dim)
-        self.figArr = np.concatenate((self.figArr, distArr), axis=concat_ax)
-        self.dim = self.figArr.shape
-
-        # making a list of the indices that the distortion panels are at
-        if concat_ax == 0:
-            dist_idx_list = [(self.dim[0]-1,i) for i in range(self.dim[1])]
-        else:
-            dist_idx_list = [(i, self.dim[1]-1) for i in range(self.dim[0])]
-            
-        return dist_idx_list
-
-    # TODO: add variance
-    def makeColorbars(self, cbar_label = '', def_cmap = 'plasma', fsize = 12, vlim=[],
-                except_panels = []):
-        
-        if self.has_cbar_panel:
-            self.matchColorbarLimits(vlim=vlim)
-            # self.logNormColorbar(vlim=vlim)
-            cmap_arr = np.empty(self.dim, dtype=object)
-            cmap_arr[:,:] = def_cmap
-            self.assignColormaps(cmap_arr, under='w')
-            cbar = plt.colorbar(cax=self.cax)
-            self.cax.set_aspect(12, anchor='W')
-            cbar.set_label(cbar_label, fontsize = fsize, rotation=270)
-        else:
-            for i in range(self.dim[0]):
-                for j in range(self.dim[1]):
-                    if (i,j) not in except_panels:
-                        plt.sca(self.panels[i][j])
-                        cbar = plt.colorbar(fraction=0.046, pad=0.04)
-                        if j == self.dim[1] - 1:
-                            cbar.set_label(cbar_label, rotation=270, fontsize=fsize)
-                        self.cax[i, j] = [cbar]
-                        
 
         return
     
-    def assignColormaps(self, cmap_array, under = None, over = None):
+    def _get2DpkData(self, result, maxks):
+        kpar, kper, pk = result.getValues()
+
+        kpar = np.unique(kpar)
+        kper = np.unique(kper)
+        # check to make sure kpar, kper are correct (kper should be longer)
+        if len(kpar) > len(kper):
+            print('have kpar and kper mixed up')
+
+        paridx = np.where(kpar>maxks[0])[0][0]
+        peridx = np.where(kper>maxks[1])[0][0]
+
+        pk = np.reshape(pk, (len(kper), len(kpar)))
+        plotpk = np.log10(pk[:paridx, :peridx])
+        KPAR, KPER = np.meshgrid(kpar[:peridx], kpar[:paridx])
+        return KPAR, KPER, plotpk
+
+    def assign2DNorms(self, vlim_list = []):
+        if not vlim_list:
+            vlim_list = [[-2, 4] for i in range(self.dim[0])]
+        norm_arr = np.empty_like(self.figArr, dtype = object)
+        for i in range(self.dim[0]):
+            for j in range(self.dim[1]):
+                vlim = vlim_list[i]
+                norm_arr[i,j] = mpl.colors.normalize(vmin=vlim[0], vmax=vlim[1])
+        self.norm_arr = norm_arr
+        return
+
+    def assignSliceNorms(self, vlim_list = []):
+        if not vlim_list:
+            vlim_list = [[2, 12.5] for i in range(self.dim[1])]
+        norm_arr = np.empty_like(self.figArr, dtype = object)
+        for i in range(self.dim[0]):
+            for j in range(self.dim[1]):
+                vlim = vlim_list[i]
+                norm_arr[i,j] = mpl.colors.normalize(vmin=vlim[0], vmax=vlim[1])
+        self.norm_arr = norm_arr
+        return
+    
+    def assignHistNorms(self, vlim_list = []):
+        if not vlim_list:
+            vlim_list = [[1, 5e2] for i in range(self.dim[1])]
+        norm_arr = np.empty_like(self.figArr, dtype = object)
 
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
-                im = self.panels[i][j].get_images()[0]
-                ca = cmap_array[i, j]
-                if isinstance(ca, str):
-                    cmap = copy.copy(mpl.cm.get_cmap(ca))
-                else:
-                    cmap = ca
-                
-                if not under is None:
-                    cmap.set_under(under)
-                if not over is None:
-                    cmap.set_over(over)
-                
-                im.set_cmap(cmap)
+                vlim = vlim_list[i]
+                norm_arr[i,j] = mpl.colors.LogNorm(vmin=vlim[0], vmax=vlim[1])
+        self.norm_arr = norm_arr
+        return
+    
+    def setNormArr(self, norm_arr):
+        self.norm_arr = norm_arr
+        return
+ 
+    def setColorbarLabels(self, cbar_label, labelpad = 20, ha = 'left', va='center',
+                label_type = ''):
+        if label_type == '2dpk':
+            cbar_label = 'log P(k$_\parallel$, k$_\perp$) (Mpc/h)$^{-3}$'
+        if label_type == 'slice':
+            cbar_label = 'log M$_*$/M$_/odot$'
+        for i in range(len(self.cax)):
+            p = self.cax[i]
+            plt.sca(p)
+            p.set_ylabel(cbar_label, labelpad = labelpad, ha = ha, va=va)
+        return
+
+     
+    def assignColormaps(self, cmap_name = 'plasma', under = None, over = None):
+        self.cmap_arr = np.empty_like(self.figArr)
+        cmap = copy.copy(mpl.cm.get_cmap(cmap_name))
+        if not under is None:
+            cmap.set_under(under)
+        if not over is None:
+            cmap.set_over(over)
+        
+        self.cmap_arr[:,:] = cmap
         
         return
 
-    def logNormColorbar(self, vlim = [], panel_exceptions = []):
-        for i in range(self.dim[0]):
-            for j in range(self.dim[1]):
-                if (i, j) not in panel_exceptions:
-                    im = self.panels[i][j].get_images()[0]
-                    clim = im.get_clim()
-                    # print(clim)
-                    if vlim:
-                        im.set_norm(mpl.colors.LogNorm(vmin=vlim[0], vmax=vlim[1]))
-                    else:
-                        im.set_norm(mpl.colors.LogNorm(vmin=clim[0], vmax=clim[1]))
-                    
-        return
-      
-    def matchColorbarLimits(self, vlim = [], panel_exceptions = []):
-        # get the limits
-        if not vlim:
-            vlim = [np.inf, -np.inf]
-            for i in range(self.dim[0]):
-                for j in range(self.dim[1]):
-                    if (i, j) not in panel_exceptions:
-                        im = self.panels[i][j].get_images()[0]
-                        cmin = im.norm.vmin
-                        cmax = im.norm.vmax
-                        if vlim[0] > cmin: vlim[0]=cmin 
-                        if vlim[1] < cmax: vlim[1]=cmax
-
-        for i in range(self.dim[0]):
-            for j in range(self.dim[1]):
-                if (i, j) not in panel_exceptions:
-                    im = self.panels[i][j].get_images()[0]
-                    im.norm.vmin = vlim[0]
-                    im.norm.vmax = vlim[1]
-
+    def setCmapArr(self, cmap_arr):
+        self.cmap_arr = cmap_arr
         return
 
     def printIprops(self, iprops, fsize=6):
@@ -558,7 +465,14 @@ class FigureLibrary():
         if axis == 'x':
             if rotation == '':
                 rotation = 'horizontal'
-            posdict['x'] = [0.5, self.yborder[1]/3/self.figsize[1]]
+            if self.has_cbar_col:
+                ncols = self.dim[1] # does not include cbar panel
+                image_length = ncols * self.panel_length + self.xborder[0] + \
+                        self.panel_bt[0] * (ncols - 1)
+                hpos = 0.5 * image_length / self.figsize[0]
+            else:
+                hpos = 0.5
+            posdict['x'] = [hpos, self.yborder[1]/3/self.figsize[1]]
         elif axis == 'y':
             if rotation == '':
                 rotation = 'vertical'
@@ -654,8 +568,8 @@ class FigureLibrary():
             ylab = r'P(k) (Mpc/h)$^{-3}$'
             
         elif dtype == 2:
-            ylab = r"k$_{\parallel}$ (h/Mpc)"
-            xlab = r"k$_{\perp}$ (h/Mpc)"
+            xlab = r"k$_{\parallel}$ (h/Mpc)"
+            ylab = r"k$_{\perp}$ (h/Mpc)"
             
         elif dtype == 'slice':
             xlab = 'x (Mpc/h)'
