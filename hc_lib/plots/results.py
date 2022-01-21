@@ -32,7 +32,9 @@ class ResultLibrary():
                 one_prop.append(r)
         
         if len(one_prop) > 1:
-            print('more than one result retrieved')
+            print('more than one result retrieved: %d results'%len(one_prop))
+            for i in one_prop:
+                print(i.props)
         return one_prop[0]
         
     def addResults(self, directory = '', pkl_file = ''):
@@ -167,9 +169,9 @@ class ResultLibrary():
             newl = []
             for i in labels:
                 if isinstance(i, list):
-                    newl.append(r'z=%.1f'%i[0])
+                    newl.append(r'z=%.1f'%round(i[0]))
                 else:
-                    newl.append(r'z=%.1f'%i)
+                    newl.append(r'z=%.1f'%round(i))
             return newl
         elif prop == 'space':
             newl = []
@@ -238,7 +240,7 @@ class ResultLibrary():
                 if not_include and not_row_col:
                     if not k in vals:
                         vals[k] = [v]
-                    else:
+                    elif v not in vals[k]:
                         vals[k].append(v)
                 
         for v in vals:
@@ -249,15 +251,14 @@ class ResultLibrary():
                     
         return
 
-    def removeResults(self, figArr, include_dict):
+    def removeResults(self, figArr, remove_dict):
         dim = figArr.shape
         for i in range(dim[0]):
             for j in range(dim[1]):
                 rpanel = figArr[i, j]
                 for r in rpanel:
-                    for prop in include_dict:
-                        if not self.getProp(r,prop) in include_dict[prop]:
-                            rpanel.remove(r)
+                    if self.matchProps(r, remove_dict):
+                        rpanel.remove(r)
                 figArr[i, j] = rpanel
 
         return figArr

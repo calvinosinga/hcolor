@@ -5,7 +5,7 @@ import matplotlib.gridspec as gspec
 import copy
 import illustris_python as il
 mpl.rcParams['text.usetex'] = True
-
+# mpl.rcParams['figure.max_open_warning'] 
 class FigureLibrary():
     def __init__(self, figArr):
         self.fig = None
@@ -81,6 +81,7 @@ class FigureLibrary():
 
     def clf(self):
         plt.clf()
+        plt.close()
         return
     
     def plotLines(self, panel_prop, labels = None, colors = None, linestyles = None):
@@ -187,8 +188,10 @@ class FigureLibrary():
             for j in range(self.dim[1]):
                 p = self.panels[i][j]
 
-                if not len(self.figArr[i, j]) == 1:
-                    print('needs only one slice in order to plot...')
+                if len(self.figArr[i, j]) > 1:
+                    print('needs only one slice: panel %d,%d'%(i,j))
+                    for r in self.figArr[i, j]:
+                        print(r.props)
                 pslice = self.figArr[i, j][0]
 
                 plt.sca(p)
@@ -320,7 +323,7 @@ class FigureLibrary():
 
     def assignSliceNorms(self, vlim_list = []):
         if not vlim_list:
-            vlim_list = [[2, 12.5] for i in range(self.dim[1])]
+            vlim_list = [[2, 12.5] for i in range(self.dim[0])]
         norm_arr = np.empty_like(self.figArr, dtype = object)
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
@@ -331,7 +334,7 @@ class FigureLibrary():
     
     def assignHistNorms(self, vlim_list = []):
         if not vlim_list:
-            vlim_list = [[1, 5e2] for i in range(self.dim[1])]
+            vlim_list = [[1, 5e2] for i in range(self.dim[0])]
         norm_arr = np.empty_like(self.figArr, dtype = object)
 
         for i in range(self.dim[0]):

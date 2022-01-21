@@ -184,7 +184,7 @@ def fieldnameR_colorC_color_cut(rlib, iprops, savePath = '', panel_length = 3, p
     panel_prop = 'color_cut'
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
-    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk', check = [0,0])
+    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
     colcuts = rlib.getVals('pk', 'color_cut', iprops)
     linelabels = {}
     linests = {}
@@ -242,9 +242,15 @@ def color_cut_test(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.2
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk', check = [0,0])
     iprops['fieldname'] = 'galaxy_dust'
     iprops['color_cut'] = '0.60'
-    gal_dust_result = rlib.getResult(iprops, 'pk')
-    gal_dust_result.addProp('color_cut', '0.60_dust')
-    figArr[0,0].append(gal_dust_result)
+    iprops['color'] = 'blue'
+    gal_dust_blue_result = rlib.getResult(iprops, 'pk')
+    iprops['color'] = 'red'
+    gal_dust_red_result = rlib.getResult(iprops, 'pk')
+
+    gal_dust_blue_result.addProp('color_cut', '0.60_dust')
+    gal_dust_red_result.addProp('color_cut', '0.60_dust')
+    figArr[0,0].append(gal_dust_blue_result)
+    figArr[0,0].append(gal_dust_red_result)
     colcuts = rlib.getVals('pk', 'color_cut', iprops)
     linelabels = {}
     linests = {}
@@ -262,6 +268,7 @@ def color_cut_test(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.2
 
     linelabels['visual_inspection'] = 'D18'
     linelabels['0.60_dust'] = 'g-r = 0.60, Dust'
+    linestyles['0.60_dust'] = '-.'
     flib = FigureLibrary(figArr) # removing resolved column
 
         

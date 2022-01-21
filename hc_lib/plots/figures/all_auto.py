@@ -65,6 +65,7 @@ def fieldnameR_spaceC_slice(rlib, iprops, savePath = '', panel_length = 3, panel
         elif rowlabels[l] == 'galaxy':
             rowlabels[l] = 'Galaxies'
 
+    rlib.removeResults(figArr, {'fieldname':'ptl', 'species':'stmass'})   
     flib = FigureLibrary(figArr)
 
     flib.createFig(panel_length, panel_bt, border, border, True)
@@ -98,6 +99,7 @@ def fieldnameR_redshiftC_axis(rlib, iprops, savePath = '', panel_length = 3, pan
 
     linelabels = {0 : 'Axis=0', 1 : 'Axis=1', 2:'Axis=2'}
 
+    rlib.removeResults(figArr, {'fieldname':'ptl', 'species':'stmass'})   
     for l in range(len(rowlabels)):
         if rowlabels[l] == 'vn':
             rowlabels[l] = 'VN18-Particle'
@@ -136,21 +138,37 @@ def fieldnameR_redshiftC_axis(rlib, iprops, savePath = '', panel_length = 3, pan
     else:
         return flib
     
-def fieldnameR_simResolutionC_box(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 1,
+def fieldnameR_simResolutionC_box(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
             border = 1):
     row_prop = 'fieldname'
     column_prop = 'sim_resolution'
     panel_prop = 'box'
-    
+    pks = rlib._getResultType('pk')
+    #for r in pks:
+    #    if rlib.getProp(r, 'fieldname') == 'hisubhalo':
+    #        print(r.props)
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
     pres = figArr[0,0]
     linelabels = {}
     for i in pres:
         box = i.getProp('box')
+        
         linelabels[box] = '%d$^3$ (Mpc/h)$^3$'%round(box) 
 
-    #print(figArr.shape)
+    for l in range(len(rowlabels)):
+        if rowlabels[l] == 'vn':
+            rowlabels[l] = 'VN18-Particle'
+        elif rowlabels[l] == 'ptl':
+            rowlabels[l] = 'Gas'
+        elif rowlabels[l] == 'hiptl':
+            rowlabels[l] = 'D18-Particle'
+        elif rowlabels[l] == 'hisubhalo':
+            rowlabels[l] = 'D18-Subhalo'
+        elif rowlabels[l] == 'galaxy':
+            rowlabels[l] = 'Galaxies'
+    
+    rlib.removeResults(figArr, {'fieldname':'ptl', 'species':'stmass'})   
     flib = FigureLibrary(figArr)
     # add distortion panels
 
@@ -178,12 +196,12 @@ def fieldnameR_simResolutionC_box(rlib, iprops, savePath = '', panel_length = 3,
     else:
         return flib
 
-def fieldnameR_spaceC_box(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 1,
+def fieldnameR_spaceC_box(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
             border = 1):
     row_prop = 'fieldname'
     column_prop = 'space'
     panel_prop = 'box'
-    
+       
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
     pres = figArr[0,0]
@@ -192,10 +210,22 @@ def fieldnameR_spaceC_box(rlib, iprops, savePath = '', panel_length = 3, panel_b
         box = i.getProp('box')
         linelabels[box] = '%d$^3$ (Mpc/h)$^3$'%round(box) 
 
+    rlib.removeResults(figArr, {'fieldname':'ptl', 'species':'stmass'})   
     #print(figArr.shape)
     flib = FigureLibrary(figArr)
     # add distortion panels
 
+    for l in range(len(rowlabels)):
+        if rowlabels[l] == 'vn':
+            rowlabels[l] = 'VN18-Particle'
+        elif rowlabels[l] == 'ptl':
+            rowlabels[l] = 'Gas'
+        elif rowlabels[l] == 'hiptl':
+            rowlabels[l] = 'D18-Particle'
+        elif rowlabels[l] == 'hisubhalo':
+            rowlabels[l] = 'D18-Subhalo'
+        elif rowlabels[l] == 'galaxy':
+            rowlabels[l] = 'Galaxies'
     flib.createFig(panel_length, panel_bt, border, border)
     flib.plotLines(panel_prop, linelabels)
     flib.addRowLabels(rowlabels)
@@ -220,20 +250,31 @@ def fieldnameR_spaceC_box(rlib, iprops, savePath = '', panel_length = 3, panel_b
     else:
         return flib
  
-def fieldnameR_boxC_simResolution(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 1,
+def fieldnameR_boxC_simResolution(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
             border = 1):
     row_prop = 'fieldname'
     column_prop = 'box'
     panel_prop = 'sim_resolution'
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
-    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
-
+    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk', check = [2,0])
+    rlib.removeResults(figArr, {'fieldname':'ptl', 'species':'stmass'})
     linelabels = {'high':'High', 'medium':'Medium', 'low':'Low'}
     #print(figArr.shape)
     flib = FigureLibrary(figArr)
     # add distortion panels
 
+    for l in range(len(rowlabels)):
+        if rowlabels[l] == 'vn':
+            rowlabels[l] = 'VN18-Particle'
+        elif rowlabels[l] == 'ptl':
+            rowlabels[l] = 'Gas'
+        elif rowlabels[l] == 'hiptl':
+            rowlabels[l] = 'D18-Particle'
+        elif rowlabels[l] == 'hisubhalo':
+            rowlabels[l] = 'D18-Subhalo'
+        elif rowlabels[l] == 'galaxy':
+            rowlabels[l] = 'Galaxies'
     flib.createFig(panel_length, panel_bt, border, border)
     flib.plotLines(panel_prop, linelabels)
     flib.addRowLabels(rowlabels)
@@ -258,20 +299,32 @@ def fieldnameR_boxC_simResolution(rlib, iprops, savePath = '', panel_length = 3,
     else:
         return flib
     
-def fieldnameR_spaceC_simResolution(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 1,
+def fieldnameR_spaceC_simResolution(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
             border = 1):
     row_prop = 'fieldname'
-    column_prop = 'box'
+    column_prop = 'space'
     panel_prop = 'sim_resolution'
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
 
+    rlib.removeResults(figArr, {'fieldname':'ptl', 'species':'stmass'})   
     linelabels = {'high':'High', 'medium':'Medium', 'low':'Low'}
     #print(figArr.shape)
     flib = FigureLibrary(figArr)
     # add distortion panels
 
+    for l in range(len(rowlabels)):
+        if rowlabels[l] == 'vn':
+            rowlabels[l] = 'VN18-Particle'
+        elif rowlabels[l] == 'ptl':
+            rowlabels[l] = 'Gas'
+        elif rowlabels[l] == 'hiptl':
+            rowlabels[l] = 'D18-Particle'
+        elif rowlabels[l] == 'hisubhalo':
+            rowlabels[l] = 'D18-Subhalo'
+        elif rowlabels[l] == 'galaxy':
+            rowlabels[l] = 'Galaxies'
     flib.createFig(panel_length, panel_bt, border, border)
     flib.plotLines(panel_prop, linelabels)
     flib.addRowLabels(rowlabels)
@@ -296,7 +349,7 @@ def fieldnameR_spaceC_simResolution(rlib, iprops, savePath = '', panel_length = 
     else:
         return flib
 
-def fieldnameR_spaceC_gridResolution(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 1,
+def fieldnameR_spaceC_gridResolution(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
             border = 1):
     row_prop = 'fieldname'
     column_prop = 'space'
@@ -305,6 +358,7 @@ def fieldnameR_spaceC_gridResolution(rlib, iprops, savePath = '', panel_length =
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
 
+    rlib.removeResults(figArr, {'fieldname':'ptl', 'species':'stmass'})   
     linelabels = {}
     pres = figArr[0,0]
     for i in pres:
@@ -315,6 +369,17 @@ def fieldnameR_spaceC_gridResolution(rlib, iprops, savePath = '', panel_length =
     flib = FigureLibrary(figArr)
     # add distortion panels
 
+    for l in range(len(rowlabels)):
+        if rowlabels[l] == 'vn':
+            rowlabels[l] = 'VN18-Particle'
+        elif rowlabels[l] == 'ptl':
+            rowlabels[l] = 'Gas'
+        elif rowlabels[l] == 'hiptl':
+            rowlabels[l] = 'D18-Particle'
+        elif rowlabels[l] == 'hisubhalo':
+            rowlabels[l] = 'D18-Subhalo'
+        elif rowlabels[l] == 'galaxy':
+            rowlabels[l] = 'Galaxies'
     flib.createFig(panel_length, panel_bt, border, border)
     flib.plotLines(panel_prop, linelabels)
     flib.addRowLabels(rowlabels)
