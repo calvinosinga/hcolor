@@ -97,7 +97,7 @@ def fieldnameR_redshiftC_axis(rlib, iprops, savePath = '', panel_length = 3, pan
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
 
-    linelabels = {0 : 'Axis=0', 1 : 'Axis=1', 2:'Axis=2'}
+    linelabels = {'0' : 'Axis=0', '1': 'Axis=1', '2':'Axis=2'}
 
     rlib.removeResults(figArr, {'fieldname':'ptl', 'species':'stmass'})   
     for l in range(len(rowlabels)):
@@ -154,7 +154,7 @@ def fieldnameR_simResolutionC_box(rlib, iprops, savePath = '', panel_length = 3,
     for i in pres:
         box = i.getProp('box')
         
-        linelabels[box] = '%d$^3$ (Mpc/h)$^3$'%round(box) 
+        linelabels[str(box)] = '%d$^3$ (Mpc/h)$^3$'%round(box) 
 
     for l in range(len(rowlabels)):
         if rowlabels[l] == 'vn':
@@ -208,7 +208,7 @@ def fieldnameR_spaceC_box(rlib, iprops, savePath = '', panel_length = 3, panel_b
     linelabels = {}
     for i in pres:
         box = i.getProp('box')
-        linelabels[box] = '%d$^3$ (Mpc/h)$^3$'%round(box) 
+        linelabels[str(box)] = '%d$^3$ (Mpc/h)$^3$'%round(box) 
 
     rlib.removeResults(figArr, {'fieldname':'ptl', 'species':'stmass'})   
     #print(figArr.shape)
@@ -363,7 +363,7 @@ def fieldnameR_spaceC_gridResolution(rlib, iprops, savePath = '', panel_length =
     pres = figArr[0,0]
     for i in pres:
         gr = i.getProp('grid_resolution')
-        linelabels[gr] = '%d$^3$ Bins'%gr
+        linelabels[str(gr)] = '%d$^3$ Bins'%gr
 
     #print(figArr.shape)
     flib = FigureLibrary(figArr)

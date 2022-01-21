@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.gridspec as gspec
 import copy
-import illustris_python as il
 mpl.rcParams['text.usetex'] = True
 # mpl.rcParams['figure.max_open_warning'] 
 class FigureLibrary():
@@ -89,50 +88,73 @@ class FigureLibrary():
         default_color_cycle = plt.rcParams['axes.prop_cycle'].by_key()['color']
         pprop = panel_prop
 
-        def _plot_one_panel_rc(rc_panel):
+        def _plot_auto(r_container, idx):
             """
             Plots a panel when the results to be plotted (rc_panel)
             is a list of ResultContainer objects. This is default.
             """
-            for r in range(len(rc_panel)):
-                r_container = rc_panel[r]
-                x, y, z = r_container.getValues()
+            
+            x, y, z = r_container.getValues()
                 
                 
-                if labels is None:
-                    l_lab = r_container.props[pprop]
-                elif not str(r_container.props[pprop]) in labels:
-                    l_lab = r_container.props[pprop]
-                else:
-                    l_lab = labels[r_container.props[pprop]]
+            if labels is None:
+                l_lab = r_container.props[pprop]
+            elif not str(r_container.props[pprop]) in labels:
+                l_lab = r_container.props[pprop]
+            else:
+                l_lab = labels[r_container.props[pprop]]
 
-                if colors is None:
-                    l_c = default_color_cycle[r%len(default_color_cycle)]
-                elif not str(r_container.props[pprop]) in colors:
-                    l_c = default_color_cycle[r%len(default_color_cycle)]
-                else:
-                    l_c = colors[r_container.props[pprop]]
+            if colors is None:
+                l_c = default_color_cycle[idx%len(default_color_cycle)]
+            elif not str(r_container.props[pprop]) in colors:
+                l_c = default_color_cycle[idx%len(default_color_cycle)]
+            else:
+                l_c = colors[r_container.props[pprop]]
 
-                if linestyles is None:    
-                    l_ls = '-'
-                elif not str(r_container.props[pprop]) in linestyles:
-                    l_ls = '-'
-                else:
-                    l_ls = linestyles[r_container.props[pprop]]
-                
-                plt.plot(x, y, label = self.texStr(l_lab), color = l_c, 
-                        linestyle = l_ls)
+            if linestyles is None:    
+                l_ls = '-'
+            elif not str(r_container.props[pprop]) in linestyles:
+                l_ls = '-'
+            else:
+                l_ls = linestyles[r_container.props[pprop]]
+            
+            plt.plot(x, y, label = self.texStr(l_lab), color = l_c, 
+                    linestyle = l_ls)
             
             return
 
+        def _plot_cross(r_container, idx):
+            x,y,z = r_container.getValues()
+            
+            l_lab = r_container.props['line_label']
+            if 'line_color' in r_container.props:
+                l_c = r_container.props['line_color']
+            else:
+                l_c = default_color_cycle[idx%len(default_color_cycle)]
+
+            if 'linestyle' in r_container.props:
+                l_ls = r_container.props['linestyle']
+            else:
+                l_ls = '-'
+            
+            
+            plt.plot(x, y, label = self.texStr(l_lab), color = l_c, 
+                    linestyle = l_ls)
+            return
+        
         for i in range(dim[0]):
             for j in range(dim[1]):
                 p = self.panels[i][j]
 
                 results_for_panel = self.figArr[i, j]
                 plt.sca(p)
-                
-                _plot_one_panel_rc(results_for_panel)
+                for r in range(len(results_for_panel)):
+                    rc = results_for_panel[r]
+                    if rc.props['is_auto']:
+                        _plot_auto(rc,r)
+                    else:
+                        _plot_cross(rc)
+
 
 
         return
@@ -239,7 +261,7 @@ class FigureLibrary():
                     plt.plot([xbins[0], xbins[-1]], [0.65, 0.65], color='red')
                     plt.plot([xbins[0], xbins[-1]], [0.7, 0.7], color='red', linestyle = ':')
                     #stmass bins already log
-                    plt.plot(xbins, 0.65 + 0.02 * (xbins - 10.28), color='white', linestyle = '--')
+                    plt.plot(xbins, 0.65 + 0.02 * (xbins - 10.28), color='gray', linestyle = '--')
         
         if self.has_cbar_col:
             p = self.cax[i]
@@ -596,43 +618,81 @@ class FigureLibrary():
     
     def _getLimits(self, panel_exceptions = []):
         dim = self.dim
-        ylims = [np.inf, -np.inf]
-        xlims = [-np.inf, np.inf]
+        ylims = np.zeros((dim[0], dim[1], 2))
+        xlims = np.zeros_like(ylims)
         for i in range(dim[0]):
             for j in range(dim[1]):
-                if not (i, j) in panel_exceptions:
-                    p = self.panels[i][j]
-                    plt.sca(p)
-                    ymin, ymax = plt.ylim()
-                    xmin, xmax = plt.xlim()
-                    # for the y-axis, we want the largest max, smallest min
-                    # in order to encompass the most data
-                    if ymin < ylims[0]:
-                        ylims[0] = ymin
-                    if ymax > ylims[1]:
-                        ylims[1] = ymax
-                    # for the x-axis, we want the smallest max, largest min
-                    # so no panel includes bad data
-                    if xmin > xlims[0]:
-                        xlims[0] = xmin
-                    if xmax < xlims[1]:
-                        xlims[1] = xmax
+                p = self.panels[i][j]
+                plt.sca(p)
+                ymin, ymax = plt.ylim()
+                xmin, xmax = plt.xlim()
+                # if not (i, j) in panel_exceptions:
+                #     # for the y-axis, we want the largest max, smallest min
+                #     # in order to encompass the most data
+                #     if ymin < ylims[0]:
+                #         ylims[0] = ymin
+                #     if ymax > ylims[1]:
+                #         ylims[1] = ymax
+                #     # for the x-axis, we want the smallest max, largest min
+                #     # so no panel includes bad data
+                #     if xmin > xlims[0]:
+                #         xlims[0] = xmin
+                #     if xmax < xlims[1]:
+                #         xlims[1] = xmax
+                # else:
+                if (i, j) in panel_exceptions:
+                    ylims[i,j,:] = np.nan
+                    xlims[i,j,:] = np.nan
+                else:
+                    ylims[i,j,0], ylims[i,j,1] = ymin, ymax
+                    xlims[i,j,0], xlims[i,j,1] = xmin, xmax
         
         return xlims, ylims
     
-    def matchAxisLimits(self, which = 'both', panel_exceptions = []):
-        xlim, ylim = self._getLimits(panel_exceptions)
+    def matchAxisLimits(self, which = 'both', panel_exceptions = [], match_line = True):
+        xlims, ylims = self._getLimits(panel_exceptions)
         dim = self.dim
+        
+        new_xlims = np.ma.masked_invalid(xlims)
+        new_ylims = np.ma.masked_invalid(ylims)
+        if not match_line:
+            # match every panel
+            max_xlim = np.max(new_xlims)
+            min_xlim = np.min(new_xlims)
+            max_ylim = np.max(new_ylims)
+            min_ylim = np.max(new_ylims)
+
+            xlims[:,:,0] = min_xlim
+            xlims[:,:,1] = max_xlim
+            ylims[:,:,0] = min_ylim
+            ylims[:,:,1] = max_ylim
+        
+        else:
+            # match the limits of the respective row or column
+            max_xlims = np.max(new_xlims[:,:,1], axis=0)
+            min_xlims = np.min(new_xlims[:,:,0], axis=0)
+
+            max_ylims = np.max(new_ylims[:,:,1], axis=1)
+            min_ylims = np.min(new_ylims[:,:,0], axis=1)
+
+            for i in range(len(max_xlims)):
+                xlims[:,i,0]=min_xlims
+                xlims[:,i,1]=max_xlims
+            for i in range(len(max_ylims)):
+                ylims[i,:,0]=min_ylims
+                ylims[i,:,1] = max_ylims
             
         for i in range(dim[0]):
             for j in range(dim[1]):
-                if not (i, j) in panel_exceptions:
-                    p = self.panels[i][j]
-                    plt.sca(p)
-                    if which == 'x' or which == 'both':
-                        plt.xlim(xlim[0], xlim[1])
-                    if which == 'y' or which == 'both':
-                        plt.ylim(ylim[0], ylim[1])
+                if (i,j) not in panel_exceptions:
+                    plt.sca(self.panels[i][j])
+                    if which == 'both' or which == 'x':
+                        plt.xlim(xlims[i,j,0], xlims[i,j,1])
+                    if which == 'both' or which == 'y':
+                        plt.ylim(ylims[i,j,0], ylims[i,j,1])
+
+
+
         
         return
             
