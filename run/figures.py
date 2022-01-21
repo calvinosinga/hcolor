@@ -22,8 +22,6 @@ def getBIP():
     baseIncludeProps['axis'] = 0
     baseIncludeProps['grid_resolution'] = 800
     baseIncludeProps['is_auto'] = True
-    #baseIncludeProps['model'] = 'm_hi_GD14_map'
-    #baseIncludeProps['projection'] = 'map'
     baseIncludeProps['snapshot'] = 99
     baseIncludeProps['mas'] = 'CICW'
     baseIncludeProps['space'] = 'real'
@@ -137,21 +135,6 @@ def hiptlAuto(rl):
     hiptlFig.redshiftR_modelC_space(rl, ip, saveDirPath)
 
     ip = cc(bip)
-    del ip['simname'], ip['space'], ip['snapshot']
-    hiptlFig.redshiftR_spaceC_box(rl, ip, saveDirPath)
-
-    del ip['sim_resolution']
-    hiptlFig.redshiftR_spaceC_simResolution(rl, ip, saveDirPath)
-    
-    ip = cc(bip)
-    del ip['grid_resolution'], ip['space'], ip['snapshot']
-    hiptlFig.redshiftR_spaceC_gridResolution(rl, ip, saveDirPath)
-
-    ip = cc(bip)
-    del ip['axis'], ip['snapshot'], ip['space']
-    hiptlFig.redshiftR_spaceC_axis(rl, ip, saveDirPath)
-
-    ip = cc(bip)
     del ip['model'], ip['snapshot']
     ip['space'] = 'redshift'
     hiptlFig.redshiftR_modelC_2D(rl, ip, saveDirPath)
@@ -209,8 +192,6 @@ def galaxyAuto(rl):
     flib = galFig.colorR_spaceC_redshift(rl, ip)
     flib.saveFig(saveDirPath, 'color', 'space', 'redshift', 'withall')
 
-
-
     
     ip = cc(bip)
     del ip['species']
@@ -220,7 +201,7 @@ def galaxyAuto(rl):
 
     ip = cc(bip)
     del ip['fieldname']
-    del ip['color']
+    ip['color'] = ['red', 'blue', 'resolved']
     del ip['snapshot']
     galFig.redshiftR_colorC_fieldname(rl, ip, saveDirPath)
     
@@ -238,6 +219,9 @@ def galaxyAuto(rl):
     del ip['color']
     ip['color_cut'] = ['visual_inspection', '0.60', '0.55', '0.50', '0.65', '0.70']
     galFig.fieldnameR_colorC_color_cut(rl, ip, saveDirPath)
+
+    flib = galFig.color_cut_test(rl, ip)
+    flib.saveFig(saveDirPath, 'fieldname', 'color', 'color_cut', '_one_panel')
 
     ip = cc(bip)
     del ip['axis']
@@ -295,22 +279,6 @@ def hisubhaloAuto(rl):
     hisubFig.modelR_spaceC_redshift(rl, ip, saveDirPath)
     
     hisubFig.redshiftR_modelC_space(rl, ip, saveDirPath)
-
-    ip = cc(bip)
-    del ip['simname'], ip['snapshot'], ip['space']
-    hisubFig.redshiftR_spaceC_box(rl, ip, saveDirPath)
-
-    ip = cc(bip)
-    del ip['simname'], ip['snapshot'], ip['space'], ip['sim_resolution']
-    hisubFig.redshiftR_spaceC_simResolution(rl, ip, saveDirPath)
-    
-    ip = cc(bip)
-    del ip['snapshot'], ip['space'], ip['grid_resolution']
-    hisubFig.redshiftR_spaceC_gridResolution(rl, ip, saveDirPath)
-
-    ip = cc(bip)
-    del ip['axis'], ip['snapshot'], ip['space']
-    hisubFig.redshiftR_spaceC_axis(rl, ip, saveDirPath)
 
     ip=cc(bip)
     del ip['snapshot'], ip['model'], ip['projection']
@@ -380,6 +348,7 @@ def vnAuto(rl):
     vnFig.fieldnameR_redshiftC_space(rl, ip, saveDirPath)
     vnFig.fieldnameR_spaceC_redshift(rl, ip, saveDirPath)
     
+    vnFig.fieldnameR_redshiftC_2D(rl, ip, saveDirPath)
     return
 
 def allAuto(rl):
@@ -398,8 +367,7 @@ def allAuto(rl):
     del ip['snapshot'], ip['space']
     ip['fieldname'] = ['vn', 'hiptl', 'hisubhalo']
      
-    autoFig.redshiftR_spaceC_fieldname_distortion(rl, ip, saveDirPath)
-    autoFig.redshiftR_spaceC_fieldname_no_distortion(rl, ip, saveDirPath)
+    autoFig.redshiftR_spaceC_fieldname(rl, ip, saveDirPath)
 
     
     ip = cc(bip)
@@ -409,7 +377,10 @@ def allAuto(rl):
     ip['model'] = ['GD14', 'f_hi_GD14_map']
     ip['color'] = ['resolved']
     ip['map'] = ['mass']
-    #autoFig.fieldnameR_spaceC_slice(rl, ip, saveDirPath)
+    autoFig.fieldnameR_spaceC_slice(rl, ip, saveDirPath)
+
+    flib = autoFig.fieldnameR_spaceC_slice(rl, ip, interp='gaussian')
+    flib.saveFig(saveDirPath, 'fieldname', 'space', 'slice', 'gaussian')
 
     ip = cc(bip)
     del ip['axis'], ip['snapshot']
@@ -420,5 +391,42 @@ def allAuto(rl):
     ip['map'] = ['mass']
     autoFig.fieldnameR_redshiftC_axis(rl, ip, saveDirPath)
 
+    ip = cc(bip)
+    ip['fieldname'] = ['vn', 'ptl','hiptl', 'hisubhalo', 'galaxy']
+    ip['species'] = ['stmass', 'gas']
+    ip['model'] = ['GD14', 'f_hi_GD14_map']
+    ip['color'] = ['resolved']
+    ip['map'] = ['mass']
+    del ip['sim_resolution'], ip['simname']
+    autoFig.fieldnameR_simResolutionC_box(rl, ip, saveDirPath)
+
+    autoFig.fieldnameR_boxC_simResolution(rl, ip, saveDirPath)
+
+    ip = cc(bip)
+    ip['fieldname'] = ['vn', 'ptl','hiptl', 'hisubhalo', 'galaxy']
+    ip['species'] = ['stmass', 'gas']
+    ip['model'] = ['GD14', 'f_hi_GD14_map']
+    ip['color'] = ['resolved']
+    ip['map'] = ['mass']
+    del ip['space'], ip['simname']
+    autoFig.fieldnameR_spaceC_box(rl, ip, saveDirPath)
+
+    ip = cc(bip)
+    ip['fieldname'] = ['vn', 'ptl','hiptl', 'hisubhalo', 'galaxy']
+    ip['species'] = ['stmass', 'gas']
+    ip['model'] = ['GD14', 'f_hi_GD14_map']
+    ip['color'] = ['resolved']
+    ip['map'] = ['mass']
+    del ip['sim_resolution'], ip['space']
+    autoFig.fieldnameR_spaceC_box(rl, ip, saveDirPath)
+    
+    ip = cc(bip)
+    ip['fieldname'] = ['vn', 'ptl','hiptl', 'hisubhalo', 'galaxy']
+    ip['species'] = ['stmass', 'gas']
+    ip['model'] = ['GD14', 'f_hi_GD14_map']
+    ip['color'] = ['resolved']
+    ip['map'] = ['mass']
+    del ip['grid_resolution'], ip['space']
+    autoFig.fieldnameR_spaceC_gridResolution(rl, ip, saveDirPath)
 
 main()

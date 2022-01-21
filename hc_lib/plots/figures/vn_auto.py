@@ -56,27 +56,21 @@ def fieldnameR_spaceC_redshift(rlib, iprops, savePath = '', panel_length = 3, pa
         linelabels[z] = '%.1f'%z    #print(figArr.shape)
     flib = FigureLibrary(figArr)
     # add distortion panels
-    dist_panels_idx_list = flib.addRedshiftDistortion((slice(None), 0), 
-            (slice(None), 1), panel_prop)
-    collabels.append('Distortion')
+
 
     flib.createFig(panel_length, panel_bt, border, border)
     flib.plotLines(panel_prop, linelabels)
     #flib.addRowLabels(rowlabels)
     flib.addColLabels(collabels)
-    flib.logAxis('y', panel_exceptions = dist_panels_idx_list)
-    flib.logAxis('x')
+    flib.logAxis('both')
 
     flib.removeXTickLabels()
     flib.changeTickDirection()
-    def_ytick_except = flib._defaultTickLabelPanelExceptions('y')
-    flib.removeYTickLabels(panel_exceptions = dist_panels_idx_list + def_ytick_except)
+    flib.removeYTickLabels()
     flib.xLimAdjustToNyquist()
     flib.flushYAxisToData()
-    flib.matchAxisLimits(which = 'x')
-    flib.matchAxisLimits(which = 'y', panel_exceptions = dist_panels_idx_list)
+    flib.matchAxisLimits(which = 'both')
     flib.defaultAxesLabels()
-    flib.axisLabel('P$_\mathrm{x}$(k)/P$_\mathrm{v}$(k)', 'y', pos = [1 - border/3/flib.figsize[1], 0.5], rotation = 270)
     flib.addLegend()
     flib.printIprops(iprops)
 
@@ -85,5 +79,36 @@ def fieldnameR_spaceC_redshift(rlib, iprops, savePath = '', panel_length = 3, pa
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, panel_prop)
         return
+    else:
+        return flib
+
+def fieldnameR_redshiftC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
+            border = 1):
+    row_prop = 'fieldname'
+    column_prop = 'redshift'
+    iprops['space'] = 'redshift'
+    print('making %sR_%sC_%s figure...'%(row_prop, column_prop, '2D'))
+    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, '2Dpk')
+
+    flib = FigureLibrary(figArr)
+    
+    flib.createFig(panel_length, panel_bt, border, border, True)
+    flib.assignColormaps()
+    flib.assign2DNorms()
+    flib.addContours()
+    flib.plot2D()
+
+    
+    flib.changeTickDirection()
+    flib.addColLabels(collabels)
+    flib.addRowLabels(rowlabels, pos=[0.05, 0.9], color = 'white')
+    
+    flib.removeDefaultTickLabels()
+    flib.defaultAxesLabels(2)
+    
+    if not savePath == '':
+        flib.saveFig(savePath, row_prop, column_prop, '2D')
+         
+        return None
     else:
         return flib

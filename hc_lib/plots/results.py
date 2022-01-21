@@ -24,7 +24,17 @@ class ResultLibrary():
         
         return paths
         
-
+    def getResult(self, iprops, result_type):
+        results = self._getResultType(result_type)
+        one_prop = []
+        for r in results:
+            if self.matchProps(r, iprops):
+                one_prop.append(r)
+        
+        if len(one_prop) > 1:
+            print('more than one result retrieved')
+        return one_prop[0]
+        
     def addResults(self, directory = '', pkl_file = ''):
         if not directory == '':
             paths = self.getPaths(directory)

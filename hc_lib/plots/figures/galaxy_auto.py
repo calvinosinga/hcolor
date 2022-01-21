@@ -1,7 +1,7 @@
 from hc_lib.plots.fig_lib import FigureLibrary
 import numpy as np
 
-def redshiftR_spaceC_color(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 1,
+def redshiftR_spaceC_color(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
             border = 1):
     """
     Basic plot, shows how the pk of the red and blue galaxies change over time in both redshift
@@ -45,7 +45,7 @@ def redshiftR_spaceC_color(rlib, iprops, savePath = '', panel_length = 3, panel_
     else:
         return flib
 
-def redshiftR_colorC_space(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 1,
+def redshiftR_colorC_space(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
             border = 1):
     """
     Basic plot, shows how the pk of the red and blue galaxies change over time in both redshift
@@ -88,7 +88,7 @@ def redshiftR_colorC_space(rlib, iprops, savePath = '', panel_length = 3, panel_
     else:
         return flib
 
-def colorR_spaceC_redshift(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 1,
+def colorR_spaceC_redshift(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
             border = 1):
     """
     More easily visualize the redshift evolution of the power spectrum.
@@ -111,7 +111,7 @@ def colorR_spaceC_redshift(rlib, iprops, savePath = '', panel_length = 3, panel_
 
     flib.createFig(panel_length, panel_bt, border, border)
     flib.plotLines(panel_prop, linelabels)
-    flib.addRowLabels(rowlabels)
+    flib.addRowLabels(rowlabels, pos = [0.05, 0.9])
     flib.addColLabels(collabels)
     flib.logAxis('both')
 
@@ -201,12 +201,17 @@ def fieldnameR_colorC_color_cut(rlib, iprops, savePath = '', panel_length = 3, p
             linests[c] = '--'
 
     linelabels['visual_inspection'] = 'D18'
-    flib = FigureLibrary(figArr[:,:-1]) # removing resolved column
-
+    flib = FigureLibrary(figArr) # removing resolved column
+    for r in range(len(rowlabels)):
+        if rowlabels[r] == 'galaxy':
+            rowlabels[r] = 'Fiducial'
+        elif rowlabels[r] == 'galaxy_dust':
+            rowlabels[r] = 'With Dust'
+        
     flib.createFig(panel_length, panel_bt, border, border)
     flib.plotLines(panel_prop, linelabels, linestyles=linests)
     flib.addRowLabels(rowlabels)
-    flib.addColLabels(collabels[:-1])
+    flib.addColLabels(collabels)
     flib.logAxis('both')
 
     flib.changeTickDirection()
@@ -222,7 +227,63 @@ def fieldnameR_colorC_color_cut(rlib, iprops, savePath = '', panel_length = 3, p
 
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, panel_prop)
-         
+        return
+    else:
+        return flib
+
+def color_cut_test(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
+            border = 1):
+    iprops['fieldname'] = 'galaxy'
+    row_prop = 'fieldname'
+    column_prop = 'color'
+    panel_prop = 'color_cut'
+    
+    print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
+    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk', check = [0,0])
+    iprops['fieldname'] = 'galaxy_dust'
+    iprops['color_cut'] = '0.60'
+    gal_dust_result = rlib.getResult(iprops, 'pk')
+    gal_dust_result.addProp('color_cut', '0.60_dust')
+    figArr[0,0].append(gal_dust_result)
+    colcuts = rlib.getVals('pk', 'color_cut', iprops)
+    linelabels = {}
+    linests = {}
+    for c in colcuts:
+        if c is None:
+            continue
+        elif '0' == c[0]:
+            linelabels[c] = 'g-r = %s'%c
+            if '0.50' == c or '0.70' == c:
+                linests[c] = ':'
+            else:
+                linests[c] = '-'
+        else:
+            linests[c] = '--'
+
+    linelabels['visual_inspection'] = 'D18'
+    linelabels['0.60_dust'] = 'g-r = 0.60, Dust'
+    flib = FigureLibrary(figArr) # removing resolved column
+
+        
+    flib.createFig(panel_length, panel_bt, border, border)
+    flib.plotLines(panel_prop, linelabels, linestyles=linests)
+    #flib.addRowLabels(rowlabels)
+    flib.addColLabels(collabels)
+    flib.logAxis('both')
+
+    flib.changeTickDirection()
+    flib.removeDefaultTickLabels()
+    flib.xLimAdjustToNyquist()
+    flib.flushYAxisToData()
+    flib.matchAxisLimits(which = 'both')
+    flib.defaultAxesLabels()
+    flib.addLegend()
+    flib.printIprops(iprops)
+
+    # if savefig, then save it, otherwise return it
+
+    if not savePath == '':
+        flib.saveFig(savePath, row_prop, column_prop, panel_prop)
         return
     else:
         return flib
@@ -327,7 +388,7 @@ def redshiftR_colorC_axis(rlib, iprops, savePath = '', panel_length = 3, panel_b
     #    if rowlabels[r] == 'galaxy_dust':
     #        rowlabels[r] = 'Dust Model'
 
-    linelabels = {0 : 'Axis=0', 1 : 'Axis=1', 2:'Axis=2'}
+    linelabels = {0 : 'Axis=0', 1 : 'Axis=1', 2:'Axis=2', '0':'Axis=0'}
     #print(figArr.shape)
     flib = FigureLibrary(figArr)
 
@@ -358,19 +419,22 @@ def redshiftR_colorC_axis(rlib, iprops, savePath = '', panel_length = 3, panel_b
         return flib
 
 def redshiftR_colorC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
-            border = 1):
+            border = 0.6):
     """
     Visualize how the redshift space distortions change with redshift for different
     galaxy colors.
     """
     row_prop = 'redshift'
     column_prop = 'color'
+    iprops['space'] = 'redshift'
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, '2D'))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, '2Dpk')
 
     flib = FigureLibrary(figArr)
-    vlimlist = [[0, 4] for i in range(flib.dim[0])] 
-    flib.createFig(panel_length, panel_bt, border, border, True)
+    vlimlist = [[0, 4] for i in range(flib.dim[0])]
+    xborder = [0.75, 0.75]
+
+    flib.createFig(panel_length, panel_bt, xborder, border, True)
     flib.assignColormaps()
     flib.assign2DNorms(vlim_list = vlimlist)
     flib.addContours(cstep = 0.25)
@@ -382,8 +446,7 @@ def redshiftR_colorC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt 
     flib.addRowLabels(rowlabels, pos = [0.05, 0.9], color = 'white')
     
     flib.removeDefaultTickLabels()
-    ypos = flib.xborder[0]/2/flib.figsize[0]
-    flib.defaultAxesLabels(2, ypos = [ypos, 0.5])
+    flib.defaultAxesLabels(2)
    
     
     if not savePath == '':
@@ -394,19 +457,21 @@ def redshiftR_colorC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt 
         return flib
     
 def axisR_colorC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
-            border = 1):
+            border = 0.6):
     """
     Visualize how different line-of-sight affects the redshift space distortion.
     """
     row_prop = 'axis'
     column_prop = 'color'
+    iprops['space'] = 'redshift'
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, '2D'))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, '2Dpk')
 
     flib = FigureLibrary(figArr)
 
-    vlimlist = [[0, 4] for i in range(flib.dim[0])] 
-    flib.createFig(panel_length, panel_bt, border, border, True)
+    vlimlist = [[0, 4] for i in range(flib.dim[0])]
+    xborder = [0.75, 0.75]
+    flib.createFig(panel_length, panel_bt, xborder, border, True)
     
     flib.assign2DNorms(vlim_list = vlimlist)
     flib.assignColormaps()
@@ -419,8 +484,7 @@ def axisR_colorC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.
     flib.addRowLabels(rowlabels, pos = [0.05, 0.9], color = 'white')
     
     flib.removeDefaultTickLabels()
-    ypos = flib.xborder[0]/2/flib.figsize[0]
-    flib.defaultAxesLabels(2, ypos = [ypos, 0.5])
+    flib.defaultAxesLabels(2)
     
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, '2D')
@@ -429,7 +493,7 @@ def axisR_colorC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.
     else:
         return flib
 
-def make_histograms(rlib, iprops, savePath='', panel_length = 3, panel_bt = 1.25,
+def make_histograms(rlib, iprops, savePath='', panel_length = 3, panel_bt = 0.75,
             border = 1):
     rowp = 'redshift'
     colp = 'fieldname'
@@ -444,6 +508,7 @@ def make_histograms(rlib, iprops, savePath='', panel_length = 3, panel_bt = 1.25
             collabels[c] = 'Fiducial'
         elif collabels[c] == 'galaxy_dust':
             collabels[c] = 'With Dust'
+
     flib.createFig(panel_length, panel_bt, border, border, True)
     flib.assignHistNorms()
     flib.assignColormaps('viridis', 'w')

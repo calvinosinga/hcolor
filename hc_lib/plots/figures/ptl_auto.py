@@ -1,7 +1,7 @@
 from hc_lib.plots.fig_lib import FigureLibrary
 import numpy as np
 
-def redshiftR_spaceC_species(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 1,
+def redshiftR_spaceC_species(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
             border = 1):
     
     row_prop = 'redshift'
@@ -14,28 +14,21 @@ def redshiftR_spaceC_species(rlib, iprops, savePath = '', panel_length = 3, pane
     linelabels = {'dm': 'Dark Matter', 'gas':'Gas', 'ptl':'All Species', 'stmass':'Stellar'}
     #print(figArr.shape)
     flib = FigureLibrary(figArr)
-    # add distortion panels
-    dist_panels_idx_list = flib.addRedshiftDistortion((slice(None), 0), 
-            (slice(None), 1), panel_prop)
-    collabels.append('Distortion')
+
 
     flib.createFig(panel_length, panel_bt, border, border)
     flib.plotLines(panel_prop, linelabels)
     flib.addRowLabels(rowlabels)
     flib.addColLabels(collabels)
-    flib.logAxis('y', panel_exceptions = dist_panels_idx_list)
-    flib.logAxis('x')
+    flib.logAxis('both')
 
     flib.removeXTickLabels()
     flib.changeTickDirection()
-    def_ytick_except = flib._defaultTickLabelPanelExceptions('y')
-    flib.removeYTickLabels(panel_exceptions = dist_panels_idx_list + def_ytick_except)
+    flib.removeYTickLabels()
     flib.xLimAdjustToNyquist()
     flib.flushYAxisToData()
-    flib.matchAxisLimits(which = 'x')
-    flib.matchAxisLimits(which = 'y', panel_exceptions = dist_panels_idx_list)
+    flib.matchAxisLimits('both')
     flib.defaultAxesLabels()
-    flib.axisLabel('P$_\mathrm{x}$(k)/P$_\mathrm{v}$(k)', 'y', pos = [1 - border/3/flib.figsize[1], 0.5], rotation = 270)
     flib.addLegend()
     flib.printIprops(iprops)
 
@@ -47,7 +40,7 @@ def redshiftR_spaceC_species(rlib, iprops, savePath = '', panel_length = 3, pane
     else:
         return flib
 
-def redshiftR_speciesC_space(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 1,
+def redshiftR_speciesC_space(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
             border = 1):
     """
     Basic plot, shows how the pk of the red and blue galaxies change over time in both redshift
@@ -99,7 +92,7 @@ def redshiftR_speciesC_space(rlib, iprops, savePath = '', panel_length = 3, pane
     else:
         return flib
 
-def speciesR_spaceC_redshift(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 1,
+def speciesR_spaceC_redshift(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
             border = 1):
     """
     More easily visualize the redshift evolution of the power spectrum.
@@ -169,21 +162,17 @@ def speciesR_spaceC_slice(rlib, iprops, savePath = '', panel_length = 3, panel_b
             rowlabels[l] = 'All Species'
         elif rowlabels[l] == 'gas':
             rowlabels[l] = 'Gas'
-    cmap_arr = np.empty_like(figArr, dtype=object)
-    cmap_arr[:,:] = 'plasma'
+
     flib = FigureLibrary(figArr)
 
-    flib.createFig(panel_length, panel_bt, border, border, False)
+    flib.createFig(panel_length, panel_bt, border, border, True)
+    flib.assignColormaps()
+    flib.assignSliceNorms()
     flib.plotSlices()
-
-    
-    flib.matchColorbarLimits()
-    flib.assignColormaps(cmap_arr, under='w')
-    flib.makeColorbars('log((M$_*$/M$_\odot$)')
 
     flib.changeTickDirection()
     flib.addColLabels(collabels)
-    flib.addRowLabels(rowlabels)
+    flib.addRowLabels(rowlabels, color = 'white')
     flib.removeDefaultTickLabels()
     flib.defaultAxesLabels('slice')
     
@@ -199,6 +188,7 @@ def redshiftR_speciesC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_b
     """
     Visualize redshift space distortions
     """
+    iprops['space'] = 'redshift'
     row_prop = 'redshift'
     column_prop = 'species'
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, '2D'))
@@ -212,18 +202,18 @@ def redshiftR_speciesC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_b
             collabels[l] = 'All Species'
         elif collabels[l] == 'gas':
             collabels[l] = 'Gas'
-    cmap_arr = np.empty_like(figArr, dtype=object)
-    cmap_arr[:,:] = 'plasma'
+
     flib = FigureLibrary(figArr)
     
     flib.createFig(panel_length, panel_bt, border, border, True)
+    flib.assign2DNorms()
+    flib.assignColormaps()
     flib.addContours()
     flib.plot2D()
-    flib.makeColorbars('P(k$_\parallel$, k$_\perp$) (Mpc/h)$^{-3}$')
 
     flib.changeTickDirection()
     flib.addColLabels(collabels)
-    flib.addRowLabels(rowlabels, is2D=True)
+    flib.addRowLabels(rowlabels, pos=[0.05, 0.9], color='white')
     
     flib.removeDefaultTickLabels()
     flib.defaultAxesLabels(2)
@@ -255,14 +245,15 @@ def axisR_speciesC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 
     flib = FigureLibrary(figArr)
     
     flib.createFig(panel_length, panel_bt, border, border, True)
+    flib.assignColormaps()
+    flib.assign2DNorms()
     flib.addContours()
     flib.plot2D()
-    flib.makeColorbars('P(k$_\parallel$, k$_\perp$) (Mpc/h)$^{-3}$')
 
     
     flib.changeTickDirection()
     flib.addColLabels(collabels)
-    flib.addRowLabels(rowlabels, is2D=True)
+    flib.addRowLabels(rowlabels, pos=[0.05, 0.9], color='white')
     
     flib.removeDefaultTickLabels()
     flib.defaultAxesLabels(2)

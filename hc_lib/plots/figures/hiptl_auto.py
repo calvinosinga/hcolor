@@ -1,7 +1,7 @@
 from hc_lib.plots.fig_lib import FigureLibrary
 import numpy as np
 
-def redshiftR_spaceC_model(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 1,
+def redshiftR_spaceC_model(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
             border = 1):
     """
     This plot is intended to compare how differently the models behave, and replicates the main plot
@@ -92,7 +92,7 @@ def modelR_spaceC_redshift(rlib, iprops, savePath = '', panel_length = 3, panel_
     pres = figArr[0, 0]
     for i in pres:
         z = i.getProp('redshift')
-        linelabels[z] = 'z = %.1f'%z
+        linelabels[z] = 'z = %.1f'%round(z)
 
     flib = FigureLibrary(figArr)
 
@@ -153,26 +153,25 @@ def redshiftR_modelC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt 
         return flib
     
 def axisR_modelC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
-            border = 1):
+            border = 0.6):
 
     row_prop = 'axis'
     column_prop = 'model'
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, '2D'))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, '2Dpk')
 
-    cmap_arr = np.empty_like(figArr, dtype=object)
-    cmap_arr[:,:] = 'plasma'
     flib = FigureLibrary(figArr)
     
     flib.createFig(panel_length, panel_bt, border, border, True)
+    flib.assignColormaps()
+    flib.assign2DNorms()
     flib.addContours()
     flib.plot2D()
-    flib.makeColorbars('P(k$_\parallel$, k$_\perp$) (Mpc/h)$^{-3}$')
 
     
     flib.changeTickDirection()
     flib.addColLabels(collabels)
-    flib.addRowLabels(rowlabels, is2D=True)
+    flib.addRowLabels(rowlabels, pos=[0.05, 0.9], color='white')
     
     flib.removeDefaultTickLabels()
     flib.defaultAxesLabels(2)
@@ -185,35 +184,29 @@ def axisR_modelC_2D(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.
         return flib
 
 def redshiftR_spaceC_slice(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.5,
-            border = 1):
+            border = 0.6):
     
     row_prop = 'redshift'
     column_prop = 'space'
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, 'slice'))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'slice')
 
-    cmap_arr = np.empty_like(figArr, dtype=object)
-    cmap_arr[:,:] = 'plasma'
     flib = FigureLibrary(figArr)
 
-    flib.createFig(panel_length, panel_bt, border, border, False)
+    flib.createFig(panel_length, panel_bt, border, border, True)
+    flib.assignSliceNorms()
+    flib.assignColormaps()
     flib.plotSlices()
-
-    
-    flib.matchColorbarLimits()
-    flib.assignColormaps(cmap_arr, under='w')
-    flib.makeColorbars('log((M$_*$/M$_\odot$)')
 
     flib.changeTickDirection()
     flib.addColLabels(collabels)
-    flib.addRowLabels(rowlabels)
+    flib.addRowLabels(rowlabels, color = 'white')
     flib.removeDefaultTickLabels()
     flib.defaultAxesLabels('slice')
     
     
     if not savePath == '':
         flib.saveFig(savePath, row_prop, column_prop, 'slice')
-         
         return None
     else:
         return flib    

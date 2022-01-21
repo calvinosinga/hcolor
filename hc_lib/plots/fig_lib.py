@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.gridspec as gspec
 import copy
+import illustris_python as il
 mpl.rcParams['text.usetex'] = True
 
 class FigureLibrary():
@@ -130,14 +131,8 @@ class FigureLibrary():
                 results_for_panel = self.figArr[i, j]
                 plt.sca(p)
                 
-                # if figlib adds distortions or variance,
-                # those results are stored as a dictionary
-                # rather than a list of ResultContainers.
-                # Thus, it requires a different way to plot them
-                if not isinstance(results_for_panel, dict):
-                    _plot_one_panel_rc(results_for_panel)
-                else:
-                    _plot_one_panel_dict(results_for_panel)
+                _plot_one_panel_rc(results_for_panel)
+
 
         return
     
@@ -174,6 +169,7 @@ class FigureLibrary():
                             # since this will now be included in the
                             # filled area, remove it from the plot
                             l.set_visible(False)
+                            l.set_label('_nolegend_')
 
                     # now make the plot
                     plt.fill_between(xdata, ymin, ymax, color=color, label=label,
@@ -185,7 +181,7 @@ class FigureLibrary():
                                         
         return
 
-    def plotSlices(self):
+    def plotSlices(self, plot_interp = None):
         
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
@@ -198,6 +194,10 @@ class FigureLibrary():
                 plt.sca(p)
 
                 xlim, ylim, mass = pslice.getValues()
+
+                if not pslice.getProp('is_groupcat'):
+                    plot_interp = None
+                
                 extent=(xlim[0], xlim[1], ylim[0], ylim[1])
                 cmap = self.cmap_arr[i, j]
                 norm = self.norm_arr[i, j]
@@ -205,7 +205,7 @@ class FigureLibrary():
                 # extent=(x_bound[0], x_bound[1], y_bound[0], y_bound[1])
                 
                 plt.imshow(mass, cmap = cmap, norm = norm, aspect = 'auto', extent=extent, 
-                            origin='lower')
+                            origin='lower', interpolation= plot_interp)
             
             if self.has_cbar_col:
                 p = self.cax[i]
@@ -574,7 +574,7 @@ class FigureLibrary():
 
         return
 
-    def defaultAxesLabels(self, xpos = [], ypos = [], dtype = 1):
+    def defaultAxesLabels(self, dtype = 1, xpos = [], ypos = []):
         if dtype == 1:
             xlab = r'k (Mpc/h)$^{-1}$'
             ylab = r'P(k) (Mpc/h)$^{-3}$'
