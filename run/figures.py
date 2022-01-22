@@ -34,7 +34,11 @@ def main():
     
     rlib = ResultLibrary()
     for OUTPATH in OUTPATHS:
-        rlib.addResults(directory=OUTPATH)
+        dirs = OUTPATH.split('/')
+        items = dirs[-1].split('_')
+        print(items)
+        runname = items[0]
+        rlib.addResults(runname, directory=OUTPATH)
     
     def printlib(pname):
         print(rlib.getVals('pk',pname))

@@ -26,7 +26,7 @@ class IODict():
         snap = self.rparams['snap']
 
         idict[simname] = tng_path
-        idict['snapshot'] = idict[simname]+'snapdir_%03d/snap_%03d.'%(snap,snap) + "%d.hdf5"
+        idict['snapshot'] = idict[simname]+'/output/snapdir_%03d/snap_%03d.'%(snap,snap) + "%d.hdf5"
         # the last %d is the chunk, given during run stage
         idict['load_header'] = idict['snapshot']%(0)
         idict['TREECOOL'] = idict[simname]+'TREECOOL_fg_dec11'

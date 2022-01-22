@@ -10,7 +10,9 @@ TNG_PATH = '/lustre/cosinga/'
 #HIH2 = '/lustre/cosinga/tng100/'
 HCOLOR = '/lustre/cosinga/hcolor/'
 
-tng_dict = {'tng100':'tng100'}
+tng_dict = {'tng100':'L75n1820TNG', 'tng300':'L205n2500TNG',
+        'tng100-2':'L75n910TNG', 'tng100-3':'L75n455TNG', 
+        'tng50':'L35n2160TNG'}
 ioobj = Input()
 rp = ioobj.getParams()
 runs = ioobj.getRuns()

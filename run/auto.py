@@ -35,7 +35,7 @@ for key in klist:
         grid = Grid.loadGrid(gridfile[key])
         gp = grid_props.loadProps(gridfile[key].attrs)
         field.computePk(grid, gp)
-        field.computeXi(grid, gp)
+        #field.computeXi(grid, gp)
         field.makeSlice(grid, gp)
 
 pickle.dump(field, open(pkl_path, 'wb'), pickle.HIGHEST_PROTOCOL)

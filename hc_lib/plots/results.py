@@ -37,18 +37,19 @@ class ResultLibrary():
                 print(i.props)
         return one_prop[0]
         
-    def addResults(self, directory = '', pkl_file = ''):
+    def addResults(self, runname, directory = '', pkl_file = ''):
         if not directory == '':
             paths = self.getPaths(directory)
             for p in paths:
                 obj = pkl.load(open(p, 'rb'))
-                if not obj.getSlices() is None:
-                    self.slices.extend(obj.getSlices())
-                self.pks.extend(obj.getPks())
-                self.xis.extend(obj.getXis())
-                self.tdpks.extend(obj.get2Dpks())
-                if obj.fieldname == 'galaxy' or obj.fieldname == 'galaxy_dust':
-                    self.hists.extend(obj.hists)
+                self._addRunnameProp(obj, runname)
+                # if not obj.getSlices() is None:
+                #     self.slices.extend(obj.getSlices())
+                # self.pks.extend(obj.getPks())
+                # self.xis.extend(obj.getXis())
+                # self.tdpks.extend(obj.get2Dpks())
+                # if obj.fieldname == 'galaxy' or obj.fieldname == 'galaxy_dust':
+                #     self.hists.extend(obj.hists)
 
         elif not pkl_file == '':
             obj = pkl.load(open(pkl_file, 'rb'))
@@ -59,6 +60,28 @@ class ResultLibrary():
         
         return
 
+    def _addRunnameProp(self, obj, runname):
+        def _addRunnameLoop(results, self_results):
+            for r in results:
+                r.addProp('runname', runname)
+            self_results.extend(results)
+            return
+        
+        pks = obj.getPks()
+        _addRunnameLoop(pks, self.pks)
+        xis = obj.getXis()
+        _addRunnameLoop(xis, self.xis)
+        slices = obj.getSlices()
+        if not slices is None:
+            _addRunnameLoop(slices, self.slices)
+
+        tdpks = obj.get2Dpks()
+        _addRunnameLoop(tdpks, self.tdpks)
+        if obj.fieldname == 'galaxy' or obj.fieldname == 'galaxy_dust':
+            hists = obj.hists
+            _addRunnameLoop(hists, self.hists)
+        return
+        
     def _getResultType(self, result_type):
         if result_type == 'pk':
             result = self.pks
@@ -113,13 +136,17 @@ class ResultLibrary():
                 print('not all cases handled')
         return isMatch
 
-    def organizeFigure(self, includep, rowp, colp, result_type, check = None,
-                default_labels = True):
+    def organizeFigure(self, includep, rowp, colp, result_type, removep = {}, check = None,
+                default_labels = True, rowlabels = [], collabels = []):
         """
         includep is dict that stores a property and the value that it should have.
         rowp is the property that separates each row
         colp is the property that separates each column
         """
+        if not rowlabels:
+            has_row_order = True
+        if not collabels:
+            has_col_order = True
         rowLabels = []
         colLabels = []
         forFig = []
@@ -136,9 +163,11 @@ class ResultLibrary():
                 
                 if not collab in colLabels:
                     colLabels.append(collab)
-                
-        rowLabels.sort()
-        colLabels.sort()
+
+        if not has_row_order:      
+            rowLabels.sort()
+        if not has_col_order:
+            colLabels.sort()
 
         nrows = len(rowLabels)
         ncols = len(colLabels)

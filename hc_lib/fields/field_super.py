@@ -219,17 +219,20 @@ class Field():
             self.xi.append(rc)
         return
 
-    def makeSlice(self, grid, grid_props, perc=0.1, mid=None, avg = False):
+    def makeSlice(self, grid, grid_props, perc=0.1, mid=None):
         if grid_props.props['compute_slice']:
             start = time.time()
             arr = grid.getGrid()
-            if avg:
-                arr = arr[::2,::2,::2] + arr[1::2, 1::2, 1::2]
             dim = arr.shape[0]
             slcidx = int(perc*dim) # the percentage of the volume that should be binned
             if mid is None:
                 mid = int(dim/2)
-            slc = np.log10(np.sum(arr[:, mid-slcidx:mid+slcidx, :], axis=(self.axis+1)%3))
+            sum_axis_slice = slice(mid-slcidx, mid+slcidx)
+            zero_axis = (slice(None), sum_axis_slice, slice(None))
+            one_axis = (slice(None), slice(None), sum_axis_slice)
+            two_axis = (sum_axis_slice, slice(None), slice(None))
+            idx_list = [zero_axis, one_axis, two_axis]
+            slc = np.log10(np.sum(arr[idx_list[self.axis]], axis=(self.axis+1)%3))
             runtime = time.time()-start
             rc = ResultContainer(self, grid_props, runtime, [0, self.box], [0, self.box], slc)
             self.slices.append(rc)

@@ -5,6 +5,9 @@ import matplotlib.gridspec as gspec
 import copy
 mpl.rcParams['text.usetex'] = True
 # mpl.rcParams['figure.max_open_warning'] 
+tng_dict = {'tng100':'L75n1820TNG', 'tng300':'L205n2500TNG',
+        'tng100-2':'L75n910TNG', 'tng100-3':'L75n455TNG', 
+        'tng50':'L35n2160TNG'}
 class FigureLibrary():
     def __init__(self, figArr):
         self.fig = None
@@ -155,8 +158,6 @@ class FigureLibrary():
                     else:
                         _plot_cross(rc)
 
-
-
         return
     
     def fillLines(self, match_label, label = '', color = 'blue', 
@@ -204,7 +205,7 @@ class FigureLibrary():
                                         
         return
 
-    def plotSlices(self, plot_interp = None):
+    def plotSlices(self, plot_scatter = True):
         
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
@@ -217,20 +218,34 @@ class FigureLibrary():
                 pslice = self.figArr[i, j][0]
 
                 plt.sca(p)
-
                 xlim, ylim, mass = pslice.getValues()
-
-                if not pslice.getProp('is_groupcat'):
-                    plot_interp = None
-                
-                extent=(xlim[0], xlim[1], ylim[0], ylim[1])
                 cmap = self.cmap_arr[i, j]
                 norm = self.norm_arr[i, j]
+
+                if plot_scatter and pslice.getProp('is_groupcat'):
+                    xpos = np.linspace(xlim[0], xlim[1], mass.shape[0])
+                    ypos = np.linspace(ylim[0], ylim[1], mass.shape[1])
+                    galxpos = np.zeros(mass.shape[0] + mass.shape[1])
+                    galypos = np.zeros_like(galxpos)
+                    sizes = np.zeros_like(galxpos)
+                    colors = np.zeros((galxpos.shape[0], 4))
+                    sm = mpl.cm.ScalarMappable(norm=norm, cmap=cmap)
+                    for i in range(mass.shape[0]):
+                        for j in range(mass.shape[1]):
+                            galxpos[i+j] = xpos[i]
+                            galypos[i+j] = ypos[j]
+                            sizes[i+j] = mass[i, j]
+                            colors[i+j, :] = sm.to_rgba(mass[i, j])
+                    
+                    sizes = sizes/np.max(sizes) * 5
+                    plt.scatter(galxpos, galypos, s=sizes, c=colors)
+
+                extent=(xlim[0], xlim[1], ylim[0], ylim[1])
                 # x_bound, y_bound, mass = pslice.getValues()
                 # extent=(x_bound[0], x_bound[1], y_bound[0], y_bound[1])
                 
                 plt.imshow(mass, cmap = cmap, norm = norm, aspect = 'auto', extent=extent, 
-                            origin='lower', interpolation= plot_interp)
+                            origin='lower')
             
             if self.has_cbar_col:
                 p = self.cax[i]
@@ -610,7 +625,8 @@ class FigureLibrary():
             
         elif dtype == 'slice':
             xlab = 'x (Mpc/h)'
-            ylab = 'y (Mpc/h)'
+            # ylab = 'y (Mpc/h)'
+            ylab = '' # understood to also be position
         self.axisLabel(xlab, 'x', pos=xpos)
         self.axisLabel(ylab, 'y', pos=ypos)
         return
