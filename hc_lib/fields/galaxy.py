@@ -72,8 +72,8 @@ class galaxy(Field):
         return gridnames
     
     
-    def makeSlice(self, grid, grid_props, perc=0.1, mid=None, avg=True):
-        return super().makeSlice(grid, grid_props, perc=perc, mid=mid, avg=avg)
+    def makeSlice(self, grid, grid_props, perc=0.1, mid=None):
+        return super().makeSlice(grid, grid_props, perc=perc, mid=mid)
     
     def _loadGalaxyData(self, simpath, fields):
         data = super()._loadGalaxyData(simpath, fields)
