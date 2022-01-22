@@ -268,7 +268,7 @@ def color_cut_test(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.2
 
     linelabels['visual_inspection'] = 'D18'
     linelabels['0.60_dust'] = 'g-r = 0.60, Dust'
-    linestyles['0.60_dust'] = '-.'
+    linests['0.60_dust'] = '-.'
     flib = FigureLibrary(figArr) # removing resolved column
 
         

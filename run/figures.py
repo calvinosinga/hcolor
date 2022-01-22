@@ -41,13 +41,13 @@ def main():
 
     printlib('fieldname')
     
-    #hiptlAuto(rlib)
-    #galaxyAuto(rlib)
-    #hisubhaloAuto(rlib)
-#    ptlAuto(rlib)
-#    vnAuto(rlib)
-    # allAuto(rlib)
-    HI_galaxy_cross_power(rlib)
+    hiptlAuto(rlib)
+    galaxyAuto(rlib)
+    hisubhaloAuto(rlib)
+    ptlAuto(rlib)
+    vnAuto(rlib)
+    allAuto(rlib)
+    #HI_galaxy_cross_power(rlib)
     #HI_ptl_cross_power(rlib)
 
     return

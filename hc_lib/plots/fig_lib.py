@@ -99,21 +99,21 @@ class FigureLibrary():
                 
             if labels is None:
                 l_lab = r_container.props[pprop]
-            elif not str(r_container.props[pprop]) in labels:
+            elif not r_container.props[pprop] in labels:
                 l_lab = r_container.props[pprop]
             else:
                 l_lab = labels[r_container.props[pprop]]
 
             if colors is None:
                 l_c = default_color_cycle[idx%len(default_color_cycle)]
-            elif not str(r_container.props[pprop]) in colors:
+            elif not r_container.props[pprop] in colors:
                 l_c = default_color_cycle[idx%len(default_color_cycle)]
             else:
                 l_c = colors[r_container.props[pprop]]
 
             if linestyles is None:    
                 l_ls = '-'
-            elif not str(r_container.props[pprop]) in linestyles:
+            elif not r_container.props[pprop] in linestyles:
                 l_ls = '-'
             else:
                 l_ls = linestyles[r_container.props[pprop]]
@@ -676,11 +676,11 @@ class FigureLibrary():
             min_ylims = np.min(new_ylims[:,:,0], axis=1)
 
             for i in range(len(max_xlims)):
-                xlims[:,i,0]=min_xlims
-                xlims[:,i,1]=max_xlims
+                xlims[:,i,0]=min_xlims[i]
+                xlims[:,i,1]=max_xlims[i]
             for i in range(len(max_ylims)):
-                ylims[i,:,0]=min_ylims
-                ylims[i,:,1] = max_ylims
+                ylims[i,:,0]=min_ylims[i]
+                ylims[i,:,1] = max_ylims[i]
             
         for i in range(dim[0]):
             for j in range(dim[1]):
