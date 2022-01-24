@@ -12,7 +12,7 @@ def redshiftR_spaceC_fieldname(rlib, iprops, rmprops, savePath = '', panel_lengt
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
 
-    figArr, rowlabels, collabels = rlib.organizeCrossFigure(iprops, row_prop, column_prop, 'pk', 1, rmprops)   
+    figArr, rowlabels, collabels = rlib.organizeCrossFigure(iprops, row_prop, column_prop, 'pk', 1, rmprops, check = [0,0])   
     linelabels = {'vn':'VN18-Particle', 'hiptl':'hiptl', 'hisubhalo':'hisubhalo'}
     colors = {'vn':'green'}
     flib = FigureLibrary(figArr)

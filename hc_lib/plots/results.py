@@ -136,7 +136,7 @@ class ResultLibrary():
                 print('not all cases handled')
         return isMatch
 
-    def organizeFigure(self, includep, rowp, colp, result_type, removep = {}, check = None,
+    def organizeFigure(self, includep, rowp, colp, result_type, removep = None, check = None,
                 default_labels = True, rowLabels = [], colLabels = []):
         """
         includep is dict that stores a property and the value that it should have.
@@ -155,8 +155,11 @@ class ResultLibrary():
         forFig = []
         result = self._getResultType(result_type)
         for r in result:
-           
-            if self.matchProps(r, includep, True) and not self.matchProps(r, removep):
+            if removep is None:
+                fulfills_rm = True
+            else:
+                fulfills_rm = not self.matchProps(removep)
+            if self.matchProps(r, includep, True) and fulfills_rm:
                 forFig.append(r)
                 rowlab = self.getProp(r, rowp)
                 collab = self.getProp(r, colp)
