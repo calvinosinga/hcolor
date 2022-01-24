@@ -256,7 +256,7 @@ class FigureLibrary():
                     
                     # TEMPORARY SLICE PLOT
                 if plot_scatter and pslice.getProp('fieldname') == 'galaxy':
-                    f = il.groupcat.loadSubhalos('/lustre/cosinga/L75n1820TNG/output/', 99, fields=['SubhaloPos', 'SubhaloMassType'])
+                    f = il.groupcat.loadSubhalos('/lustre/cosinga/L75n1820TNG/output/', 99, fields=['SubhaloPos', 'SubhaloMassType', 'SubhaloVel'])
                     mid = pslice.props['box']/2
                     mnm = mid - pslice.props['box'] * 0.1
                     mxm = mid + pslice.props['box'] * 0.1
@@ -271,29 +271,31 @@ class FigureLibrary():
                     sizes = np.log10(np.sum(mass[mask, :], axis=1))
                     colors = np.zeros((sizes.shape[0], 4))
                     sm = mpl.cm.ScalarMappable(norm = norm, cmap = cmap)
-                    for s in sizes:
+                    for s in range(len(sizes)):
                         colors[s, :] = sm.to_rgba(sizes[s])
                     sizes = sizes/np.max(sizes) * 5
                     print(x.shape)
                     plt.scatter(x,y, s=sizes, c=colors)
                 elif plot_scatter and pslice.getProp('fieldname') == 'hisubhalo':
-                    f = il.groupcat.loadSubhalos('/lustre/cosinga/L75n1820TNG/output/', 99, fields=['SubhaloPos'])
+                    f = il.groupcat.loadSubhalos('/lustre/cosinga/L75n1820TNG/output/', 99, fields=['SubhaloPos','SubhaloVel'])
                     h = hp.File('/lustre/cosinga/L75n1820TNG/postprocessing/hih2/hih2_galaxy_099.hdf5', 'r')
                     ids = h['id_subhalo'][:]
-                    ids.astype(np.int32)
-                    pos = f['SubhaloPos'][ids, :]
+                    ids = ids.astype(np.int32)
+                    pos = f['SubhaloPos'][ids]
+                    vel = f['SubhaloVel'][ids]
+                    
                     mid = pslice.props['box']/2
                     mnm = mid - pslice.props['box'] * 0.1
                     mxm = mid + pslice.props['box'] * 0.1                    
                     pos_mask = (pos[:,1]> mnm) & (pos[:,1]<mxm)
                     x = pos[pos_mask, 2]
                     y = pos[pos_mask, 0]
-
+                    
                     mass = h[pslice.props['model']][pos_mask]
                     sizes = np.log10(mass)
                     colors = np.zeros((sizes.shape[0], 4))
                     sm = mpl.cm.ScalarMappable(norm = norm, cmap = cmap)
-                    for s in sizes:
+                    for s in range(len(sizes)):
                         colors[s,:] = sm.to_rgba(sizes[s])
                     sizes = sizes/np.max(sizes) * 5
                     print(x.shape)

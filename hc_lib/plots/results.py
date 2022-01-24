@@ -62,9 +62,15 @@ class ResultLibrary():
 
     def _addRunnameProp(self, obj, runname):
         def _addRunnameLoop(results, self_results):
+            for_results = []
             for r in results:
                 r.addProp('runname', runname)
-            self_results.extend(results)
+                if r.props['is_auto']:
+                    for_results.append(r)
+                else:
+                    if r.props['space'][0] == r.props['space'][1]:
+                        for_results.append(r)
+            self_results.extend(for_results)
             return
         
         pks = obj.getPks()
@@ -147,10 +153,12 @@ class ResultLibrary():
             has_row_order = True
         else:
             rowLabels = []
+            has_row_order = False
         if not colLabels:
             has_col_order = True
         else:
             colLabels = []
+            has_col_order = False
 
         forFig = []
         result = self._getResultType(result_type)

@@ -11,7 +11,6 @@ def redshiftR_spaceC_fieldname(rlib, iprops, rmprops, savePath = '', panel_lengt
     panel_prop = 'fieldname'
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
-
     figArr, rowlabels, collabels = rlib.organizeCrossFigure(iprops, row_prop, column_prop, 'pk', 1, rmprops, check = [0,0])   
     linelabels = {'vn':'VN18-Particle', 'hiptl':'hiptl', 'hisubhalo':'hisubhalo'}
     colors = {'vn':'green'}
@@ -19,7 +18,8 @@ def redshiftR_spaceC_fieldname(rlib, iprops, rmprops, savePath = '', panel_lengt
 
     flib.createFig(panel_length, panel_bt, border, border)
     flib.plotLines(panel_prop, linelabels, colors)
-
+    for r in figArr[0,0]:
+        print(r.props)
 #     # combining the lines
     flib.fillLines('hisubhalo', label='D18-Subhalo', color='orange')
     flib.fillLines('hiptl', label='D18-Particle', color='blue')
