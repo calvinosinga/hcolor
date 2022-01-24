@@ -56,7 +56,7 @@ def main():
    # vnAuto(rlib)
     #allAuto(rlib)
     HI_galaxy_cross_power(rlib)
-    HI_ptl_cross_power(rlib)
+    #HI_ptl_cross_power(rlib)
 
     return
 

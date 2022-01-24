@@ -53,7 +53,8 @@ def redshiftR_fieldnameC_space(rlib, iprops, rmprops, savePath = '', panel_lengt
     panel_prop = 'space'
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
-    figArr, rowlabels, collabels = rlib.organizeCrossFigure(iprops, row_prop, column_prop, 'pk', 1, rmprops, check = [0,0])
+    figArr, rowlabels, collabels = rlib.organizeCrossFigure(iprops, row_prop, column_prop, 'pk', 0, rmprops)
+    vnidx = figArr.shape[1] - 1
     for l in range(len(collabels)):
         if 'vn' in collabels[l]:
             collabels[l] = 'VN18-Particle'
@@ -69,9 +70,9 @@ def redshiftR_fieldnameC_space(rlib, iprops, rmprops, savePath = '', panel_lengt
     flib = FigureLibrary(figArr)
     flib.createFig(panel_length, panel_bt, border, border)
     flib.plotLines(panel_prop, linelabels, colors)
-    vn_panels = [(i,vnidx) for i in figArr.shape[0]]
-    flib.fillLines('real', label='Real Space', color = 'blue', except_panels=vn_panels)
-    flib.fillLines('redshift', label='Redshift Space', color = 'red', except_panels=vn_panels)
+    vn_panels = [(i,vnidx) for i in range(figArr.shape[0])]
+    flib.fillLines('Real Space', label='Real Space', color = 'blue', except_panels=vn_panels)
+    flib.fillLines('Redshift Space', label='Redshift Space', color = 'red', except_panels=vn_panels)
     flib.addRowLabels(rowlabels)
     flib.addColLabels(collabels)
     flib.logAxis('both')
@@ -104,7 +105,7 @@ def fieldnameR_spaceC_redshift(rlib, iprops, rmprops, savePath = '', panel_lengt
     panel_prop = 'redshift'
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
-    figArr, rowlabels, collabels = rlib.organizeCrossFigure(iprops, row_prop, column_prop, 'pk', 1, rmprops, check = [0,0])   
+    figArr, rowlabels, collabels = rlib.organizeCrossFigure(iprops, row_prop, column_prop, 'pk', 0, rmprops, check = [0,0])   
     flib = FigureLibrary(figArr)
     linelabels = {}
     linecolors = {}
@@ -112,12 +113,18 @@ def fieldnameR_spaceC_redshift(rlib, iprops, rmprops, savePath = '', panel_lengt
     for i in pres:
         z = i.getProp('redshift')
         linelabels[z[0]] = 'z = %.1f'%round(z[0])
+        print(i.props)
     zs = list(linelabels.keys())
-    zs = zs.sort()
-    color_seq = ['navy', 'blue','cornflowerblue', 'darkturqoise','cyan', 'lightcyan']
-    for i in range(len(zs)):
-        linecolors[zs[i]] = color_seq[i]
 
+    zs = zs.sort()
+    print(zs)
+    print(linelabels)
+    color_seq = ['navy', 'blue','cornflowerblue', 'darkturqoise','cyan', 'lightcyan']
+    count = 0
+    vnidx = figArr.shape[0]-1
+    for i in linelabels:
+        linecolors[i] = color_seq[count]
+        count += 1
     for l in range(len(rowlabels)):
         if rowlabels[l] == 'vn':
             rowlabels[l] = 'VN18-Particle'
@@ -126,12 +133,12 @@ def fieldnameR_spaceC_redshift(rlib, iprops, rmprops, savePath = '', panel_lengt
             rowlabels[l] = 'D18-Particle'
         elif rowlabels[l] == 'hisubhalo':
             rowlabels[l] = 'D18-Subhalo'
-    vn_panels = [(vnidx, i) for i in figArr.shape[1]]
+    vn_panels = [(vnidx, i) for i in range(figArr.shape[1])]
     flib.createFig(panel_length, panel_bt, border, border)
     flib.plotLines(panel_prop, linelabels, linecolors)
     for ll in linelabels:
         c = linecolors[ll]
-        flib.fillLines(linelabels[ll], ll, color=c,except_panels=vn_panels)
+        flib.fillLines(linelabels[ll], linelabels[ll], color=c,except_panels=vn_panels)
     # combining the lines
     flib.addRowLabels(rowlabels)
     flib.addColLabels(collabels)
