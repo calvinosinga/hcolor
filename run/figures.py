@@ -78,7 +78,7 @@ def HI_galaxy_cross_power(rl):
     bip['gal_res'] = 'diemer'
     bip['color_cut'] = None
     bip['species'] = 'stmass'
-    bip['fieldname'] = ['galaxy', 'hisubhalo', 'hiptl', 'vn']
+    bip['fieldname'] = ['hisubhalo', 'hiptl', 'vn']
     
     ip = cc(bip)
     del ip['snapshot'], ip['space']
