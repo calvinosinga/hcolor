@@ -220,10 +220,10 @@ class ResultLibrary():
                 else:
                     col_def_idx = def_idx
                 if not rowlab[row_def_idx] in rowLabels:
-                    rowLabels.append(rowlab)
+                    rowLabels.append(rowlab[row_def_idx])
                 
                 if not collab[col_def_idx] in colLabels:
-                    colLabels.append(collab)
+                    colLabels.append(collab[col_def_idx])
 
         nrows = len(rowLabels)
         ncols = len(colLabels)

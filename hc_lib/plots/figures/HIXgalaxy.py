@@ -12,8 +12,7 @@ def redshiftR_spaceC_fieldname(rlib, iprops, rmprops, savePath = '', panel_lengt
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
 
-    figArr, rowlabels, collabels = rlib.organizeCrossFigure(iprops, row_prop, column_prop, 'pk', rmprops, 1)
-    
+    figArr, rowlabels, collabels = rlib.organizeCrossFigure(iprops, row_prop, column_prop, 'pk', 1, rmprops)   
     linelabels = {'vn':'VN18-Particle', 'hiptl':'hiptl', 'hisubhalo':'hisubhalo'}
     colors = {'vn':'green'}
     flib = FigureLibrary(figArr)
@@ -40,8 +39,7 @@ def redshiftR_spaceC_fieldname(rlib, iprops, rmprops, savePath = '', panel_lengt
     # if savefig, then save it, otherwise return it
 
     if not savePath == '':
-        flib.saveFig(savePath, row_prop, column_prop, panel_prop, 
-                'no_distortion')
+        flib.saveFig(savePath, row_prop, column_prop, panel_prop)
         return
     else:
         return flib
