@@ -110,12 +110,10 @@ class galaxy_grid_props(grid_props):
 
         # for galaxyXgalaxy
         if op['fieldname'] == sp['fieldname']:
-            mas_match = op['mas'] == sp['mas']
             stmass_or_total = op['species'] == sp['species']
             resdef_match = op['gal_res'] == sp['gal_res'] and op['gal_res'] == 'diemer'
             coldef_match = op['color_cut'] == sp['color_cut'] and sp['color_cut'] == '0.60'
-            space_match = op['space'] == sp['space']
-            return mas_match and stmass_or_total and resdef_match and coldef_match and space_match
+            return stmass_or_total and resdef_match and coldef_match and super().isCompatible(other)
         
         # hiptlXgalaxy handled by hiptl
         
@@ -123,7 +121,7 @@ class galaxy_grid_props(grid_props):
 
         # vnXgalaxy handled by vn
 
-        return True
+        return super().isCompatible(other)
 
     def isIncluded(self):
 
@@ -237,7 +235,7 @@ class hiptl_grid_props(grid_props):
                 obs_defs = rl.galaxyObsColorDefs()
                 obs_defs.remove('papastergis_SDSS')
                 match_obs = op['gal_res'] in obs_defs and op['color_cut'] in obs_defs
-                return match_obs
+                return match_obs and super().isCompatible(other)
             
             # if a mass map, it is either diemer
             elif op['gal_res'] == 'diemer':
@@ -247,7 +245,7 @@ class hiptl_grid_props(grid_props):
                 # also include resolved
                 is_resolved = op['color'] == 'resolved'
 
-                return op['color_cut'] == '0.60' or is_resolved
+                return (op['color_cut'] == '0.60' or is_resolved) and super().isCompatible(other)
             
             # ignore all papa resdefs -> hisubhalo is more comparable
             elif op['gal_res'] == 'papastergis_SDSS':
@@ -260,7 +258,7 @@ class hiptl_grid_props(grid_props):
         # hiptlXptl
         else:
             # include if mass map, not temp map
-            return sp['map'] == 'mass'
+            return sp['map'] == 'mass' and super().isCompatible(other)
 
 ############################################################################################################
 
@@ -325,7 +323,7 @@ class hisubhalo_grid_props(grid_props):
             elif op['gal_res'] == 'diemer':
                 # cdefs = ['0.55','0.60','0.65', 'visual_inspection']
                 is_resolved = op['color'] == 'resolved'
-                return op['color_cut'] in ['0.60'] or is_resolved
+                return (op['color_cut'] in ['0.60'] or is_resolved) and super().isCompatible(other)
             
             # don't include other observational stuff temporarily
             elif op['gal_res'] == 'wolz_eBOSS_ELG':
@@ -342,7 +340,7 @@ class hisubhalo_grid_props(grid_props):
                 
             # if all galaxies, also include
             elif op['color'] == 'all':
-                return True
+                return super().isCompatible(other)
             
             return False
         
@@ -353,7 +351,7 @@ class hisubhalo_grid_props(grid_props):
         #         models = rl.getMolFracModelsGalH2()
             
         #     return sp['model'] == models[0] # compute cross power with just one
-        return True
+        return super().isCompatible(other)
 
 #############################################################################################################
 
@@ -412,7 +410,7 @@ class vn_grid_props(grid_props):
                 obs = rl.galaxyObsColorDefs()
                 obs.remove('papastergis_SDSS')
                 obs_match = op['gal_res'] in obs and op['color_cut'] in obs
-                return obs_match
+                return obs_match and super().isCompatible(other)
             
             # if a mass map, it is either diemer or papa
             elif op['gal_res'] == 'diemer':
@@ -422,7 +420,7 @@ class vn_grid_props(grid_props):
                 # also include resolved
                 is_resolved = op['color'] == 'resolved'
 
-                return op['color_cut'] == '0.60' or is_resolved
+                return (op['color_cut'] == '0.60' or is_resolved) and super().isCompatible(other)
             
             # ignore all papa resdefs -> hisubhalo is more comparable
             elif op['gal_res'] == 'papastergis_SDSS':
@@ -430,8 +428,8 @@ class vn_grid_props(grid_props):
             
             # if all = base, then include
             elif op['color'] == 'all':
-                return True
+                return super().isCompatible(other)
 
         # vnXptl
         else:
-            return sp['map'] == 'mass'
+            return sp['map'] == 'mass' and super().isCompatible(other)

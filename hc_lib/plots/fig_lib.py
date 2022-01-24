@@ -171,13 +171,47 @@ class FigureLibrary():
 
         return
     
+    def fillLinesInPanel(self, panel, match_label, label = '', color = 'blue', 
+                opacity = 0.55, dark_edges = False):
+        p = self.panels[panel[0]][panel[1]]
+        plt.sca(p)
+        lines = p.get_lines()
+        # get the ymax/ymin of the lines
+        ymin = None
+        ymax = None
+        xdata = None
+        for l in lines:
+            
+            if l.get_label() in match_label:
+                temp = l.get_ydata()
+                
+                if ymin is None:
+                    ymin = temp
+                    ymax = temp
+                    xdata = l.get_xdata()
+                else:
+                    ymin = np.minimum(ymin, temp)
+                    ymax = np.maximum(ymax, temp)
+                
+                # since this will now be included in the
+                # filled area, remove it from the plot
+                l.set_visible(False)
+                l.set_label('_nolegend_')
+
+        # now make the plot
+        plt.fill_between(xdata, ymin, ymax, color=color, label=label,
+                    alpha = opacity)
+                
+        if dark_edges:
+            plt.plot(xdata, ymin, color=color)
+            plt.plot(xdata, ymax, color=color)
+        return
     def fillLines(self, match_label, label = '', color = 'blue', 
                 opacity = 0.55, dark_edges = False, except_panels = []):
         """
         For each line that has a panel_label that is in match_label, the area between
         the lines is filled in and then the lines are removed from the plot.
         """
-        
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
                 if (i, j) not in except_panels:
