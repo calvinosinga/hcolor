@@ -74,7 +74,7 @@ def HI_galaxy_cross_power(rl):
     bip['is_auto'] = False
     bip['color'] = 'resolved'
     bip['map'] = 'mass'
-    bip['HI_res'] = 'hi'
+    bip['HI_res'] = 'diemer'
     bip['gal_res'] = 'diemer'
     bip['color_cut'] = None
     bip['species'] = 'stmass'
@@ -82,13 +82,10 @@ def HI_galaxy_cross_power(rl):
     
     ip = cc(bip)
     del ip['snapshot'], ip['space']
-    #HIxgal.redshiftR_spaceC_fieldname_distortion(rl, ip, saveDirPath)
-    
-    HIxgal.redshiftR_spaceC_fieldname(rl, ip, saveDirPath)
-    HIxgal.fieldnameR_spaceC_redshift(rl, ip, saveDirPath)
-    HIxgal.redshiftR_fieldnameC_space(rl, ip, saveDirPath)
-
-
+    rmp = {'fieldname':'ptl'}
+    HIxgal.redshiftR_spaceC_fieldname(rl, ip, rmp, saveDirPath)
+    HIxgal.fieldnameR_spaceC_redshift(rl, ip, rmp, saveDirPath)
+    HIxgal.redshiftR_fieldnameC_space(rl, ip, rmp, saveDirPath)
 
     return
 

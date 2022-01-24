@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.gridspec as gspec
 import copy
+import illustris_python as il
+import h5py as hp
 mpl.rcParams['text.usetex'] = True
 # mpl.rcParams['figure.max_open_warning'] 
 tng_dict = {'tng100':'L75n1820TNG', 'tng300':'L205n2500TNG',
@@ -98,8 +100,7 @@ class FigureLibrary():
             """
             
             x, y, z = r_container.getValues()
-                
-                
+                 
             if labels is None:
                 l_lab = r_container.props[pprop]
             elif not r_container.props[pprop] in labels:
@@ -234,25 +235,69 @@ class FigureLibrary():
                 cmap = self.cmap_arr[i, j]
                 norm = self.norm_arr[i, j]
 
-                if plot_scatter and pslice.getProp('is_groupcat'):
-                    xpos = np.linspace(xlim[0], xlim[1], mass.shape[0])
-                    ypos = np.linspace(ylim[0], ylim[1], mass.shape[1])
-                    galxpos = np.zeros(mass.shape[0] + mass.shape[1])
-                    galypos = np.zeros_like(galxpos)
-                    sizes = np.zeros_like(galxpos)
-                    colors = np.zeros((galxpos.shape[0], 4))
-                    sm = mpl.cm.ScalarMappable(norm=norm, cmap=cmap)
-                    for n in range(mass.shape[0]):
-                        for m in range(mass.shape[1]):
-                            if mass[n, m] > norm.vmin:
-                                galxpos[n+m] = xpos[n]
-                                galypos[n+m] = ypos[m]
-                                sizes[n+m] = mass[n, m]
-                                colors[n+m, :] = sm.to_rgba(mass[n, m])
+                # if plot_scatter and pslice.getProp('is_groupcat'):
+                    # xpos = np.linspace(xlim[0], xlim[1], mass.shape[0])
+                    # ypos = np.linspace(ylim[0], ylim[1], mass.shape[1])
+                    # galxpos = np.zeros(mass.shape[0] + mass.shape[1])
+                    # galypos = np.zeros_like(galxpos)
+                    # sizes = np.zeros_like(galxpos)
+                    # colors = np.zeros((galxpos.shape[0], 4))
+                    # sm = mpl.cm.ScalarMappable(norm=norm, cmap=cmap)
+                    # for n in range(mass.shape[0]):
+                    #     for m in range(mass.shape[1]):
+                    #         if mass[n, m] > norm.vmin:
+                    #             galxpos[n+m] = xpos[n]
+                    #             galypos[n+m] = ypos[m]
+                    #             sizes[n+m] = mass[n, m]
+                    #             colors[n+m, :] = sm.to_rgba(mass[n, m])
                     
+                    # sizes = sizes/np.max(sizes) * 5
+                    # plt.scatter(galxpos, galypos, s=sizes, c=colors)
+                    
+                    # TEMPORARY SLICE PLOT
+                if plot_scatter and pslice.getProp('fieldname') == 'galaxy':
+                    f = il.groupcat.loadSubhalos('/lustre/cosinga/L75n1820TNG/output/', 99, fields=['SubhaloPos', 'SubhaloMassType'])
+                    mid = pslice.props['box']/2
+                    mnm = mid - pslice.props['box'] * 0.1
+                    mxm = mid + pslice.props['box'] * 0.1
+                    pos = f['SubhaloPos'][:]/1e3
+                    mass = f['SubhaloMassType'][:]*1e10/.6774
+                    pos_mask = (pos[:,1]> mnm) & (pos[:,1]<mxm)
+                    mass_mask = (mass[:,4] > 200*1.4e6)
+                    mask = pos_mask & mass_mask
+                    x = pos[mask, 2]
+                    y = pos[mask, 0]
+                    
+                    sizes = np.log10(np.sum(mass[mask, :], axis=1))
+                    colors = np.zeros((sizes.shape[0], 4))
+                    sm = mpl.cm.ScalarMappable(norm = norm, cmap = cmap)
+                    for s in sizes:
+                        colors[s, :] = sm.to_rgba(sizes[s])
                     sizes = sizes/np.max(sizes) * 5
-                    plt.scatter(galxpos, galypos, s=sizes, c=colors)
+                    print(x.shape)
+                    plt.scatter(x,y, s=sizes, c=colors)
+                elif plot_scatter and pslice.getProp('fieldname') == 'hisubhalo':
+                    f = il.groupcat.loadSubhalos('/lustre/cosinga/L75n1820TNG/output/', 99, fields=['SubhaloPos'])
+                    h = hp.File('/lustre/cosinga/L75n1820TNG/postprocessing/hih2/hih2_galaxy_099.hdf5', 'r')
+                    ids = h['id_subhalo'][:]
+                    ids.astype(np.int32)
+                    pos = f['SubhaloPos'][ids, :]
+                    mid = pslice.props['box']/2
+                    mnm = mid - pslice.props['box'] * 0.1
+                    mxm = mid + pslice.props['box'] * 0.1                    
+                    pos_mask = (pos[:,1]> mnm) & (pos[:,1]<mxm)
+                    x = pos[pos_mask, 2]
+                    y = pos[pos_mask, 0]
 
+                    mass = h[pslice.props['model']][pos_mask]
+                    sizes = np.log10(mass)
+                    colors = np.zeros((sizes.shape[0], 4))
+                    sm = mpl.cm.ScalarMappable(norm = norm, cmap = cmap)
+                    for s in sizes:
+                        colors[s,:] = sm.to_rgba(sizes[s])
+                    sizes = sizes/np.max(sizes) * 5
+                    print(x.shape)
+                    plt.scatter(s,y,s=sizes,c=colors)
                 else:
                     extent=(xlim[0], xlim[1], ylim[0], ylim[1])
                 # x_bound, y_bound, mass = pslice.getValues()

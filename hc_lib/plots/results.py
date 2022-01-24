@@ -137,27 +137,30 @@ class ResultLibrary():
         return isMatch
 
     def organizeFigure(self, includep, rowp, colp, result_type, removep = {}, check = None,
-                default_labels = True, rowlabels = [], collabels = []):
+                default_labels = True, rowLabels = [], colLabels = []):
         """
         includep is dict that stores a property and the value that it should have.
         rowp is the property that separates each row
         colp is the property that separates each column
         """
-        if not rowlabels:
+        if not rowLabels:
             has_row_order = True
-        if not collabels:
+        else:
+            rowLabels = []
+        if not colLabels:
             has_col_order = True
-        rowLabels = []
-        colLabels = []
+        else:
+            colLabels = []
+
         forFig = []
         result = self._getResultType(result_type)
         for r in result:
            
-            if self.matchProps(r, includep, True):
+            if self.matchProps(r, includep, True) and not self.matchProps(r, removep):
                 forFig.append(r)
                 rowlab = self.getProp(r, rowp)
                 collab = self.getProp(r, colp)
-                
+
                 if not rowlab in rowLabels:
                     rowLabels.append(rowlab)
                 
@@ -192,6 +195,60 @@ class ResultLibrary():
             rowLabels =  self._defaultLabels(rowp, rowLabels)
             colLabels = self._defaultLabels(colp, colLabels)
         return figArr, rowLabels, colLabels
+
+    def organizeCrossFigure(self, includep, rowp, colp, result_type, def_idx, 
+                removep = {}, check = None, default_labels = True):
+
+        forFig = []
+        result = self._getResultType(result_type)
+        rowLabels = []
+        colLabels = []
+        for r in result:
+           
+            if self.matchProps(r, includep, True) and not self.matchProps(r, removep):
+                forFig.append(r)
+                rowlab = self.getProp(r, rowp)
+                collab = self.getProp(r, colp)
+
+                if len(rowlab) <= def_idx:
+                    row_def_idx = 0
+                else:
+                    row_def_idx = def_idx
+                
+                if len(collab) <= def_idx:
+                    col_def_idx = 0
+                else:
+                    col_def_idx = def_idx
+                if not rowlab[row_def_idx] in rowLabels:
+                    rowLabels.append(rowlab)
+                
+                if not collab[col_def_idx] in colLabels:
+                    colLabels.append(collab)
+
+        nrows = len(rowLabels)
+        ncols = len(colLabels)
+
+        # saves an array of lists of result containers, each element corresponds
+        # to a panel in the final figure
+        figArr = np.empty((nrows, ncols), dtype=object)
+        for i in range(nrows):
+            for j in range(ncols):
+                temp = []
+                for f in range(len(forFig)):
+                    rowres = self.getProp(forFig[f],rowp)
+                    colres = self.getProp(forFig[f],colp)
+                    if rowLabels[i] in rowres and colLabels[j] in colres:
+                        temp.append(forFig[f])
+                figArr[i, j] = temp
+        
+        if not check is None:
+            self._checkPanel(figArr[check[0], check[1]], includep, rowp, colp)
+        
+        if default_labels:
+            rowLabels =  self._defaultLabels(rowp, rowLabels)
+            colLabels = self._defaultLabels(colp, colLabels)
+        return figArr, rowLabels, colLabels
+
 
     def _defaultLabels(self, prop, labels):
         if prop == 'redshift':
