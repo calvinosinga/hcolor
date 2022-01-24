@@ -128,17 +128,27 @@ class FigureLibrary():
 
         def _plot_cross(r_container, idx):
             x,y,z = r_container.getValues()
-            
-            l_lab = r_container.props['line_label']
-            if 'line_color' in r_container.props:
-                l_c = r_container.props['line_color']
-            else:
-                l_c = default_color_cycle[idx%len(default_color_cycle)]
+            ppropval = r_container.props[pprop]
+            def _find_line_property(gdict, def_val):
+                if gdict is None:
+                    return def_val
+                elif isinstance(ppropval, list):
+                    if ppropval[0] in gdict:
+                        return gdict[ppropval[0]]
+                    elif ppropval[1] in gdict:
+                        return gdict[ppropval[1]]
+                    else:
+                        return def_val
+                else:
+                    if ppropval in gdict:
+                        return gdict[ppropval]
+                    else:
+                        return def_val
 
-            if 'linestyle' in r_container.props:
-                l_ls = r_container.props['linestyle']
-            else:
-                l_ls = '-'
+            l_lab = _find_line_property(labels, ppropval)
+            l_c = _find_line_property(colors, 
+                    default_color_cycle[idx%len(default_color_cycle)])
+            l_ls = _find_line_property(linestyles, '-')
             
             
             plt.plot(x, y, label = self.texStr(l_lab), color = l_c, 
@@ -156,7 +166,7 @@ class FigureLibrary():
                     if rc.props['is_auto']:
                         _plot_auto(rc,r)
                     else:
-                        _plot_cross(rc)
+                        _plot_cross(rc,r)
 
         return
     
@@ -206,9 +216,11 @@ class FigureLibrary():
         return
 
     def plotSlices(self, plot_scatter = True):
-        
+        #print(self.dim)
+        #print(len(self.panels), len(self.panels[0]))
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
+                #print(i,j)
                 p = self.panels[i][j]
 
                 if len(self.figArr[i, j]) > 1:
@@ -230,21 +242,23 @@ class FigureLibrary():
                     sizes = np.zeros_like(galxpos)
                     colors = np.zeros((galxpos.shape[0], 4))
                     sm = mpl.cm.ScalarMappable(norm=norm, cmap=cmap)
-                    for i in range(mass.shape[0]):
-                        for j in range(mass.shape[1]):
-                            galxpos[i+j] = xpos[i]
-                            galypos[i+j] = ypos[j]
-                            sizes[i+j] = mass[i, j]
-                            colors[i+j, :] = sm.to_rgba(mass[i, j])
+                    for n in range(mass.shape[0]):
+                        for m in range(mass.shape[1]):
+                            if mass[n, m] > norm.vmin:
+                                galxpos[n+m] = xpos[n]
+                                galypos[n+m] = ypos[m]
+                                sizes[n+m] = mass[n, m]
+                                colors[n+m, :] = sm.to_rgba(mass[n, m])
                     
                     sizes = sizes/np.max(sizes) * 5
                     plt.scatter(galxpos, galypos, s=sizes, c=colors)
 
-                extent=(xlim[0], xlim[1], ylim[0], ylim[1])
+                else:
+                    extent=(xlim[0], xlim[1], ylim[0], ylim[1])
                 # x_bound, y_bound, mass = pslice.getValues()
                 # extent=(x_bound[0], x_bound[1], y_bound[0], y_bound[1])
                 
-                plt.imshow(mass, cmap = cmap, norm = norm, aspect = 'auto', extent=extent, 
+                    plt.imshow(mass, cmap = cmap, norm = norm, aspect = 'auto', extent=extent, 
                             origin='lower')
             
             if self.has_cbar_col:
@@ -559,16 +573,17 @@ class FigureLibrary():
                     xmin, xmax = plt.xlim()
                     nyq = xmax
                     mink = np.inf
-                    for r in res_container_list:
-                        if not isinstance(res_container_list, dict):
-                            
+                    for r in res_container_list:    
+                        if r.props['is_auto']:    
                             nyq_temp = r.props['grid_resolution'] * np.pi / r.props['box']
-                            if nyq_temp < nyq:
-                                nyq = nyq_temp
-                            wavenum, pk, z = r.getValues()
+                        else:
+                            nyq_temp = r.props['grid_resolution'][0] * np.pi / r.props['box'][0]
+                        if nyq_temp < nyq:
+                            nyq = nyq_temp
+                        wavenum, pk, z = r.getValues()
 
-                            if mink > np.min(wavenum):
-                                mink = np.min(wavenum)
+                        if mink > np.min(wavenum):
+                            mink = np.min(wavenum)
 
                     if not mink == np.inf:
                         plt.xlim(mink, nyq)

@@ -26,6 +26,7 @@ def getBIP():
     baseIncludeProps['mas'] = 'CICW'
     baseIncludeProps['space'] = 'real'
     baseIncludeProps['sim_resolution'] = 'high'
+    baseIncludeProps['runname'] = 'reduced'
     return baseIncludeProps
 
 def main():
@@ -35,24 +36,27 @@ def main():
     rlib = ResultLibrary()
     for OUTPATH in OUTPATHS:
         dirs = OUTPATH.split('/')
-        items = dirs[-1].split('_')
-        print(items)
-        runname = items[0]
-        rlib.addResults(runname, directory=OUTPATH)
+        items = dirs[-2].split('_')
+        namelist = items[:len(items)-4]
+        runname=''
+        for n in namelist:
+            runname += n + '_'
+        print(runname[:-1])
+        rlib.addResults(runname[:-1], directory=OUTPATH)
     
     def printlib(pname):
         print(rlib.getVals('pk',pname))
 
     printlib('fieldname')
     
-    hiptlAuto(rlib)
-    galaxyAuto(rlib)
-    hisubhaloAuto(rlib)
-    ptlAuto(rlib)
-    vnAuto(rlib)
-    allAuto(rlib)
-    #HI_galaxy_cross_power(rlib)
-    #HI_ptl_cross_power(rlib)
+    #hiptlAuto(rlib)
+    #galaxyAuto(rlib)
+    #hisubhaloAuto(rlib)
+    #ptlAuto(rlib)
+   # vnAuto(rlib)
+    #allAuto(rlib)
+    HI_galaxy_cross_power(rlib)
+    HI_ptl_cross_power(rlib)
 
     return
 
@@ -80,7 +84,7 @@ def HI_galaxy_cross_power(rl):
     del ip['snapshot'], ip['space']
     #HIxgal.redshiftR_spaceC_fieldname_distortion(rl, ip, saveDirPath)
     
-    HIxgal.redshiftR_spaceC_fieldname_no_distortion(rl, ip, saveDirPath)
+    HIxgal.redshiftR_spaceC_fieldname(rl, ip, saveDirPath)
     HIxgal.fieldnameR_spaceC_redshift(rl, ip, saveDirPath)
     HIxgal.redshiftR_fieldnameC_space(rl, ip, saveDirPath)
 
@@ -147,6 +151,10 @@ def hiptlAuto(rl):
     del ip['axis'], ip['model']
     ip['space'] = 'redshift'
     hiptlFig.axisR_modelC_2D(rl, ip, saveDirPath)
+    
+    ip = cc(bip)
+    del ip['model'], ip['space'], ip['runname']
+    hiptlFig.spaceR_modelC_runname(rl, ip, saveDirPath)
 
     ip = cc(bip)
     del ip['snapshot'], ip['space']
@@ -383,8 +391,8 @@ def allAuto(rl):
     ip['map'] = ['mass']
     autoFig.fieldnameR_spaceC_slice(rl, ip, saveDirPath)
 
-    flib = autoFig.fieldnameR_spaceC_slice(rl, ip, interp='gaussian')
-    flib.saveFig(saveDirPath, 'fieldname', 'space', 'slice', 'gaussian')
+    flib = autoFig.fieldnameR_spaceC_slice(rl, ip, plot_scatter=False)
+    flib.saveFig(saveDirPath, 'fieldname', 'space', 'slice', 'only_imshow')
 
     ip = cc(bip)
     del ip['axis'], ip['snapshot']

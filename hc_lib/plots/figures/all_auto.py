@@ -47,7 +47,7 @@ def redshiftR_spaceC_fieldname(rlib, iprops, savePath = '', panel_length = 3, pa
         return flib
 
 def fieldnameR_spaceC_slice(rlib, iprops, savePath = '', panel_length = 3, panel_bt = 0.25,
-            border = 1, interp = None):
+            border = 1, plot_scatter = True):
     row_prop = 'fieldname'
     column_prop = 'space'
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, 'slice'))
@@ -70,7 +70,7 @@ def fieldnameR_spaceC_slice(rlib, iprops, savePath = '', panel_length = 3, panel
     flib.createFig(panel_length, panel_bt, border, border, True)
     flib.assignSliceNorms()
     flib.assignColormaps()
-    flib.plotSlices(plot_interp=interp)
+    flib.plotSlices(plot_scatter = plot_scatter)
 
     flib.changeTickDirection()
     flib.addColLabels(collabels)
