@@ -394,15 +394,15 @@ def allAuto(rl):
     
     ip = cc(bip)
     del ip['space']
-    ip['fieldname'] = ['vn', 'ptl','hiptl', 'hisubhalo', 'galaxy']
+    ip['fieldname'] = ['vn','hiptl', 'hisubhalo']
     ip['species'] = ['stmass', 'gas']
     ip['model'] = ['GD14', 'm_hi_GD14_map']
     ip['color'] = ['resolved']
     ip['map'] = ['mass']
-    autoFig.fieldnameR_spaceC_slice(rl, ip, saveDirPath)
+    autoFig.fieldnameR_spaceC_slice(rl, ip, saveDirPath, plot_scatter=False)
 
-    flib = autoFig.fieldnameR_spaceC_slice(rl, ip, plot_scatter=False)
-    flib.saveFig(saveDirPath, 'fieldname', 'space', 'slice', 'only_imshow')
+    # flib = autoFig.fieldnameR_spaceC_slice(rl, ip, plot_scatter=False)
+    # flib.saveFig(saveDirPath, 'fieldname', 'space', 'slice', 'only_imshow')
 
     ip = cc(bip)
     del ip['axis'], ip['snapshot']

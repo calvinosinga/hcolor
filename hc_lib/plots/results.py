@@ -2,6 +2,7 @@ import os
 import pickle as pkl
 import numpy as np
 import copy
+import h5py as hp
 
 class ResultLibrary():
 
@@ -206,6 +207,21 @@ class ResultLibrary():
             rowLabels =  self._defaultLabels(rowp, rowLabels)
             colLabels = self._defaultLabels(colp, colLabels)
         return figArr, rowLabels, colLabels
+
+    def tohdf5(self, figArr, outpath):
+        out = hp.File(outpath, 'w')
+        for i in range(figArr.shape[0]):
+            for j in range(figArr.shape[1]):
+                rcs = figArr[i,j]
+                for r in range(len(rcs)):
+                    props = rcs[r].props
+                    x,y,z = rcs[r].getValues()
+                    data = [x,y,z]
+                    dset = out.create_dataset('%d %d %d'%(i,j,r), data=data)
+                    for k,v in props.items():
+                        dset.attrs[k] = v
+        return
+
 
     def organizeCrossFigure(self, includep, rowp, colp, result_type, def_idx, 
                 removep = {}, check = None, default_labels = True):

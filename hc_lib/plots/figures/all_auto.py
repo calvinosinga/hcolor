@@ -13,6 +13,7 @@ def redshiftR_spaceC_fieldname(rlib, iprops, savePath = '', panel_length = 3, pa
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
+    rlib.tohdf5(figArr, savePath + 'HIautopk.hdf5')
     linelabels = {'vn':'VN18-Particle'}
     colors = {'vn':'green'}
 
@@ -52,6 +53,7 @@ def fieldnameR_spaceC_slice(rlib, iprops, savePath = '', panel_length = 3, panel
     column_prop = 'space'
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, 'slice'))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'slice')
+    rlib.tohdf5(figArr, savePath + 'HIslices.hdf5')
     for l in range(len(rowlabels)):
         if rowlabels[l] == 'vn':
             rowlabels[l] = 'VN18-Particle'
