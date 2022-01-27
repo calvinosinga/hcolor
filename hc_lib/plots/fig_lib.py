@@ -98,7 +98,7 @@ class FigureLibrary():
         default_color_cycle = plt.rcParams['axes.prop_cycle'].by_key()['color']
         pprop = panel_prop
 
-        def _plot_auto(r_container, idx):
+        def _plot_auto(r_container, idx, ax):
             """
             Plots a panel when the results to be plotted (rc_panel)
             is a list of ResultContainer objects. This is default.
@@ -127,12 +127,12 @@ class FigureLibrary():
             else:
                 l_ls = linestyles[r_container.props[pprop]]
             
-            plt.plot(x, y, label = self.texStr(l_lab), color = l_c, 
+            ax.plot(x, y, label = self.texStr(l_lab), color = l_c, 
                     linestyle = l_ls)
             
             return
 
-        def _plot_cross(r_container, idx):
+        def _plot_cross(r_container, idx, ax):
             x,y,z = r_container.getValues()
             ppropval = r_container.props[pprop]
             def _find_line_property(gdict, def_val):
@@ -157,7 +157,7 @@ class FigureLibrary():
             l_ls = _find_line_property(linestyles, '-')
             
             
-            plt.plot(x, y, label = self.texStr(l_lab), color = l_c, 
+            ax.plot(x, y, label = self.texStr(l_lab), color = l_c, 
                     linestyle = l_ls)
             return
         
@@ -166,51 +166,32 @@ class FigureLibrary():
                 p = self.panels[i][j]
 
                 results_for_panel = self.figArr[i, j]
-                plt.sca(p)
                 for r in range(len(results_for_panel)):
                     rc = results_for_panel[r]
                     if rc.props['is_auto']:
-                        _plot_auto(rc,r)
+                        _plot_auto(rc,r,p)
                     else:
-                        _plot_cross(rc,r)
+                        _plot_cross(rc,r,p)
 
         return
     
-    def fillLinesInPanel(self, panel, match_label, label = '', color = 'blue', 
-                opacity = 0.55, dark_edges = False):
-        p = self.panels[panel[0]][panel[1]]
-        plt.sca(p)
-        lines = p.get_lines()
-        # get the ymax/ymin of the lines
-        ymin = None
-        ymax = None
-        xdata = None
-        for l in lines:
-            
-            if l.get_label() in match_label:
-                temp = l.get_ydata()
-                
-                if ymin is None:
-                    ymin = temp
-                    ymax = temp
-                    xdata = l.get_xdata()
-                else:
-                    ymin = np.minimum(ymin, temp)
-                    ymax = np.maximum(ymax, temp)
-                
-                # since this will now be included in the
-                # filled area, remove it from the plot
-                l.set_visible(False)
-                l.set_label('_nolegend_')
-
-        # now make the plot
-        plt.fill_between(xdata, ymin, ymax, color=color, label=label,
-                    alpha = opacity)
-                
-        if dark_edges:
-            plt.plot(xdata, ymin, color=color)
-            plt.plot(xdata, ymax, color=color)
+    def plotLinePanel(self, idx, x, y, label = '', color = 'k', linestyle = '-'):
+        p = self.panels[idx[0]][idx[1]]
+        p.plot(x, y, label=label, color=color, linestyle=linestyle)
         return
+    
+    def plotFillPanel(self, idx, x, ys, label = '', color = 'blue', 
+                opacity = 0.55, dark_edges = False):
+        p = self.panels[idx[0]][idx[1]]
+        mx = np.max(ys, axis=1)
+        mn = np.min(ys, axis=1)
+        p.fill_between(x, mn, mx, color=color, label=label, alpha=opacity)
+        if dark_edges:
+            p.plot(x,mn, color=color)
+            p.plot(x,mx, color=color)
+        return
+
+
     def fillLines(self, match_label, label = '', color = 'blue', 
                 opacity = 0.55, dark_edges = False, except_panels = []):
         """
@@ -221,7 +202,6 @@ class FigureLibrary():
             for j in range(self.dim[1]):
                 if (i, j) not in except_panels:
                     p = self.panels[i][j]
-                    plt.sca(p)
                     lines = p.get_lines()
                     # get the ymax/ymin of the lines
                     ymin = None
@@ -246,12 +226,12 @@ class FigureLibrary():
                             l.set_label('_nolegend_')
 
                     # now make the plot
-                    plt.fill_between(xdata, ymin, ymax, color=color, label=label,
+                    p.fill_between(xdata, ymin, ymax, color=color, label=label,
                                 alpha = opacity)
                             
                     if dark_edges:
-                        plt.plot(xdata, ymin, color=color)
-                        plt.plot(xdata, ymax, color=color)
+                        p.plot(xdata, ymin, color=color)
+                        p.plot(xdata, ymax, color=color)
                                         
         return
 
@@ -344,7 +324,7 @@ class FigureLibrary():
                 # x_bound, y_bound, mass = pslice.getValues()
                 # extent=(x_bound[0], x_bound[1], y_bound[0], y_bound[1])
                 
-                    plt.imshow(mass, cmap = cmap, norm = norm, aspect = 'auto', extent=extent, 
+                    p.imshow(mass, cmap = cmap, norm = norm, aspect = 'auto', extent=extent, 
                             origin='lower')
             
             if self.has_cbar_col:
@@ -354,6 +334,7 @@ class FigureLibrary():
                 p.set_aspect(12,anchor = 'W')
                 self.fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), cax=p)
         return
+    
     def plotSlicePanel(self, idx, data, xlim, ylim):
         #plt.sca(self.panels[idx[0]][idx[1]])
         cmap = self.cmap_arr[idx]
@@ -365,11 +346,11 @@ class FigureLibrary():
         self.panels[idx[0]][idx[1]].imshow(data, cmap = cmap, norm = norm, aspect = 'auto', extent=extent, 
                 origin='lower')
         return
+    
     def plotHists(self, make_lines = True):
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
                 p = self.panels[i][j]
-                plt.sca(p)
                 cmap = self.cmap_arr[i, j]
                 norm = self.norm_arr[i, j]
 
@@ -377,16 +358,16 @@ class FigureLibrary():
                 xbins, ybins, counts = hist.getValues()
                 counts = np.rot90(np.flip(counts, axis=0), 3)
                 extent = (xbins[0], xbins[-1], ybins[0], ybins[-1])
-                plt.imshow(counts, cmap = cmap, norm = norm, origin='lower', extent=extent, 
+                p.imshow(counts, cmap = cmap, norm = norm, origin='lower', extent=extent, 
                             aspect = 'auto')
                 if make_lines:
-                    plt.plot([xbins[0], xbins[-1]], [0.6, 0.6], color='red')
-                    plt.plot([xbins[0], xbins[-1]], [0.55, 0.55], color='red')
-                    plt.plot([xbins[0], xbins[-1]], [0.5, 0.5], color='red', linestyle = ':')
-                    plt.plot([xbins[0], xbins[-1]], [0.65, 0.65], color='red')
-                    plt.plot([xbins[0], xbins[-1]], [0.7, 0.7], color='red', linestyle = ':')
+                    p.plot([xbins[0], xbins[-1]], [0.6, 0.6], color='red')
+                    p.plot([xbins[0], xbins[-1]], [0.55, 0.55], color='red')
+                    p.plot([xbins[0], xbins[-1]], [0.5, 0.5], color='red', linestyle = ':')
+                    p.plot([xbins[0], xbins[-1]], [0.65, 0.65], color='red')
+                    p.plot([xbins[0], xbins[-1]], [0.7, 0.7], color='red', linestyle = ':')
                     #stmass bins already log
-                    plt.plot(xbins, 0.65 + 0.02 * (xbins - 10.28), color='gray', linestyle = '--')
+                    p.plot(xbins, 0.65 + 0.02 * (xbins - 10.28), color='gray', linestyle = '--')
         
         if self.has_cbar_col:
             p = self.cax[i]
@@ -397,6 +378,25 @@ class FigureLibrary():
 
         return
     
+    def plotHistPanel(self, idx, xbins, ybins, counts, make_lines):
+        p = self.panels[idx[0]][idx[1]]
+        cmap = self.cmap_arr[idx]
+        norm = self.norm_arr[idx]
+        counts = np.rot90(np.flip(counts, axis=0), 3)
+        extent = (xbins[0], xbins[-1], ybins[0], ybins[-1])
+        p.imshow(counts, cmap = cmap, norm = norm, origin='lower', extent=extent, 
+                    aspect = 'auto')
+        if make_lines:
+            p.plot([xbins[0], xbins[-1]], [0.6, 0.6], color='red')
+            p.plot([xbins[0], xbins[-1]], [0.55, 0.55], color='red')
+            p.plot([xbins[0], xbins[-1]], [0.5, 0.5], color='red', linestyle = ':')
+            p.plot([xbins[0], xbins[-1]], [0.65, 0.65], color='red')
+            p.plot([xbins[0], xbins[-1]], [0.7, 0.7], color='red', linestyle = ':')
+            #stmass bins already log
+            p.plot(xbins, 0.65 + 0.02 * (xbins - 10.28), color='salmon', linestyle = '--')
+        
+        return
+    
     def plot2D(self, maxks = [5, 5]):
         
         for i in range(self.dim[0]):
@@ -404,7 +404,6 @@ class FigureLibrary():
                 p = self.panels[i][j]
                 cmap = self.cmap_arr[i,j]
                 norm = self.norm_arr[i,j]
-                plt.sca(p)
                 # should only be one result in list
                 result = self.figArr[i, j][0]
                 if len(self.figArr[i, j]) > 1:
@@ -412,7 +411,7 @@ class FigureLibrary():
                 KPAR, KPER, plotpk = self._get2DpkData(result, maxks)
                 extent = (np.min(KPAR),np.max(KPAR),np.min(KPER),np.max(KPER))
                 
-                plt.imshow(plotpk, extent=extent, origin='lower', aspect = 'auto',
+                p.imshow(plotpk, extent=extent, origin='lower', aspect = 'auto',
                             norm=norm, cmap=cmap)
 
             if self.has_cbar_col:
@@ -423,18 +422,37 @@ class FigureLibrary():
                 p.set_aspect(12, anchor = 'W')
         return
     
+    def plot2DPanel(self, idx, kpar, kper, pk, maxks=[5,5], cstep=0.5, color='k'):
+        p = self.panels[idx[0]][idx[1]]
+        cmap = self.cmap_arr[idx]
+        norm = self.norm_arr[idx]
+        kpar = np.unique(kpar)
+        kper = np.unique(kper)
+        paridx = np.where(kpar>maxks[0])[0][0]
+        peridx = np.where(kper>maxks[1])[0][0]
+
+        pk = np.reshape(pk, (len(kper), len(kpar)))
+        plotpk = np.log10(pk[:paridx, :peridx])
+        KPAR, KPER = np.meshgrid(kpar[:peridx], kpar[:paridx])
+        levels = np.arange(int(norm.vmin), int(norm.vmax)+1, cstep)
+        p.contour(KPAR, KPER, plotpk, vmin=norm.vmin,
+                vmax=norm.vmax, levels = levels, colors=color,
+                linestyles='solid')
+        extent = (np.min(KPAR),np.max(KPAR),np.min(KPER),np.max(KPER))
+                
+        p.imshow(plotpk, extent=extent, origin='lower', aspect = 'auto',
+                    norm=norm, cmap=cmap)
 
     def addContours(self, color = 'k', maxks = [5,5], cstep = 0.5):
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
                 p = self.panels[i][j]
                 norm = self.norm_arr[i,j]
-                plt.sca(p)
                 result = self.figArr[i, j][0]
                 KPAR, KPER, plotpk = self._get2DpkData(result, maxks)
 
                 levels = np.arange(int(norm.vmin), int(norm.vmax)+1, cstep)
-                plt.contour(KPAR, KPER, plotpk, vmin=norm.vmin,
+                p.contour(KPAR, KPER, plotpk, vmin=norm.vmin,
                         vmax=norm.vmax, levels = levels, colors=color,
                         linestyles='solid')
 
@@ -534,19 +552,14 @@ class FigureLibrary():
     def addRowLabels(self, rowlabels, pos = (0.05, 0.05), fsize = 16, is2D = False,
                     color = 'black'):
         dim = self.dim
-        if not is2D:
+
+        for i in range(dim[0]):
+            p = self.panels[i][0]
             
-            for i in range(dim[0]):
-                p = self.panels[i][0]
-                
-                p.text(pos[0], pos[1], self.texStr(rowlabels[i]), fontsize = fsize,
-                            ha = 'left', va = 'bottom', color = color, 
-                            transform = p.transAxes)
-        else:
-            for i in range(dim[0]):
-                p = self.panels[i][0]
-                plt.sca(p)
-                plt.ylabel(rowlabels[i], color=color, fontsize=fsize)
+            p.text(pos[0], pos[1], self.texStr(rowlabels[i]), fontsize = fsize,
+                        ha = 'left', va = 'bottom', color = color, 
+                        transform = p.transAxes)
+
         return
     
     def addColLabels(self, collabels, fsize = 16, color='black'):

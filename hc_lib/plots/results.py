@@ -3,7 +3,6 @@ import pickle as pkl
 import numpy as np
 import copy
 import h5py as hp
-import hashlib
 class ResultLibrary():
 
     def __init__(self):
@@ -208,7 +207,7 @@ class ResultLibrary():
             colLabels = self._defaultLabels(colp, colLabels)
         return figArr, rowLabels, colLabels
 
-    def tohdf5(self, figArr, outpath, panelp):
+    def tohdf5(self, figArr, outpath, saveprops):
         out = hp.File(outpath, 'w')
         for i in range(figArr.shape[0]):
             for j in range(figArr.shape[1]):
@@ -216,12 +215,21 @@ class ResultLibrary():
                 for r in range(len(rcs)):
                     props = rcs[r].props
                     x,y,z = rcs[r].getValues()
-                    pval = props[panelp]
+                    pvals = {}
+                    for sp in saveprops:
+                        try:
+                            pvals[sp] = props[sp]
+                        except KeyError:
+                            continue
+
                     dset = out.create_dataset('%d %d %d x'%(i,j,r), data=x)
-                    if isinstance(pval, list):
-                        for i in range(len(pval)):
-                            dset.attrs[panelp + str(i)] = hash(pval[i])
-                        
+
+                    for propname, propval in pvals.items():
+                        if isinstance(propval, list):
+                            for i in range(len(propval)):
+                                dset.attrs[propname + str(i)] = hash(propval[i])
+                        else:
+                            dset.attrs[propname] = hash(propval)
 
                     if not y is None:
                         dset = out.create_dataset('%d %d %d y'%(i,j,r), data=y)

@@ -106,6 +106,8 @@ def fieldnameR_spaceC_redshift(rlib, iprops, rmprops, savePath = '', panel_lengt
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeCrossFigure(iprops, row_prop, column_prop, 'pk', 0, rmprops, check = [0,0])   
+    rlib.tohdf5(figArr, savePath + 'HIxGal_fieldnameR_spaceC_redshift.hdf5', ['color','model','fieldname','redshift', 'space'])   
+
     flib = FigureLibrary(figArr)
     linelabels = {}
     linecolors = {}
@@ -308,7 +310,8 @@ def redshiftR_fieldnameC_color(rlib, iprops, rmprops, savePath = '', panel_lengt
     panel_prop = 'color'
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
-    figArr, rowlabels, collabels = rlib.organizeCrossFigure(iprops, row_prop, column_prop, 'pk', 0, rmprops, check = [0,0])   
+    figArr, rowlabels, collabels = rlib.organizeCrossFigure(iprops, row_prop, column_prop, 'pk', 0, rmprops, check = [0,0])
+    rlib.tohdf5(figArr, savePath + 'HIxGal_redshiftR_fieldnameC_color.hdf5', ['color','model','fieldname','redshift', 'space'])   
     flib = FigureLibrary(figArr)
     linelabels = {'red':'Red Galaxies', 'blue':'Blue Galaxies', 'resolved':'Resolved Galaxies'}
     linecolors = {'red':'red', 'blue':'blue', 'resolved':'green'}
@@ -351,12 +354,3 @@ def redshiftR_fieldnameC_color(rlib, iprops, rmprops, savePath = '', panel_lengt
     else:
         return flib        
 
-
-
-
-
-
-
-def fieldnameR_colorC_axis(rlib, iprops, rmprops, savePath = '', panel_length = 3, panel_bt = 0.25,
-            border = 1):
-    return

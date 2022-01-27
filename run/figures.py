@@ -54,8 +54,8 @@ def main():
     #hisubhaloAuto(rlib)
     #ptlAuto(rlib)
    # vnAuto(rlib)
-    allAuto(rlib)
-    #HI_galaxy_cross_power(rlib)
+    #allAuto(rlib)
+    HI_galaxy_cross_power(rlib)
     #HI_ptl_cross_power(rlib)
 
     return
@@ -82,24 +82,31 @@ def HI_galaxy_cross_power(rl):
     
     ip = cc(bip)
     del ip['snapshot'], ip['space']
-    rmp = {'fieldname':'ptl'}
-    HIxgal.redshiftR_spaceC_fieldname(rl, ip, rmp, saveDirPath)
-    HIxgal.fieldnameR_spaceC_redshift(rl, ip, rmp, saveDirPath)
-    HIxgal.redshiftR_fieldnameC_space(rl, ip, rmp, saveDirPath)
-
-    ip = cc(bip)
-    del ip['color'], ip['space']
+    rmp = {'fieldname', 'ptl'}
+    ip['color'] = ['red', 'blue', 'resolved']
     ip['color_cut'] = ['0.60', None]
-
-    HIxgal.colorR_spaceC_fieldname(rl, ip, rmp, saveDirPath)
-    HIxgal.fieldnameR_spaceC_color(rl, ip, rmp, saveDirPath)
-
-    ip = cc(bip)
-    del ip['snapshot'], ip['color']
-    ip['color_cut'] = ['0.60', None]
-
-    HIxgal.redshiftR_colorC_fieldname(rl, ip, rmp, saveDirPath)
     HIxgal.redshiftR_fieldnameC_color(rl, ip, rmp, saveDirPath)
+    HIxgal.fieldnameR_spaceC_color(rl, ip, rmp, saveDirPath)
+    # ip = cc(bip)
+    # del ip['snapshot'], ip['space']
+    # rmp = {'fieldname':'ptl'}
+    # HIxgal.redshiftR_spaceC_fieldname(rl, ip, rmp, saveDirPath)
+    # HIxgal.fieldnameR_spaceC_redshift(rl, ip, rmp, saveDirPath)
+    # HIxgal.redshiftR_fieldnameC_space(rl, ip, rmp, saveDirPath)
+
+    # ip = cc(bip)
+    # del ip['color'], ip['space']
+    # ip['color_cut'] = ['0.60', None]
+
+    # HIxgal.colorR_spaceC_fieldname(rl, ip, rmp, saveDirPath)
+    # HIxgal.fieldnameR_spaceC_color(rl, ip, rmp, saveDirPath)
+
+    # ip = cc(bip)
+    # del ip['snapshot'], ip['color']
+    # ip['color_cut'] = ['0.60', None]
+
+    # HIxgal.redshiftR_colorC_fieldname(rl, ip, rmp, saveDirPath)
+    # HIxgal.redshiftR_fieldnameC_color(rl, ip, rmp, saveDirPath)
     return
 
 def HI_ptl_cross_power(rl):
