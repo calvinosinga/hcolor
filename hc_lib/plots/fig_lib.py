@@ -11,12 +11,17 @@ tng_dict = {'tng100':'L75n1820TNG', 'tng300':'L205n2500TNG',
         'tng100-2':'L75n910TNG', 'tng100-3':'L75n455TNG', 
         'tng50':'L35n2160TNG'}
 class FigureLibrary():
-    def __init__(self, figArr):
+    def __init__(self, figArr = None, fig = None, panels = None):
         self.fig = None
         self.panels = None
-        self.figArr = figArr
+        if figArr is not None:
+            self.figArr = figArr
         
-        self.dim = figArr.shape
+            self.dim = figArr.shape
+        if fig is not None:
+            self.fig = fig
+            self.panels = panels
+            self.dim = [len(panels), len(panels[0])]
         return
 
     def createFig(self, panel_length, panel_bt, xborder, yborder,
@@ -349,7 +354,17 @@ class FigureLibrary():
                 p.set_aspect(12,anchor = 'W')
                 self.fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), cax=p)
         return
-    
+    def plotSlicePanel(self, idx, data, xlim, ylim):
+        #plt.sca(self.panels[idx[0]][idx[1]])
+        cmap = self.cmap_arr[idx]
+        norm = self.norm_arr[idx]
+        extent=(xlim[0], xlim[1], ylim[0], ylim[1])
+                # x_bound, y_bound, mass = pslice.getValues()
+                # extent=(x_bound[0], x_bound[1], y_bound[0], y_bound[1])
+                
+        self.panels[idx[0]][idx[1]].imshow(data, cmap = cmap, norm = norm, aspect = 'auto', extent=extent, 
+                origin='lower')
+        return
     def plotHists(self, make_lines = True):
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
@@ -456,7 +471,7 @@ class FigureLibrary():
     def assignSliceNorms(self, vlim_list = []):
         if not vlim_list:
             vlim_list = [[2, 12.5] for i in range(self.dim[0])]
-        norm_arr = np.empty_like(self.figArr, dtype = object)
+        norm_arr = np.empty(self.dim, dtype = object)
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
                 vlim = vlim_list[i]
@@ -494,7 +509,7 @@ class FigureLibrary():
 
      
     def assignColormaps(self, cmap_name = 'plasma', under = None, over = None):
-        self.cmap_arr = np.empty_like(self.figArr)
+        self.cmap_arr = np.empty(self.dim, dtype=object)
         cmap = copy.copy(mpl.cm.get_cmap(cmap_name))
         if not under is None:
             cmap.set_under(under)
@@ -523,8 +538,8 @@ class FigureLibrary():
             
             for i in range(dim[0]):
                 p = self.panels[i][0]
-                plt.sca(p)
-                plt.text(pos[0], pos[1], self.texStr(rowlabels[i]), fontsize = fsize,
+                
+                p.text(pos[0], pos[1], self.texStr(rowlabels[i]), fontsize = fsize,
                             ha = 'left', va = 'bottom', color = color, 
                             transform = p.transAxes)
         else:
@@ -538,9 +553,9 @@ class FigureLibrary():
         dim = self.dim
         for j in range(dim[1]):
             p = self.panels[0][j]
-            plt.sca(p)
+            
             p.xaxis.set_label_position('top')
-            plt.xlabel(self.texStr(collabels[j]), color = color, fontsize = fsize)
+            p.set_xlabel(self.texStr(collabels[j]), color = color, fontsize = fsize)
         return
     
     def removeYTickLabels(self, panel_exceptions = []):

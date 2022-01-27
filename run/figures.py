@@ -54,8 +54,8 @@ def main():
     #hisubhaloAuto(rlib)
     #ptlAuto(rlib)
    # vnAuto(rlib)
-    #allAuto(rlib)
-    HI_galaxy_cross_power(rlib)
+    allAuto(rlib)
+    #HI_galaxy_cross_power(rlib)
     #HI_ptl_cross_power(rlib)
 
     return
