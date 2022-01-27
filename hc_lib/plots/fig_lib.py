@@ -183,8 +183,8 @@ class FigureLibrary():
     def plotFillPanel(self, idx, x, ys, label = '', color = 'blue', 
                 opacity = 0.55, dark_edges = False):
         p = self.panels[idx[0]][idx[1]]
-        mx = np.max(ys, axis=1)
-        mn = np.min(ys, axis=1)
+        mx = np.max(ys, axis=0)
+        mn = np.min(ys, axis=0)
         p.fill_between(x, mn, mx, color=color, label=label, alpha=opacity)
         if dark_edges:
             p.plot(x,mn, color=color)
@@ -521,7 +521,7 @@ class FigureLibrary():
             cbar_label = 'log M$_*$/M$_/odot$'
         for i in range(len(self.cax)):
             p = self.cax[i]
-            plt.sca(p)
+            
             p.set_ylabel(cbar_label, fontsize = fsize, labelpad = labelpad, ha = ha, va=va)
         return
 
@@ -624,13 +624,14 @@ class FigureLibrary():
             for j in range(dim[1]):
                 if (i, j) not in panel_exceptions:
                     p = self.panels[i][j]
-                    plt.sca(p)
+                    
                     if which == 'both':
-                        plt.loglog()
+                        p.set_yscale('log')
+                        p.set_xscale('log')
                     elif which == 'y':
-                        plt.yscale('log')
+                        p.set_yscale('log')
                     elif which == 'x':
-                        plt.xscale('log')
+                        plt.set_xscale('log')
         
         return
     
@@ -666,33 +667,37 @@ class FigureLibrary():
     
     def addLegend(self, panel_idx = (0,0), loc = 'upper right'):
         p = self.panels[panel_idx[0]][panel_idx[1]]
-        plt.sca(p)
-        plt.legend(loc = loc)
+        
+        p.legend(loc = loc)
         return
     
-    def xLimAdjustToNyquist(self, panel_exceptions = []):
+    def xLimAdjustToNyquist(self, gridres = -1, box = -1, xleft = -1, panel_exceptions = []):
         dim = self.dim
         
         for i in range(dim[0]):
             for j in range(dim[1]):
                 if (i, j) not in panel_exceptions:
                     p = self.panels[i][j]
-                    plt.sca(p)
+                    
                     res_container_list = self.figArr[i, j]
-                    xmin, xmax = plt.xlim()
+                    xmin, xmax = p.get_xlim()
                     nyq = xmax
                     mink = np.inf
-                    for r in res_container_list:    
-                        if r.props['is_auto']:    
-                            nyq_temp = r.props['grid_resolution'] * np.pi / r.props['box']
-                        else:
-                            nyq_temp = r.props['grid_resolution'][0] * np.pi / r.props['box'][0]
-                        if nyq_temp < nyq:
-                            nyq = nyq_temp
-                        wavenum, pk, z = r.getValues()
+                    if gridres == -1 or box == -1 or xleft == -1:
+                        for r in res_container_list:    
+                            if r.props['is_auto']:    
+                                nyq_temp = r.props['grid_resolution'] * np.pi / r.props['box']
+                            else:
+                                nyq_temp = r.props['grid_resolution'][0] * np.pi / r.props['box'][0]
+                            if nyq_temp < nyq:
+                                nyq = nyq_temp
+                            wavenum, pk, z = r.getValues()
 
-                        if mink > np.min(wavenum):
-                            mink = np.min(wavenum)
+                            if mink > np.min(wavenum):
+                                mink = np.min(wavenum)
+                    else:
+                        nyq = gridres * np.pi / box
+                        mink = xleft
 
                     if not mink == np.inf:
                         plt.xlim(mink, nyq)
@@ -702,15 +707,15 @@ class FigureLibrary():
         self.matchAxisLimits(which='x', panel_exceptions=panel_exceptions)
         return
     
+
     def flushYAxisToData(self, result_type = 'pk', panel_exceptions = []):
         
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
                 if (i, j) not in panel_exceptions:
                     p = self.panels[i][j]
-                    plt.sca(p)
                     res_container_list = self.figArr[i, j]
-                    xmin, xmax = plt.xlim()
+                    xmin, xmax = p.get_xlim()
                     ylim = [np.inf, -np.inf] # each panel is flushed individually, reset ylim vals
                     if result_type == 'pk':
                         for r in res_container_list:
@@ -733,7 +738,7 @@ class FigureLibrary():
                                 ylim[1] = ymax
                         
                         # after the loop, we have the new ylims for the panel. Set them
-                        plt.ylim(ylim[0], ylim[1])
+                        p.set_ylim(ylim[0], ylim[1])
         
 
         return
@@ -763,9 +768,8 @@ class FigureLibrary():
         for i in range(dim[0]):
             for j in range(dim[1]):
                 p = self.panels[i][j]
-                plt.sca(p)
-                ymin, ymax = plt.ylim()
-                xmin, xmax = plt.xlim()
+                ymin, ymax = p.get_ylim()
+                xmin, xmax = p.get_xlim()
                 # if not (i, j) in panel_exceptions:
                 #     # for the y-axis, we want the largest max, smallest min
                 #     # in order to encompass the most data
@@ -825,11 +829,11 @@ class FigureLibrary():
         for i in range(dim[0]):
             for j in range(dim[1]):
                 if (i,j) not in panel_exceptions:
-                    plt.sca(self.panels[i][j])
+                    p = self.panels[i][j]
                     if which == 'both' or which == 'x':
-                        plt.xlim(xlims[i,j,0], xlims[i,j,1])
+                        p.set_xlim(xlims[i,j,0], xlims[i,j,1])
                     if which == 'both' or which == 'y':
-                        plt.ylim(ylims[i,j,0], ylims[i,j,1])
+                        p.set_ylim(ylims[i,j,0], ylims[i,j,1])
 
 
 
@@ -840,6 +844,6 @@ class FigureLibrary():
         outstr = '%sR_%sC_%s'%(rowp, colp, panelp)
         if not suffix == '':
             outstr += '_' + suffix 
-        plt.savefig(dir_path + outstr + '.png')
+        fig.savefig(dir_path + outstr + '.png')
         self.clf()
         return

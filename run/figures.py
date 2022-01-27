@@ -82,11 +82,11 @@ def HI_galaxy_cross_power(rl):
     
     ip = cc(bip)
     del ip['snapshot'], ip['space']
-    rmp = {'fieldname', 'ptl'}
+    rmp = {'fieldname': 'ptl'}
     ip['color'] = ['red', 'blue', 'resolved']
     ip['color_cut'] = ['0.60', None]
     HIxgal.redshiftR_fieldnameC_color(rl, ip, rmp, saveDirPath)
-    HIxgal.fieldnameR_spaceC_color(rl, ip, rmp, saveDirPath)
+    HIxgal.fieldnameR_spaceC_redshift(rl, ip, rmp, saveDirPath)
     # ip = cc(bip)
     # del ip['snapshot'], ip['space']
     # rmp = {'fieldname':'ptl'}

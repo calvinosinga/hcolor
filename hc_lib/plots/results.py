@@ -225,11 +225,8 @@ class ResultLibrary():
                     dset = out.create_dataset('%d %d %d x'%(i,j,r), data=x)
 
                     for propname, propval in pvals.items():
-                        if isinstance(propval, list):
-                            for i in range(len(propval)):
-                                dset.attrs[propname + str(i)] = hash(propval[i])
-                        else:
-                            dset.attrs[propname] = hash(propval)
+                        
+                        dset.attrs[propname] = propval
 
                     if not y is None:
                         dset = out.create_dataset('%d %d %d y'%(i,j,r), data=y)
