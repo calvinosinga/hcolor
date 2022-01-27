@@ -186,9 +186,8 @@ class FigureLibrary():
         mx = np.max(ys, axis=0)
         mn = np.min(ys, axis=0)
         p.fill_between(x, mn, mx, color=color, label=label, alpha=opacity)
-        if dark_edges:
-            p.plot(x,mn, color=color)
-            p.plot(x,mx, color=color)
+        p.plot(x,mn, color=color, label = '_nolegend_', visible = dark_edges)
+        p.plot(x,mx, color=color, label = '_nolegend_', visible = dark_edges)
         return
 
 
@@ -714,17 +713,12 @@ class FigureLibrary():
             for j in range(self.dim[1]):
                 if (i, j) not in panel_exceptions:
                     p = self.panels[i][j]
-                    res_container_list = self.figArr[i, j]
+                    lines = p.get_lines()
                     xmin, xmax = p.get_xlim()
                     ylim = [np.inf, -np.inf] # each panel is flushed individually, reset ylim vals
                     if result_type == 'pk':
-                        for r in res_container_list:
-                            # iterate through all the plots to find the data plotted
-                            if not isinstance(res_container_list, dict):
-                                wavenum, pk, z = r.getValues()
-                            else:
-                                wavenum = res_container_list[r][0]
-                                pk = res_container_list[r][1]
+                        for l in lines:
+                            wavenum, pk = l.get_data()
 
                             max_idx = np.argmax(wavenum > xmax)
                             min_idx = np.argmax(wavenum < xmin)
