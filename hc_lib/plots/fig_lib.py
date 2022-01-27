@@ -679,11 +679,11 @@ class FigureLibrary():
                 if (i, j) not in panel_exceptions:
                     p = self.panels[i][j]
                     
-                    res_container_list = self.figArr[i, j]
-                    xmin, xmax = p.get_xlim()
-                    nyq = xmax
-                    mink = np.inf
                     if gridres == -1 or box == -1 or xleft == -1:
+                        res_container_list = self.figArr[i, j]
+                        xmin, xmax = p.get_xlim()
+                        nyq = xmax
+                        mink = np.inf
                         for r in res_container_list:    
                             if r.props['is_auto']:    
                                 nyq_temp = r.props['grid_resolution'] * np.pi / r.props['box']
@@ -700,10 +700,10 @@ class FigureLibrary():
                         mink = xleft
 
                     if not mink == np.inf:
-                        plt.xlim(mink, nyq)
+                        p.set_xlim(mink, nyq)
                     
                     else:
-                        plt.xlim(xmin, nyq)
+                        p.set_xlim(xmin, nyq)
         self.matchAxisLimits(which='x', panel_exceptions=panel_exceptions)
         return
     
