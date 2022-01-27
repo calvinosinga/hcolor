@@ -844,6 +844,6 @@ class FigureLibrary():
         outstr = '%sR_%sC_%s'%(rowp, colp, panelp)
         if not suffix == '':
             outstr += '_' + suffix 
-        fig.savefig(dir_path + outstr + '.png')
+        self.fig.savefig(dir_path + outstr + '.png')
         self.clf()
         return
