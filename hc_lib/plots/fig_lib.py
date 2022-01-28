@@ -549,25 +549,34 @@ class FigureLibrary():
         return
         
     def addRowLabels(self, rowlabels, pos = (0.05, 0.05), fsize = 16, is2D = False,
-                    color = 'black'):
+                    color = 'black', va = 'bottom', ha='left'):
         dim = self.dim
 
         for i in range(dim[0]):
             p = self.panels[i][0]
             
-            p.text(pos[0], pos[1], self.texStr(rowlabels[i]), fontsize = fsize,
-                        ha = 'left', va = 'bottom', color = color, 
+            p.text(pos[0], pos[1], rowlabels[i], fontsize = fsize,
+                        ha = ha, va = va, color = color, 
                         transform = p.transAxes)
 
         return
     
-    def addColLabels(self, collabels, fsize = 16, color='black'):
+    def addColLabels(self, collabels, in_panel = False, pos = (0.05, 0.05), va='bottom', ha='left',
+            fsize = 16, color='black', row_idx = 0):
+        
         dim = self.dim
-        for j in range(dim[1]):
-            p = self.panels[0][j]
+        if in_panel:
+            for j in range(dim[1]):
+                p = self.panels[row_idx][j]
+                p.text(pos[0], pos[1], collabels[j], color = color,
+                        fontsize=fsize, ha = ha, va = va, transform = p.transAxes)
+        else:
+
+            for j in range(dim[1]):
+                p = self.panels[row_idx][j]
             
-            p.xaxis.set_label_position('top')
-            p.set_xlabel(self.texStr(collabels[j]), color = color, fontsize = fsize)
+                p.xaxis.set_label_position('top')
+                p.set_xlabel(collabels[j], color = color, fontsize = fsize)
         return
     
     def removeYTickLabels(self, panel_exceptions = []):
@@ -630,7 +639,7 @@ class FigureLibrary():
                     elif which == 'y':
                         p.set_yscale('log')
                     elif which == 'x':
-                        plt.set_xscale('log')
+                        p.set_xscale('log')
         
         return
     
