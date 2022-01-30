@@ -43,22 +43,18 @@ outfile = hp.File(outfilepath, 'w')
 if FIELDNAME == 'hiptlgrid':
     field = hiptl(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, pickle_path,
             gd['verbose'], gd['snapshot'], gd['hih2ptl'])
-
-elif FIELDNAME == 'hiptl_nHgrid':
-    field = hiptl_nH(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, pickle_path,
-            gd['verbose'], gd['snapshot'], gd['hih2ptl'])
     
 elif FIELDNAME == 'hisubhalogrid':
     field = hisubhalo(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, pickle_path, 
-            gd['verbose'], gd[SIMNAME], gd['hih2catsh'])
+            gd['verbose'], gd['groupcat'], gd['hih2catsh'])
 
 elif FIELDNAME == 'galaxygrid':
     field = galaxy(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, pickle_path, 
-            gd['verbose'], gd[SIMNAME])
+            gd['verbose'], gd['groupcat'])
 
 elif FIELDNAME == 'galaxy_dustgrid':
     field = galaxy_dust(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, pickle_path, 
-            gd['verbose'], gd[SIMNAME], gd['dust'])
+            gd['verbose'], gd['groupcat'], gd['dust'])
         
 elif FIELDNAME == 'vngrid':
     field = vn(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, pickle_path,
@@ -74,7 +70,7 @@ elif FIELDNAME == 'h2ptlgrid':
 
 elif FIELDNAME == 'h2subhalogrid':
     field = h2subhalo(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, pickle_path, 
-            gd['verbose'], gd[SIMNAME], gd['hih2catsh'])
+            gd['verbose'], gd['groupcat'], gd['hih2catsh'])
 else:
     raise NotImplementedError("there is no field named %s"%FIELDNAME)
 
