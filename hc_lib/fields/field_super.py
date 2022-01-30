@@ -319,6 +319,9 @@ class Field():
                     dset.attrs[k] = v
                 except TypeError:
                     continue
+        
+        return
+    
     def _loadSnapshotData(self):
         """
         The fields that use snapshot data vary in what they need too much,
@@ -517,7 +520,64 @@ class Cross():
         self.xxis.append(rc1)
 
         return
-    
+
+    def exportResultsToHdf5(self, pkl_path):
+        path = pkl_path[:-4] + '_%s.hdf5'
+        pks = self.getPks()
+        out = hp.File(path%'pks', 'w')
+        for r in range(len(pks)):
+            wn, pk, _ = pks[r].getValues()
+            arr = np.stack((wn, pk))
+            dset = out.create_dataset('%d'%r, data=arr)
+            props = pks[r].props
+            for k,v in props.items():
+                try:
+                    dset.attrs[k] = v
+                except TypeError:
+                    continue
+        out.close()
+
+        slices = self.getSlices()
+        out = hp.File(path%'slice', 'w')
+        for r in range(len(slices)):
+            xlim,ylim,mass = slices[r].getValues()
+            dset = out.create_dataset('%d'%r, data=[xlim, ylim, mass])
+            props = slices[r].props
+            for k,v in props.items():
+                try:
+                    dset.attrs[k] = v
+                except TypeError:
+                    continue
+        out.close()
+
+        xis = self.getXis()
+        out = hp.File(path%'xis', 'w')
+        for r in range(len(xis)):
+            x, xi, _ = xis[r].getValues()
+            arr = np.stack((x, xi))
+            dset = out.create_dataset('%d'%r, data=arr)
+            props = xis[r].props
+            for k,v in props.items():
+                try:
+                    dset.attrs[k] = v
+                except TypeError:
+                    continue
+        out.close()
+
+        tdpks = self.get2Dpks()
+        out = hp.File(path%'2dpks', 'w')
+        for r in range(len(tdpks)):
+            kpar, kper, pk = tdpks[r].getValues()
+            arr = np.stack((kpar,kper, pk))
+            dset = out.create_dataset('%d'%r, data=arr)
+            props = tdpks[r].props
+            for k,v in props.items():
+                try:
+                    dset.attrs[k] = v
+                except TypeError:
+                    continue
+        
+        return
     def _toOverdensity(self, arr):
         arr = arr/self.box**3
         arr = arr/np.mean(arr).astype(np.float32)

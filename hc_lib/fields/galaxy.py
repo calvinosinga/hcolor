@@ -29,8 +29,6 @@ class galaxy(Field):
         # use a different resolution definition.
         
         self.loadpath = catshpath
-        self.hists = []
-        self.hists_done = []
 
         super().__init__(simname, snapshot, axis, resolution, pkl_path, verbose)
         return
@@ -169,8 +167,8 @@ class galaxy(Field):
             #     gir = self.make_gi_r(photo['gi'][resolved_mask], photo['r'][resolved_mask])
             #     self.gir_hists[gp['gal_res']] = gir
             
-            if gp['gal_res'] not in self.hists_done and not gp['gal_res'] is None:
-                self.make_gr_stmass(g, photo['gr'][resolved_mask], mass[resolved_mask, 4])
+            # if gp['gal_res'] not in self.hists_done and not gp['gal_res'] is None:
+            #     self.make_gr_stmass(g, photo['gr'][resolved_mask], mass[resolved_mask, 4])
             
             self.saveData(outfile, grid, g)
             del grid
