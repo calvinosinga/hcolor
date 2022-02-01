@@ -341,7 +341,8 @@ class FigureLibrary():
         extent=(xlim[0], xlim[1], ylim[0], ylim[1])
                 # x_bound, y_bound, mass = pslice.getValues()
                 # extent=(x_bound[0], x_bound[1], y_bound[0], y_bound[1])
-                
+        mask = data < norm.vmin
+        data[mask] = norm.vmin
         self.panels[idx[0]][idx[1]].imshow(data, cmap = cmap, norm = norm, aspect = 'auto', extent=extent, 
                 origin='lower')
         return
