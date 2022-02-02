@@ -11,8 +11,8 @@ import time
 from hc_lib.build.input import Input
 
 class ResultContainer():
-    def __init__(self, field_obj, grid_props, runtime, xvalues, yvalues = None, 
-            zvalues = None, Nmodes = None):
+    def __init__(self, field_obj, grid_props, runtime, xvalues, yvalues = [], 
+            zvalues = [], Nmodes = []):
         self.xvalues = xvalues
         self.yvalues = yvalues
         self.zvalues = zvalues
@@ -265,7 +265,9 @@ class Field():
         return self.xi
     
     def exportResultsToHdf5(self):
-        path = self.pkl_path[:-4] + '_%s.hdf5'
+        print('#'*10 + 'EXPORTING RESULTS' + '#'*10)
+        print('exporting pks...')
+        path = self.pkl_path[:-4] + '_%s.hdf5'        
         pks = self.getPks()
         out = hp.File(path%'pks', 'w')
         for r in range(len(pks)):
@@ -281,10 +283,11 @@ class Field():
         out.close()
 
         slices = self.getSlices()
+        print('exporting slices...')
         out = hp.File(path%'slice', 'w')
         for r in range(len(slices)):
             xlim,ylim,mass = slices[r].getValues()
-            dset = out.create_dataset('%d'%r, data=[xlim, ylim, mass])
+            dset = out.create_dataset('%d'%r, data=mass)
             props = slices[r].props
             for k,v in props.items():
                 try:
@@ -293,19 +296,21 @@ class Field():
                     continue
         out.close()
 
+
         xis = self.getXis()
-        out = hp.File(path%'xis', 'w')
-        for r in range(len(xis)):
-            x, xi, _ = xis[r].getValues()
-            arr = np.stack((x, xi))
-            dset = out.create_dataset('%d'%r, data=arr)
-            props = xis[r].props
-            for k,v in props.items():
-                try:
-                    dset.attrs[k] = v
-                except TypeError:
-                    continue
-        out.close()
+        if not xis is None:
+            out = hp.File(path%'xis', 'w')
+            for r in range(len(xis)):
+                x, xi, _ = xis[r].getValues()
+                arr = np.stack((x, xi))
+                dset = out.create_dataset('%d'%r, data=arr)
+                props = xis[r].props
+                for k,v in props.items():
+                    try:
+                        dset.attrs[k] = v
+                    except TypeError:
+                        continue
+            out.close()
 
         tdpks = self.get2Dpks()
         out = hp.File(path%'2dpks', 'w')
@@ -426,7 +431,7 @@ class Cross():
         return self.tdxpks
     
     def getSlices(self):
-        return None
+        return []
     
     def getXis(self):
         return self.xxis
@@ -537,19 +542,6 @@ class Cross():
                     continue
         out.close()
 
-        slices = self.getSlices()
-        out = hp.File(path%'slice', 'w')
-        for r in range(len(slices)):
-            xlim,ylim,mass = slices[r].getValues()
-            dset = out.create_dataset('%d'%r, data=[xlim, ylim, mass])
-            props = slices[r].props
-            for k,v in props.items():
-                try:
-                    dset.attrs[k] = v
-                except TypeError:
-                    continue
-        out.close()
-
         xis = self.getXis()
         out = hp.File(path%'xis', 'w')
         for r in range(len(xis)):
@@ -578,6 +570,7 @@ class Cross():
                     continue
         
         return
+    
     def _toOverdensity(self, arr):
         arr = arr/self.box**3
         arr = arr/np.mean(arr).astype(np.float32)

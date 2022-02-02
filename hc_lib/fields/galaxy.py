@@ -57,13 +57,13 @@ class galaxy(Field):
             for mt in mass_type:
                 for Mt in MAS_type:
                     for s in spaces:
-                        gp = galaxy_grid_props(Mt, self.fieldname, s, 'resolved', mt, r, None)
+                        gp = galaxy_grid_props(Mt, self.fieldname, s, 'resolved', mt, r, 'None')
                         if gp.isIncluded():
                             gridnames[gp.getH5DsetName()] = gp
         for mt in mass_type:
             for Mt in MAS_type:
                 for s in spaces:
-                    gp = galaxy_grid_props(Mt, self.fieldname,s, 'all', mt, None, None)
+                    gp = galaxy_grid_props(Mt, self.fieldname,s, 'all', mt, 'None', 'None')
                     if gp.isIncluded():
                         gridnames[gp.getH5DsetName()] = gp
         
@@ -131,7 +131,7 @@ class galaxy(Field):
 
             # create the appropriate mask for the color
             gp = g.props
-            if not gp['gal_res'] is None:
+            if not gp['gal_res'] is 'None':
                 resolved_dict = galaxyResDefs(self.simname)[gp['gal_res']]
                 resolved_mask = galaxyResolvedMask(mass[:, 4], photo, resolved_dict)
             else: # "all" does not have resdef -> so none are masked

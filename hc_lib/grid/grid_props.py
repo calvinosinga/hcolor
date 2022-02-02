@@ -197,22 +197,16 @@ class galaxy_grid_props(grid_props):
 
 class hiptl_grid_props(grid_props):
 
-    def __init__(self, mas, field, space, model, mass_or_temp, nH = None):
+    def __init__(self, mas, field, space, model, mass_or_temp):
         other = {}
         other['map'] = mass_or_temp
         other['model'] = model
-        if not nH is None:
-            self.nH_bin = nH
-            nH_str = str(nH)
-            other['nH_bin'] = nH_str
-        else:
-            other['nH_bin'] = nH
         super().__init__(mas, field, space, other)
         return
     
     @classmethod
     def loadProps(cls, dct):
-        inputs = ['mas', 'fieldname', 'space', 'model', 'map', 'nH_bin']
+        inputs = ['mas', 'fieldname', 'space', 'model', 'map']
         prm = []
         for i in inputs:
             try:
