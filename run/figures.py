@@ -7,6 +7,7 @@ import hc_lib.plots.figures.vn_auto as vnFig
 import hc_lib.plots.figures.all_auto as autoFig
 import hc_lib.plots.figures.HIXgalaxy as HIxgal
 import hc_lib.plots.figures.HIXptl as HIxptl
+import hc_lib.plots.figures.galaxyXgalaxy as galxgal
 import sys
 import os
 import copy
@@ -56,10 +57,31 @@ def main():
    # vnAuto(rlib)
     #allAuto(rlib)
     HI_galaxy_cross_power(rlib)
-    #HI_ptl_cross_power(rlib)
-
+    HI_ptl_cross_power(rlib)
+    gal_gal_cross(rlib)
     return
 
+def gal_gal_cross(rl):
+    print('_________ MAKING GALAXY-GALAXY CROSS POWER SPECTRA PLOTS ______\n')
+    cc = copy.copy # used often, so just made shortcut
+    #rl.printLib()
+    # create directory to save figures in
+    saveDirPath = SAVEPATH+'galaxyXgalaxy/'
+    if not os.path.isdir(saveDirPath):
+        os.mkdir(saveDirPath)
+    
+    bip = getBIP()
+    bip['is_auto'] = False
+    bip['gal_res'] = 'diemer'
+    bip['species'] = 'stmass'
+    bip['fieldname'] = ['galaxy']
+    
+    ip = cc(bip)
+    ip['color'] = ['red','blue','resolved']
+    ip['color_cut'] = ['0.60', None]
+    rmp = {'fieldname':['vn','ptl','hiptl','hisubhalo']}
+    galxgal.redshiftR_spaceC_color(rl, ip, rmp, saveDirPath)
+    return
 
 def HI_galaxy_cross_power(rl):
     print('_________ MAKING HI-GALAXY CROSS POWER SPECTRA PLOTS ______\n')
@@ -123,20 +145,16 @@ def HI_ptl_cross_power(rl):
 
     bip = getBIP()
     bip['is_auto'] = False
-    bip['color'] = 'resolved'
     bip['map'] = 'mass'
-    bip['HI_res'] = 'hi'
-    bip['gal_res'] = 'diemer'
-    bip['color_cut'] = None
+    bip['HI_res'] = 'diemer'
     bip['species'] = 'ptl'
     bip['fieldname'] = ['ptl', 'hisubhalo', 'hiptl', 'vn']
 
     ip = cc(bip)
     del ip['space'], ip['snapshot']
-    HIxptl.redshiftR_spaceC_fieldname_no_distortion(rl, ip, saveDirPath)
-    HIxptl.redshiftR_spaceC_fieldname_distortion(rl, ip, saveDirPath)
-    HIxptl.fieldnameR_spaceC_redshift(rl, ip, saveDirPath)
-    HIxptl.redshiftR_fieldnameC_space(rl, ip, saveDirPath)
+    rmp = {'fieldname':'galaxy'}
+    HIxptl.redshiftR_spaceC_fieldname(rl,ip,rmp,saveDirPath)
+    HIxptl.redshiftR_fieldnameC_2D(rl, ip, rmp, saveDirPath)
     return
 
 def hiptlAuto(rl):
