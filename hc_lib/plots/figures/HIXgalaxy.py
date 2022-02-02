@@ -353,4 +353,3 @@ def redshiftR_fieldnameC_color(rlib, iprops, rmprops, savePath = '', panel_lengt
         return
     else:
         return flib        
-
