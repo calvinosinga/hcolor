@@ -362,8 +362,8 @@ def colorR_fieldnameC_2D(rlib, iprops, rmprops, savePath = '', panel_length = 3,
     row_prop = 'color'
     column_prop = 'fieldname'
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, '2D'))
-    figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, '2Dpk', 0, rmprops)
-    rlib.tohdf5(figArr, savePath, ['fieldname','color'])
+    figArr, rowlabels, collabels = rlib.organizeCrossFigure(iprops, row_prop, column_prop, '2Dpk', 0, rmprops)
+    rlib.tohdf5(figArr, savePath+'colorR_fieldnameC_2D.hdf5', ['fieldname','color'])
     flib = FigureLibrary(figArr)
     
     flib.createFig(panel_length, panel_bt, border, border, True)

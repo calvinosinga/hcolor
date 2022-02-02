@@ -55,10 +55,10 @@ def main():
     #hisubhaloAuto(rlib)
     #ptlAuto(rlib)
    # vnAuto(rlib)
-    #allAuto(rlib)
-    HI_galaxy_cross_power(rlib)
-    HI_ptl_cross_power(rlib)
-    gal_gal_cross(rlib)
+    allAuto(rlib)
+    #HI_galaxy_cross_power(rlib)
+    #HI_ptl_cross_power(rlib)
+    #gal_gal_cross(rlib)
     return
 
 def gal_gal_cross(rl):
@@ -438,7 +438,7 @@ def allAuto(rl):
     ip['model'] = ['GD14', 'm_hi_GD14_map']
     ip['color'] = ['resolved']
     ip['map'] = ['mass']
-    autoFig.fieldnameR_redshiftC_axis(rl, ip, saveDirPath)
+    #autoFig.fieldnameR_redshiftC_axis(rl, ip, saveDirPath)
 
     ip = cc(bip)
     ip['fieldname'] = ['vn', 'ptl','hiptl', 'hisubhalo', 'galaxy']
@@ -447,9 +447,9 @@ def allAuto(rl):
     ip['color'] = ['resolved']
     ip['map'] = ['mass']
     del ip['sim_resolution'], ip['simname']
-    autoFig.fieldnameR_simResolutionC_box(rl, ip, saveDirPath)
+    #autoFig.fieldnameR_simResolutionC_box(rl, ip, saveDirPath)
 
-    autoFig.fieldnameR_boxC_simResolution(rl, ip, saveDirPath)
+    #autoFig.fieldnameR_boxC_simResolution(rl, ip, saveDirPath)
 
     ip = cc(bip)
     ip['fieldname'] = ['vn', 'ptl','hiptl', 'hisubhalo', 'galaxy']
@@ -458,7 +458,7 @@ def allAuto(rl):
     ip['color'] = ['resolved']
     ip['map'] = ['mass']
     del ip['space'], ip['simname']
-    autoFig.fieldnameR_spaceC_box(rl, ip, saveDirPath)
+    #autoFig.fieldnameR_spaceC_box(rl, ip, saveDirPath)
 
     ip = cc(bip)
     ip['fieldname'] = ['vn', 'ptl','hiptl', 'hisubhalo', 'galaxy']
@@ -467,7 +467,7 @@ def allAuto(rl):
     ip['color'] = ['resolved']
     ip['map'] = ['mass']
     del ip['sim_resolution'], ip['space']
-    autoFig.fieldnameR_spaceC_simResolution(rl, ip, saveDirPath)
+    #autoFig.fieldnameR_spaceC_simResolution(rl, ip, saveDirPath)
     
     ip = cc(bip)
     ip['fieldname'] = ['vn', 'ptl','hiptl', 'hisubhalo', 'galaxy']
@@ -476,6 +476,6 @@ def allAuto(rl):
     ip['color'] = ['resolved']
     ip['map'] = ['mass']
     del ip['grid_resolution'], ip['space']
-    autoFig.fieldnameR_spaceC_gridResolution(rl, ip, saveDirPath)
+    #autoFig.fieldnameR_spaceC_gridResolution(rl, ip, saveDirPath)
 
 main()

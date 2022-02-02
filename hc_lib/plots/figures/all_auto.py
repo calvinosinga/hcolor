@@ -13,7 +13,7 @@ def redshiftR_spaceC_fieldname(rlib, iprops, savePath = '', panel_length = 3, pa
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeFigure(iprops, row_prop, column_prop, 'pk')
-    rlib.tohdf5(figArr, savePath + 'HIautopk.hdf5', panel_prop)
+    rlib.tohdf5(figArr, savePath + 'HIautopk.hdf5', ['model','fieldname','redshift','snapshot','space'])
     linelabels = {'vn':'VN18-Particle'}
     colors = {'vn':'green'}
 

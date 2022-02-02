@@ -478,7 +478,7 @@ class FigureLibrary():
     def assign2DNorms(self, vlim_list = []):
         if not vlim_list:
             vlim_list = [[-2, 4] for i in range(self.dim[0])]
-        norm_arr = np.empty_like(self.figArr, dtype = object)
+        norm_arr = np.empty(self.dim, dtype = object)
         for i in range(self.dim[0]):
             for j in range(self.dim[1]):
                 vlim = vlim_list[i]

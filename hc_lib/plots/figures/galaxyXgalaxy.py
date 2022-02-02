@@ -12,7 +12,7 @@ def redshiftR_spaceC_color(rlib, iprops, rmprops, savePath = '', panel_length = 
     
     print('making %sR_%sC_%s figure...'%(row_prop, column_prop, panel_prop))
     figArr, rowlabels, collabels = rlib.organizeCrossFigure(iprops, row_prop, column_prop, 'pk', 1, rmprops, check = [0,0])
-    rlib.tohdf5(figArr, savePath, ['redshift', 'color', 'snapshot','space'])
+    rlib.tohdf5(figArr, savePath+'redshiftR_spaceC_color.hdf5', ['redshift', 'color', 'snapshot','space'])
     # linelabels = {'vn':'VN18-Particle', 'hiptl':'hiptl', 'hisubhalo':'hisubhalo'}
     # colors = {'vn':'green'}
     # flib = FigureLibrary(figArr)
