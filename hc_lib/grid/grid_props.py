@@ -246,16 +246,29 @@ class hiptl_grid_props(grid_props):
 
                 # also include resolved
                 is_resolved = op['color'] == 'resolved'
+                fid_colcut = op['color_cut'] == '0.60'
+                is_stmass = op['species'] == 'stmass'
+                galcheck = (is_resolved or fid_colcut) and is_stmass
 
-                return (op['color_cut'] == '0.60' or is_resolved) and super().isCompatible(other)
+                
+                return galcheck and super().isCompatible(other)
             
+            elif 'bin' in op['gal_res'] or 'threshold' in op['gal_res']:
+                is_resolved = op['color'] == 'resolved'
+                fid_colcut = op['color_cut'] == '0.60'
+                is_stmass = op['species'] == 'stmass'
+                galcheck = (is_resolved or fid_colcut) and is_stmass
+
+                
+                return galcheck and super().isCompatible(other)
+                
             # ignore all papa resdefs -> hisubhalo is more comparable
             elif op['gal_res'] == 'papastergis_SDSS':
                 return False
             
             # if all = color, then include
             elif op['color'] == 'all':
-                return True
+                return super().isCompatible(other) and op['species'] == 'stmass'
 
         # hiptlXptl
         else:
@@ -329,24 +342,39 @@ class hisubhalo_grid_props(grid_props):
             elif op['gal_res'] == 'diemer':
                 # cdefs = ['0.55','0.60','0.65', 'visual_inspection']
                 is_resolved = op['color'] == 'resolved'
-                return (op['color_cut'] in ['0.60'] or is_resolved) and super().isCompatible(other)
+                fid_colcut = op['color_cut'] == '0.60'
+                is_stmass = op['species'] == 'stmass'
+                check_gal_props = (is_resolved or fid_colcut) and is_stmass
+
+
+                return check_gal_props and super().isCompatible(other)
             
-            # don't include other observational stuff temporarily
-            elif op['gal_res'] == 'wolz_eBOSS_ELG':
-                return False
+            elif 'bin' in op['gal_res'] or 'threshold' in op['gal_res']:
+                is_resolved = op['color'] == 'resolved'
+                fid_colcut = op['color_cut'] == '0.60'
+                is_stmass = op['species'] == 'stmass'
+                check_gal_props = (is_resolved or fid_colcut) and is_stmass
+
+                is_diemer = sp['HI_res'] == 'diemer'
+
+                return check_gal_props and is_diemer and super().isCompatible(other)
+
+            # # don't include other observational stuff temporarily
+            # elif op['gal_res'] == 'wolz_eBOSS_ELG':
+            #     return False
             
-            elif op['gal_res'] == 'wolz_eBOSS_LRG':
-                return False
+            # elif op['gal_res'] == 'wolz_eBOSS_LRG':
+            #     return False
             
-            elif op['gal_res'] == 'wolz_wiggleZ':
-                return False
+            # elif op['gal_res'] == 'wolz_wiggleZ':
+            #     return False
             
-            elif op['gal_res'] == 'anderson_2df':
-                return False
+            # elif op['gal_res'] == 'anderson_2df':
+                # return False
                 
             # if all galaxies, also include
             elif op['color'] == 'all':
-                return super().isCompatible(other)
+                return super().isCompatible(other) and op['species'] == 'stmass'
             
             return False
         
@@ -435,8 +463,12 @@ class vn_grid_props(grid_props):
 
                 # also include resolved
                 is_resolved = op['color'] == 'resolved'
+                fid_colcut = op['color_cut'] == '0.60'
+                is_stmass = op['species'] == 'stmass'
+                check_gal = (is_resolved or fid_colcut) and is_stmass
 
-                return (op['color_cut'] == '0.60' or is_resolved) and super().isCompatible(other)
+
+                return check_gal and super().isCompatible(other)
             
             # ignore all papa resdefs -> hisubhalo is more comparable
             elif op['gal_res'] == 'papastergis_SDSS':
@@ -444,7 +476,7 @@ class vn_grid_props(grid_props):
             
             # if all = base, then include
             elif op['color'] == 'all':
-                return super().isCompatible(other)
+                return super().isCompatible(other) and op['species'] == 'stmass'
 
         # vnXptl
         else:

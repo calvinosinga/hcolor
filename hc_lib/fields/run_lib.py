@@ -113,10 +113,10 @@ def galaxyResDefs(simname):
     galaxy_min_resolution['mid-threshold'] = {'stmass':(10**9, np.inf)}
     galaxy_min_resolution['high-threshold'] = {'stmass':(10**10, np.inf)}
     galaxy_min_resolution['higher-threshold'] = {'stmass':(10**11, np.inf)}
-    galaxy_min_resolution['low-threshold'] = {'stmass':(thres, 10**9)}
-    galaxy_min_resolution['mid-threshold'] = {'stmass':(10**9, 10**10)}
-    galaxy_min_resolution['high-threshold'] = {'stmass':(10**10, 10**11)}
-    galaxy_min_resolution['higher-threshold'] = {'stmass':(10**11, np.inf)}
+    galaxy_min_resolution['low-bin'] = {'stmass':(thres, 10**9)}
+    galaxy_min_resolution['mid-bin'] = {'stmass':(10**9, 10**10)}
+    galaxy_min_resolution['high-bin'] = {'stmass':(10**10, 10**11)}
+    galaxy_min_resolution['higher-bin'] = {'stmass':(10**11, np.inf)}
 
     return galaxy_min_resolution
 
