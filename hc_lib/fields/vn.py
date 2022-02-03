@@ -34,6 +34,8 @@ class vn(Field):
             for mt in MorT:
                 gp = vn_grid_props("CICW", self.fieldname, s, mt)
                 if gp.isIncluded():
+                    if mt == 'temp':
+                        gp.props['compute_slice'] = False
                     grp[gp.getH5DsetName()] = gp
 
         return grp

@@ -54,7 +54,8 @@ for i in range(len(fields)):
         fn1 = fields[i].fieldname
         fn2 = fields[j].fieldname
         galXgal = (fn1 == 'galaxy' and fn2 == 'galaxy')
-        if (ioobj.isHyd(fn1) and ioobj.isMat(fn2)) or galXgal:
+        galXptl = (fn1 == 'galaxy' and fn2 == 'ptl')
+        if (ioobj.isHyd(fn1) and ioobj.isMat(fn2)) or galXgal or galXptl:
             cvar, csb, cdep, csave = Sbatch.makeCrossSbatch(fields[i], fields[j])
             jobnames.extend(csb)
             dependencies.update(cdep)

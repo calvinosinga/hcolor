@@ -39,7 +39,6 @@ def galaxyColorMasks(photo, stmass, color_cut):
     return blue_mask, red_mask
     
 
-
 def galaxyResolvedMask(stmass, photo, res_dict):
     ################ HELPER METHODS #############################
     def gr_elg():
@@ -91,24 +90,34 @@ def galaxyResDefs(simname):
     # papastergis makes an additional cut (i-z) > -0.25, but states that
     # this cut eliminates a small number of misidentified galaxies by the 
     # SDSS pipeline
-
+    thres = mean_baryon_cell[simname]*200
     # resolution to match hisubhalo
-    galaxy_min_resolution['diemer'] = {'stmass':(mean_baryon_cell[simname]*200, np.inf)}
+    galaxy_min_resolution['diemer'] = {'stmass':(thres, np.inf)}
 
     # wigglez isn't a good comparison, TNG doesn't have any equivalent UV
     # filters and wigglez has poor r definition (from wolz)
-    galaxy_min_resolution['wolz_wiggleZ'] = {'r':(20,22)}
+    #galaxy_min_resolution['wolz_wiggleZ'] = {'r':(20,22)}
     
     # eBOSS Emission line galaxies
-    galaxy_min_resolution['wolz_eBOSS_ELG'] = {'g':(21.825, 22.825), 'gr':'gr_elg',
-    'rz':'rz_elg'}
+    #galaxy_min_resolution['wolz_eBOSS_ELG'] = {'g':(21.825, 22.825), 'gr':'gr_elg',
+    #'rz':'rz_elg'}
     # since gr and rz depend on other values, use strings to indicate a method
     # to use in the resolution definition
-    galaxy_min_resolution['wolz_eBOSS_LRG'] = {'i':(19.9,21.8), 'z':(-np.inf, 19.95),
-                'ri':(0.98, np.inf)}
+    #galaxy_min_resolution['wolz_eBOSS_LRG'] = {'i':(19.9,21.8), 'z':(-np.inf, 19.95),
+    #            'ri':(0.98, np.inf)}
     # I still need to check if there is an equivalent band for IRACI in TNG
 
-    galaxy_min_resolution['anderson_2df'] = {'b_j':(-np.inf, 19.45), 'r_f':(-np.inf, 21)}
+    #galaxy_min_resolution['anderson_2df'] = {'b_j':(-np.inf, 19.45), 'r_f':(-np.inf, 21)}
+
+    galaxy_min_resolution['low-threshold'] = {'stmass':(thres, np.inf)}
+    galaxy_min_resolution['mid-threshold'] = {'stmass':(10**9, np.inf)}
+    galaxy_min_resolution['high-threshold'] = {'stmass':(10**10, np.inf)}
+    galaxy_min_resolution['higher-threshold'] = {'stmass':(10**11, np.inf)}
+    galaxy_min_resolution['low-threshold'] = {'stmass':(thres, 10**9)}
+    galaxy_min_resolution['mid-threshold'] = {'stmass':(10**9, 10**10)}
+    galaxy_min_resolution['high-threshold'] = {'stmass':(10**10, 10**11)}
+    galaxy_min_resolution['higher-threshold'] = {'stmass':(10**11, np.inf)}
+
     return galaxy_min_resolution
 
 def galaxyColorDefs():
@@ -132,9 +141,15 @@ def HIResolutionDefinitions():
     mean_baryon_cell = {'tng100':1.4e6, 'tng100-2':11.2e6, 'tng100-3':89.2e6,
             'tng300':11e6, 'tng300-2':88e6, 'tng300-3':703e6}
     res_defs = {}
-    res_defs['papastergis_ALFALFA'] = {'HI':(10**7.5, np.inf)} 
+    #res_defs['papastergis_ALFALFA'] = {'HI':(10**7.5, np.inf)} 
     res_defs['diemer'] = {'HI':(0, np.inf)} # by default, already implemented on data
-    
+    res_defs['low-threshold'] = {'HI':(10**7, np.inf)}
+    res_defs['mid-threshold'] = {'HI':(10**8, np.inf)}
+    res_defs['high-threshold'] = {'HI':(10**9, np.inf)}
+    res_defs['lowest-bin'] = {'HI'(-np.inf, 10**7)}
+    res_defs['low-bin'] = {'HI':(10**7,10**8)}
+    res_defs['mid-bin'] = {'HI':(10**8,10**9)}
+    res_defs['high-bin'] = {'HI':(10**9,np.inf)}
     # there is a linewidths restriction, unsure how to approach that in papastergis
     # wolz is intensity map so no minimum threshold
     return res_defs

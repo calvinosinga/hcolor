@@ -12,11 +12,12 @@ from hc_lib.build.input import Input
 
 class ResultContainer():
     def __init__(self, field_obj, grid_props, runtime, xvalues, yvalues = [], 
-            zvalues = [], Nmodes = []):
+            zvalues = [], Nmodes = [], count = -1):
         self.xvalues = xvalues
         self.yvalues = yvalues
         self.zvalues = zvalues
         self.Nmodes = Nmodes
+        self.count = count
         self.props = {}
         self.props['result_runtime'] = runtime
         self.props['is_auto'] = True
@@ -199,11 +200,11 @@ class Field():
         runtime = time.time() - start
 
         rc = ResultContainer(self, grid_props, runtime, pk.k3D, pk.Pk[:,0], 
-                Nmodes = pk.Nmodes3D)
+                Nmodes = pk.Nmodes3D, count = grid.count)
         self.pks.append(rc)
         if grid_props.props['space'] == 'redshift':
             rc2D = ResultContainer(self, grid_props, runtime, pk.kpar, pk.kper,
-                    pk.Pk2D[:], pk.Nmodes2D)
+                    pk.Pk2D[:], pk.Nmodes2D, count=grid.count)
             self.tdpks.append(rc2D)
         
         return
@@ -215,7 +216,7 @@ class Field():
             arr = self._toOverdensity(arr)
             xi = Xi(arr, self.header["BoxSize"], axis = self.axis, MAS='CIC')
             runtime = time.time() - start
-            rc = ResultContainer(self, grid_props, runtime, xi.r3D, xi.xi[:,0])
+            rc = ResultContainer(self, grid_props, runtime, xi.r3D, xi.xi[:,0], count=grid.count)
             self.xi.append(rc)
         return
 
@@ -234,7 +235,8 @@ class Field():
             idx_list = [zero_axis, one_axis, two_axis]
             slc = np.log10(np.sum(arr[idx_list[self.axis]], axis=(self.axis+1)%3))
             runtime = time.time()-start
-            rc = ResultContainer(self, grid_props, runtime, [0, self.box], [0, self.box], slc)
+            rc = ResultContainer(self, grid_props, runtime, [0, self.box], [0, self.box], slc,
+                    count=grid.count)
             self.slices.append(rc)
         return
     

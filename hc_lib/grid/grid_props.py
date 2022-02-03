@@ -5,7 +5,7 @@ import hc_lib.fields.run_lib as rl
 class grid_props():
     
     def __init__(self, mas, field, space, other_props,
-                compute_xi = True, compute_slice = True):
+                compute_xi = False, compute_slice = True):
         self.props = {}
         self.props['mas'] = mas
         self.props['fieldname'] = field
@@ -47,7 +47,7 @@ class grid_props():
         if fn == 'galaxy' or fn == 'galaxy_dust':
             return galaxy_grid_props.loadProps(temp)
 
-        elif fn == 'hiptl' or fn == 'h2ptl' or fn == 'hiptl_nH':
+        elif fn == 'hiptl' or fn == 'h2ptl':
             return hiptl_grid_props.loadProps(temp)
         
         elif fn == 'hisubhalo' or fn == 'h2subhalo':
@@ -121,6 +121,7 @@ class galaxy_grid_props(grid_props):
 
         # vnXgalaxy handled by vn
 
+        # galaxyXptl handled by ptl
         return super().isCompatible(other)
 
     def isIncluded(self):
@@ -135,43 +136,44 @@ class galaxy_grid_props(grid_props):
             self.props['compute_xi'] = False
             self.props['compute_slice'] = False
 
-        if self.props['gal_res'] == 'papastergis_SDSS':
-            cds = ['papastergis_SDSS']
-            ms = ['stmass']
-            schts = ['CIC']
-            only_pk()
-            return test(cds, ms, schts)
+        # if self.props['gal_res'] == 'papastergis_SDSS':
+        #     cds = ['papastergis_SDSS']
+        #     ms = ['stmass']
+        #     schts = ['CIC']
+        #     only_pk()
+        #     return test(cds, ms, schts)
         
-        elif self.props['gal_res'] == 'wolz_wiggleZ':
-            cds = ['wolz_wiggleZ']
-            ms = ['stmass']
-            schts = ['CIC']
-            only_pk()
-            return test(cds, ms, schts) and self.props['color'] == 'red'
+        # elif self.props['gal_res'] == 'wolz_wiggleZ':
+        #     cds = ['wolz_wiggleZ']
+        #     ms = ['stmass']
+        #     schts = ['CIC']
+        #     only_pk()
+        #     return test(cds, ms, schts) and self.props['color'] == 'red'
         
-        elif self.props['gal_res'] == 'wolz_eBOSS_ELG':
-            cds = ['wolz_eBOSS_ELG']
-            ms = ['stmass']
-            schts = ['CIC']
-            only_pk()
-            return test(cds, ms, schts) and self.props['color'] == 'blue'
+        # elif self.props['gal_res'] == 'wolz_eBOSS_ELG':
+        #     cds = ['wolz_eBOSS_ELG']
+        #     ms = ['stmass']
+        #     schts = ['CIC']
+        #     only_pk()
+        #     return test(cds, ms, schts) and self.props['color'] == 'blue'
 
-        elif self.props['gal_res'] == 'wolz_eBOSS_LRG':
-            cds = ['wolz_eBOSS_LRG']
-            ms = ['stmass']
-            schts = ['CIC']
-            only_pk()
-            return test(cds, ms, schts) and self.props['color'] == 'red'
+        # elif self.props['gal_res'] == 'wolz_eBOSS_LRG':
+        #     cds = ['wolz_eBOSS_LRG']
+        #     ms = ['stmass']
+        #     schts = ['CIC']
+        #     only_pk()
+        #     return test(cds, ms, schts) and self.props['color'] == 'red'
 
-        elif self.props['gal_res'] == 'anderson_2df':
-            cds = ['anderson_2df']
-            ms = ['stmass']
-            schts = ['CIC']
-            only_pk()
-            return test(cds, ms, schts)
+        # elif self.props['gal_res'] == 'anderson_2df':
+        #     cds = ['anderson_2df']
+        #     ms = ['stmass']
+        #     schts = ['CIC']
+        #     only_pk()
+        #     return test(cds, ms, schts)
+
 
         # everything that isn't a color definition associated with an observation is fine
-        elif self.props['gal_res'] == 'diemer':
+        if self.props['gal_res'] == 'diemer':
             obs_color_cuts = rl.galaxyObsColorDefs()
             coldef_is_compatible = not (self.props['color_cut'] in obs_color_cuts)
             # CIC between stmass and all mass should be the same - removing redundancy
@@ -180,12 +182,18 @@ class galaxy_grid_props(grid_props):
 
             return coldef_is_compatible and (is_CICW or is_CIC_and_stmass)
 
-        # if this is gridprop obj for resolved, then
-        elif self.props['color'] == 'resolved':
-            # removing redundancy in CIC with both kinds of mass
-            is_CICW = self.props['mas'] == 'CICW'
-            is_CIC_and_stmass = self.props['mas'] == 'CIC' and self.props['species'] == 'stmass'
-            return is_CICW or is_CIC_and_stmass
+        elif 'threshold' in self.props['gal_res'] or 'bin' in self.props['gal_res']:
+            fid_colcut = self.props['color_cut'] == '0.60'
+            only_pk()
+            is_cicw = self.props['mas'] == 'CICW'
+            is_stmass = self.props['species'] == 'stmass'
+            return fid_colcut and is_cicw and is_stmass
+        # # if this is gridprop obj for resolved, then
+        # elif self.props['color'] == 'resolved':
+        #     # removing redundancy in CIC with both kinds of mass
+        #     is_CICW = self.props['mas'] == 'CICW'
+        #     is_CIC_and_stmass = self.props['mas'] == 'CIC' and self.props['species'] == 'stmass'
+        #     return is_CICW or is_CIC_and_stmass
         
         elif self.props['color'] == 'all':
             is_CICW = self.props['mas'] == 'CICW'
@@ -216,7 +224,7 @@ class hiptl_grid_props(grid_props):
             
             prm.append(val)
         
-        return hiptl_grid_props(prm[0], prm[1], prm[2], prm[3], prm[4], prm[5])
+        return hiptl_grid_props(prm[0], prm[1], prm[2], prm[3], prm[4])
     
     def isCompatible(self, other):
         sp = self.props
@@ -296,6 +304,10 @@ class hisubhalo_grid_props(grid_props):
             mas = ['CIC']
             only_pk()
             return test(mas) and sp['fieldname'] == 'hisubhalo'
+        elif 'bin' in sp['HI_res'] or 'threshold' in sp['HI_res']:
+            is_cicw = sp['mas'] == 'CICW'
+            only_pk()
+            return is_cicw
 
         return True
     
@@ -370,6 +382,16 @@ class ptl_grid_props(grid_props):
         
         return ptl_grid_props(prm[0], prm[1], prm[2], prm[3])
 
+    def isCompatible(self, other):
+        op = other.props
+        if op['fieldname'] == 'galaxy':
+            fid_colcut = op['color_cut'] == '0.60'
+            fid_res = op['gal_res'] == 'diemer'
+            stsp = op['species'] == 'stmass'
+            match = fid_colcut and fid_res and stsp
+            return match and super().isCompatible(other)
+        else:
+            return super().isCompatible(other)
 ################################################################################################################
 
 class vn_grid_props(grid_props):

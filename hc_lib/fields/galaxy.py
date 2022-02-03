@@ -35,8 +35,10 @@ class galaxy(Field):
     
     def getGridProps(self):
         colors = ['blue', 'red']
-        #resolutions = list(galaxyResDefs(self.simname).keys())
-        resolutions = ['diemer']
+        if self.simname == 'tng100':
+            resolutions = list(galaxyResDefs(self.simname).keys())
+        else:
+            resolutions = ['diemer']
         colordefs = galaxyColorDefs()
         mass_type = ['stmass', 'total']
         # MAS_type = ['CIC','CICW']
