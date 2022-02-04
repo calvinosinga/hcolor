@@ -261,7 +261,7 @@ class hiptl_grid_props(grid_props):
 
                 
                 return galcheck and super().isCompatible(other)
-                
+
             # ignore all papa resdefs -> hisubhalo is more comparable
             elif op['gal_res'] == 'papastergis_SDSS':
                 return False
