@@ -11,7 +11,7 @@ import hc_lib.plots.figures.galaxyXgalaxy as galxgal
 import sys
 import os
 import copy
-#import pickle as pkl
+import pickle as pkl
 sys.argv.pop(0)
 SAVEPATH = sys.argv.pop(0)
 OUTPATHS = sys.argv
@@ -47,7 +47,7 @@ def main():
     
     def printlib(pname):
         print(rlib.getVals('pk',pname))
-#    pkl.dump(rlib, open('resultlib.pkl', 'wb'), pkl.HIGHEST_PROTOCOL)
+    pkl.dump(rlib, open(SAVEPATH+'resultlib.pkl', 'wb'), pkl.HIGHEST_PROTOCOL)
     printlib('fieldname')
     
     #hiptlAuto(rlib)
