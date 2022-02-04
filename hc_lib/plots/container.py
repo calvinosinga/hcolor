@@ -1,20 +1,29 @@
+from hc_lib.build.input import Input
 
 
 class ResultContainer():
-    def __init__(self, field_obj, grid_props, runtime, xvalues, yvalues = [], 
-            zvalues = [], Nmodes = [], count = -1):
-        self.xvalues = xvalues
-        self.yvalues = yvalues
-        self.zvalues = zvalues
-        self.Nmodes = Nmodes
-        self.count = count
-        self.props = {}
-        self.props['result_runtime'] = runtime
-        self.props['is_auto'] = True
-        self._extract_field_properties(field_obj)
-        self._extract_grid_properties(grid_props)
-        return
+    # def __init__(self, field_obj, grid_props, runtime, xvalues, yvalues = [], 
+    #         zvalues = [], Nmodes = [], count = -1):
+    #     self.xvalues = xvalues
+    #     self.yvalues = yvalues
+    #     self.zvalues = zvalues
+    #     self.Nmodes = Nmodes
+    #     self.count = count
+    #     self.props = {}
+    #     self.props['result_runtime'] = runtime
+    #     self.props['is_auto'] = True
+    #     self._extract_field_properties(field_obj)
+    #     self._extract_grid_properties(grid_props)
+    #     return
     
+    def __init__(self, rc):
+        self.xvalues = rc.xvalues
+        self.yvalues = rc.yvalues
+        self.zvalues = rc.zvalues
+        self.Nmodes = rc.Nmodes
+        self.count = rc.count
+        self.props = rc.props
+        return
     
     def _extract_field_properties(self, f):
         self.props['box'] = f.box
