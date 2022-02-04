@@ -35,8 +35,6 @@ class hiptl(Field):
                 for mt in mass_or_temp:
                     gp = hiptl_grid_props('CICW', self.fieldname, s, m, mass_or_temp = mt)
                     if gp.isIncluded():
-                        if 'GD14' not in m or mt == 'temp':
-                            gp['compute_xi'] = False
                         grp[gp.getH5DsetName()] = gp
         return grp
     

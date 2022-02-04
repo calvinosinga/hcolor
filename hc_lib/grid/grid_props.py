@@ -225,7 +225,12 @@ class hiptl_grid_props(grid_props):
             prm.append(val)
         
         return hiptl_grid_props(prm[0], prm[1], prm[2], prm[3], prm[4])
-    
+    def isIncluded(self):
+        sp = self.props
+        if not sp['model'] == 'GD14':
+            self.props['compute_xi'] = False
+            self.props['compute_slice'] = False
+        return super().isIncluded and self.props['map'] == 'mass'
     def isCompatible(self, other):
         sp = self.props
         op = other.props

@@ -146,7 +146,7 @@ def HIResolutionDefinitions():
     res_defs['low-threshold'] = {'HI':(10**7, np.inf)}
     res_defs['mid-threshold'] = {'HI':(10**8, np.inf)}
     res_defs['high-threshold'] = {'HI':(10**9, np.inf)}
-    res_defs['lowest-bin'] = {'HI'(-np.inf, 10**7)}
+    res_defs['lowest-bin'] = {'HI':(-np.inf, 10**7)}
     res_defs['low-bin'] = {'HI':(10**7,10**8)}
     res_defs['mid-bin'] = {'HI':(10**8,10**9)}
     res_defs['high-bin'] = {'HI':(10**9,np.inf)}
