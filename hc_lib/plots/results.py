@@ -84,9 +84,9 @@ class ResultLibrary():
 
         tdpks = obj.get2Dpks()
         _addRunnameLoop(tdpks, self.tdpks)
-        if obj.fieldname == 'galaxy' or obj.fieldname == 'galaxy_dust':
-            hists = obj.hists
-            _addRunnameLoop(hists, self.hists)
+#        if obj.fieldname == 'galaxy' or obj.fieldname == 'galaxy_dust':
+#            hists = obj.hists
+#            _addRunnameLoop(hists, self.hists)
         return
         
     def _getResultType(self, result_type):
