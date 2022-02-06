@@ -78,10 +78,8 @@ class hisubhalo(Field):
             grid = Grid(gprop.getH5DsetName(), self.grid_resolution, verbose=self.v)
 
             mass = hih2file[gprop.props['model']][:] #already in solar masses
-            if gprop.props['HI_res'] == 'papa':
-                mask = self.getResolvedSubhalos(mass, gprop.props['HI_res'])
-            else:
-                mask = np.ones_like(mass, dtype=bool)
+            mask = self.getResolvedSubhalos(mass, gprop.props['HI_res'])
+
             if gprop.props['mas'] == 'CICW':
                 if not np.issubdtype(mask[0], bool):
                     mask = mask.astype('bool')
@@ -112,7 +110,7 @@ class hisubhalo(Field):
         mask = np.ones_like(mass, dtype=bool)
         for k, v in resdict.items():
             if k == 'HI':
-                mask *= (mass >= v[0]) & (mass < v[1])
+                mask &= (mass >= v[0]) & (mass < v[1])
         return mask
 
     def makeSlice(self, grid, grid_props, perc=0.1, mid=None):

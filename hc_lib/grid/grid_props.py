@@ -184,10 +184,11 @@ class galaxy_grid_props(grid_props):
 
         elif 'threshold' in self.props['gal_res'] or 'bin' in self.props['gal_res']:
             fid_colcut = self.props['color_cut'] == '0.60'
+            is_resolved = self.props['color'] == 'resolved'
             only_pk()
             is_cicw = self.props['mas'] == 'CICW'
             is_stmass = self.props['species'] == 'stmass'
-            return fid_colcut and is_cicw and is_stmass
+            return (fid_colcut or is_resolved) and is_cicw and is_stmass
         # # if this is gridprop obj for resolved, then
         # elif self.props['color'] == 'resolved':
         #     # removing redundancy in CIC with both kinds of mass
