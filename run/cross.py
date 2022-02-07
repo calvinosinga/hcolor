@@ -7,7 +7,7 @@ import os
 import pickle
 import h5py as hp
 from hc_lib.fields.field_super import Cross
-
+from hc_lib.plots.result_lib import ResultLibrary
 gd = pickle.load(open(os.getenv('GDFILE'),'rb'))
 
 if gd['verbose']:
@@ -42,6 +42,10 @@ if gd['verbose']:
 
 res = Cross(field1, field2, gridpaths[0], gridpaths[1])
 res.computeXpks()
-res.computeXxis()
-res.exportResultsToHdf5(OUTFILEPATH)
+#res.computeXxis()
 pickle.dump(res, open(OUTFILEPATH, 'wb'), pickle.HIGHEST_PROTOCOL)
+
+rlib = ResultLibrary(OUTFILEPATH + '_rlib.pkl')
+rlib.addResults(res.getPks())
+rlib.addResults(res.get2Dpks())
+pickle.dump(rlib, open(rlib.path, 'wb'), pickle.HIGHEST_PROTOCOL)

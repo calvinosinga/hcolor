@@ -10,6 +10,7 @@ mpl.rcParams['text.usetex'] = True
 tng_dict = {'tng100':'L75n1820TNG', 'tng300':'L205n2500TNG',
         'tng100-2':'L75n910TNG', 'tng100-3':'L75n455TNG', 
         'tng50':'L35n2160TNG'}
+        
 class FigureLibrary():
     def __init__(self, figArr = None, fig = None, panels = None):
         self.fig = None

@@ -8,123 +8,7 @@ import h5py as hp
 from Pk_library import Pk, Xi, XPk, XXi
 import copy
 import time
-from hc_lib.build.input import Input
-
-class ResultContainer():
-    def __init__(self, field_obj, grid_props, runtime, xvalues, yvalues = [], 
-            zvalues = [], Nmodes = [], count = -1):
-        self.xvalues = xvalues
-        self.yvalues = yvalues
-        self.zvalues = zvalues
-        self.Nmodes = Nmodes
-        self.count = count
-        self.props = {}
-        self.props['result_runtime'] = runtime
-        self.props['is_auto'] = True
-        self._extract_field_properties(field_obj)
-        self._extract_grid_properties(grid_props)
-        return
-    
-    
-    def _extract_field_properties(self, f):
-        self.props['box'] = f.box
-        self.props['simname'] = f.simname
-        if '-2' in f.simname:
-            self.props['sim_resolution'] = 'medium'
-        elif '-3' in f.simname:
-            self.props['sim_resolution'] = 'low'
-        else:
-            self.props['sim_resolution'] = 'high'
-        self.props['num_part'] = f.numDMpart
-        self.props['grid_resolution'] = f.grid_resolution
-        self.props['snapshot'] = f.snapshot
-        self.props['redshift'] = f.header['Redshift']
-        self.props['axis'] = f.axis
-        self.props['fieldname'] = f.fieldname
-        self.props['is_hydrogen'] = Input.isHyd(f.fieldname)
-        self.props['is_atomic'] = Input.isAtomic(f.fieldname)
-        self.props['is_molecular'] = Input.isMolecular(f.fieldname)
-        self.props['is_particle'] = Input.isPtl(f.fieldname)
-        self.props['is_groupcat'] = Input.isCat(f.fieldname)
-        self.props['is_matter'] = Input.isMat(f.fieldname)
-        return
-    
-    def _extract_grid_properties(self, gp):
-        self.props.update(gp.props)
-        return
-
-    def addCrossedField(self, other_rc):
-        temp = {}
-        oprop = other_rc.props
-        skip = ['is_auto']
-        for k,v in oprop.items():
-            self_val = self.getProp(k)
-
-            if not k in skip:
-                if self_val is None:
-                    temp[k] = [v]
-                else:
-                    temp[k] = [v, self_val]
-        
-        for k,v in self.props.items():
-            if not k in temp:
-                temp[k] = [v]
-
-        self.props = temp
-        self.props['is_auto'] = False
-        return
-
-    def getProp(self, prop_key):
-        try:
-            v = self.props[prop_key]
-            if self.props['is_auto']:
-                return v
-            elif len(v) == 1:
-                return v[0]
-            else:
-                return v
-                
-        except KeyError:
-            return None
-    
-    def matchProps(self, desired_props, verbose=False):
-        """
-        a match is defined to be when each of the desired props is equal
-        to the value in self.props when auto, otherwise is in the list.
-        """
-        isMatch = True
-        failed_list = []
-        for k,v in desired_props.items():
-            self_val = self.getProp(k)
-            if not isinstance(v, list):
-                v = [v]
-            
-            if self.props['is_auto']:
-                if self_val in v:
-                    isMatch = (isMatch and True)
-                elif verbose:
-                    failed_list.append([k, v, self_val])
-            else:
-                if v in self_val:
-                    isMatch = (isMatch and True)
-                elif verbose:
-                    failed_list.append([k, v, self_val])
-
-        if verbose:
-            print('Match Failed:')
-            print(failed_list)
-
-        return isMatch
-                
-    def addProp(self, key, val):
-        self.props[key] = val
-        return
-        
-    def getValues(self):
-        return self.xvalues, self.yvalues, self.zvalues
-    
-
-    
+from hc_lib.plots.container import ResultContainer
 
 class Field():
 
@@ -199,11 +83,11 @@ class Field():
         pk = Pk(arr, self.header["BoxSize"], axis = self.axis, MAS='CIC')
         runtime = time.time() - start
 
-        rc = ResultContainer(self, grid_props, runtime, pk.k3D, pk.Pk[:,0], 
+        rc = ResultContainer(self, 'pk', grid_props, runtime, pk.k3D, pk.Pk[:,0], 
                 Nmodes = pk.Nmodes3D, count = grid.count)
         self.pks.append(rc)
         if grid_props.props['space'] == 'redshift':
-            rc2D = ResultContainer(self, grid_props, runtime, pk.kpar, pk.kper,
+            rc2D = ResultContainer(self, '2Dpk', grid_props, runtime, pk.kpar, pk.kper,
                     pk.Pk2D[:], pk.Nmodes2D, count=grid.count)
             self.tdpks.append(rc2D)
         
@@ -216,7 +100,7 @@ class Field():
             arr = self._toOverdensity(arr)
             xi = Xi(arr, self.header["BoxSize"], axis = self.axis, MAS='CIC')
             runtime = time.time() - start
-            rc = ResultContainer(self, grid_props, runtime, xi.r3D, xi.xi[:,0], count=grid.count)
+            rc = ResultContainer(self, 'xi', grid_props, runtime, xi.r3D, xi.xi[:,0], count=grid.count)
             self.xi.append(rc)
         return
 
@@ -235,7 +119,7 @@ class Field():
             idx_list = [zero_axis, one_axis, two_axis]
             slc = np.log10(np.sum(arr[idx_list[self.axis]], axis=(self.axis+1)%3))
             runtime = time.time()-start
-            rc = ResultContainer(self, grid_props, runtime, [0, self.box], [0, self.box], slc,
+            rc = ResultContainer(self, 'slice', grid_props, runtime, [0, self.box], [0, self.box], slc,
                     count=grid.count)
             self.slices.append(rc)
         return
@@ -265,69 +149,6 @@ class Field():
     
     def getXis(self):
         return self.xi
-    
-    def exportResultsToHdf5(self):
-        print('#'*10 + 'EXPORTING RESULTS' + '#'*10)
-        print('exporting pks...')
-        path = self.pkl_path[:-4] + '_%s.hdf5'        
-        pks = self.getPks()
-        out = hp.File(path%'pks', 'w')
-        for r in range(len(pks)):
-            wn, pk, _ = pks[r].getValues()
-            arr = np.stack((wn, pk))
-            dset = out.create_dataset('%d'%r, data=arr)
-            props = pks[r].props
-            for k,v in props.items():
-                try:
-                    dset.attrs[k] = v
-                except TypeError:
-                    continue
-        out.close()
-
-        slices = self.getSlices()
-        print('exporting slices...')
-        out = hp.File(path%'slice', 'w')
-        for r in range(len(slices)):
-            xlim,ylim,mass = slices[r].getValues()
-            dset = out.create_dataset('%d'%r, data=mass)
-            props = slices[r].props
-            for k,v in props.items():
-                try:
-                    dset.attrs[k] = v
-                except TypeError:
-                    continue
-        out.close()
-
-
-        xis = self.getXis()
-        if not xis is None:
-            out = hp.File(path%'xis', 'w')
-            for r in range(len(xis)):
-                x, xi, _ = xis[r].getValues()
-                arr = np.stack((x, xi))
-                dset = out.create_dataset('%d'%r, data=arr)
-                props = xis[r].props
-                for k,v in props.items():
-                    try:
-                        dset.attrs[k] = v
-                    except TypeError:
-                        continue
-            out.close()
-
-        tdpks = self.get2Dpks()
-        out = hp.File(path%'2dpks', 'w')
-        for r in range(len(tdpks)):
-            kpar, kper, pk = tdpks[r].getValues()
-            arr = np.stack((kpar,kper, pk))
-            dset = out.create_dataset('%d'%r, data=arr)
-            props = tdpks[r].props
-            for k,v in props.items():
-                try:
-                    dset.attrs[k] = v
-                except TypeError:
-                    continue
-        
-        return
     
     def _loadSnapshotData(self):
         """
@@ -454,9 +275,6 @@ class Cross():
                 if gp1.isCompatible(gp2) and gp2.isCompatible(gp1):
                     grid1 = Grid.loadGrid(gf1[k1])
                     grid2 = Grid.loadGrid(gf2[k2])
-                    print('Would be calculating xpk between: ')
-                    print('\t %s'%k1)
-                    print('\t %s'%k2)
                     self._xpk(grid1, grid2, gp1, gp2)
         return
     
@@ -467,18 +285,18 @@ class Cross():
         xpk = XPk(arrs, self.box, self.axis, MAS=['CIC','CIC'])
         runtime = time.time() - start
 
-        rc1 = ResultContainer(self.field1, gp1, runtime, xpk.k3D, 
+        rc1 = ResultContainer(self.field1, 'pk', gp1, runtime, xpk.k3D, 
                 xpk.XPk[:,0,0], Nmodes = xpk.Nmodes3D)
-        rc2 = ResultContainer(self.field2, gp2, runtime, xpk.k3D,
+        rc2 = ResultContainer(self.field2, 'pk', gp2, runtime, xpk.k3D,
                 xpk.XPk[:,0,0], Nmodes=xpk.Nmodes3D)
         rc1.addCrossedField(rc2)
         self.xpks.append(rc1)
 
         do_2D = gp1.props['space'] == 'redshift' and gp2.props['space'] == 'redshift'
         if do_2D:
-            rc1 = ResultContainer(self.field1, gp1, runtime, xpk.kpar, xpk.kper,
+            rc1 = ResultContainer(self.field1, '2Dpk', gp1, runtime, xpk.kpar, xpk.kper,
                     xpk.PkX2D[:,0], Nmodes= xpk.Nmodes2D)
-            rc2 = ResultContainer(self.field2, gp2, runtime, xpk.kpar, xpk.kper, 
+            rc2 = ResultContainer(self.field2, '2Dpk', gp2, runtime, xpk.kpar, xpk.kper, 
                     xpk.PkX2D[:,0], Nmodes=xpk.Nmodes2D)
             rc1.addCrossedField(rc2)
             self.tdxpks.append(rc1)
@@ -526,51 +344,6 @@ class Cross():
         rc1.addCrossedField(rc2)
         self.xxis.append(rc1)
 
-        return
-
-    def exportResultsToHdf5(self, pkl_path):
-        path = pkl_path[:-4] + '_%s.hdf5'
-        pks = self.getPks()
-        out = hp.File(path%'pks', 'w')
-        for r in range(len(pks)):
-            wn, pk, _ = pks[r].getValues()
-            arr = np.stack((wn, pk))
-            dset = out.create_dataset('%d'%r, data=arr)
-            props = pks[r].props
-            for k,v in props.items():
-                try:
-                    dset.attrs[k] = v
-                except TypeError:
-                    continue
-        out.close()
-
-        xis = self.getXis()
-        out = hp.File(path%'xis', 'w')
-        for r in range(len(xis)):
-            x, xi, _ = xis[r].getValues()
-            arr = np.stack((x, xi))
-            dset = out.create_dataset('%d'%r, data=arr)
-            props = xis[r].props
-            for k,v in props.items():
-                try:
-                    dset.attrs[k] = v
-                except TypeError:
-                    continue
-        out.close()
-
-        tdpks = self.get2Dpks()
-        out = hp.File(path%'2dpks', 'w')
-        for r in range(len(tdpks)):
-            kpar, kper, pk = tdpks[r].getValues()
-            arr = np.stack((kpar,kper, pk))
-            dset = out.create_dataset('%d'%r, data=arr)
-            props = tdpks[r].props
-            for k,v in props.items():
-                try:
-                    dset.attrs[k] = v
-                except TypeError:
-                    continue
-        
         return
     
     def _toOverdensity(self, arr):

@@ -2,28 +2,23 @@ from hc_lib.build.input import Input
 
 
 class ResultContainer():
-    # def __init__(self, field_obj, grid_props, runtime, xvalues, yvalues = [], 
-    #         zvalues = [], Nmodes = [], count = -1):
-    #     self.xvalues = xvalues
-    #     self.yvalues = yvalues
-    #     self.zvalues = zvalues
-    #     self.Nmodes = Nmodes
-    #     self.count = count
-    #     self.props = {}
-    #     self.props['result_runtime'] = runtime
-    #     self.props['is_auto'] = True
-    #     self._extract_field_properties(field_obj)
-    #     self._extract_grid_properties(grid_props)
-    #     return
-    
-    def __init__(self, rc):
-        self.xvalues = rc.xvalues
-        self.yvalues = rc.yvalues
-        self.zvalues = rc.zvalues
-        self.Nmodes = rc.Nmodes
-        self.count = rc.count
-        self.props = rc.props
+    def __init__(self, field_obj, result_type, grid_props, runtime, xvalues, yvalues = [], 
+            zvalues = [], Nmodes = [], count = -1):
+        self.xvalues = xvalues
+        self.yvalues = yvalues
+        self.zvalues = zvalues
+        self.Nmodes = Nmodes
+        self.rt = result_type
+        self.count = count
+        self.props = {}
+        self.props['result_runtime'] = runtime
+        self.props['is_auto'] = True
+        self._extract_field_properties(field_obj)
+        self._extract_grid_properties(grid_props)
         return
+    
+    def getType(self):
+        return self.rt
     
     def _extract_field_properties(self, f):
         self.props['box'] = f.box
@@ -86,34 +81,6 @@ class ResultContainer():
         except KeyError:
             return None
     
-    def matchProps(self, desired_props, verbose=False):
-        """
-        a match is defined to be when each of the desired props is equal
-        to the value in self.props when auto, otherwise is in the list.
-        """
-        isMatch = True
-        failed_list = []
-        for k,v in desired_props.items():
-            self_val = self.getProp(k)
-            if not isinstance(v, list):
-                v = [v]
-            
-            if self.props['is_auto']:
-                if self_val in v:
-                    isMatch = (isMatch and True)
-                elif verbose:
-                    failed_list.append([k, v, self_val])
-            else:
-                if v in self_val:
-                    isMatch = (isMatch and True)
-                elif verbose:
-                    failed_list.append([k, v, self_val])
-
-        if verbose:
-            print('Match Failed:')
-            print(failed_list)
-
-        return isMatch
                 
     def addProp(self, key, val):
         self.props[key] = val

@@ -9,6 +9,7 @@ import pickle
 from hc_lib.grid.grid import Grid
 from hc_lib.grid.grid_props import grid_props
 import h5py as hp
+from hc_lib.plots.result_lib import ResultLibrary
 
 
 gd = pickle.load(open(os.getenv('GDFILE'),'rb'))
@@ -35,10 +36,16 @@ for key in klist:
         grid = Grid.loadGrid(gridfile[key])
         gp = grid_props.loadProps(gridfile[key].attrs)
         field.computePk(grid, gp)
-        field.computeXi(grid, gp)
+        #field.computeXi(grid, gp)
         field.makeSlice(grid, gp)
 
 
-field.exportResultsToHdf5()
 pickle.dump(field, open(pkl_path, 'wb'), pickle.HIGHEST_PROTOCOL)
+
+rlib = ResultLibrary(field.pkl_path + '_rlib.pkl')
+rlib.addResults(field.getPks())
+rlib.addResults(field.getSlices())
+rlib.addResults(field.get2Dpks())
+pickle.dump(rlib, open(rlib.path, 'wb'), pickle.HIGHEST_PROTOCOL)
+
 gridfile.close()
