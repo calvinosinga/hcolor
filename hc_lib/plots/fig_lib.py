@@ -84,11 +84,6 @@ class FigureLibrary():
     def getFig(self):
         return self.fig, self.panels
     
-    def texStr(self, instr):
-        if isinstance(instr, str):
-            instr = instr.replace('_','\_')
-        return instr
-
     def clf(self):
         plt.clf()
         plt.close()
@@ -128,7 +123,7 @@ class FigureLibrary():
             else:
                 l_ls = linestyles[r_container.props[pprop]]
             
-            ax.plot(x, y, label = self.texStr(l_lab), color = l_c, 
+            ax.plot(x, y, label = l_lab, color = l_c, 
                     linestyle = l_ls)
             
             return
@@ -158,7 +153,7 @@ class FigureLibrary():
             l_ls = _find_line_property(linestyles, '-')
             
             
-            ax.plot(x, y, label = self.texStr(l_lab), color = l_c, 
+            ax.plot(x, y, label = l_lab, color = l_c, 
                     linestyle = l_ls)
             return
         
@@ -645,7 +640,7 @@ class FigureLibrary():
         
         return
     
-    def axisLabel(self, text, axis, pos = [], fsize = 16, rotation = '', usetex=True):
+    def axisLabel(self, text, axis, pos = [], fsize = 16, rotation = ''):
         posdict = {}
         if axis == 'x':
             if rotation == '':
@@ -668,17 +663,17 @@ class FigureLibrary():
         if not pos:
             pos = posdict[axis]
         
-        if not usetex:
-            text= self.texStr(text)
+   #     print(text)
         
         self.fig.text(pos[0], pos[1], text, ha = 'center', va = 'center',
                     fontsize = fsize, rotation = rotation)
         return
     
-    def addLegend(self, panel_idx = (0,0), loc = 'upper right'):
+    def addLegend(self, panel_idx = (0,0), loc = 'upper right', fsize = 12,
+                frameon = False):
         p = self.panels[panel_idx[0]][panel_idx[1]]
         
-        p.legend(loc = loc)
+        p.legend(loc = loc, frameon = frameon, prop = {'size':fsize})
         return
     
     def xLimAdjustToNyquist(self, gridres = -1, box = -1, xleft = -1, panel_exceptions = []):
