@@ -438,6 +438,7 @@ class FigureLibrary():
                 
         p.imshow(plotpk, extent=extent, origin='lower', aspect = 'auto',
                     norm=norm, cmap=cmap)
+        return
 
     def addContours(self, color = 'k', maxks = [5,5], cstep = 0.5):
         for i in range(self.dim[0]):
