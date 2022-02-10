@@ -25,14 +25,16 @@ class FigureLibrary():
         plt.close()
         return
 
-    def saveFig(self, dir_path, rowp, colp, panelp, suffix = ''):
-        outstr = '%sR_%sC_%s'%(rowp, colp, panelp)
+    def saveFig(self, dir_path, suffix = ''):
+        outstr = '%sR_%sC_%s'%(self.rowprop, self.colprop, self.panelprop)
         if not suffix == '':
             outstr += '_' + suffix 
         self.fig.savefig(dir_path + outstr + '.png')
         self.clf()
         return
     
+    def setGspecIndices(self, idxs = None):
+        for i in range(self.
     def createFig(self, nrows, ncols, panel_length = 3, panel_bt = 0.1, 
                 xborder = 1, yborder = 1, height_ratios = None, 
                 width_ratios = None):
@@ -66,9 +68,9 @@ class FigureLibrary():
         
         # making panels list
         panels = []
-        for i in range(self.dim[0]):
+        for i in range(nrows):
             col_panels = []
-            for j in range(self.dim[1]):
+            for j in range(ncols):
                 col_panels.append(fig.add_subplot(gs[i, j]))
                     
             panels.append(col_panels)
@@ -82,12 +84,13 @@ class FigureLibrary():
         self.xborder = xborder
         self.yborder = yborder
         self.figsize = [figwidth, figheight]
+        self.has_cbar_col = False
         return
     
     def _isMatch(self, rc, desired_props):
-        isMatch = True
+        isMatch = not len(desired_props) == 0
         for k,v in desired_props.items():
-            self_val = self.getProp(rc, k)
+            self_val = rc.props[k]
             
             if self_val == 'no key':
                 continue
@@ -152,6 +155,19 @@ class FigureLibrary():
         self.results.extend(results_from_other_rlib)
         return
     
+    def getPropVals(self, propname, rcs = []):
+        if not rcs:
+            rcs = self.results
+        propvals = []
+        for r in rcs:
+            rpval = r.props[propname]
+            if rpval not in propvals:
+                propvals.append(rpval)
+        return propvals
+    
+    
+    def getDim(self):
+        return [self.nrows, self.ncols]
     ################ PLOTTING ROUTINES ########################################
     def plotLine(self, idx, rcs = [], line_kwargs = {}):
         if not rcs:
@@ -169,15 +185,16 @@ class FigureLibrary():
         return
     
 
-    def plotFill(self, idx, rcs = [], fill_kwargs = {}, dark_edges = False,
+    def plotFill(self, idx, iprops, rcs = [], fill_kwargs = {}, dark_edges = False,
                 line_kwargs = {}):
         ys = []
         if not rcs:
             rcs = self.figarr[idx]
 
         for r in rcs:
-            x, y, _ = r.getValues()
-            ys.append(y)
+            if self._isMatch(r, iprops):
+                x, y, _ = r.getValues()
+                ys.append(y)
         ys = np.array(ys)
 
         p = self.panels[idx[0]][idx[1]]
@@ -194,7 +211,7 @@ class FigureLibrary():
         line_kwargs['visible'] = dark_edges
         line_kwargs['label'] = '_nolegend_'
         line_kwargs['color'] = fill_kwargs['color']
-
+        
         p.plot(x,mn, **line_kwargs)
         p.plot(x,mx, **line_kwargs)
         p.fill_between(x, mn, mx, **fill_kwargs)
@@ -223,7 +240,6 @@ class FigureLibrary():
         return
     
     
-    # def plot2D(self, idx, kpar, kper, pk, maxks=[5,5], cstep=0.5, color='k'):
     def plot2D(self, idx, rc = None, maxks = [5, 5], cstep = 0.5, ctr_kwargs = {},
                 im_kwargs = {}):
 
@@ -262,18 +278,18 @@ class FigureLibrary():
     
     def _defaultNorms(self):
         if self.rt == '2Dpk':
-            vlim_list = [[-2, 4] for i in range(self.dim[0])]
-            norm_arr = np.empty(self.dim, dtype = object)
-            for i in range(self.dim[0]):
-                for j in range(self.dim[1]):
+            vlim_list = [[-2, 4] for i in range(self.nrows)]
+            norm_arr = np.empty((self.nrows, self.ncols), dtype = object)
+            for i in range(self.nrows):
+                for j in range(self.ncols):
                     vlim = vlim_list[i]
                     norm_arr[i,j] = mpl.colors.Normalize(vmin=vlim[0], vmax=vlim[1])
 
         elif self.rt == 'slice':
-            vlim_list = [[2, 12.5] for i in range(self.dim[0])]
-            norm_arr = np.empty(self.dim, dtype = object)
-            for i in range(self.dim[0]):
-                for j in range(self.dim[1]):
+            vlim_list = [[2, 12.5] for i in range(self.nrows)]
+            norm_arr = np.empty((self.nrows, self.ncols), dtype = object)
+            for i in range(self.nrows):
+                for j in range(self.ncols):
                     vlim = vlim_list[i]
                     norm_arr[i,j] = mpl.colors.Normalize(vmin=vlim[0], vmax=vlim[1])
         
@@ -286,14 +302,14 @@ class FigureLibrary():
             self.norm_arr = self._defaultNorms()
         else:
             self.norm_arr = norm_arr
-        
+        self.has_cbar_col = True
         return
     
     def _defaultCmaps(self):
         cmap_name = 'plasma'
         under = 'w'
         over = None
-        cmap_arr = np.empty(self.dim, dtype=object)
+        cmap_arr = np.empty((self.nrows, self.ncols), dtype=object)
         cmap = copy.copy(mpl.cm.get_cmap(cmap_name))
         if not under is None:
             cmap.set_under(under)
@@ -308,6 +324,7 @@ class FigureLibrary():
             self.cmap_arr = self._defaultCmaps()
         else:
             self.cmap_arr = cmap_arr
+        self.has_cbar_col = True
         return
     
     def makeCbar(self, idx, label = '', label_kwargs = {}):
@@ -317,12 +334,13 @@ class FigureLibrary():
         cbar = self.fig.colorbar(mpl.cm.ScalarMappable(norm=norm, cmap=cmap), cax=p)
         p.set_aspect(12, anchor = 'W')
         cbar.set_label(label, **label_kwargs)
+        self.has_cbar_col = True
         return
 
 
 
     ########### HANDLING LABELS #########################################################
-    def rowlabels(self, rowlabels, colidx = 0, pos = (0.05, 0.05), txt_kwargs = {}):
+    def rowLabels(self, rowlabels, colidx = 0, pos = (0.05, 0.05), txt_kwargs = {}):
         if 'va' not in txt_kwargs:
             txt_kwargs['va'] = 'bottom'
         
@@ -402,7 +420,7 @@ class FigureLibrary():
             if 'rotation' not in txt_kwargs:
                 txt_kwargs['rotation'] = 'horizontal'
             if self.has_cbar_col:
-                ncols = self.dim[1] # does not include cbar panel
+                ncols = self.ncols - 1 # does not include cbar panel
                 image_length = ncols * self.panel_length + \
                         self.panel_bt[0] * (ncols - 1)
                 
@@ -424,8 +442,11 @@ class FigureLibrary():
         
         if 'fontsize' not in txt_kwargs:
             txt_kwargs['fontsize'] = 16
-        self.fig.text(pos[0], pos[1], text, ha = 'center', va = 'center',
-                    **txt_kwargs)
+        if 'ha' not in txt_kwargs:
+            txt_kwargs['ha'] = 'center'
+        if 'va' not in txt_kwargs:
+            txt_kwargs['va'] = 'center'
+        self.fig.text(pos[0], pos[1], text, **txt_kwargs)
         return
     
     def addLegend(self, idx = (0,0), kwargs = {}):
@@ -450,9 +471,9 @@ class FigureLibrary():
     
     def _defaultTickLabelPanelExceptions(self, axis):
         if axis == 'y':
-            return [(i, 0) for i in range(self.dim[0])]
+            return [(i, 0) for i in range(self.nrows)]
         elif axis == 'x':
-            return [(self.dim[0]-1, i) for i in range(self.dim[1])]
+            return [(self.nrows-1, i) for i in range(self.ncols)]
         else:
             return
         
@@ -468,21 +489,22 @@ class FigureLibrary():
         self.removeYTickLabels()
         return
     
-    def changeTickParams(self, kwargs, panel_exceptions):
+    def changeTickParams(self, kwargs = {}, panel_exceptions=[]):
         if not 'direction' in kwargs:
             kwargs['direction'] = 'in'
-
-        for i in range(self.dim[0]):
-            for j in range(self.dim[1]):
+        
+        if not 'which' in kwargs:
+            kwargs['which'] = 'both'
+        for i in range(self.nrows):
+            for j in range(self.ncols):
                 if (i,j) not in panel_exceptions:
                     self.panels[i][j].tick_params(axis='both', **kwargs)
         return
 
     def _removeTickLabels(self, axis, panel_exceptions = []):
-        dim = self.dim
         
-        for i in range(dim[0]):
-            for j in range(dim[1]):
+        for i in range(self.nrows):
+            for j in range(self.ncols):
                 if (i, j) not in panel_exceptions:
                     p = self.panels[i][j]
                     if axis == 'y':
@@ -492,16 +514,31 @@ class FigureLibrary():
         return
     
     ############### HANDLING AXES ########################################3
+    def _getLimits(self, panel_exceptions = []):
+        ylims = np.zeros((self.nrows, self.ncols, 2))
+        xlims = np.zeros_like(ylims)
+        for i in range(self.nrows):
+            for j in range(self.ncols):
+                p = self.panels[i][j]
+                ymin, ymax = p.get_ylim()
+                xmin, xmax = p.get_xlim()
+
+                if (i, j) in panel_exceptions:
+                    ylims[i,j,:] = np.nan
+                    xlims[i,j,:] = np.nan
+                else:
+                    ylims[i,j,0], ylims[i,j,1] = ymin, ymax
+                    xlims[i,j,0], xlims[i,j,1] = xmin, xmax
+        return xlims, ylims
 
     def xLimAdjustToNyquist(self, panel_exceptions = []):
-        dim = self.dim
         
-        for i in range(dim[0]):
-            for j in range(dim[1]):
+        for i in range(self.nrows):
+            for j in range(self.ncols):
                 if (i, j) not in panel_exceptions:
                     p = self.panels[i][j]
                     
-                    res_container_list = self.figArr[i, j]
+                    res_container_list = self.figarr[i, j]
                     xmin, xmax = p.get_xlim()
                     nyq = xmax
                     mink = np.inf
@@ -528,8 +565,8 @@ class FigureLibrary():
     
     def flushYAxisToData(self, result_type = 'pk', panel_exceptions = []):
         
-        for i in range(self.dim[0]):
-            for j in range(self.dim[1]):
+        for i in range(self.nrows):
+            for j in range(self.ncols):
                 if (i, j) not in panel_exceptions:
                     p = self.panels[i][j]
                     lines = p.get_lines()
@@ -558,7 +595,6 @@ class FigureLibrary():
     
     def matchAxisLimits(self, which = 'both', panel_exceptions = [], match_line = True):
         xlims, ylims = self._getLimits(panel_exceptions)
-        dim = self.dim
         
         new_xlims = np.ma.masked_invalid(xlims)
         new_ylims = np.ma.masked_invalid(ylims)
@@ -589,12 +625,24 @@ class FigureLibrary():
                 ylims[i,:,0]=min_ylims[i]
                 ylims[i,:,1] = max_ylims[i]
             
-        for i in range(dim[0]):
-            for j in range(dim[1]):
+        for i in range(self.nrows):
+            for j in range(self.ncols):
                 if (i,j) not in panel_exceptions:
                     p = self.panels[i][j]
                     if which == 'both' or which == 'x':
                         p.set_xlim(xlims[i,j,0], xlims[i,j,1])
                     if which == 'both' or which == 'y':
                         p.set_ylim(ylims[i,j,0], ylims[i,j,1])
+        return
+    
+    def logAxis(self, which = 'both', panel_exceptions = []):
+        
+        for i in range(self.nrows):
+            for j in range(self.ncols):
+                p = self.panels[i][j]
+
+                if which == 'both' or which == 'x':
+                    p.set_xscale('log')
+                if which == 'both' or which == 'y':
+                    p.set_yscale('log')
         return
