@@ -11,6 +11,7 @@ class FigureLibrary():
         self.rt = result_type
         self.fig = None
         self.panels = None
+        self.gsidx = None
         return
     
     ########## HANDLING FIGURE ORGANIZATION/CREATION #################################
@@ -33,8 +34,10 @@ class FigureLibrary():
         self.clf()
         return
     
-    def setGspecIndices(self, idxs = None):
-        for i in range(self.
+    def setGspecIndices(self, idxs):
+        self.gsidx = idxs
+        return
+
     def createFig(self, nrows, ncols, panel_length = 3, panel_bt = 0.1, 
                 xborder = 1, yborder = 1, height_ratios = None, 
                 width_ratios = None):
@@ -60,6 +63,38 @@ class FigureLibrary():
         
         fig = plt.figure(figsize=(figwidth, figheight))
 
+        self.fig = fig
+        self.nrows = nrows
+        self.ncols = ncols
+        self.panel_length = panel_length
+        self.panel_bt = panel_bt
+        self.xborder = xborder
+        self.yborder = yborder
+        self.figsize = [figwidth, figheight]
+        self.has_cbar_col = False
+
+        return
+    
+    def createFigGrid(self, nrows, ncols, panel_length = 3, panel_bt = 0.1, 
+                xborder = 1, yborder = 1, height_ratios = None, 
+                width_ratios = None):
+
+        # create Figure
+        self.createFig(nrows, ncols, panel_length, panel_bt, 
+                xborder, yborder, height_ratios, 
+                width_ratios)
+
+        figheight = self.figsize[0]
+        figwidth = self.figsize[1]
+
+        # set default gspec idxs if not already set
+        if self.gsidx is None:
+            gsidx = []
+            for i in range(self.nrows):
+                for j in range(self.ncols):
+                    gsidx.append((i,j))
+            self.setGspecIndices(gsidx)
+        
         # creating gridspec
         gs = gspec.GridSpec(nrows, ncols, left= xborder[0]/figwidth, right=1-xborder[1]/figwidth,
                 top=1-yborder[1]/figheight, bottom=yborder[0]/figheight,
@@ -67,24 +102,12 @@ class FigureLibrary():
                 height_ratios = height_ratios, width_ratios = width_ratios)
         
         # making panels list
-        panels = []
-        for i in range(nrows):
-            col_panels = []
-            for j in range(ncols):
-                col_panels.append(fig.add_subplot(gs[i, j]))
-                    
-            panels.append(col_panels)
+        panels = np.empty((nrows, ncols), dtype=object)
+        for idx in self.gsidx:
+            panels[idx] = self.fig.add_subplot(gs[idx])
+
         
-        self.fig = fig
-        self.nrows = nrows
-        self.ncols = ncols
         self.panels = panels
-        self.panel_length = panel_length
-        self.panel_bt = panel_bt
-        self.xborder = xborder
-        self.yborder = yborder
-        self.figsize = [figwidth, figheight]
-        self.has_cbar_col = False
         return
     
     def _isMatch(self, rc, desired_props):
