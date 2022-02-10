@@ -42,11 +42,6 @@ class FigureLibrary():
                 xborder = 1, yborder = 1, height_ratios = None, 
                 width_ratios = None):
 
-        if height_ratios is None:
-            height_ratios = np.ones(nrows)*panel_length
-        
-        if width_ratios is None:
-            width_ratios = np.ones(ncols)*panel_length
         # border input can be either a list or single number
         if isinstance(xborder, float) or isinstance(xborder, int):
             xborder = [xborder, xborder]
@@ -75,26 +70,22 @@ class FigureLibrary():
 
         return
     
-    def createFigGrid(self, nrows, ncols, panel_length = 3, panel_bt = 0.1, 
-                xborder = 1, yborder = 1, height_ratios = None, 
-                width_ratios = None):
+    def createGrid(self, height_ratios = None, width_ratios= None):
+        # needed fig params
+        nrows = self.nrows
+        ncols = self.ncols
+        figheight = self.figsize[1]
+        figwidth = self.figsize[0]
+        yborder = self.yborder
+        xborder = self.xborder
+        panel_bt = self.panel_bt
+        panel_length = self.panel_length
 
-        # create Figure
-        self.createFig(nrows, ncols, panel_length, panel_bt, 
-                xborder, yborder, height_ratios, 
-                width_ratios)
-
-        figheight = self.figsize[0]
-        figwidth = self.figsize[1]
-
-        # set default gspec idxs if not already set
-        if self.gsidx is None:
-            gsidx = []
-            for i in range(self.nrows):
-                for j in range(self.ncols):
-                    gsidx.append((i,j))
-            self.setGspecIndices(gsidx)
+        if height_ratios is None:
+            height_ratios = np.ones(nrows)*panel_length
         
+        if width_ratios is None:
+            width_ratios = np.ones(ncols)*panel_length
         # creating gridspec
         gs = gspec.GridSpec(nrows, ncols, left= xborder[0]/figwidth, right=1-xborder[1]/figwidth,
                 top=1-yborder[1]/figheight, bottom=yborder[0]/figheight,
@@ -108,6 +99,28 @@ class FigureLibrary():
 
         
         self.panels = panels
+        return
+
+    def createFigGrid(self, nrows, ncols, panel_length = 3, panel_bt = 0.1, 
+                xborder = 1, yborder = 1, height_ratios = None, 
+                width_ratios = None):
+
+        # create Figure
+        self.createFig(nrows, ncols, panel_length, panel_bt, 
+                xborder, yborder, height_ratios, 
+                width_ratios)
+
+        
+        # set default gspec idxs if not already set
+        if self.gsidx is None:
+            gsidx = []
+            for i in range(self.nrows):
+                for j in range(self.ncols):
+                    gsidx.append((i,j))
+            self.setGspecIndices(gsidx)
+        
+        # create gspec
+        self.createGrid(width_ratios, height_ratios)
         return
     
     def _isMatch(self, rc, desired_props):
@@ -178,6 +191,11 @@ class FigureLibrary():
         self.results.extend(results_from_other_rlib)
         return
     
+    def setDim(self, nrows, ncols):
+        self.nrows = nrows
+        self.ncols = ncols
+        return
+
     def getPropVals(self, propname, rcs = []):
         if not rcs:
             rcs = self.results
