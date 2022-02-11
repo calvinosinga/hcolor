@@ -39,8 +39,7 @@ class FigureLibrary():
         return
 
     def createFig(self, nrows, ncols, panel_length = 3, panel_bt = 0.1, 
-                xborder = 1, yborder = 1, height_ratios = None, 
-                width_ratios = None):
+                xborder = 1, yborder = 1):
 
         # border input can be either a list or single number
         if isinstance(xborder, float) or isinstance(xborder, int):
@@ -125,8 +124,6 @@ class FigureLibrary():
     
     def _isMatch(self, rc, desired_props):
         isMatch = True
-        if not desired_props:
-            return False
 
         for k,v in desired_props.items():
             self_val = rc.props[k]
@@ -162,14 +159,15 @@ class FigureLibrary():
     def getMatchingResults(self, iprops, rmprops):
         matches = []
         for r in self.results:
-            if self._isMatch(r, iprops) and not self._isMatch(r, rmprops):
-                matches.append(r)
-        print(rmprops)
+            if self._isMatch(r, iprops):
+                if not rmprops:
+                    matches.append(r)
+                elif not self._isMatch(r, rmprops):
+                    matches.append(r)
         return matches
     
     def arrangeResults(self, iprops, rowp, rowvals,
             colp, colvals, panelp, rmprops = {}):
-        print(rmprops)
         figarr = np.empty((self.nrows, self.ncols), dtype = object)
         for i in range(self.nrows):
             for j in range(self.ncols):
@@ -186,7 +184,8 @@ class FigureLibrary():
     
     def setResultArray(self, figarr):
         self.figarr = figarr
-        return
+        return                    
+
 
     ################ DATA ACCESS/MANAGEMENT ############################################
     def addResults(self, rlib):
@@ -204,15 +203,17 @@ class FigureLibrary():
             rcs = self.results
         propvals = []
         for r in rcs:
-            rpval = r.props[propname]
-            if rpval not in propvals:
-                propvals.append(rpval)
+            if propname in r.props:
+                rpval = r.props[propname]
+                if rpval not in propvals:
+                    propvals.append(rpval)
         return propvals
     
     
     def getDim(self):
         return [self.nrows, self.ncols]
-    ################ PLOTTING ROUTINES ########################################
+    
+    ################ INDIVIDUAL PANEL PLOTTING ROUTINES #############
     def plotLine(self, idx, rcs = [], line_kwargs = {}):
         if not rcs:
             rcs = self.figarr[idx]
@@ -382,7 +383,69 @@ class FigureLibrary():
         return
 
 
+    ########### AUTOMATIC PLOTTING ROUTINES #############################################
+    def plotpk(self, rowp, colp, panelp, iprops, rmprops, 
+                cdict, ldict):
+        rowlabels = self.getPropVals(rowp)
+        collabels = self.getPropVals(colp)
 
+        self.createFigGrid(len(rowlabels), len(collabels))
+
+        self.arrangeResults(iprops, rowp, rowlabels, colp, collabels,
+                panelp, rmprops)
+        
+        dim = self.getDim()
+        for i in range(dim[0]):
+            for j in range(dim[1]):
+                idx = (i, j)
+                # find if any results have same panelp
+                res_in_panel = {}
+
+                # if they have the same panelp, also give them
+                # a unique color
+                for rc in self.figarr[idx]:
+                    panel_val = rc.props[panelp]
+                    if panel_val not in res_in_panel:
+                        res_in_panel[panel_val] = [rc]
+
+                    else:
+                        res_in_panel[panel_val].extend(rc)
+                    
+                # if mult. results have same panel_val, they are
+                # plotted as fillbt
+                
+                for panel_val in res_in_panel:
+                    results_with_val = res_in_panel[panel_val]
+                    kwargs = {'color':cdict[panel_val], 
+                            'label':ldict[panel_val]}
+                    if len(results_with_val) == 1:
+                        self.plotLine(idx, results_with_val, kwargs)
+                    else:
+                        iprops = {panelp:panel_val}
+                        self.plotFill(idx, iprops, results_with_val, kwargs)
+
+        # axes
+        self.logAxis()
+        self.xLimAdjustToNyquist()
+        self.flushYAxisToData()
+        self.matchAxisLimits()
+
+        # ticks
+        self.removeDefaultTickLabels()
+        self.changeTickParams()
+
+        # labels
+        self.colLabels(collabels)
+        self.rowLabels(rowlabels)
+        if self.ncols > 1:
+            self.addLegend((0, 1))
+        else:
+            self.addLegend((1, 0), {'loc':'upper right'})
+
+        self.axisLabel('x')
+        self.axisLabel('y', txt_kwargs={'rotation':'vertical'})
+
+        return
     ########### HANDLING LABELS #########################################################
     def rowLabels(self, rowlabels, colidx = 0, pos = (0.05, 0.05), txt_kwargs = {}):
         if 'va' not in txt_kwargs:

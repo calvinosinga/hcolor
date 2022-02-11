@@ -1,11 +1,9 @@
+#!/usr/bin/env python3
 """
 This file is responsible for the creation of the contituent sbatch files that make
 up the pipeline.
 """
-import os
 import h5py as hp
-from hc_lib.fields.galaxy import galaxy
-import copy
 class Sbatch():
 
     def __init__(self, gd, fieldname, run_params):
