@@ -30,7 +30,7 @@ class FigureLibrary():
         outstr = '%sR_%sC_%s'%(self.rowprop, self.colprop, self.panelprop)
         if not suffix == '':
             outstr += '_' + suffix 
-        self.fig.savefig(dir_path + outstr + '.png')
+        self.fig.savefig(dir_path + outstr + '.pdf')
         self.clf()
         return
     
@@ -124,7 +124,10 @@ class FigureLibrary():
         return
     
     def _isMatch(self, rc, desired_props):
-        isMatch = not len(desired_props) == 0
+        isMatch = True
+        if not desired_props:
+            return False
+
         for k,v in desired_props.items():
             self_val = rc.props[k]
             
@@ -161,12 +164,12 @@ class FigureLibrary():
         for r in self.results:
             if self._isMatch(r, iprops) and not self._isMatch(r, rmprops):
                 matches.append(r)
-        
+        print(rmprops)
         return matches
     
     def arrangeResults(self, iprops, rowp, rowvals,
             colp, colvals, panelp, rmprops = {}):
-        
+        print(rmprops)
         figarr = np.empty((self.nrows, self.ncols), dtype = object)
         for i in range(self.nrows):
             for j in range(self.ncols):
