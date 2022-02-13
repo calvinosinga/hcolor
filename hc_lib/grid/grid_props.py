@@ -356,6 +356,8 @@ class ptl_grid_props(grid_props):
             stsp = op['species'] == 'stmass'
             match = fid_colcut and fid_res and stsp
             return match and super().isCompatible(other)
+        elif op['fieldname'] == 'galaxy_dust':
+            return False
         else:
             return super().isCompatible(other)
 ################################################################################################################
@@ -386,7 +388,7 @@ class vn_grid_props(grid_props):
         op = other.props
 
         # vnXgalaxy 
-        if 'galaxy' in op['fieldname']:
+        if 'galaxy' == op['fieldname']:
             
             if op['gal_res'] == 'diemer':
                 # the important color definitions
@@ -407,7 +409,9 @@ class vn_grid_props(grid_props):
             # if all = base, then exclude
             elif op['color'] == 'all':
                 return False
-
+        
+        elif 'galaxy_dust' == op['fieldname']:
+            return False
         # vnXptl
         else:
             return sp['map'] == 'mass' and super().isCompatible(other)
