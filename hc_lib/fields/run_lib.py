@@ -109,14 +109,15 @@ def galaxyResDefs(simname):
 
     #galaxy_min_resolution['anderson_2df'] = {'b_j':(-np.inf, 19.45), 'r_f':(-np.inf, 21)}
 
-    galaxy_min_resolution['low-threshold'] = {'stmass':(thres, np.inf)}
-    galaxy_min_resolution['mid-threshold'] = {'stmass':(10**9, np.inf)}
-    galaxy_min_resolution['high-threshold'] = {'stmass':(10**10, np.inf)}
-    galaxy_min_resolution['higher-threshold'] = {'stmass':(10**11, np.inf)}
-    galaxy_min_resolution['low-bin'] = {'stmass':(thres, 10**9)}
-    galaxy_min_resolution['mid-bin'] = {'stmass':(10**9, 10**10)}
-    galaxy_min_resolution['high-bin'] = {'stmass':(10**10, 10**11)}
-    galaxy_min_resolution['higher-bin'] = {'stmass':(10**11, np.inf)}
+    # calculate the magnitude orders to get threshold/bin tests
+    oom = int(np.log10(thres))
+
+    galaxy_min_resolution['low-threshold'] = {'stmass':(10**(oom+1), np.inf)}
+    galaxy_min_resolution['mid-threshold'] = {'stmass':(10**(oom+2), np.inf)}
+    galaxy_min_resolution['high-threshold'] = {'stmass':(10**(oom+3), np.inf)}
+    galaxy_min_resolution['low-bin'] = {'stmass':(thres, 10**(oom+1))}
+    galaxy_min_resolution['mid-bin'] = {'stmass':(10**(oom+1), 10**(oom+2))}
+    galaxy_min_resolution['high-bin'] = {'stmass':(10**(oom+2), 10**(oom+3))}
 
     return galaxy_min_resolution
 
@@ -136,16 +137,19 @@ def galaxyObsColorDefs():
 def getMolFracModelsPtl():
     return ['GD14', 'GK11', 'S14', 'K13']
 
-def HIResolutionDefinitions():
+def HIResolutionDefinitions(simname):
     # taken from Pillepich et al 2018, table 1 (in solar masses)
     mean_baryon_cell = {'tng100':1.4e6, 'tng100-2':11.2e6, 'tng100-3':89.2e6,
             'tng300':11e6, 'tng300-2':88e6, 'tng300-3':703e6}
+    thres = mean_baryon_cell[simname] * 200
+
     res_defs = {}
     #res_defs['papastergis_ALFALFA'] = {'HI':(10**7.5, np.inf)} 
     res_defs['diemer'] = {'HI':(0, np.inf)} # by default, already implemented on data
     res_defs['low-threshold'] = {'HI':(10**7, np.inf)}
     res_defs['mid-threshold'] = {'HI':(10**8, np.inf)}
     res_defs['high-threshold'] = {'HI':(10**9, np.inf)}
+    
     res_defs['lowest-bin'] = {'HI':(-np.inf, 10**7)}
     res_defs['low-bin'] = {'HI':(10**7,10**8)}
     res_defs['mid-bin'] = {'HI':(10**8,10**9)}

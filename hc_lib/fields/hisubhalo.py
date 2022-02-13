@@ -34,10 +34,8 @@ class hisubhalo(Field):
         mas = ['CICW']
         spaces = ['redshift', 'real']
         
-        if self.simname == 'tng100':
-            res = list(HIResolutionDefinitions().keys())
-        else:
-            res = ['diemer']
+        res = list(HIResolutionDefinitions(self.simname).keys())
+
         grp = {}
         for m in models:
             for s in spaces:
@@ -106,7 +104,7 @@ class hisubhalo(Field):
         return
 
     def getResolvedSubhalos(self, mass, resdef):
-        resdict = HIResolutionDefinitions()[resdef]
+        resdict = HIResolutionDefinitions(self.simname)[resdef]
         mask = np.ones_like(mass, dtype=bool)
         for k, v in resdict.items():
             if k == 'HI':

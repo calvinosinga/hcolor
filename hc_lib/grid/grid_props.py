@@ -110,10 +110,10 @@ class galaxy_grid_props(grid_props):
 
         # for galaxyXgalaxy
         if op['fieldname'] == sp['fieldname']:
-            stmass_or_total = op['species'] == sp['species']
-            resdef_match = op['gal_res'] == sp['gal_res'] and op['gal_res'] == 'diemer'
-            coldef_match = op['color_cut'] == sp['color_cut'] and sp['color_cut'] == '0.60'
-            return stmass_or_total and resdef_match and coldef_match and super().isCompatible(other)
+            both_stmass = op['species'] == 'stmass' and sp['species'] == 'stmass'
+            both_diemer = sp['gal_res'] == 'diemer' and op['gal_res'] == 'diemer'
+            both_fid_cc = sp['color_cut'] == '0.60' and op['color_cut'] == '0.60'
+            return both_stmass and both_diemer and both_fid_cc and super().isCompatible(other)
         
         # hiptlXgalaxy handled by hiptl
         
@@ -125,81 +125,33 @@ class galaxy_grid_props(grid_props):
         return super().isCompatible(other)
 
     def isIncluded(self):
-
-        def test(cds, mts, schts):
-            cdtest = self.props['color_cut'] in cds
-            mtest = self.props['species'] in mts
-            mastest = self.props['mas'] in schts
-            return cdtest and mtest and mastest
         
         def only_pk():
             self.props['compute_xi'] = False
             self.props['compute_slice'] = False
 
-        # if self.props['gal_res'] == 'papastergis_SDSS':
-        #     cds = ['papastergis_SDSS']
-        #     ms = ['stmass']
-        #     schts = ['CIC']
-        #     only_pk()
-        #     return test(cds, ms, schts)
-        
-        # elif self.props['gal_res'] == 'wolz_wiggleZ':
-        #     cds = ['wolz_wiggleZ']
-        #     ms = ['stmass']
-        #     schts = ['CIC']
-        #     only_pk()
-        #     return test(cds, ms, schts) and self.props['color'] == 'red'
-        
-        # elif self.props['gal_res'] == 'wolz_eBOSS_ELG':
-        #     cds = ['wolz_eBOSS_ELG']
-        #     ms = ['stmass']
-        #     schts = ['CIC']
-        #     only_pk()
-        #     return test(cds, ms, schts) and self.props['color'] == 'blue'
 
-        # elif self.props['gal_res'] == 'wolz_eBOSS_LRG':
-        #     cds = ['wolz_eBOSS_LRG']
-        #     ms = ['stmass']
-        #     schts = ['CIC']
-        #     only_pk()
-        #     return test(cds, ms, schts) and self.props['color'] == 'red'
-
-        # elif self.props['gal_res'] == 'anderson_2df':
-        #     cds = ['anderson_2df']
-        #     ms = ['stmass']
-        #     schts = ['CIC']
-        #     only_pk()
-        #     return test(cds, ms, schts)
-
-
-        # everything that isn't a color definition associated with an observation is fine
         if self.props['gal_res'] == 'diemer':
             obs_color_cuts = rl.galaxyObsColorDefs()
             coldef_is_compatible = not (self.props['color_cut'] in obs_color_cuts)
             # CIC between stmass and all mass should be the same - removing redundancy
             is_CICW = self.props['mas'] == 'CICW'
-            is_CIC_and_stmass = self.props['mas'] == 'CIC' and self.props['species'] == 'stmass'
+            # is_CIC_and_stmass = self.props['mas'] == 'CIC' and self.props['species'] == 'stmass'
 
-            return coldef_is_compatible and (is_CICW or is_CIC_and_stmass)
+            return coldef_is_compatible and is_CICW
 
         elif 'threshold' in self.props['gal_res'] or 'bin' in self.props['gal_res']:
             fid_colcut = self.props['color_cut'] == '0.60'
             is_resolved = self.props['color'] == 'resolved'
             only_pk()
-            is_cicw = self.props['mas'] == 'CICW'
             is_stmass = self.props['species'] == 'stmass'
-            return (fid_colcut or is_resolved) and is_cicw and is_stmass
-        # # if this is gridprop obj for resolved, then
-        # elif self.props['color'] == 'resolved':
-        #     # removing redundancy in CIC with both kinds of mass
-        #     is_CICW = self.props['mas'] == 'CICW'
-        #     is_CIC_and_stmass = self.props['mas'] == 'CIC' and self.props['species'] == 'stmass'
-        #     return is_CICW or is_CIC_and_stmass
+            return (fid_colcut or is_resolved) and is_stmass
         
+        # if there isnt' a resolution definition, must be 'all'
         elif self.props['color'] == 'all':
             is_CICW = self.props['mas'] == 'CICW'
-            is_CIC_and_stmass = self.props['mas'] == 'CIC' and self.props['species'] == 'stmass'
-            return is_CICW or is_CIC_and_stmass
+            return is_CICW
+
         return False
 
 ############################################################################################################
@@ -226,27 +178,23 @@ class hiptl_grid_props(grid_props):
             prm.append(val)
         
         return hiptl_grid_props(prm[0], prm[1], prm[2], prm[3], prm[4])
+    
     def isIncluded(self):
         sp = self.props
         if not sp['model'] == 'GD14':
             self.props['compute_xi'] = False
             self.props['compute_slice'] = False
         return super().isIncluded and self.props['map'] == 'mass'
+    
     def isCompatible(self, other):
         sp = self.props
         op = other.props
 
-        # hiptl/h2ptlXgalaxy/galaxy_dust
-        if 'galaxy' in op['fieldname']:
-            # for comparisons to Anderson and Wolz -> stmass/resdef is eBOSS, wiggleZ, 2df
-            if 'temp' == sp['map']:
-                obs_defs = rl.galaxyObsColorDefs()
-                obs_defs.remove('papastergis_SDSS')
-                match_obs = op['gal_res'] in obs_defs and op['color_cut'] in obs_defs
-                return match_obs and super().isCompatible(other)
+        # hiptl/h2ptlXgalaxy
+        if 'galaxy' == op['fieldname']:
             
             # if a mass map, it is either diemer
-            elif op['gal_res'] == 'diemer':
+            if op['gal_res'] == 'diemer':
                 # the important color definitions
                 # cols = ['0.60', '0.55', '0.65', 'visual_inspection']
 
@@ -260,22 +208,23 @@ class hiptl_grid_props(grid_props):
                 return galcheck and super().isCompatible(other)
             
             elif 'bin' in op['gal_res'] or 'threshold' in op['gal_res']:
-                is_resolved = op['color'] == 'resolved'
-                fid_colcut = op['color_cut'] == '0.60'
-                is_stmass = op['species'] == 'stmass'
-                galcheck = (is_resolved or fid_colcut) and is_stmass
+                # is_resolved = op['color'] == 'resolved'
+                # fid_colcut = op['color_cut'] == '0.60'
+                # is_stmass = op['species'] == 'stmass'
+                # galcheck = (is_resolved or fid_colcut) and is_stmass
 
                 
-                return galcheck and super().isCompatible(other)
+                # return galcheck and super().isCompatible(other)
+                return False # Just want to compare with hisubhalo
 
-            # ignore all papa resdefs -> hisubhalo is more comparable
-            elif op['gal_res'] == 'papastergis_SDSS':
-                return False
             
-            # if all = color, then include
+            # if all = color, then exclude
             elif op['color'] == 'all':
-                return super().isCompatible(other) and op['species'] == 'stmass'
+                return False
 
+        # hiptlXgalaxy_dust
+        elif 'galaxy_dust' == op['fieldname']:
+            return False
         # hiptlXptl
         else:
             # include if mass map, not temp map
@@ -308,27 +257,23 @@ class hisubhalo_grid_props(grid_props):
         return hisubhalo_grid_props(prm[0], prm[1], prm[2], prm[3], prm[4])
     
     def isIncluded(self):
-        def test(schts):
-            mastest = self.props['mas'] in schts
-            return mastest
         
         def only_pk():
             self.props['compute_xi'] = False
             self.props['compute_slice'] = False
             return
         
-        
         sp = self.props
-        if sp['HI_res'] == 'papastergis_ALFALFA':
-            mas = ['CIC']
-            only_pk()
-            return test(mas) and sp['fieldname'] == 'hisubhalo'
-        elif 'bin' in sp['HI_res'] or 'threshold' in sp['HI_res']:
-            is_cicw = sp['mas'] == 'CICW'
-            only_pk()
-            return is_cicw
+        if 'bin' in sp['HI_res'] or 'threshold' in sp['HI_res']:
+            # calculate auto power spectrum to test how clustering changes
+            # with HI mass
 
-        return True
+            # want both CIC and CICW
+            only_pk()
+            return sp['mas'] == 'CICW'
+        else:
+            # in all other cases, we JUST want CICW
+            return sp['mas'] == 'CICW'
     
     def setupGrids(self, outfile):
         return super().setupGrids(outfile)
@@ -336,61 +281,49 @@ class hisubhalo_grid_props(grid_props):
     def isCompatible(self, other):
         sp = self.props
         op = other.props
+
+        # if hisubhalo doesnt have diemer resolution definition, don't calculate
+        # cross-power because it ends up looking strange/isn't interesting.
+        if 'threshold' or 'bin' in sp['HI_res']:
+            return False
+
         # hisubhaloXgalaxy
-        if 'galaxy' in op['fieldname']:
-            # if both have papastergis resolution definition, include only hisubhalo
-            if op['gal_res'] == 'papastergis_SDSS':
-                #return sp['HI_res'] == 'papastergis_ALFALFA'
-                return False # returning false because trying to compare to papastergis is
-                # going to be qualitatively difficult
-            
-            # if diemer resdef, include certain color definitions and resolved definition
-            elif op['gal_res'] == 'diemer':
-                # cdefs = ['0.55','0.60','0.65', 'visual_inspection']
+        if 'galaxy' == op['fieldname']:
+            # we have diemer, bin/threshold gal_res to handle
+
+            # if diemer resdef, include fiducial color_cut and resolved definition
+            if op['gal_res'] == 'diemer':
                 is_resolved = op['color'] == 'resolved'
                 fid_colcut = op['color_cut'] == '0.60'
                 is_stmass = op['species'] == 'stmass'
+                # don't want total mass
                 check_gal_props = (is_resolved or fid_colcut) and is_stmass
 
-
+                # also make sure they are in the same space and have same MAS
                 return check_gal_props and super().isCompatible(other)
             
+
             elif 'bin' in op['gal_res'] or 'threshold' in op['gal_res']:
                 is_resolved = op['color'] == 'resolved'
                 fid_colcut = op['color_cut'] == '0.60'
                 is_stmass = op['species'] == 'stmass'
                 check_gal_props = (is_resolved or fid_colcut) and is_stmass
 
+                # only calculate cross-power with fiducial HI_res
                 is_diemer = sp['HI_res'] == 'diemer'
 
                 return check_gal_props and is_diemer and super().isCompatible(other)
 
-            # # don't include other observational stuff temporarily
-            # elif op['gal_res'] == 'wolz_eBOSS_ELG':
-            #     return False
-            
-            # elif op['gal_res'] == 'wolz_eBOSS_LRG':
-            #     return False
-            
-            # elif op['gal_res'] == 'wolz_wiggleZ':
-            #     return False
-            
-            # elif op['gal_res'] == 'anderson_2df':
-                # return False
                 
-            # if all galaxies, also include
             elif op['color'] == 'all':
-                return super().isCompatible(other) and op['species'] == 'stmass'
+                return False
             
             return False
+        # hisubhaloXgalaxy_dust
+        elif 'galaxy_dust' == op['fieldname']:
+            return False
         
-        # elif op['fieldname'] == 'ptl':
-        #     if sp['fieldname'] == 'hisubhalo':
-        #         models = rl.getMolFracModelsGalHI()
-        #     elif sp['fieldname'] == 'h2subhalo':
-        #         models = rl.getMolFracModelsGalH2()
-            
-        #     return sp['model'] == models[0] # compute cross power with just one
+        # hisubhaloXptl - default setting
         return super().isCompatible(other)
 
 #############################################################################################################
@@ -455,15 +388,8 @@ class vn_grid_props(grid_props):
 
         # vnXgalaxy 
         if 'galaxy' in op['fieldname']:
-            # for comparisons to Anderson and Wolz -> stmass/resdef is eBOSS, wiggleZ, 2df
-            if 'temp' == sp['map']:
-                obs = rl.galaxyObsColorDefs()
-                obs.remove('papastergis_SDSS')
-                obs_match = op['gal_res'] in obs and op['color_cut'] in obs
-                return obs_match and super().isCompatible(other)
             
-            # if a mass map, it is either diemer or papa
-            elif op['gal_res'] == 'diemer':
+            if op['gal_res'] == 'diemer':
                 # the important color definitions
                 # cols = ['0.60', '0.55', '0.65', 'visual_inspection']
 
@@ -476,13 +402,12 @@ class vn_grid_props(grid_props):
 
                 return check_gal and super().isCompatible(other)
             
-            # ignore all papa resdefs -> hisubhalo is more comparable
-            elif op['gal_res'] == 'papastergis_SDSS':
+            elif 'bin' in op['gal_res'] or 'threshold' in op['gal_res']:
                 return False
             
-            # if all = base, then include
+            # if all = base, then exclude
             elif op['color'] == 'all':
-                return super().isCompatible(other) and op['species'] == 'stmass'
+                return False
 
         # vnXptl
         else:
