@@ -113,7 +113,8 @@ class galaxy_grid_props(grid_props):
             both_stmass = op['species'] == 'stmass' and sp['species'] == 'stmass'
             both_diemer = sp['gal_res'] == 'diemer' and op['gal_res'] == 'diemer'
             both_fid_cc = sp['color_cut'] == '0.60' and op['color_cut'] == '0.60'
-            return both_stmass and both_diemer and both_fid_cc and super().isCompatible(other)
+            not_same = not op['color'] == sp['color']
+            return both_stmass and both_diemer and both_fid_cc and not_same and super().isCompatible(other)
         
         # hiptlXgalaxy handled by hiptl
         
@@ -150,7 +151,8 @@ class galaxy_grid_props(grid_props):
         # if there isnt' a resolution definition, must be 'all'
         elif self.props['color'] == 'all':
             is_CICW = self.props['mas'] == 'CICW'
-            return is_CICW
+            is_stmass = self.props['species'] == 'stmass'
+            return is_CICW and is_stmass
 
         return False
 
@@ -268,11 +270,9 @@ class hisubhalo_grid_props(grid_props):
             # calculate auto power spectrum to test how clustering changes
             # with HI mass
 
-            # want both CIC and CICW
             only_pk()
             return sp['mas'] == 'CICW'
         else:
-            # in all other cases, we JUST want CICW
             return sp['mas'] == 'CICW'
     
     def setupGrids(self, outfile):
@@ -284,9 +284,8 @@ class hisubhalo_grid_props(grid_props):
 
         # if hisubhalo doesnt have diemer resolution definition, don't calculate
         # cross-power because it ends up looking strange/isn't interesting.
-        if 'threshold' or 'bin' in sp['HI_res']:
+        if 'threshold' in sp['HI_res'] or 'bin' in sp['HI_res']:
             return False
-
         # hisubhaloXgalaxy
         if 'galaxy' == op['fieldname']:
             # we have diemer, bin/threshold gal_res to handle

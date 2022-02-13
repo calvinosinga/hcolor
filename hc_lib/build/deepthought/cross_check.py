@@ -18,32 +18,33 @@ pkl_path = ''
 
 tests = [sys.argv[1], sys.argv[2]]
 fields = []
-
+print(tests)
 def printgp(field):
     gps = field.gridprops
-    print('grids in %s'%gps[0].props['fieldname'])
+    print('grids in %s'%field.fieldname)
     for gp in gps:
-        print(gp.props)
+        print(gps[gp].props)
     print()
     fields.append(field)
     return
 
 def getCrosses(gps1, gps2):
-    for i in gps1:
-        for j in gps2:
+    count = 0
+    for ii in gps1:
+        for jj in gps2:
+            i = gps1[ii]
+            j = gps2[jj]
+            
             if i.isCompatible(j) and j.isCompatible(i):
                 print('COMPATIBLE:')
                 print(i.props)
                 print()
                 print(j.props)
                 print('\n')
-            else:
-                print('NOT COMPATIBLE:')
-                print(i.props)
-                print()
-                print(j.props)
-                print('\n')
-
+                count += 1
+            #print(i.isCompatible(j))
+            #print(j.isCompatible(i))
+    print('total compatible xpks: %d'%count)
     return
 
 
@@ -53,22 +54,22 @@ if 'galaxy_dust' in tests:
     printgp(galaxy_dust)
 
 elif 'galaxy' in tests:
-    galaxy = galaxy(simname, snapshot, axis, resolution, pkl_path, verbose, '')
-    printgp(galaxy)
+    gal = galaxy(simname, snapshot, axis, resolution, pkl_path, verbose, '')
+    printgp(gal)
 
-elif 'hiptl' in tests:
-    hiptl = hiptl(simname, snapshot, axis, resolution, 0, pkl_path, verbose, '','')
+if 'hiptl' in tests:
+    hiptl = hiptl(simname, snapshot, axis, resolution, 0, pkl_path, verbose, '%d','%d')
     printgp(hiptl)
 
 elif 'h2ptl' in tests:
-    h2ptl = h2ptl(simname, snapshot, axis, resolution, 0, pkl_path, verbose, '','')
+    h2ptl = h2ptl(simname, snapshot, axis, resolution, 0, pkl_path, verbose, '%d','%d')
     printgp(h2ptl)
 
-elif 'ptl' in tests:
-    ptl = ptl(simname, snapshot, axis, resolution, 0, pkl_path, verbose, '')
+if 'ptl' == tests[0] or 'ptl' == tests[1]:
+    ptl = ptl(simname, snapshot, axis, resolution, 0, pkl_path, verbose, '%d')
     printgp(ptl)
 
-elif 'hisubhalo' in tests:
+if 'hisubhalo' in tests:
     hisubhalo = hisubhalo(simname, snapshot, axis, resolution, pkl_path, verbose, '', '')
     printgp(hisubhalo)
 
@@ -76,10 +77,11 @@ elif 'h2subhalo' in tests:
     h2subhalo = h2subhalo(simname, snapshot, axis, resolution, pkl_path, verbose, '', '')
     printgp(h2subhalo)
 
-elif 'vn' in tests:
-    vn = vn(simname, snapshot, axis, resolution, pkl_path, verbose, '', '')
+if 'vn' in tests:
+    vn = vn(simname, snapshot, axis, resolution, 0, pkl_path, verbose, '%d', '%d')
     printgp(vn)
-
+if tests[1] == 'galaxy':
+    fields.append(galaxy(simname, snapshot, axis, resolution, pkl_path, verbose, ''))
 getCrosses(fields[0].gridprops, fields[1].gridprops)
 
 
