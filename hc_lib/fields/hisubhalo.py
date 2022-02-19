@@ -30,8 +30,7 @@ class hisubhalo(Field):
     
     def getGridProps(self):
         models = getMolFracModelsGalHI()
-        # mas = ['CIC', 'CICW']
-        mas = ['CICW']
+        mas = ['rCICW', 'CICW']
         spaces = ['redshift', 'real']
         
         res = list(HIResolutionDefinitions(self.simname).keys())
@@ -77,14 +76,8 @@ class hisubhalo(Field):
 
             mass = hih2file[gprop.props['model']][:] #already in solar masses
             mask = self.getResolvedSubhalos(mass, gprop.props['HI_res'])
-
-            if gprop.props['mas'] == 'CICW':
-                if not np.issubdtype(mask[0], bool):
-                    mask = mask.astype('bool')
-                grid.CICW(pos[mask, :], self.header['BoxSize'], mass[mask])
-
-            else:
-                grid.CIC(pos[mask, :], self.header['BoxSize'])
+            
+            grid.runMAS(gprop.props['mas'], pos[mask, :], self.header['BoxSize'], mass[mask])
             
             
             self.saveData(outfile, grid, gprop)

@@ -124,6 +124,23 @@ class Grid():
             print('#'*40 + '\n')
         return
     
+    def randomizeCICW(self, pos, boxsize, mass):        
+        mass = np.shuffle(mass)
+        self.CICW(pos, boxsize, mass)
+        return
+    
+    def runMAS(self, scheme, pos, boxsize, mass = None):
+        if mass is None:
+            mass = np.ones(len(pos), dtype=np.float32)
+
+        if scheme == 'CIC':
+            self.CIC(pos, boxsize)
+        elif scheme == 'CICW':
+            self.CICW(pos, boxsize, mass)
+        elif scheme == 'rCICW':
+            self.randomizeCICW(pos, boxsize, mass)
+        return
+    
     def _computeGridSum(self):
         self.grid_sum = np.sum(self.grid)
         return

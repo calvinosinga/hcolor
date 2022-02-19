@@ -38,7 +38,7 @@ class galaxy(Field):
         resolutions = list(galaxyResDefs(self.simname).keys())
         colordefs = galaxyColorDefs()
         mass_type = ['stmass', 'total']
-        MAS_type = ['CICW']
+        MAS_type = ['CICW', 'rCICW']
         spaces = ['redshift', 'real']
         gridnames = {}
 
@@ -104,10 +104,7 @@ class galaxy(Field):
         def computeGal(pos, mass, gc):
             grid = Grid(gc.getH5DsetName(), self.grid_resolution, verbose=self.v)
             
-            if gc.props['mas'] == 'CICW':
-                grid.CICW(pos, self.header['BoxSize'], mass)
-            else:
-                grid.CIC(pos, self.header['BoxSize'])
+            grid.runMAS(gc.props['mas'], self.header['BoxSize'], mass)
             
             return grid
         ###########################################################################
