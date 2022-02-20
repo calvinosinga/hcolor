@@ -1,5 +1,13 @@
 import numpy as np
 
+def galaxyRuns():
+    runs = ['fiducial', 'random_MAS', 'axis_test', 'colordef_test',
+            'bins', 'thresholds', 'species_test', 'all_test']
+    return runs
+
+def hisubRuns():
+    runs = ['fiducial', 'random_MAS', 'bins', 'thresholds']
+    return runs
 
 def galaxyColorMasks(photo, stmass, color_cut):
     if color_cut == 'visual_inspection':
@@ -126,9 +134,8 @@ def galaxyColorDefs():
     implemented_color_defs = ['visual_inspection', '0.50', '0.55', 
             '0.60', '0.65', '0.70']
     
-    implemented_color_defs.extend(obs)
+    #implemented_color_defs.extend(obs)
     return implemented_color_defs
-
 
 def galaxyObsColorDefs():
     return ['papastergis_SDSS', 'wolz_eBOSS_ELG', 'wolz_eBOSS_LRG', 'anderson_2df',
@@ -150,7 +157,7 @@ def HIResolutionDefinitions(simname):
     res_defs['mid-threshold'] = {'HI':(10**8, np.inf)}
     res_defs['high-threshold'] = {'HI':(10**9, np.inf)}
     
-    res_defs['lowest-bin'] = {'HI':(-np.inf, 10**7)}
+    # res_defs['lowest-bin'] = {'HI':(-np.inf, 10**7)}
     res_defs['low-bin'] = {'HI':(10**7,10**8)}
     res_defs['mid-bin'] = {'HI':(10**8,10**9)}
     res_defs['high-bin'] = {'HI':(10**9,np.inf)}

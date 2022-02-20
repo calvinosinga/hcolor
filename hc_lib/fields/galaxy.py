@@ -23,49 +23,130 @@ class galaxy(Field):
         
 
         self.fieldname = fieldname
-        # we use blue/red/all for every color definition
-
-        # each run will do each color definition provided, but will need a different run to
-        # use a different resolution definition.
         
         self.loadpath = catshpath
 
         super().__init__(simname, snapshot, axis, resolution, pkl_path, verbose)
         return
     
-    def getGridProps(self):
-        colors = ['blue', 'red']
-        resolutions = list(galaxyResDefs(self.simname).keys())
-        colordefs = galaxyColorDefs()
-        mass_type = ['stmass', 'total']
-        MAS_type = ['CICW', 'rCICW']
-        spaces = ['redshift', 'real']
+    def getGridProps(self, runtype):
         gridnames = {}
 
-
-        for c in colors:
-            for r in resolutions:
-                for cd in colordefs:
-                    for mt in mass_type:
-                        for Mt in MAS_type:
-                            for s in spaces:
-                                gp = galaxy_grid_props(Mt, self.fieldname, s, c, mt, r, cd)
-                                if gp.isIncluded():
+        def _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type):
+            for c in colors:
+                for r in resolutions:
+                    for cd in colordefs:
+                        for MT in MAS_type:
+                            for mt in mass_type:
+                                for s in spaces:
+                                    gp = galaxy_grid_props(MT, self.fieldname,
+                                        s, c, mt, r, cd)
                                     gridnames[gp.getH5DsetName()] = gp
-        for r in resolutions:
-            for mt in mass_type:
-                for Mt in MAS_type:
-                    for s in spaces:
-                        gp = galaxy_grid_props(Mt, self.fieldname, s, 'resolved', mt, r, 'None')
-                        if gp.isIncluded():
-                            gridnames[gp.getH5DsetName()] = gp
-        for mt in mass_type:
-            for Mt in MAS_type:
-                for s in spaces:
-                    gp = galaxy_grid_props(Mt, self.fieldname,s, 'all', mt, 'None', 'None')
-                    if gp.isIncluded():
-                        gridnames[gp.getH5DsetName()] = gp
+
+
+
+        if runtype == 'fiducial':
+            colors = ['blue', 'red']
+            resolutions = ['diemer']
+            colordefs = ['0.60']
+            MAS_type = ['CICW']
+            spaces = ['real', 'redshift']
+            mass_type = ['stmass']
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
+            colors = ['resolved']
+            colordefs = ['None']
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
         
+        elif runtype == 'random_MAS':
+            colors = ['blue', 'red']
+            resolutions = ['diemer']
+            colordefs = ['0.60']
+            MAS_type = ['CICW', 'rCICW']
+            spaces = ['real', 'redshift']
+            mass_type = ['stmass']
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
+            colors = ['resolved']
+            colordefs = ['None']
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
+        
+        elif runtype == 'axis_test':
+            colors = ['blue', 'red']
+            resolutions = ['diemer']
+            colordefs = ['0.60']
+            MAS_type = ['CICW']
+            spaces = ['redshift']
+            mass_type = ['stmass']
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
+            colors = ['resolved']
+            colordefs = ['None']
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
+        
+        elif runtype == 'colordef_test':
+            colors = ['blue', 'red']
+            resolutions = ['diemer']
+            colordefs = galaxyColorDefs()
+            spaces = ['real']
+            mass_type = ['stmass']
+            MAS_type = ['CICW']
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
+
+        elif runtype == 'bins':
+            colors = ['blue', 'red']
+            resolutions = []
+            for r in list(galaxyResDefs().keys()):
+                if 'bin' in r:
+                    resolutions.append(r)
+            colordefs = ['0.60']
+            MAS_type = ['CICW']
+            spaces = ['real', 'redshift']
+            mass_type = ['stmass']
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
+            colors = ['resolved']
+            colordefs = ['None']
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)            
+        
+        elif runtype == 'thresholds':
+            colors = ['blue', 'red']
+            resolutions = []
+            for r in list(galaxyResDefs().keys()):
+                if 'threshold' in r:
+                    resolutions.append(r)
+            colordefs = ['0.60']
+            MAS_type = ['CICW']
+            spaces = ['real', 'redshift']
+            mass_type = ['stmass']
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
+            colors = ['resolved']
+            colordefs = ['None']
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type) 
+
+        elif runtype == 'species_test':
+            colors = ['blue', 'red']
+            resolutions = ['diemer']
+            colordefs = ['0.60']
+            MAS_type = ['CICW']
+            spaces = ['redshift']
+            mass_type = ['stmass', 'total']
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
+            colors = ['resolved']
+            colordefs = ['None']
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
+        
+        elif runtype == 'all_test':
+            colors = ['blue', 'red']
+            resolutions = ['diemer']
+            colordefs = ['0.60']
+            MAS_type = ['CICW']
+            spaces = ['real', 'redshift']
+            mass_type = ['stmass']
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
+            colors = ['resolved']
+            colordefs = ['None']
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
+            colors = ['all']
+            resolutions = ['None']
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
+
         return gridnames
     
     

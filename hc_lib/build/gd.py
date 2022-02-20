@@ -18,6 +18,8 @@ class IODict():
         # other odds and ends to add to gd
         self.input_dict['pickles'] = {}
         self.input_dict['verbose'] = run_params['verbose']
+        self.input_dict['galaxy_runtype'] = run_params['galaxy_runtype']
+        self.input_dict['hisubhalo_runtype'] = run_params['hisubhalo_runtype']
         return
     
     def addSimPaths(self, tng_path):

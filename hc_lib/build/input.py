@@ -1,6 +1,7 @@
 """
 Takes user input
 """
+from hc_lib.fields.run_lib import galaxyRuns, hisubRuns
 
 class Input():
     ptl_runs = ['hiptl', 'h2ptl', 'hiptl_nH', 'ptl', 'vn']
@@ -67,12 +68,20 @@ class Input():
     def getFields(self):
         done = False
         runs = []
+        self.rparams['galaxy_runtype'] = ''
+        self.rparams['hisubhalo_runtype'] = ''
         while not done:
             field = input("fieldname (type done to exit): ")
             if not field in self.implemented:
                 done = field == 'done'
                 if not done:
                     print("not in implemented fields %s \n"%self.implemented)
+            elif field == 'galaxy':
+                runtype = input("runtype " + str(galaxyRuns()) + ':')
+                self.rparams['galaxy_runtype'] = runtype
+            elif field == 'hisubhalo':
+                runtype = input("runtype " + str(hisubRuns()) + ':')
+                self.rparams['hisubhalo_runtype'] = runtype
             else:
                 runs.append(field)
         return runs

@@ -28,25 +28,55 @@ class hisubhalo(Field):
             print(self.__dict__)
         return
     
-    def getGridProps(self):
-        models = getMolFracModelsGalHI()
-        mas = ['rCICW', 'CICW']
-        spaces = ['redshift', 'real']
+    def getGridProps(self, runtype):
+        gridnames = {}
+
+        def _addGrids(models, spaces, resolutions, MAS):
+            for m in models:
+                for r in resolutions:
+                    for M in MAS:
+                        for s in spaces:
+                            gp = hisubhalo_grid_props(M, self.fieldname,
+                                s, m, r)
+                            gridnames[gp.getH5DsetName()] = gp
         
-        res = list(HIResolutionDefinitions(self.simname).keys())
 
-        grp = {}
-        for m in models:
-            for s in spaces:
-                for r in res:
-                    for M in mas:                 
-                        gp = hisubhalo_grid_props(M, self.fieldname, s, m, r)
-                            
-                        if gp.isIncluded():
-                            grp[gp.getH5DsetName()] = gp
+        if runtype == 'fiducial':
 
-                            
-        return grp
+            models = getMolFracModelsGalHI()
+            mas = ['CICW']
+            spaces = ['redshift', 'real']
+            resolutions = ['diemer']
+            _addGrids(models, spaces, resolutions, mas)
+        
+        elif runtype == 'random_MAS':
+            models = getMolFracModelsGalHI()
+            mas = ['rCICW']
+            spaces = ['redshift', 'real']
+            resolutions = ['diemer']
+            _addGrids(models, spaces, resolutions, mas)
+        
+        elif runtype == 'bins':
+            models = getMolFracModelsGalHI()
+            mas = ['CICW']
+            spaces = ['redshift', 'real']
+            resolutions = []
+            for r in list(HIResolutionDefinitions().keys()):
+                if 'bin' in r:
+                    resolutions.append(r)
+            _addGrids(models, spaces, resolutions, mas)
+
+        elif runtype == 'thresholds':
+            models = getMolFracModelsGalHI()
+            mas = ['CICW']
+            spaces = ['redshift', 'real']
+            resolutions = ['diemer']
+            for r in list(HIResolutionDefinitions().keys()):
+                if 'threshold' in r:
+                    resolutions.append(r)
+                    
+            _addGrids(models, spaces, resolutions, mas)
+        return gridnames
     
 
     def computeGrids(self, outfile):
