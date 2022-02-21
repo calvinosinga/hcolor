@@ -106,8 +106,7 @@ class FigureLibrary():
 
         # create Figure
         self.createFig(nrows, ncols, panel_length, panel_bt, 
-                xborder, yborder, height_ratios, 
-                width_ratios)
+                xborder, yborder)
 
         
         # set default gspec idxs if not already set
@@ -126,8 +125,10 @@ class FigureLibrary():
         isMatch = True
 
         for k,v in desired_props.items():
-            self_val = rc.props[k]
-            
+            try:
+                self_val = rc.props[k]
+            except KeyError:
+                self_val = 'no key'
             if self_val == 'no key':
                 continue
 
@@ -214,7 +215,7 @@ class FigureLibrary():
         return [self.nrows, self.ncols]
     
     ################ INDIVIDUAL PANEL PLOTTING ROUTINES #############
-    def plotLine(self, idx, rcs = [], line_kwargs = {}):
+    def plotLine(self, idx, panelval, rcs = [], line_kwargs = {}):
         if not rcs:
             rcs = self.figarr[idx]
         
@@ -225,8 +226,9 @@ class FigureLibrary():
 
             if 'label' not in line_kwargs:
                 line_kwargs['label'] = r.props[self.panelprop]
-            
-            p.plot(x, y, **line_kwargs)
+            if r.props[self.panelprop] == panelval:
+
+                p.plot(x, y, **line_kwargs)
         return
     
 

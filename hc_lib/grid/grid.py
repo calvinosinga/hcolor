@@ -125,7 +125,7 @@ class Grid():
         return
     
     def randomizeCICW(self, pos, boxsize, mass):        
-        mass = np.random.shuffle(mass)
+        np.random.shuffle(mass)
         self.CICW(pos, boxsize, mass)
         return
     

@@ -62,7 +62,7 @@ class galaxy(Field):
             colors = ['blue', 'red']
             resolutions = ['diemer']
             colordefs = ['0.60']
-            MAS_type = ['CICW', 'rCICW']
+            MAS_type = ['rCICW']
             spaces = ['real', 'redshift']
             mass_type = ['stmass']
             _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
