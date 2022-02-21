@@ -186,7 +186,7 @@ class galaxy(Field):
         def computeGal(pos, mass, gc):
             grid = Grid(gc.getH5DsetName(), self.grid_resolution, verbose=self.v)
             
-            grid.runMAS(gc.props['mas'], self.header['BoxSize'], mass)
+            grid.runMAS(gc.props['mas'], pos, self.header['BoxSize'], mass)
             
             return grid
         ###########################################################################

@@ -27,10 +27,6 @@ class hisubhalo(Field):
             print('\nhisubhalo object created, object dictionary:')
             print(self.__dict__)
         return
-    
-    def setRun(self, runtype):
-        self.runtype = runtype
-        return
 
     def getGridProps(self):
         gridnames = {}
