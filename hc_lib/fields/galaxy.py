@@ -25,12 +25,9 @@ class galaxy(Field):
         self.fieldname = fieldname
         self.runtype = runtype
         self.loadpath = catshpath
-
         super().__init__(simname, snapshot, axis, resolution, pkl_path, verbose)
-        return
-
-    def setRun(self, runtype):
-        self.runtype = runtype
+        if verbose:
+            print('RUNTYPE: ' + runtype)
         return
 
     def getGridProps(self):
