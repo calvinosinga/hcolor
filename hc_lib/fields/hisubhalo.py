@@ -15,22 +15,26 @@ import numpy as np
 class hisubhalo(Field):
 
     def __init__(self, simname, snapshot, axis, resolution, pkl_path, verbose,
-                shcatpath, hih2filepath, fieldname = 'hisubhalo'):
+                shcatpath, hih2filepath, fieldname = 'hisubhalo', runtype = ''):
         
         self.fieldname = fieldname
  
         self.hih2filepath = hih2filepath
         self.loadpath = shcatpath
-        
+        self.runtype = runtype
         super().__init__(simname, snapshot, axis, resolution, pkl_path, verbose)
         if self.v:
             print('\nhisubhalo object created, object dictionary:')
             print(self.__dict__)
         return
     
-    def getGridProps(self, runtype):
-        gridnames = {}
+    def setRun(self, runtype):
+        self.runtype = runtype
+        return
 
+    def getGridProps(self):
+        gridnames = {}
+        runtype = self.runtype
         def _addGrids(models, spaces, resolutions, MAS):
             for m in models:
                 for r in resolutions:

@@ -76,14 +76,14 @@ class Input():
                 done = field == 'done'
                 if not done:
                     print("not in implemented fields %s \n"%self.implemented)
-            elif field == 'galaxy':
-                runtype = input("runtype " + str(galaxyRuns()) + ':')
-                self.rparams['galaxy_runtype'] = runtype
-            elif field == 'hisubhalo':
-                runtype = input("runtype " + str(hisubRuns()) + ':')
-                self.rparams['hisubhalo_runtype'] = runtype
             else:
                 runs.append(field)
+            if field == 'galaxy':
+                runtype = input("runtype " + str(galaxyRuns()) + ':')
+                self.rparams['galaxy_runtype'] = runtype
+            if field == 'hisubhalo':
+                runtype = input("runtype " + str(hisubRuns()) + ':')
+                self.rparams['hisubhalo_runtype'] = runtype
         return runs
     
     @classmethod

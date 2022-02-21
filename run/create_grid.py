@@ -1,4 +1,5 @@
 
+
 from hc_lib.fields.ptl import ptl
 from hc_lib.fields.galaxy import galaxy, galaxy_dust
 import sys
@@ -46,16 +47,16 @@ if FIELDNAME == 'hiptlgrid':
     
 elif FIELDNAME == 'hisubhalogrid':
     field = hisubhalo(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, pickle_path, 
-            gd['verbose'], gd['groupcat'], gd['hih2catsh'])
+            gd['verbose'], gd['groupcat'], gd['hih2catsh'], gd['hisubhalo_runtype'])
 
 elif FIELDNAME == 'galaxygrid':
     field = galaxy(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, pickle_path, 
-            gd['verbose'], gd['groupcat'])
+            gd['verbose'], gd['groupcat'], gd['galaxy_runtype'])
 
 elif FIELDNAME == 'galaxy_dustgrid':
     field = galaxy_dust(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, pickle_path, 
-            gd['verbose'], gd['groupcat'], gd['dust'])
-        
+            gd['verbose'], gd['groupcat'], gd['dust'], gd['galaxy_runtype'])
+
 elif FIELDNAME == 'vngrid':
     field = vn(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, pickle_path,
             gd['verbose'], gd['snapshot'], gd['TREECOOL'])
@@ -70,7 +71,7 @@ elif FIELDNAME == 'h2ptlgrid':
 
 elif FIELDNAME == 'h2subhalogrid':
     field = h2subhalo(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, pickle_path, 
-            gd['verbose'], gd['groupcat'], gd['hih2catsh'])
+            gd['verbose'], gd['groupcat'], gd['hih2catsh'], gd['hisubhalo_runtype'])
 else:
     raise NotImplementedError("there is no field named %s"%FIELDNAME)
 

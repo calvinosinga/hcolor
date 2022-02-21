@@ -19,19 +19,23 @@ import copy
 class galaxy(Field):
 
     def __init__(self, simname, snapshot, axis, resolution, 
-            pkl_path, verbose, catshpath, fieldname='galaxy'):
+            pkl_path, verbose, catshpath, fieldname='galaxy', runtype=''):
         
 
         self.fieldname = fieldname
-        
+        self.runtype = runtype
         self.loadpath = catshpath
 
         super().__init__(simname, snapshot, axis, resolution, pkl_path, verbose)
         return
-    
-    def getGridProps(self, runtype):
-        gridnames = {}
 
+    def setRun(self, runtype):
+        self.runtype = runtype
+        return
+
+    def getGridProps(self):
+        gridnames = {}
+        runtype = self.runtype
         def _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type):
             for c in colors:
                 for r in resolutions:
