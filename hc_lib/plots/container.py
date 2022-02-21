@@ -1,5 +1,5 @@
 from hc_lib.build.input import Input
-
+import numpy as np
 
 class ResultContainer():
     def __init__(self, field_obj, result_type, grid_props, runtime, xvalues, yvalues = [], 
@@ -88,3 +88,54 @@ class ResultContainer():
         
     def getValues(self):
         return self.xvalues, self.yvalues, self.zvalues
+
+class PostResult(ResultContainer):
+
+    def __init__(self):
+        self.xvalues = []
+        self.yvalues = []
+        self.zvalues = []
+        self.rt = ''
+        self.props = {}
+        return
+    
+    def computeBiasTheory(self, cross_rc, auto_rc):
+        if not cross_rc.getType() == auto_rc.getType():
+            raise ValueError('need to be same result type')
+        self.rt = 'bias'
+
+        # assuming that the result containers are power spectra
+
+        # wavenum stay the same
+        self.xvalues = cross_rc.xvalues
+        self.yvalues = cross_rc.yvalues / auto_rc.yvalues
+
+        # auto props should already be in the cross props
+        self.props = cross_rc.props
+        return
+
+    def computeBiasObs(self, numer, denom):
+        if not numer.getType() == denom.getType():
+            raise ValueError('need to be same result type')
+
+        self.rt = 'bias'
+
+        self.xvalues = numer.xvalues
+        self.yvalues = np.sqrt(numer.yvalues / denom.yvalues)
+
+        self.props = numer.props
+        self.addCrossedField(denom.props)
+        return
+
+    def computeRatio(self, numer, denom):
+        if not numer.getType() == denom.getType():
+            raise ValueError('need to be same result type')
+
+        self.rt = 'ratio'
+
+        self.xvalues = numer.xvalues
+        self.yvalues = numer.yvalues / denom.yvalues
+
+        self.props = numer.props
+        self.addCrossedField(denom.props)
+        return
