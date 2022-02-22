@@ -12,6 +12,8 @@ class FigureLibrary():
         self.fig = None
         self.panels = None
         self.gsidx = None
+        plt.rcParams["font.family"] = "serif"
+        plt.rcParams["mathtext.fontset"] = 'dejavuserif'
         return
     
     ########## HANDLING FIGURE ORGANIZATION/CREATION #################################
@@ -39,8 +41,9 @@ class FigureLibrary():
         return
 
     def createFig(self, nrows, ncols, panel_length = 3, panel_bt = 0.1, 
-                xborder = 1, yborder = 1):
-
+                xborder = 1, yborder = 1, height_ratios = None,
+                width_ratios = None):
+        
         # border input can be either a list or single number
         if isinstance(xborder, float) or isinstance(xborder, int):
             xborder = [xborder, xborder]
@@ -48,11 +51,27 @@ class FigureLibrary():
             yborder = [yborder, yborder]
         if isinstance(panel_bt, float) or isinstance(panel_bt, int):
             panel_bt = [panel_bt, panel_bt]
+        if height_ratios is None:
+            height_ratios = np.ones(nrows) * panel_length
+        else:
+            # renormalize
+            maxval = np.max(height_ratios)
+            height_ratios /= maxval
+            height_ratios *= panel_length
+
+        if width_ratios is None:
+            width_ratios = np.ones(ncols) * panel_length
+        else:
+            #renormalize
+            maxval = np.max(width_ratios)
+            width_ratios /= maxval
+            width_ratios *= panel_length
+        
         # creating Figure object
 
-        figwidth = panel_length * ncols + panel_bt[0] * (ncols - 1) + \
+        figwidth = np.sum(width_ratios) + panel_bt[0] * (ncols - 1) + \
                 xborder[0] + xborder[1]
-        figheight = panel_length * nrows + panel_bt[1] * (nrows - 1) + \
+        figheight = np.sum(height_ratios) + panel_bt[1] * (nrows - 1) + \
                 yborder[0] + yborder[1]
         
         fig = plt.figure(figsize=(figwidth, figheight))
@@ -106,7 +125,7 @@ class FigureLibrary():
 
         # create Figure
         self.createFig(nrows, ncols, panel_length, panel_bt, 
-                xborder, yborder)
+                xborder, yborder, height_ratios, width_ratios)
 
         
         # set default gspec idxs if not already set
@@ -118,7 +137,7 @@ class FigureLibrary():
             self.setGspecIndices(gsidx)
         
         # create gspec
-        self.createGrid(width_ratios, height_ratios)
+        self.createGrid(height_ratios, width_ratios)
         return
     
     def _isMatch(self, rc, desired_props):
@@ -558,6 +577,14 @@ class FigureLibrary():
         self.fig.text(pos[0], pos[1], text, **txt_kwargs)
         return
     
+    def labelPanelAxis(self, idx, which, text, txt_kwargs):
+        ax = self.panels[idx]
+        if which == 'x':
+            ax.set_xlabel(text, **txt_kwargs)
+        if which == 'y':
+            ax.set_ylabel(text, **txt_kwargs)
+        return
+
     def addLegend(self, idx = (0,0), kwargs = {}):
         p = self.panels[idx[0]][idx[1]]
         if 'fontsize' not in kwargs:
@@ -748,10 +775,11 @@ class FigureLibrary():
         
         for i in range(self.nrows):
             for j in range(self.ncols):
-                p = self.panels[i][j]
+                if (i, j) not in panel_exceptions:
+                    p = self.panels[i][j]
 
-                if which == 'both' or which == 'x':
-                    p.set_xscale('log')
-                if which == 'both' or which == 'y':
-                    p.set_yscale('log')
+                    if which == 'both' or which == 'x':
+                        p.set_xscale('log')
+                    if which == 'both' or which == 'y':
+                        p.set_yscale('log')
         return

@@ -287,7 +287,7 @@ class galaxy(Field):
 
 class galaxy_dust(galaxy):
     def __init__(self, simname, snapshot, axis, resolution, pkl_path, verbose,
-            catshpath, dustpath):
+            catshpath, dustpath, runtype = 'fiducial'):
         super().__init__(simname, snapshot, axis, resolution, 
                 pkl_path, verbose, catshpath, 'galaxy_dust')
         self.dustpath = dustpath

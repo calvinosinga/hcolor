@@ -137,5 +137,5 @@ class PostResult(ResultContainer):
         self.yvalues = numer.yvalues / denom.yvalues
 
         self.props = numer.props
-        self.addCrossedField(denom.props)
+        self.addCrossedField(denom)
         return
