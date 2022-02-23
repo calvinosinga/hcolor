@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import matplotlib.gridspec as gspec
 import copy
+from hc_lib.plots.container import PostResult
 
 class FigureLibrary():
 
@@ -179,9 +180,11 @@ class FigureLibrary():
                 print('not all cases handled')
         return isMatch
     
-    def getMatchingResults(self, iprops, rmprops):
+    def getMatchingResults(self, iprops, rmprops, rcs = []):
+        if not rcs:
+            rcs = self.results
         matches = []
-        for r in self.results:
+        for r in rcs:
             if self._isMatch(r, iprops):
                 if not rmprops:
                     matches.append(r)
@@ -205,11 +208,68 @@ class FigureLibrary():
         self.panelprop = panelp
         return figarr
     
-    def setResultArray(self, figarr):
+    def arrangeResultsReturn(self, iprops, rowp, rowvals,
+            colp, colvals, rmprops = {}):
+        figarr = np.empty((self.nrows, self.ncols), dtype = object)
+        for i in range(self.nrows):
+            for j in range(self.ncols):
+                ip_temp = copy.copy(iprops)
+                ip_temp[rowp] = rowvals[i]
+                ip_temp[colp] = colvals[j]
+                figarr[i,j] = self.getMatchingResults(ip_temp, rmprops)
+
+        # self.figarr = figarr
+        # self.rowprop = rowp
+        # self.colprop = colp
+        # self.panelprop = panelp
+        return figarr
+    
+    def arrangePerPanel(self, iprops_per_panel, rmprops_per_panel, 
+                    rowp = '', colp = '', panelp = ''):
+        figarr = np.empty((self.nrows, self.ncols), dtype = object)
+        self.rowprop = rowp
+        self.colprop = colp
+        self.panelprop = panelp
+        for i in range(self.nrows):
+            for j in range(self.ncols):
+                idx = (i, j)
+                iprops = iprops_per_panel[idx]
+                rmprops = rmprops_per_panel[idx]
+                figarr[i,j] = self.getMatchingResults(iprops, rmprops)
         self.figarr = figarr
+        return figarr
+
+    def setResultArray(self, figarr, rowp = '', colp = '', panelp = ''):
+        self.figarr = figarr
+        self.rowprop = rowp
+        self.colprop = colp
+        self.panelprop = panelp
         return                    
 
+    def makeRatios(self, idx, denom_iprops, denom_rmprops = {}):
+        results = self.figarr[idx]
+        denom = self.getMatchingResults(denom_iprops, denom_rmprops, results)
+        ratios = []
+        for r in results:
+            postr = PostResult()
+            postr.computeRatio(r, denom)
+            ratios.append(postr)
+        
+        self.figarr[idx] = ratios
+        return
 
+    def makeObsBias(self, idx, denom_iprops, denom_rmprops = {}):
+        results = self.figarr[idx]
+        denom = self.getMatchingResults(denom_iprops, denom_rmprops, results)
+        ratios = []
+        for r in results:
+            postr = PostResult()
+            postr.computeBiasObs(r, denom)
+            ratios.append(postr)
+        
+        self.figarr[idx] = ratios
+        return
+    
     ################ DATA ACCESS/MANAGEMENT ############################################
     def addResults(self, rlib):
         results_from_other_rlib = rlib.results[self.rt]
@@ -221,12 +281,16 @@ class FigureLibrary():
         self.ncols = ncols
         return
 
-    def getPropVals(self, propname, rcs = []):
+    def getPropVals(self, propname, iprops = {}, rcs = []):
         if not rcs:
             rcs = self.results
         propvals = []
         for r in rcs:
-            if propname in r.props:
+            if iprops:
+                is_match = self._isMatch(r, iprops)
+            else:
+                is_match = True
+            if propname in r.props and is_match:
                 rpval = r.props[propname]
                 if rpval not in propvals:
                     propvals.append(rpval)
@@ -252,7 +316,6 @@ class FigureLibrary():
 
                 p.plot(x, y, **line_kwargs)
         return
-    
 
     def plotFill(self, idx, iprops, rcs = [], fill_kwargs = {}, dark_edges = False,
                 line_kwargs = {}):

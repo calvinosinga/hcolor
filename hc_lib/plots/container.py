@@ -112,6 +112,8 @@ class PostResult(ResultContainer):
 
         # auto props should already be in the cross props
         self.props = cross_rc.props
+        self.props['is_bias'] = True
+        self.props['has_stoch'] = False
         return
 
     def computeBiasObs(self, numer, denom):
@@ -125,6 +127,8 @@ class PostResult(ResultContainer):
 
         self.props = numer.props
         self.addCrossedField(denom.props)
+        self.props['is_bias'] = True
+        self.props['has_stoch'] = True
         return
 
     def computeRatio(self, numer, denom):
@@ -138,4 +142,5 @@ class PostResult(ResultContainer):
 
         self.props = numer.props
         self.addCrossedField(denom)
+        self.props['is_ratio'] = True
         return
