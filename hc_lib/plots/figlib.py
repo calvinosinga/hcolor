@@ -6,8 +6,11 @@ import copy
 
 class FigureLibrary():
 
-    def __init__(self, rlib, result_type):
-        self.results = rlib.results[result_type]
+    def __init__(self, rlib = None, result_type = 'pk'):
+        if not rlib is None:
+            self.results = rlib.results[result_type]
+        else:
+            self.results = []
         self.rt = result_type
         self.fig = None
         self.panels = None
