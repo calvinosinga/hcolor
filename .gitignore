@@ -6,5 +6,5 @@ output/*
 figures/*.py
 figures/*.ipynb
 *.ipynb_ch*
-/hc_lib/*.pkl
+*.pkl
 *.hdf5
