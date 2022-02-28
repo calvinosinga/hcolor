@@ -296,7 +296,6 @@ class FigureLibrary():
                     propvals.append(rpval)
         return propvals
     
-    
     def getDim(self):
         return [self.nrows, self.ncols]
     

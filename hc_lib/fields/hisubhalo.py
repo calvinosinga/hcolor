@@ -76,6 +76,13 @@ class hisubhalo(Field):
                     resolutions.append(r)
                     
             _addGrids(models, spaces, resolutions, mas)
+        
+        elif runtype == 'CIC':
+            models = getMolFracModelsGalHI()
+            mas = ['CIC']
+            spaces = ['redshift', 'real']
+            resolutions = ['diemer']
+            _addGrids(models, spaces, resolutions, mas)
         return gridnames
     
 
