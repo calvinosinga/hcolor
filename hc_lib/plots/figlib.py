@@ -300,7 +300,7 @@ class FigureLibrary():
         return [self.nrows, self.ncols]
     
     ################ INDIVIDUAL PANEL PLOTTING ROUTINES #############
-    def plotLine(self, idx, panelval, rcs = [], line_kwargs = {}):
+    def plotLine(self, idx, iprops, rcs = [], line_kwargs = {}):
         if not rcs:
             rcs = self.figarr[idx]
         
@@ -311,7 +311,7 @@ class FigureLibrary():
 
             if 'label' not in line_kwargs:
                 line_kwargs['label'] = r.props[self.panelprop]
-            if r.props[self.panelprop] == panelval:
+            if self._isMatch(r, iprops):
 
                 p.plot(x, y, **line_kwargs)
         return
@@ -779,7 +779,6 @@ class FigureLibrary():
 
                             max_idx = np.argmax(wavenum > xmax)
                             min_idx = np.argmax(wavenum < xmin)
-                            
                             ymin = np.min(pk[min_idx:max_idx])
                             ymax = np.max(pk[min_idx:max_idx])
                             
