@@ -470,15 +470,7 @@ class FigureLibrary():
 
 
     ########### AUTOMATIC PLOTTING ROUTINES #############################################
-    def plotpk(self, rowp, colp, panelp, iprops, rmprops, 
-                cdict, ldict):
-        rowlabels = self.getPropVals(rowp)
-        collabels = self.getPropVals(colp)
-
-        self.createFigGrid(len(rowlabels), len(collabels))
-
-        self.arrangeResults(iprops, rowp, rowlabels, colp, collabels,
-                panelp, rmprops)
+    def plotpk(self, row_dict):
         
         dim = self.getDim()
         for i in range(dim[0]):
