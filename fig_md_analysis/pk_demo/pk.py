@@ -70,13 +70,18 @@ class Overdensity():
     
     ######## GRID GENERATION ##########################
     def uniform(self, grid):
-        self.delta = np.ones(grid)
+        self.delta = np.ones((grid, grid, grid))
         return
 
     def setGaussian(self, mu, sigma, grid):
         self.delta = np.random.normal(mu, sigma, (grid, grid, grid))
         return
     
+    def zeros(self, grid):
+        self.delta = np.zeros((grid, grid, grid))
+    
+    def toOverdensity(self):
+        self.delta = self.delta / np.mean(self.delta) - 1
     ###### GRID TUNING ###############################
     def addPower(self, k, amp):
         xs = np.linspace(0, self.box, self.delta.shape[0])
@@ -86,6 +91,7 @@ class Overdensity():
         print(R.shape)
         self.delta += amp * np.sin(k * R)
         return
+    
     ##### PLOTTING ROUTINES ############
     def setCmap(self, cmap_name = 'plasma', under = 'w'):
         cmap = copy.copy(mpl.cm.get_cmap(cmap_name))
@@ -163,7 +169,35 @@ class Overdensity():
             plt.savefig(savename)
         return
 
+    # MAS routine
+    def CICW(self, pos, mass):
+        boxsize = self.box
+        start = time.time()
+        ptls = pos.shape[0]; coord = pos.shape[1]; dims = self.delta.shape[0]
+        inv_cell_size = dims/boxsize
+        
+        index_d = np.zeros(3, dtype=np.int64)
+        index_u = np.zeros(3, dtype=np.int64)
+        d = np.zeros(3)
+        u = np.zeros(3)
 
+        for i in range(ptls):
+            for axis in range(coord):
+                dist = pos[i,axis] * inv_cell_size
+                u[axis] = dist - int(dist)
+                d[axis] = 1 - u[axis]
+                index_d[axis] = (int(dist))%dims
+                index_u[axis] = index_d[axis] + 1
+                index_u[axis] = index_u[axis]%dims #seems this is faster
+            self.delta[index_d[0],index_d[1],index_d[2]] += d[0]*d[1]*d[2]*mass[i]
+            self.delta[index_d[0],index_d[1],index_u[2]] += d[0]*d[1]*u[2]*mass[i]
+            self.delta[index_d[0],index_u[1],index_d[2]] += d[0]*u[1]*d[2]*mass[i]
+            self.delta[index_d[0],index_u[1],index_u[2]] += d[0]*u[1]*u[2]*mass[i]
+            self.delta[index_u[0],index_d[1],index_d[2]] += u[0]*d[1]*d[2]*mass[i]
+            self.delta[index_u[0],index_d[1],index_u[2]] += u[0]*d[1]*u[2]*mass[i]
+            self.delta[index_u[0],index_u[1],index_d[2]] += u[0]*u[1]*d[2]*mass[i]
+            self.delta[index_u[0],index_u[1],index_u[2]] += u[0]*u[1]*u[2]*mass[i]
+        return
     # Power Spectrum routine
     def pk(self, axis=2, MAS = 'CIC'):
         delta = self.delta

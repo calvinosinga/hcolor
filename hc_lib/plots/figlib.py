@@ -468,62 +468,6 @@ class FigureLibrary():
         self.has_cbar_col = True
         return
 
-
-    ########### AUTOMATIC PLOTTING ROUTINES #############################################
-    def plotpk(self, row_dict):
-        
-        dim = self.getDim()
-        for i in range(dim[0]):
-            for j in range(dim[1]):
-                idx = (i, j)
-                # find if any results have same panelp
-                res_in_panel = {}
-
-                # if they have the same panelp, also give them
-                # a unique color
-                for rc in self.figarr[idx]:
-                    panel_val = rc.props[panelp]
-                    if panel_val not in res_in_panel:
-                        res_in_panel[panel_val] = [rc]
-
-                    else:
-                        res_in_panel[panel_val].extend(rc)
-                    
-                # if mult. results have same panel_val, they are
-                # plotted as fillbt
-                
-                for panel_val in res_in_panel:
-                    results_with_val = res_in_panel[panel_val]
-                    kwargs = {'color':cdict[panel_val], 
-                            'label':ldict[panel_val]}
-                    if len(results_with_val) == 1:
-                        self.plotLine(idx, results_with_val, kwargs)
-                    else:
-                        iprops = {panelp:panel_val}
-                        self.plotFill(idx, iprops, results_with_val, kwargs)
-
-        # axes
-        self.logAxis()
-        self.xLimAdjustToNyquist()
-        self.flushYAxisToData()
-        self.matchAxisLimits()
-
-        # ticks
-        self.removeDefaultTickLabels()
-        self.changeTickParams()
-
-        # labels
-        self.colLabels(collabels)
-        self.rowLabels(rowlabels)
-        if self.ncols > 1:
-            self.addLegend((0, 1))
-        else:
-            self.addLegend((1, 0), {'loc':'upper right'})
-
-        self.axisLabel('x')
-        self.axisLabel('y', txt_kwargs={'rotation':'vertical'})
-
-        return
     ########### HANDLING LABELS #########################################################
     def rowLabels(self, rowlabels, colidx = 0, pos = (0.05, 0.05), txt_kwargs = {}):
         if 'va' not in txt_kwargs:
