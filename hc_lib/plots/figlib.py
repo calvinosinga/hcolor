@@ -319,7 +319,7 @@ class FigureLibrary():
         return
 
     def plotFill(self, idx, iprops, rcs = [], fill_kwargs = {}, dark_edges = False,
-                line_kwargs = {}):
+                line_kwargs = {}, ax = None):
         ys = []
         if not rcs:
             rcs = self.figarr[idx]
@@ -329,8 +329,10 @@ class FigureLibrary():
                 x, y, _ = r.getValues()
                 ys.append(y)
         ys = np.array(ys)
-
-        p = self.panels[idx[0]][idx[1]]
+        if ax is None:
+            p = self.panels[idx[0]][idx[1]]
+        else:
+            p = ax
         mx = np.max(ys, axis=0)
         mn = np.min(ys, axis=0)
 
