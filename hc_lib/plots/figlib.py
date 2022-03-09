@@ -353,6 +353,42 @@ class FigureLibrary():
         p.fill_between(x, mn, mx, **fill_kwargs)
         return
     
+    def plotMedian(self, idx, iprops, rcs = [], line_kwargs = {}, ax = None):
+        ys = []
+        if not rcs:
+            rcs = self.figarr[idx]
+
+        for r in rcs:
+            if self._isMatch(r, iprops):
+                x, y, _ = r.getValues()
+                ys.append(y)
+        ys = np.array(ys)
+        if ax is None:
+            p = self.panels[idx[0]][idx[1]]
+        else:
+            p = ax
+#        mx = np.max(ys, axis=0)
+#        mn = np.min(ys, axis=0)
+        md = np.median(ys, axis = 0)
+#        if 'label' not in fill_kwargs:
+#            fill_kwargs['label'] = r.props[self.panelprop]
+#        if 'alpha' not in fill_kwargs:
+#            fill_kwargs['alpha'] = 0.55
+#        if 'color' not in fill_kwargs:
+#            fill_kwargs['color'] = 'blue'
+        
+#        line_kwargs['visible'] = dark_edges
+#        line_kwargs['label'] = '_nolegend_'
+#        if 'color' not in line_kwargs:
+#            line_kwargs['color'] = fill_kwargs['color']
+        
+#        p.plot(x,mn, **line_kwargs)
+#        p.plot(x,mx, **line_kwargs)
+#        p.fill_between(x, mn, mx, **fill_kwargs)
+            
+        p.plot(x, md, **line_kwargs)
+        return
+    
     def plotSlice(self, idx, rc = None, im_kwargs = {}):
         if rc is None:
             rcs = self.figarr[idx]
