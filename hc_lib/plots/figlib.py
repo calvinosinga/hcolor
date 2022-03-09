@@ -246,28 +246,30 @@ class FigureLibrary():
         self.panelprop = panelp
         return                    
 
-    def makeRatios(self, idx, denom_iprops, denom_rmprops = {}):
-        results = self.figarr[idx]
-        denom = self.getMatchingResults(denom_iprops, denom_rmprops, results)
+    def makeRatios(self, num_iprops, denom_iprops, num_rmprops = {},
+                denom_rmprops = {}):
+        nums = self.getMatchingResults(num_iprops, num_rmprops)
+        denom = self.getMatchingResults(denom_iprops, denom_rmprops)
         ratios = []
-        for r in results:
+        for r in nums:
             postr = PostResult()
             postr.computeRatio(r, denom)
             ratios.append(postr)
         
-        self.figarr[idx] = ratios
+        self.results.extend(ratios)
         return
 
-    def makeObsBias(self, idx, denom_iprops, denom_rmprops = {}):
-        results = self.figarr[idx]
-        denom = self.getMatchingResults(denom_iprops, denom_rmprops, results)
+    def makeObsBias(self, num_iprops, denom_iprops, num_rmprops = {}, 
+                denom_rmprops = {}):
+        nums = self.getMatchingResults(num_iprops, num_rmprops)
+        denom = self.getMatchingResults(denom_iprops, denom_rmprops)
         ratios = []
-        for r in results:
+        for r in nums:
             postr = PostResult()
             postr.computeBiasObs(r, denom)
             ratios.append(postr)
         
-        self.figarr[idx] = ratios
+        self.results.extend(ratios)
         return
     
     ################ DATA ACCESS/MANAGEMENT ############################################
@@ -347,7 +349,6 @@ class FigureLibrary():
         p.plot(x,mn, **line_kwargs)
         p.plot(x,mx, **line_kwargs)
         p.fill_between(x, mn, mx, **fill_kwargs)
-
         return
     
     def plotSlice(self, idx, rc = None, im_kwargs = {}):
