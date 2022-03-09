@@ -341,7 +341,8 @@ class FigureLibrary():
         
         line_kwargs['visible'] = dark_edges
         line_kwargs['label'] = '_nolegend_'
-        line_kwargs['color'] = fill_kwargs['color']
+        if 'color' not in line_kwargs:
+            line_kwargs['color'] = fill_kwargs['color']
         
         p.plot(x,mn, **line_kwargs)
         p.plot(x,mx, **line_kwargs)
@@ -668,7 +669,7 @@ class FigureLibrary():
                     xlims[i,j,0], xlims[i,j,1] = xmin, xmax
         return xlims, ylims
 
-    def xLimAdjustToNyquist(self, panel_exceptions = []):
+    def xLimAdjustToNyquist(self, shift = 0.0, panel_exceptions = []):
         
         for i in range(self.nrows):
             for j in range(self.ncols):
@@ -693,10 +694,10 @@ class FigureLibrary():
 
 
                     if not mink == np.inf:
-                        p.set_xlim(mink, nyq)
+                        p.set_xlim(mink, nyq - shift)
                     
                     else:
-                        p.set_xlim(xmin, nyq)
+                        p.set_xlim(xmin, nyq - shift)
         self.matchAxisLimits(which='x', panel_exceptions=panel_exceptions)
         return
     

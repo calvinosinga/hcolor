@@ -1,6 +1,6 @@
 from hc_lib.build.input import Input
 import numpy as np
-
+import copy
 class ResultContainer():
     def __init__(self, field_obj, result_type, grid_props, runtime, xvalues, yvalues = [], 
             zvalues = [], Nmodes = [], count = -1):
@@ -103,15 +103,15 @@ class PostResult(ResultContainer):
         if not cross_rc.getType() == auto_rc.getType():
             raise ValueError('need to be same result type')
         self.rt = 'bias'
-
+        cc = copy.copy
         # assuming that the result containers are power spectra
 
         # wavenum stay the same
-        self.xvalues = cross_rc.xvalues
-        self.yvalues = cross_rc.yvalues / auto_rc.yvalues
+        self.xvalues = cc(cross_rc.xvalues)
+        self.yvalues = cc(cross_rc.yvalues) / cc(auto_rc.yvalues)
 
         # auto props should already be in the cross props
-        self.props = cross_rc.props
+        self.props = cc(cross_rc.props)
         self.props['is_bias'] = True
         self.props['has_stoch'] = False
         return
@@ -119,14 +119,14 @@ class PostResult(ResultContainer):
     def computeBiasObs(self, numer, denom):
         if not numer.getType() == denom.getType():
             raise ValueError('need to be same result type')
-
+        cc = copy.copy
         self.rt = 'bias'
 
-        self.xvalues = numer.xvalues
-        self.yvalues = np.sqrt(numer.yvalues / denom.yvalues)
+        self.xvalues = cc(numer.xvalues)
+        self.yvalues = np.sqrt(cc(numer.yvalues) / cc(denom.yvalues))
 
-        self.props = numer.props
-        self.addCrossedField(denom.props)
+        self.props = cc(numer.props)
+        self.addCrossedField(cc(denom.props))
         self.props['is_bias'] = True
         self.props['has_stoch'] = True
         return
@@ -134,13 +134,13 @@ class PostResult(ResultContainer):
     def computeRatio(self, numer, denom):
         if not numer.getType() == denom.getType():
             raise ValueError('need to be same result type')
-
+        cc = copy.copy
         self.rt = 'ratio'
 
-        self.xvalues = numer.xvalues
-        self.yvalues = numer.yvalues / denom.yvalues
+        self.xvalues = cc(numer.xvalues)
+        self.yvalues = cc(numer.yvalues) / cc(denom.yvalues)
 
-        self.props = numer.props
-        self.addCrossedField(denom)
+        self.props = cc(numer.props)
+        #self.addCrossedField(denom)
         self.props['is_ratio'] = True
         return
