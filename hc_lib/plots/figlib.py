@@ -251,6 +251,7 @@ class FigureLibrary():
         nums = self.getMatchingResults(num_iprops, num_rmprops)
         denom = self.getMatchingResults(denom_iprops, denom_rmprops)
         ratios = []
+        
         for r in nums:
             postr = PostResult()
             postr.computeRatio(r, denom)
@@ -272,6 +273,24 @@ class FigureLibrary():
         self.results.extend(ratios)
         return
     
+    def addColorRatios(self, idx, reds, blues):
+        ratios = []
+        for r in range(len(reds)):
+            postr = PostResult()
+            rprops = copy.copy(reds[r].props)
+            rprops['color'] = 'blue'
+            rprops['fieldname'] = rprops['fieldname'][0]
+            del rprops['result_runtime']
+            denom = self.getMatchingResults(rprops, {}, rcs = blues)
+            postr.computeRatio(reds[r], denom[0])
+            print(postr.props['space'])
+            ratios.append(postr)
+        if self.figarr[idx] is None:
+            self.figarr[idx] = ratios
+        else:
+            self.figarr[idx].extend(ratios)
+        return
+
     ################ DATA ACCESS/MANAGEMENT ############################################
     def addResults(self, rlib):
         results_from_other_rlib = rlib.results[self.rt]
@@ -339,7 +358,7 @@ class FigureLibrary():
         if 'label' not in fill_kwargs:
             fill_kwargs['label'] = r.props[self.panelprop]
         if 'alpha' not in fill_kwargs:
-            fill_kwargs['alpha'] = 0.55
+            fill_kwargs['alpha'] = 0.3
         if 'color' not in fill_kwargs:
             fill_kwargs['color'] = 'blue'
         
