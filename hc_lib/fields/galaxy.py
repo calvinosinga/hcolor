@@ -91,11 +91,11 @@ class galaxy(Field):
             MAS_type = ['CICW']
             _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
 
-        elif runtype == 'bins':
+        elif runtype == 'bins_thresholds':
             colors = ['blue', 'red']
             resolutions = []
             for r in list(galaxyResDefs().keys()):
-                if 'bin' in r:
+                if 'bin' in r or 'threshold' in r:
                     resolutions.append(r)
             colordefs = ['0.60']
             MAS_type = ['CICW']
@@ -105,21 +105,6 @@ class galaxy(Field):
             colors = ['resolved']
             colordefs = ['None']
             _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)            
-        
-        elif runtype == 'thresholds':
-            colors = ['blue', 'red']
-            resolutions = []
-            for r in list(galaxyResDefs().keys()):
-                if 'threshold' in r:
-                    resolutions.append(r)
-            colordefs = ['0.60']
-            MAS_type = ['CICW']
-            spaces = ['real', 'redshift']
-            mass_type = ['stmass']
-            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
-            colors = ['resolved']
-            colordefs = ['None']
-            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type) 
 
         elif runtype == 'species_test':
             colors = ['blue', 'red']

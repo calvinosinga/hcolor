@@ -56,25 +56,14 @@ class hisubhalo(Field):
             resolutions = ['diemer']
             _addGrids(models, spaces, resolutions, mas)
         
-        elif runtype == 'bins':
+        elif runtype == 'bins_thresholds':
             models = getMolFracModelsGalHI()
             mas = ['CICW']
             spaces = ['redshift', 'real']
             resolutions = []
             for r in list(HIResolutionDefinitions().keys()):
-                if 'bin' in r:
+                if 'bin' in r or 'threshold' in r:
                     resolutions.append(r)
-            _addGrids(models, spaces, resolutions, mas)
-
-        elif runtype == 'thresholds':
-            models = getMolFracModelsGalHI()
-            mas = ['CICW']
-            spaces = ['redshift', 'real']
-            resolutions = ['diemer']
-            for r in list(HIResolutionDefinitions().keys()):
-                if 'threshold' in r:
-                    resolutions.append(r)
-                    
             _addGrids(models, spaces, resolutions, mas)
         
         return gridnames
