@@ -126,7 +126,7 @@ class PostResult(ResultContainer):
         self.yvalues = np.sqrt(cc(numer.yvalues) / cc(denom.yvalues))
 
         self.props = cc(numer.props)
-        self.addCrossedField(cc(denom.props))
+        self.addCrossedField(cc(denom))
         self.props['is_bias'] = True
         self.props['has_stoch'] = True
         return

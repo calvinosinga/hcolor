@@ -261,6 +261,18 @@ class FigureLibrary():
         
         self.results.extend(ratios)
         return
+    
+    def addObsBias(self, idx, nums, denom):
+        ratios = []
+        for r in nums:
+            postr = PostResult()
+            postr.computeBiasObs(r, denom)
+            ratios.append(postr)
+        if self.figarr[idx] is None:
+            self.figarr[idx] = ratios
+        else:
+            self.figarr[idx].extend(ratios)
+        return
 
     def makeObsBias(self, num_iprops, denom_iprops, num_rmprops = {}, 
                 denom_rmprops = {}):
@@ -499,6 +511,7 @@ class FigureLibrary():
     
     def _defaultCmaps(self):
         cmap_name = 'plasma'
+        txt_kwargs = copy.copy(txt_kwargs)
         under = 'w'
         over = None
         cmap_arr = np.empty((self.nrows, self.ncols), dtype=object)
@@ -606,6 +619,7 @@ class FigureLibrary():
     def axisLabel(self, axis, text = '', subscript = '',
                 pos = [], txt_kwargs = {}):
         posdict = {}
+        txt_kwargs = copy.copy(txt_kwargs)
         if axis == 'x':
             if 'rotation' not in txt_kwargs:
                 txt_kwargs['rotation'] = 'horizontal'
@@ -637,6 +651,7 @@ class FigureLibrary():
         if 'va' not in txt_kwargs:
             txt_kwargs['va'] = 'center'
         self.fig.text(pos[0], pos[1], text, **txt_kwargs)
+        del txt_kwargs
         return
     
     def labelPanelAxis(self, idx, which, text, txt_kwargs):
