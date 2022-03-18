@@ -16,6 +16,8 @@ class FigureLibrary():
         self.fig = None
         self.panels = None
         self.gsidx = None
+        self.bigfont = 12
+        self.smallfont = 10
         plt.rcParams["font.family"] = "serif"
         plt.rcParams["mathtext.fontset"] = 'dejavuserif'
         return
@@ -536,7 +538,7 @@ class FigureLibrary():
             txt_kwargs['ha'] = 'left'
         
         if 'fontsize' not in txt_kwargs:
-            txt_kwargs['fontsize'] = 16
+            txt_kwargs['fontsize'] = self.smallfont
         
         for i in range(self.nrows):
             p = self.panels[i][colidx]
@@ -552,7 +554,7 @@ class FigureLibrary():
         ncols = self.ncols
 
         if 'fontsize' not in txt_kwargs:
-            txt_kwargs['fontsize'] = 16
+            txt_kwargs['fontsize'] = self.smallfont
         
         if 'va' not in txt_kwargs:
             txt_kwargs['va'] = 'top'
@@ -629,7 +631,7 @@ class FigureLibrary():
             pos = posdict[axis]
         
         if 'fontsize' not in txt_kwargs:
-            txt_kwargs['fontsize'] = 16
+            txt_kwargs['fontsize'] = self.bigfont
         if 'ha' not in txt_kwargs:
             txt_kwargs['ha'] = 'center'
         if 'va' not in txt_kwargs:
@@ -648,7 +650,7 @@ class FigureLibrary():
     def addLegend(self, idx = (0,0), kwargs = {}):
         p = self.panels[idx[0]][idx[1]]
         if 'fontsize' not in kwargs:
-            kwargs['fontsize'] = 16
+            kwargs['fontsize'] = self.smallfont
         
         if 'frameon' not in kwargs:
             kwargs['frameon'] = False
@@ -691,6 +693,10 @@ class FigureLibrary():
         
         if not 'which' in kwargs:
             kwargs['which'] = 'both'
+
+        if not 'labelsize' in kwargs:
+            kwargs['labelsize'] = self.smallfont
+
         for i in range(self.nrows):
             for j in range(self.ncols):
                 if (i,j) not in panel_exceptions:
