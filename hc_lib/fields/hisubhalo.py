@@ -49,9 +49,9 @@ class hisubhalo(Field):
             resolutions = ['diemer']
             _addGrids(models, spaces, resolutions, mas)
         
-        elif runtype == 'random_MAS':
+        elif runtype == 'alt_MAS':
             models = getMolFracModelsGalHI()
-            mas = ['rCICW']
+            mas = ['rCICW', 'CIC']
             spaces = ['redshift', 'real']
             resolutions = ['diemer']
             _addGrids(models, spaces, resolutions, mas)
@@ -77,12 +77,6 @@ class hisubhalo(Field):
                     
             _addGrids(models, spaces, resolutions, mas)
         
-        elif runtype == 'CIC':
-            models = getMolFracModelsGalHI()
-            mas = ['CIC']
-            spaces = ['redshift', 'real']
-            resolutions = ['diemer']
-            _addGrids(models, spaces, resolutions, mas)
         return gridnames
     
 
