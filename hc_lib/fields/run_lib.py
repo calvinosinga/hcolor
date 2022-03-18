@@ -84,9 +84,21 @@ def galaxyResolvedMask(stmass, photo, res_dict):
 
 
 def galaxyResDefs(simname):
-    # taken from Pillepich et al 2018, table 1 (in solar masses)
-    mean_baryon_cell = {'tng100':1.4e6, 'tng100-2':11.2e6, 'tng100-3':89.2e6,
-            'tng300':11e6, 'tng300-2':88e6, 'tng300-3':703e6}
+    # taken from Benedikt's cuts 2018, table 1 (in solar masses)
+    if simname in ['orig', 'tng100']:
+        Mstar_min = 2E8
+        Mgas_min = 2E8
+    elif simname == 'tng300':
+        Mstar_min = 5E10
+        Mgas_min = 5E9
+
+    elif simname == 'tng100-2':
+        Mstar_min = 1.1E9
+        Mgas_min = 1.1E9
+    elif simname == 'tng100-3':
+        Mstar_min = 9E9
+        Mgas_min = 9E9
+    
     # papastergis: z=.0023-0.05
     # wolz: z=0.6-1.0
     # anderson: z ~ 0
@@ -98,9 +110,8 @@ def galaxyResDefs(simname):
     # papastergis makes an additional cut (i-z) > -0.25, but states that
     # this cut eliminates a small number of misidentified galaxies by the 
     # SDSS pipeline
-    thres = mean_baryon_cell[simname]*200
     # resolution to match hisubhalo
-    galaxy_min_resolution['diemer'] = {'stmass':(thres, np.inf)}
+    galaxy_min_resolution['diemer'] = {'stmass':(Mstar_min, np.inf)}
 
     # wigglez isn't a good comparison, TNG doesn't have any equivalent UV
     # filters and wigglez has poor r definition (from wolz)
@@ -118,12 +129,12 @@ def galaxyResDefs(simname):
     #galaxy_min_resolution['anderson_2df'] = {'b_j':(-np.inf, 19.45), 'r_f':(-np.inf, 21)}
 
     # calculate the magnitude orders to get threshold/bin tests
-    oom = int(np.log10(thres))
+    oom = int(np.log10(Mstar_min))
 
     galaxy_min_resolution['low-threshold'] = {'stmass':(10**(oom+1), np.inf)}
     galaxy_min_resolution['mid-threshold'] = {'stmass':(10**(oom+2), np.inf)}
     galaxy_min_resolution['high-threshold'] = {'stmass':(10**(oom+3), np.inf)}
-    galaxy_min_resolution['low-bin'] = {'stmass':(thres, 10**(oom+1))}
+    galaxy_min_resolution['low-bin'] = {'stmass':(Mstar_min, 10**(oom+1))}
     galaxy_min_resolution['mid-bin'] = {'stmass':(10**(oom+1), 10**(oom+2))}
     galaxy_min_resolution['high-bin'] = {'stmass':(10**(oom+2), 10**(oom+3))}
 
