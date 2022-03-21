@@ -48,24 +48,10 @@ class ResultContainer():
         return
 
     def addCrossedField(self, other_rc):
-        temp = {}
-        oprop = other_rc.props
-        skip = ['is_auto']
-        for k,v in oprop.items():
-            self_val = self.getProp(k)
-
-            if not k in skip:
-                if self_val is None:
-                    temp[k] = [v]
-                else:
-                    temp[k] = [v, self_val]
-        
-        for k,v in self.props.items():
-            if not k in temp:
-                temp[k] = [v]
-
-        self.props = temp
-        self.props['is_auto'] = False
+        oprops = other_rc.props
+        for k, v in oprops.items():
+            k = oprops['fieldname'] + '_' + str(k)
+            self.props[k] = v
         return
 
     def getProp(self, prop_key):
