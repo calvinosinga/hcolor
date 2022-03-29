@@ -94,7 +94,7 @@ class galaxy(Field):
         elif runtype == 'bins_thresholds':
             colors = ['blue', 'red']
             resolutions = []
-            for r in list(galaxyResDefs().keys()):
+            for r in list(galaxyResDefs(self.simname).keys()):
                 if 'bin' in r or 'threshold' in r:
                     resolutions.append(r)
             colordefs = ['0.60']
