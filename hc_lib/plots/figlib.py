@@ -2,7 +2,7 @@ from hc_lib.plots.container import PostResult
 import site
 import pickle as pkl
 import numpy as np
-
+import copy
 def siteFG():
 
     FGPATH = '/homes/cosinga/figrid/'
@@ -53,4 +53,30 @@ def pklabels(fg, xpos = [], ypos = [], ysub = '', xtxtkw = {}, ytxtkw = {}):
     fg.makeXLabel(xtext, xpos, xtxtkw)
     fg.makeYLabel(ytext, ypos, ytxtkw)
     return
+
+def makeRSD(datalist):
+    from figrid.data_container import DataContainer
+    ip = {'space':'real'}
+    real = datalist.getMatching(ip)
+    rsdlist = []
+    for dc in real:
+        mattr = copy.deepcopy(dc.attrs)
+        rmattr = []
+        for k in mattr:
+            if 'fieldname' in k or 'runtime' in k:
+                rmattr.append(k)
+        for rm in rmattr:
+            del mattr[rm]
+        mattr['space'] = 'redshift'
+        print(mattr)
+        redshift = datalist.getMatching(mattr)
+#        print(redshift)
+#        print(len(redshift))
+        redshift = redshift[0]
+        data = [dc.data[0], dc.data[1]/redshift.data[1]]
+        rsd = DataContainer(data)
+        mattr['space'] = 'rsd' 
+        rsd.update(mattr)
+        rsdlist.append(rsd)
+    return rsdlist
 
