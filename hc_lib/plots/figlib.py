@@ -63,20 +63,53 @@ def makeRSD(datalist):
         mattr = copy.deepcopy(dc.attrs)
         rmattr = []
         for k in mattr:
-            if 'fieldname' in k or 'runtime' in k:
+            if 'fieldname' in k or 'runtime' in k or 'space' in k:
                 rmattr.append(k)
         for rm in rmattr:
             del mattr[rm]
         mattr['space'] = 'redshift'
-        print(mattr)
+
+#        print(mattr)
         redshift = datalist.getMatching(mattr)
 #        print(redshift)
 #        print(len(redshift))
         redshift = redshift[0]
-        data = [dc.data[0], dc.data[1]/redshift.data[1]]
+        data = [dc.data[0], redshift.data[1]/dc.data[1]]
         rsd = DataContainer(data)
         mattr['space'] = 'rsd' 
         rsd.update(mattr)
         rsdlist.append(rsd)
     return rsdlist
 
+def makeBlueRedRatio(datalist):
+    from figrid.data_container import DataContainer
+    ip = {'color':'blue'}
+    blues = datalist.getMatching(ip)
+    ratiolist = []
+    for dc in blues:
+        mattr = copy.deepcopy(dc.attrs)
+        rmattr = []
+        for k in mattr:
+            if 'fieldname' in k or 'runtime' in k or 'color' in k:
+                rmattr.append(k)
+        for rm in rmattr:
+            del mattr[rm]
+        mattr['color'] = 'red'
+
+#        print(mattr)
+        reds = datalist.getMatching(mattr)
+#        print(redshift)
+        print(len(reds))
+        reds = reds[0]
+        data = [dc.data[0], reds.data[1]/dc.data[1]]
+        ratio = DataContainer(data)
+        mattr['color'] = 'ratio' 
+        ratio.update(mattr)
+        ratiolist.append(ratio)
+    return ratiolist
+
+def plotOnes(fg, idx):
+    p = fg.axes[idx]
+    xlim = p.get_xlim()
+    p.plot(xlim, [1, 1], color = 'black', linestyle = ':')
+    return
