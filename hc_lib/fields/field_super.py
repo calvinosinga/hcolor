@@ -185,9 +185,9 @@ class Field():
     
     def _convertPos(self, pos):
         """
-        Converts position units from ckpc/h to Mpc/h
+        Converts position units from ckpc/h to cMpc/h
         """
-        pos *= self.header["Time"]/1e3
+        pos *= 1/1e3
         return pos
     
     def _convertVel(self, vel):
