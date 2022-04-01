@@ -136,7 +136,7 @@ def color_compare(ip, area_or_middle, smooth, savename):
     flib.setFacecolor(fg, fcolors)
     flib.plotOnes(fg, (fg.dim[0]-1,0))
     fg.save(savename)
-    return
+    return box, res
 
 # the red vs blue ratios don't make a lot of sense with the ratios
 ip = {'color':['red', 'blue']}
@@ -149,7 +149,7 @@ for smoother in [True, False]:
             else:
                 smoothname = 'nosmooth'
             name = 'redvsblue_noall_%s_%s_%03d.pdf'%(plottype, smoothname, ss)
-            color_compare(ip, plottype, smoother, name)
+            box, res = color_compare(ip, plottype, smoother, name)
 
 
 rbonly = DataList(master.getMatching({'color':['red', 'blue']}))
