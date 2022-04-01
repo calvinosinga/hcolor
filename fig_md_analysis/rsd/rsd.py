@@ -16,10 +16,12 @@ for f in files:
     for s in snap:
         rlib = flib.load(box, s, axis, res, f)
         kmin = rlib.results['pk'][0].xvalues[0]
+        
         master.loadResults(rlib.results['pk'])
 smfont = 10
 larfont = 12
-
+box = rlib.results['pk'][0].props['box']
+res = rlib.results['pk'][0].props['grid_resolution']
 def space_compare(ip, allcolor, withlegend, name):
     withall = 'resolved' in ip['color']
     dl = DataList(master.getMatching(ip))
@@ -84,6 +86,7 @@ def space_compare(ip, allcolor, withlegend, name):
     lkw['loc'] = 'center right'
     if withlegend:
         fg.drawLegend(lkw, (fg.dim[0]-1,0))
+
     fcolors = np.empty(fg.dim, dtype = object)
     trgba = mpl.colors.to_rgba
     alpha = 0.15
@@ -94,7 +97,7 @@ def space_compare(ip, allcolor, withlegend, name):
     flib.setFacecolor(fg, fcolors)
     flib.plotOnes(fg, (fg.dim[0]-1,0))
     fg.save(name)
-    return
+    return box, res
 
 withall = ['red', 'blue', 'resolved']
 noall = ['red', 'blue']
@@ -121,7 +124,7 @@ for a in [withall, noall]:
                 ip['snapshot'] = ss
                 ip['color'] = a
                 
-                space_compare(ip, c, leg, name)
+                box, res = space_compare(ip, c, leg, name)
         
 
 # make ratios
