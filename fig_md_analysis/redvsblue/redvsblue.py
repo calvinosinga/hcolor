@@ -142,6 +142,7 @@ def smooth_compare(smooth_vals):
     ip = {'snapshot':99, 'vn_fieldname':'vn'}
     dl = DataList(master.getMatching(ip))
     rob = flib.makeBlueRedRatio(dl)
+    print('smooth compare')
     print(len(rob))
     return
 
@@ -152,7 +153,7 @@ for smooth_val in smooth_vals:
     for ss in [99, 67]:
         ip['snapshot'] = ss
         name = 'redvsblue_smooth%d_%03d.png'%(smooth_val, ss)
-        box, res = color_compare(ip, smooth_val, name)
+        color_compare(ip, smooth_val, name)
 
 smooth_compare(smooth_vals)
 
