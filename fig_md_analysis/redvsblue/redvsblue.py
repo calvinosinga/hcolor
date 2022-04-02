@@ -98,7 +98,8 @@ def color_compare(ip, area_or_middle, smooth, savename):
     
     fg.plot()
 
-    pkslc = (slice(0,fg.dim[0]-1), slice(None))
+    redslc = (slice(1,fg.dim[0]-1), slice(None))
+    realslc = (slice(0, 1), slice(None))
     # fix the axes
     axparams = {}
     flib.setNyq(fg, kmin, res, box)
@@ -107,7 +108,9 @@ def color_compare(ip, area_or_middle, smooth, savename):
     fg.setAxisParams(axparams)
     axparams['yscale'] = 'log'
     axparams['ylim'] = [0.1, 1e4]
-    fg.setAxisParams(axparams, slc=pkslc)
+    fg.setAxisParams(axparams, slc=redslc)
+    axparams['ylim'] = [1, 1e4]
+    fg.setAxisParams(axparams, slc = realslc)
     # fix the tick labels
     fg.setDefaultTicksParams()
     fg.setTicks({'labelsize':smfont, 'direction':'in'})
