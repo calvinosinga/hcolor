@@ -3,6 +3,19 @@ import site
 import pickle as pkl
 import numpy as np
 import copy
+import seaborn as sb
+
+def getCdict():
+    cdict = {}
+    cdict['real'] = 'green'
+    cdict['redshift'] = 'orange'
+    cdict['red'] = 'red'
+    cdict['blue'] = 'blue'
+    zevo = {}
+    for k, v in cdict.items():
+        zevo[k] = sb.color_palette(v.capitalize() + 's', 5)
+    cdict['zevo'] = zevo
+    return cdict
 
 def siteFG():
     FGPATH = '/homes/cosinga/figrid/'

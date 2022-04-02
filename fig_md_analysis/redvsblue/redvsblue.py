@@ -24,12 +24,14 @@ for f in files:
 
 smfont = 10
 larfont = 12
-real_color = 'green'
-redshift_color = 'gold'
+cdict = flib.getCdict()
+real_color = cdict['real']
+redshift_color = cdict['redshift']
+blue_color = cdict['blue']
+red_color = cdict['red']
 
 def color_compare(ip, smooth, savename):
     def _smooth(ax, data, kwargs):
-        print('using smooth func')
         x = []
         ymin = []
         ymax = []
@@ -64,22 +66,18 @@ def color_compare(ip, smooth, savename):
     
     fgrob.setFunc({'figrid_process':'fill'}, _smooth)
     fgrob.plot()
-    axparams = {}
-    axparams['xscale'] = 'log'
-    axparams['ylim'] = [0, 2]
-    fgrob.setAxisParams(axparams)
-    fgrob.save(savename + 'ratio_only.png')
+
     dl = DataList(master.getMatching(ip))
     fg = Figrid(dl)
     fg.setColOrder(['real', 'redshift'])
     fg.arrange('space', 'is_particle', panel_length = 2, panel_bt = 0.11, yborder = 0.3)
     pargs = {}
     pargs['label'] = 'HI-Blue Cross-Power'
-    pargs['color'] = 'blue'
+    pargs['color'] = blue_color
     pargs['alpha'] = 0.55
     fg.makeFills({'color':'blue'}, pargs)
     pargs['label'] = 'HI-Red Cross-Power'
-    pargs['color'] = 'red'
+    pargs['color'] = red_color
     fg.makeFills({'color':'red'}, pargs)
     fg.combineFigrids(fgrob)
     
@@ -172,28 +170,38 @@ for smooth_val in smooth_vals:
 
 
 smooth_compare(smooth_vals)
+ip['snapshot'] = 99
+color_compare(ip, 1, 'redvsblue_FINAL.pdf')
 
-def redshift_evo():
+def redshift_evo(ip, savename, withratio):
 
-    rbonly = DataList(master.getMatching({'color':['red', 'blue']}))
+    rbonly = DataList(master.getMatching(ip))
     withrat = flib.makeBlueRedRatio(rbonly)
-    rbonly.dclist.extend(withrat)
+    if withratio:
+        rbonly.dclist.extend(withrat)
 
     fg = Figrid(rbonly)
     fg.setRowOrder(['real', 'redshift'])
-    fg.setColOrder(['blue', 'red', 'ratio'])
+    if withratio:
+        fg.setColOrder(['blue', 'red', 'ratio'])
+    else:
+        fg.setColOrder(['blue', 'red'])
+    
     fg.arrange('color', 'space', panel_length = 2, panel_bt = 0.11, yborder = 0.3)
-    zcols = sb.color_palette('summer', len(master.getAttrVals('snapshot')))
-    pargs = {}
-    pargs['label'] = 'z=0'
-    pargs['color'] = zcols[0]
-    pargs['alpha'] = 0.55
-    fg.makeFills({'snapshot': 99}, pargs)
-    pargs['label'] = 'z=0.5'
-    pargs['color'] = zcols[1]
-    fg.makeFills({'snapshot':67}, pargs)
+    zcols = flib.getCdict()['zevo']
+    
+    for rv in fg.rowValues:
+        pargs = {}
+        pargs['label'] = 'z=0'
+        pargs['color'] = zcols[rv][0]
+        pargs['alpha'] = 0.55
+        fg.makeFills({'snapshot': 99, 'color':rv}, pargs)
+        pargs['label'] = 'z=0.5'
+        pargs['color'] = zcols[rv][1]
+        fg.makeFills({'snapshot':67, 'color':rv}, pargs)
+        return
+    
     fg.plot()
-
     pkslc = (slice(0,2), slice(None))
     # fix the axes
     axparams = {}
@@ -217,7 +225,11 @@ def redshift_evo():
     txtkw['ha'] = 'center'
     txtkw['va'] = 'top'
     txtkw['fontsize'] = smfont
-    fg.setRowLabels(['Blue Galaxies', 'Red Galaxies', 'Color Ratio'], [0.5, 0.95],
+    if withratio:
+        fg.setRowLabels(['Blue Galaxies', 'Red Galaxies', 'Color Ratio'], [0.5, 0.95],
+                txtkw)
+    else:
+        fg.setRowLabels(['Blue Galaxies', 'Red Galaxies'], [0.5, 0.95],
                 txtkw)
     txtkw['ha'] = 'left'
     txtkw['va'] = 'bottom'
@@ -229,11 +241,19 @@ def redshift_evo():
     fg.drawLegend(lkw, (1,1))
     lkw['loc'] = 'center right'
     # fg.drawLegend(lkw, (2,0))
-    fcolors = np.empty(fg.dim, dtype = object)
-    trgba = mpl.colors.to_rgba
-    alpha = 0.15
-    for i in range(2):
-        flib.plotOnes(fg, (2, i))
+    if withratio:
+        for i in range(2):
+            flib.plotOnes(fg, (2, i))
     # fcolors[:,0] = [trgba('blue', alpha), trgba('red', alpha), trgba('white')]
     # flib.setFacecolor(fg, fcolors)
-    fg.save("redvsblue_redshift_evo.png")
+    fg.save(savename)
+
+for wr in [True, False]:
+    if wr:
+        wrst = 'withratio'
+    else:
+        wrst = 'noratio'
+    name = 'redvsblue_zevo_%s.png'%wrst
+    redshift_evo({'color':['red', 'blue']}, name, wr)
+
+redshift_evo({'color':['red', 'blue']}, 'redvsblue_zevoFINAL.pdf', False)
