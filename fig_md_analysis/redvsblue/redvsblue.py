@@ -4,6 +4,9 @@ from figrid.figrid import DataList
 from figrid.figrid import Figrid
 import numpy as np
 import matplotlib as mpl
+import matplotlib.pyplot as plt
+import copy
+import seaborn as sb
 
 box = 'tng100'
 snap = [99, 67]
@@ -15,73 +18,52 @@ for f in files:
     for s in snap:
         rlib = flib.load(box, s, axis, res, f)
         kmin = rlib.results['pk'][0].xvalues[0]
+        BOX = rlib.results['pk'][0].props['box']
+        RES = rlib.results['pk'][0].props['grid_resolution']
         master.loadResults(rlib.results['pk'])
 
 smfont = 10
 larfont = 12
+real_color = 'green'
+redshift_color = 'gold'
 
-def color_compare(ip, area_or_middle, smooth, savename):
+def color_compare(ip, smooth, savename):
     def _smooth(ax, data, kwargs):
-        shape = int(data[0].shape[0] / 2)
-        x = np.zeros(shape)
-        ymin = np.zeros_like(x)
-        ymax = np.zeros_like(x)
+        
+        x = []
+        ymin = []
+        ymax = []
 
-        for i in range(shape):
-            x[i] = (data[0][2*i] + data[0][2*i + 1]) / 2
-            ymin[i] = (data[1][2*i] + data[1][2*i + 1]) / 2
-            ymax[i] = (data[2][2*i] + data[2][2*i + 1]) / 2
+        idx = 0
+        while idx < len(data[0]):
+            x.append(data[0][idx])
+            ymin.append(np.mean(data[1][idx:idx+smooth]))
+            ymax.append(np.mean(data[2][idx:idx+smooth]))
+            idx += smooth
+
 
         ax.fill_between(x, ymin, ymax, **kwargs)      
-        return
-
-    def _middle(ax, data, kwargs):
-        y = np.mean(np.array([data[1], data[2]]), axis = 1)
-        ax.plot(data[0], y, **kwargs)
-        return
-    
-    def _smoothMiddle(ax, data, kwargs):
-        shape = int(data[0].shape[0] / 2)
-        x = np.zeros(shape)
-        ymin = np.zeros_like(x)
-        ymax = np.zeros_like(x)
-
-        for i in range(shape):
-            x[i] = (data[0][2*i] + data[0][2*i + 1]) / 2
-            ymin[i] = (data[1][2*i] + data[1][2*i + 1]) / 2
-            ymax[i] = (data[2][2*i] + data[2][2*i + 1]) / 2
-        
-        y = np.mean(np.array([ymin, ymax]), axis = 1)
-        ax.plot(x, y, **kwargs)
         return
     
     # make ratios
     dl = DataList(master.getMatching(ip))
     rob = flib.makeBlueRedRatio(dl)
     robdl = DataList(rob)
-    if area_or_middle == 'middle':
-        if smooth:
-            robdl.setFunc({'figrid_process':'fill'}, _smoothMiddle)
-        else:
-            robdl.setFunc({'figrid_process':'fill'}, _middle)
     
-    elif smooth:
-        robdl.setFunc({'figrid_process':'fill'}, _smooth)
+    robdl.setFunc({'figrid_process':'fill'}, _smooth)
     
     fgrob = Figrid(robdl)
     fgrob.arrange('ratio', 'is_particle', panel_length = 2)
     fkw = {}
     fkw['label'] = 'Real Space'
-    fkw['color'] = 'gray'
+    fkw['color'] = real_color
     fkw['alpha'] = 0.35
     fgrob.makeFills({'space':'real'}, fkw)
     fkw['label'] = 'Redshift Space'
-    fkw['color'] = 'tan'
+    fkw['color'] = redshift_color
     fgrob.makeFills({'space':'redshift'}, fkw)
 
 
-    box = dl.getAttrVals('box')[0]
-    res = dl.getAttrVals('grid_resolution')[0]
     dl = DataList(master.getMatching(ip))
     fg = Figrid(dl)
     fg.setColOrder(['real', 'redshift'])
@@ -102,7 +84,7 @@ def color_compare(ip, area_or_middle, smooth, savename):
     realslc = (slice(0, 1), slice(None))
     # fix the axes
     axparams = {}
-    flib.setNyq(fg, kmin, res, box)
+    flib.setNyq(fg, kmin, RES, BOX)
     axparams['xscale'] = 'log'
     axparams['ylim'] = [0, 2]
     fg.setAxisParams(axparams)
@@ -135,31 +117,49 @@ def color_compare(ip, area_or_middle, smooth, savename):
     fcolors = np.empty(fg.dim, dtype = object)
     trgba = mpl.colors.to_rgba
     alpha = 0.3
-    fcolors[:,0] = [trgba('gray', alpha), trgba('tan', alpha), trgba('white')]
+    fcolors[:,0] = [trgba(real_color, alpha), trgba(redshift_color, alpha), trgba('white')]
     flib.setFacecolor(fg, fcolors)
     flib.plotOnes(fg, (fg.dim[0]-1,0))
     fg.save(savename)
-    return box, res
+    return
 
-# the red vs blue ratios don't make a lot of sense with the ratios
+def smooth_compare(smooth_vals):
+    # def _smooth(data):
+    #     x = []
+    #     ymin = []
+    #     ymax = []
+
+    #     idx = 0
+    #     while idx < len(data[0]):
+    #         x.append(data[0][idx])
+    #         ymin.append(np.mean(data[1][idx:idx+smooth]))
+    #         ymax.append(np.mean(data[2][idx:idx+smooth]))
+    #         idx += smooth
+
+
+    #     ax.fill_between(x, ymin, ymax, **kwargs)      
+    #     return
+    ip = {'snapshot':99, 'vn_fieldname':'vn'}
+    dl = DataList(master.getMatching(ip))
+    rob = flib.makeBlueRedRatio(dl)
+    print(len(rob))
+    return
+
 ip = {'color':['red', 'blue']}
-for smoother in [True, False]:
-    for plottype in ['middle', 'area']:
-        for ss in [99, 67]:
-            ip['snapshot'] = ss
-            if smoother:
-                smoothname = 'smoothed'
-            else:
-                smoothname = 'nosmooth'
-            name = 'redvsblue_noall_%s_%s_%03d.pdf'%(plottype, smoothname, ss)
-            box, res = color_compare(ip, plottype, smoother, name)
 
+smooth_vals = [1, 2, 5, 10]
+for smooth_val in smooth_vals:
+    for ss in [99, 67]:
+        ip['snapshot'] = ss
+        name = 'redvsblue_smooth%d_%03d.png'%(smooth_val, ss)
+        box, res = color_compare(ip, smooth_val, name)
+
+smooth_compare(smooth_vals)
 
 rbonly = DataList(master.getMatching({'color':['red', 'blue']}))
 withrat = flib.makeBlueRedRatio(rbonly)
 rbonly.dclist.extend(withrat)
 
-import seaborn as sb
 fg = Figrid(rbonly)
 fg.setRowOrder(['real', 'redshift'])
 fg.setColOrder(['blue', 'red', 'ratio'])

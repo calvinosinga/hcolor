@@ -18,6 +18,8 @@ for f in files:
         kmin = rlib.results['pk'][0].xvalues[0]
         
         master.loadResults(rlib.results['pk'])
+
+real_color = ''
 smfont = 10
 larfont = 12
 box = rlib.results['pk'][0].props['box']

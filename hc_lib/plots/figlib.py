@@ -3,8 +3,8 @@ import site
 import pickle as pkl
 import numpy as np
 import copy
-def siteFG():
 
+def siteFG():
     FGPATH = '/homes/cosinga/figrid/'
     site.addsitedir(FGPATH)
     return
@@ -19,12 +19,6 @@ def load(box, snap, axis, res, filename, dirname = 'fiducial'):
     f = pkl.load(open(filepath, 'rb'))
     return f
 
-def printAttrs(dl, attrs):
-    for a in attrs:
-        print('data for %s'%a)
-        print(dl.getAttrVals(a))
-
-    return
 
 def logAxes(fg):
     axkw = {}
