@@ -29,7 +29,7 @@ redshift_color = 'gold'
 
 def color_compare(ip, smooth, savename):
     def _smooth(ax, data, kwargs):
-        
+        print('using smooth func')
         x = []
         ymin = []
         ymax = []
@@ -37,8 +37,8 @@ def color_compare(ip, smooth, savename):
         idx = 0
         while idx < len(data[0]):
             x.append(data[0][idx])
-            ymin.append(np.mean(data[1][idx:idx+smooth]))
-            ymax.append(np.mean(data[2][idx:idx+smooth]))
+            ymin.append(np.median(data[1][idx:idx+smooth]))
+            ymax.append(np.median(data[2][idx:idx+smooth]))
             idx += smooth
 
 
@@ -131,7 +131,7 @@ def smooth_compare(smooth_vals):
         idx = 0
         while idx < len(data[0]):
             x.append(data[0][idx])
-            y.append(np.mean(data[1][idx:idx+smooth]))
+            y.append(np.median(data[1][idx:idx+smooth]))
             idx += smooth
 
 
@@ -150,6 +150,7 @@ def smooth_compare(smooth_vals):
             p.set_xscale('log')
             p.set_ylim(0, 2)
     
+    axs[0].legend()
 
     fig.savefig('smooth_compare.png')
 
@@ -157,12 +158,12 @@ def smooth_compare(smooth_vals):
 
 ip = {'color':['red', 'blue']}
 
-smooth_vals = [1, 5, 10, 50, 100, 200]
-# for smooth_val in smooth_vals:
-#     for ss in [99, 67]:
-#         ip['snapshot'] = ss
-#         name = 'redvsblue_smooth%d_%03d.png'%(smooth_val, ss)
-#         color_compare(ip, smooth_val, name)
+smooth_vals = [1, 5]
+for smooth_val in smooth_vals:
+    for ss in [99, 67]:
+        ip['snapshot'] = ss
+        name = 'redvsblue_smooth%d_%03d.png'%(smooth_val, ss)
+        color_compare(ip, smooth_val, name)
 
 
 smooth_compare(smooth_vals)
