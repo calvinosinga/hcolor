@@ -125,6 +125,7 @@ def color_compare(ip, smooth, savename):
     flib.setFacecolor(fg, fcolors)
     flib.plotOnes(fg, (fg.dim[0]-1,0))
     fg.save(savename)
+    fg.clf()
     return
 
 def smooth_compare(smooth_vals):
@@ -158,7 +159,8 @@ def smooth_compare(smooth_vals):
     axs[0].legend()
 
     fig.savefig('smooth_compare.png')
-
+    plt.clf()
+    plt.close()
     return
 
 ip = {'color':['red', 'blue']}
@@ -194,21 +196,22 @@ def redshift_evo(ip, savename, withratio):
     print(fg.rowValues)
     print(fg.colValues)
     for rv in fg.rowValues:
-        pargs = {}
-        pargs['label'] = 'z=0'
-        pargs['color'] = zcols[rv][0]
-        pargs['alpha'] = 0.55
-        fg.makeFills({'snapshot': 99, 'color':rv}, pargs)
-        pargs['label'] = 'z=0.5'
-        pargs['color'] = zcols[rv][1]
-        fg.makeFills({'snapshot':67, 'color':rv}, pargs)
-        return
+        if rv in zcols:
+            pargs = {}
+            pargs['label'] = 'z=0'
+            pargs['color'] = zcols[rv][0]
+            pargs['alpha'] = 0.55
+            fg.makeFills({'snapshot': 99, 'color':rv}, pargs)
+            pargs['label'] = 'z=0.5'
+            pargs['color'] = zcols[rv][1]
+            fg.makeFills({'snapshot':67, 'color':rv}, pargs)
+        
     
     fg.plot()
     pkslc = (slice(0,2), slice(None))
     # fix the axes
     axparams = {}
-    flib.setNyq(fg, kmin, res, box)
+    flib.setNyq(fg, kmin, RES, BOX)
     axparams['xscale'] = 'log'
     axparams['ylim'] = [0, 2]
     fg.setAxisParams(axparams)
@@ -249,7 +252,10 @@ def redshift_evo(ip, savename, withratio):
             flib.plotOnes(fg, (2, i))
     # fcolors[:,0] = [trgba('blue', alpha), trgba('red', alpha), trgba('white')]
     # flib.setFacecolor(fg, fcolors)
+    print('about to save figure: %s'%savename)
     fg.save(savename)
+    fg.clf()
+    return
 
 for wr in [True, False]:
     if wr:
