@@ -103,10 +103,9 @@ def makeBlueRedRatio(datalist):
             del mattr[rm]
         mattr['color'] = 'red'
 
-#        print(mattr)
         reds = datalist.getMatching(mattr)
-#        print(redshift)
-        print(len(reds))
+        if len(reds) > 1:
+            print('more than one corresponding red for a blue')
         reds = reds[0]
         data = [dc.data[0], reds.data[1]/dc.data[1]]
         ratio = DataContainer(data)

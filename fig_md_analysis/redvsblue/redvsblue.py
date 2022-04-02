@@ -31,6 +31,7 @@ blue_color = cdict['blue']
 red_color = cdict['red']
 
 def color_compare(ip, smooth, savename):
+    print('MAKING COLOR COMPARISON')
     def _smooth(ax, data, kwargs):
         x = []
         ymin = []
@@ -127,6 +128,7 @@ def color_compare(ip, smooth, savename):
     return
 
 def smooth_compare(smooth_vals):
+    print('MAKING SMOOTHING COMPARISON')
     def _smooth(ax, data, smooth):
         x = []
         y = []
@@ -174,7 +176,7 @@ ip['snapshot'] = 99
 color_compare(ip, 1, 'redvsblue_FINAL.pdf')
 
 def redshift_evo(ip, savename, withratio):
-
+    print('MAKING REDSHIFT EVOLUTION FIGURE')
     rbonly = DataList(master.getMatching(ip))
     withrat = flib.makeBlueRedRatio(rbonly)
     if withratio:
@@ -189,7 +191,8 @@ def redshift_evo(ip, savename, withratio):
     
     fg.arrange('color', 'space', panel_length = 2, panel_bt = 0.11, yborder = 0.3)
     zcols = flib.getCdict()['zevo']
-    
+    print(fg.rowValues)
+    print(fg.colValues)
     for rv in fg.rowValues:
         pargs = {}
         pargs['label'] = 'z=0'
