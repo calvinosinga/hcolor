@@ -126,18 +126,16 @@ def color_compare(ip, smooth, savename):
 def smooth_compare(smooth_vals):
     def _smooth(ax, data, smooth):
         x = []
-        ymin = []
-        ymax = []
+        y = []
 
         idx = 0
         while idx < len(data[0]):
             x.append(data[0][idx])
-            ymin.append(np.mean(data[1][idx:idx+smooth]))
-            ymax.append(np.mean(data[2][idx:idx+smooth]))
+            y.append(np.mean(data[1][idx:idx+smooth]))
             idx += smooth
 
 
-        ax.fill_between(x, ymin, ymax, label = 'smooth%d'%smooth)      
+        ax.plot(x, y, label = 'smooth%d'%smooth)      
         return
     
     ip = {'snapshot':99, 'vn_fieldname':'vn'}
