@@ -50,7 +50,6 @@ def color_compare(ip, smooth, savename):
     rob = flib.makeBlueRedRatio(dl)
     robdl = DataList(rob)
     
-    robdl.setFunc({'figrid_process':'fill'}, _smooth)
     
     fgrob = Figrid(robdl)
     fgrob.arrange('ratio', 'is_particle', panel_length = 2)
@@ -62,8 +61,14 @@ def color_compare(ip, smooth, savename):
     fkw['label'] = 'Redshift Space'
     fkw['color'] = redshift_color
     fgrob.makeFills({'space':'redshift'}, fkw)
-
-
+    
+    fgrob.setFunc({'figrid_process':'fill'}, _smooth)
+    fgrob.plot()
+    axparams = {}
+    axparams['xscale'] = 'log'
+    axparams['ylim'] = [0, 2]
+    fgrob.setAxisParams(axparams)
+    fgrob.save(savename + 'ratio_only.png')
     dl = DataList(master.getMatching(ip))
     fg = Figrid(dl)
     fg.setColOrder(['real', 'redshift'])
@@ -158,7 +163,7 @@ def smooth_compare(smooth_vals):
 
 ip = {'color':['red', 'blue']}
 
-smooth_vals = [1, 5]
+smooth_vals = [1, 5, 10]
 for smooth_val in smooth_vals:
     for ss in [99, 67]:
         ip['snapshot'] = ss
