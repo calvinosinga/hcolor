@@ -104,6 +104,7 @@ def color_compare(ip, smooth, savename):
     kw = {'fontsize':larfont}
     pknum = fg.dim[0] - 1
     ypos = [0, 1 - 0.5*(fg.panel_length * pknum + fg.panel_bt[1] * (pknum-1)+ fg.yborder[1]) / fg.figsize[1]]
+    print('ypos : %s'%str(ypos))
     flib.pklabels(fg, ysub = r'\rm{HI-gal}', ypos = ypos, xtxtkw = kw, ytxtkw = kw)
     txtkw = {}
     txtkw['ha'] = 'center'
@@ -193,8 +194,6 @@ def redshift_evo(ip, savename, withratio):
     
     fg.arrange('color', 'space', panel_length = 2, panel_bt = 0.11, yborder = 0.3)
     zcols = flib.getCdict()['zevo']
-    print(fg.rowValues)
-    print(fg.colValues)
     for rv in fg.rowValues:
         if rv in zcols:
             pargs = {}
@@ -252,7 +251,6 @@ def redshift_evo(ip, savename, withratio):
             flib.plotOnes(fg, (2, i))
     # fcolors[:,0] = [trgba('blue', alpha), trgba('red', alpha), trgba('white')]
     # flib.setFacecolor(fg, fcolors)
-    print('about to save figure: %s'%savename)
     fg.save(savename)
     fg.clf()
     return
@@ -265,4 +263,5 @@ for wr in [True, False]:
     name = 'redvsblue_zevo_%s.png'%wrst
     redshift_evo({'color':['red', 'blue']}, name, wr)
 
-redshift_evo({'color':['red', 'blue']}, 'redvsblue_zevoFINAL.pdf', False)
+# displays same information as the one shown in rsd
+# redshift_evo({'color':['red', 'blue']}, 'redvsblue_zevoFINAL.pdf', False)
