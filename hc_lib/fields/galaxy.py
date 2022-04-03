@@ -219,7 +219,7 @@ class galaxy(Field):
             elif gp['space'] == 'redshift':
                 pos_arr = rspos
 
-            if gp['species'] == 'stmass':
+            if gp['gal_species'] == 'stmass':
                 grid = computeGal(pos_arr[mask, :], mass[mask, 4], g)
             else:
                 total_mass = np.sum(mass, axis = 1)

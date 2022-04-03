@@ -82,7 +82,7 @@ class galaxy_grid_props(grid_props):
                 gal_resolution_def, color_cut):
         other = {}
         lst = [color, species, gal_resolution_def, color_cut]
-        keys = ['color', 'species', 'gal_res','color_cut']
+        keys = ['color', 'gal_species', 'gal_res','color_cut']
         for i in range(len(lst)):
             other[keys[i]] = lst[i]
 
@@ -92,7 +92,7 @@ class galaxy_grid_props(grid_props):
     
     @classmethod
     def loadProps(cls, dct):
-        inputs = ['mas', 'fieldname', 'space', 'color', 'species', 'gal_res', 'color_cut']
+        inputs = ['mas', 'fieldname', 'space', 'color', 'gal_species', 'gal_res', 'color_cut']
         prm = []
         for i in inputs:
             try:
@@ -110,7 +110,7 @@ class galaxy_grid_props(grid_props):
 
         # for galaxyXgalaxy
         if op['fieldname'] == sp['fieldname']:
-            both_stmass = op['species'] == 'stmass' and sp['species'] == 'stmass'
+            both_stmass = op['gal_species'] == 'stmass' and sp['gal_species'] == 'stmass'
             both_diemer = sp['gal_res'] == 'diemer' and op['gal_res'] == 'diemer'
             both_fid_cc = sp['color_cut'] == '0.60' and op['color_cut'] == '0.60'
             not_same = not op['color'] == sp['color']
@@ -145,13 +145,13 @@ class galaxy_grid_props(grid_props):
             fid_colcut = self.props['color_cut'] == '0.60'
             is_resolved = self.props['color'] == 'resolved'
             only_pk()
-            is_stmass = self.props['species'] == 'stmass'
+            is_stmass = self.props['gal_species'] == 'stmass'
             return (fid_colcut or is_resolved) and is_stmass
         
         # if there isnt' a resolution definition, must be 'all'
         elif self.props['color'] == 'all':
             is_CICW = self.props['mas'] == 'CICW'
-            is_stmass = self.props['species'] == 'stmass'
+            is_stmass = self.props['gal_species'] == 'stmass'
             return is_CICW and is_stmass
 
         return False
@@ -164,6 +164,7 @@ class hiptl_grid_props(grid_props):
         other = {}
         other['map'] = mass_or_temp
         other['model'] = model
+        other['HI_fieldname'] = field
         super().__init__(mas, field, space, other)
         return
     
@@ -203,7 +204,7 @@ class hiptl_grid_props(grid_props):
                 # also include resolved
                 is_resolved = op['color'] == 'resolved'
                 fid_colcut = op['color_cut'] == '0.60'
-                is_stmass = op['species'] == 'stmass'
+                is_stmass = op['gal_species'] == 'stmass'
                 galcheck = (is_resolved or fid_colcut) and is_stmass
 
                 
@@ -242,6 +243,7 @@ class hisubhalo_grid_props(grid_props):
         splt = model.split('_')
         other['projection'] = splt[-1]
         other['HI_res'] = HI_res
+        other['HI_fieldname'] = field
         super().__init__(mas, field, space, other)
     
     @classmethod
@@ -294,7 +296,7 @@ class hisubhalo_grid_props(grid_props):
             if op['gal_res'] == 'diemer':
                 is_resolved = op['color'] == 'resolved'
                 fid_colcut = op['color_cut'] == '0.60'
-                is_stmass = op['species'] == 'stmass'
+                is_stmass = op['gal_species'] == 'stmass'
                 # don't want total mass
                 check_gal_props = (is_resolved or fid_colcut) and is_stmass
 
@@ -305,7 +307,7 @@ class hisubhalo_grid_props(grid_props):
             elif 'bin' in op['gal_res'] or 'threshold' in op['gal_res']:
                 is_resolved = op['color'] == 'resolved'
                 fid_colcut = op['color_cut'] == '0.60'
-                is_stmass = op['species'] == 'stmass'
+                is_stmass = op['gal_species'] == 'stmass'
                 check_gal_props = (is_resolved or fid_colcut) and is_stmass
 
                 # only calculate cross-power with fiducial HI_res
@@ -330,13 +332,13 @@ class hisubhalo_grid_props(grid_props):
 class ptl_grid_props(grid_props):
     
     def __init__(self, mas, field, space, species):
-        other = {'species':species}
+        other = {'ptl_species':species}
         super().__init__(mas, field, space, other)
         return
     
     @classmethod
     def loadProps(cls, dct):
-        inputs = ['mas', 'fieldname', 'space', 'species']
+        inputs = ['mas', 'fieldname', 'space', 'ptl_species']
         prm = []
         for i in inputs:
             try:
@@ -353,7 +355,7 @@ class ptl_grid_props(grid_props):
         if op['fieldname'] == 'galaxy':
             fid_colcut = op['color_cut'] == '0.60'
             fid_res = op['gal_res'] == 'diemer'
-            stsp = op['species'] == 'stmass'
+            stsp = op['gal_species'] == 'stmass'
             match = fid_colcut and fid_res and stsp
             return match and super().isCompatible(other)
         elif op['fieldname'] == 'galaxy_dust':
@@ -366,8 +368,9 @@ class vn_grid_props(grid_props):
     def __init__(self, mas, field, space, mass_or_temp):
         other = {}
         other['map'] = mass_or_temp
-
+        other['HI_fieldname'] = field
         super().__init__(mas, field, space, other)
+        return
 
     @classmethod
     def loadProps(cls, dct):
@@ -397,7 +400,7 @@ class vn_grid_props(grid_props):
                 # also include resolved
                 is_resolved = op['color'] == 'resolved'
                 fid_colcut = op['color_cut'] == '0.60'
-                is_stmass = op['species'] == 'stmass'
+                is_stmass = op['gal_species'] == 'stmass'
                 check_gal = (is_resolved or fid_colcut) and is_stmass
 
 

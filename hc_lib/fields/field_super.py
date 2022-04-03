@@ -51,7 +51,7 @@ class Field():
         paramparams = ['BoxSize', 'HubbleParam']
         for p in paramparams:
             self.header[p] = temp[p]
-        self.header['BoxSize'] *= self.header["Time"]/1e3
+        self.header['BoxSize'] *= 1/1e3
         # don't want to use self._convertPos(..) because that might change in subclasses
         self.header['MassTable'] *= 1e10/self.header['HubbleParam']
         self.box = self.header['BoxSize']
@@ -163,7 +163,7 @@ class Field():
         return il.groupcat.loadSubhalos(simpath, self.snapshot, fields=fields)
     
     def _toRedshiftSpace(self, pos, vel):
-        boxsize = self.header["BoxSize"] # Mpc/h
+        boxsize = self.header["BoxSize"] # cMpc/h
         hubble = self.header["HubbleParam"]*100 # defined using big H
         redshift = self.header['Redshift']
 
@@ -199,7 +199,7 @@ class Field():
     
     def _convertDensity(self, density):
         # assuming that the density is given in 10^10 sm/h / (ckpc/h)**3
-        density *= (self.header['Time']/1e3)**3
+        density *= (1/1e3)**3
         density *= 1e10/self.header["HubbleParam"]
         return density
 

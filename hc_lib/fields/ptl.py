@@ -61,11 +61,11 @@ class ptl(Field):
         ################################################################
 
         for g in list(self.gridprops.values()):
-            if g.props['species'] == 'stmass':
+            if g.props['ptl_species'] == 'stmass':
                 slc = slices[2]
-            elif g.props['species'] == 'dm':
+            elif g.props['ptl_species'] == 'dm':
                 slc = slices[1]
-            elif g.props['species'] == 'gas':
+            elif g.props['ptl_species'] == 'gas':
                 slc = slices[0]
             else:
                 slc = slice(None)

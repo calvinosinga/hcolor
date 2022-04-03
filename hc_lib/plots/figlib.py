@@ -11,6 +11,7 @@ def getCdict():
     cdict['redshift'] = 'orange'
     cdict['red'] = 'red'
     cdict['blue'] = 'blue'
+    cdict['resolved'] = 'gray'
     zevo = {}
     for k, v in cdict.items():
         zevo[k] = sb.color_palette(v.capitalize() + 's', 5)

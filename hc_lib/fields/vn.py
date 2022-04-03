@@ -108,7 +108,7 @@ class vn(Field):
     # these have to be redefined since Paco uses solar/h for mass and
     # cMpc/h for position
     def _convertPos(self, pos=None):
-        pos *= self.header['Time']
+        # want to keep the position in terms of cMpc/h
         return pos
     
     def _convertMass(self, mass=None):
