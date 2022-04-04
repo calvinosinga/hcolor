@@ -100,7 +100,7 @@ def makeBlueRedRatio(datalist):
         mattr = copy.deepcopy(dc.attrs)
         rmattr = []
         for k in mattr:
-            if 'fieldname' in k or 'runtime' in k or 'color' in k:
+            if 'runtime' in k or 'color' in k:
                 rmattr.append(k)
         for rm in rmattr:
             del mattr[rm]
