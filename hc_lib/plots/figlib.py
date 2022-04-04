@@ -11,7 +11,7 @@ def getCdict():
     cdict['redshift'] = 'orange'
     cdict['red'] = 'red'
     cdict['blue'] = 'blue'
-    cdict['resolved'] = 'gray'
+    cdict['resolved'] = 'grey'
     zevo = {}
     for k, v in cdict.items():
         zevo[k] = sb.color_palette(v.capitalize() + 's', 5)
@@ -58,6 +58,8 @@ def setNyq(fg, xmin, res, box, shift = 0):
 def pklabels(fg, xpos = [], ypos = [], ysub = '', xtxtkw = {}, ytxtkw = {}):
     xtext = 'k (cMpc/h)$^{-1}$'
     ytext = 'P$_{' + ysub + '}$ (k) (cMpc/h)$^{-3}$'
+    if not xpos:
+        xpos = [(fg.xborder[0] + 0.5 *  np.sum(fg.panel_widths)) / fg.figsize[0], 0]
     fg.makeXLabel(xtext, xpos, xtxtkw)
     fg.makeYLabel(ytext, ypos, ytxtkw)
     return

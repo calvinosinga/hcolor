@@ -71,7 +71,8 @@ def color_compare(ip, smooth, savename):
     dl = DataList(master.getMatching(ip))
     fg = Figrid(dl)
     fg.setColOrder(['real', 'redshift'])
-    fg.arrange('space', 'is_particle', panel_length = 2, panel_bt = 0.11, yborder = 0.3)
+    fg.arrange('space', 'is_particle', panel_length = 2, panel_bt = 0.11, xborder = [0.33, 0],
+            yborder = [0.33, 0])
     pargs = {}
     pargs['label'] = 'HI-Blue Cross-Power'
     pargs['color'] = blue_color
@@ -103,9 +104,10 @@ def color_compare(ip, smooth, savename):
     # labels
     kw = {'fontsize':larfont}
     pknum = fg.dim[0] - 1
-    ypos = [0, 1 - 0.5*(fg.panel_length * pknum + fg.panel_bt[1] * (pknum-1)+ fg.yborder[1]) / fg.figsize[1]]
+    ypos = [fg.xborder[0] * 0.1 / fg.figsize[0], 1 - 0.5*(fg.panel_length * pknum + fg.panel_bt[1] * (pknum-1)+ fg.yborder[1]) / fg.figsize[1]]
     print('ypos : %s'%str(ypos))
-    flib.pklabels(fg, ysub = r'\rm{HI-gal}', ypos = ypos, xtxtkw = kw, ytxtkw = kw)
+    ykw = {'fontsize':larfont, 'ha':'left'}
+    flib.pklabels(fg, ysub = r'\rm{HI-gal}', ypos = ypos, xtxtkw = kw, ytxtkw = ykw)
     txtkw = {}
     txtkw['ha'] = 'center'
     txtkw['va'] = 'top'
@@ -113,7 +115,7 @@ def color_compare(ip, smooth, savename):
     fg.setRowLabels(['Real Space', 'Redshift Space', 'Color Ratio'], [0.5, 0.95],
                 txtkw)
     fg.makeYLabel(r'P$_{\rm{red}}$ (k) / P$_{\rm{blue}}$ (k)', 
-                [0, (0.5 * fg.panel_length + fg.yborder[0]) / fg.figsize[1]], 
+                [ypos[0], (0.5 * fg.panel_length + fg.yborder[0]) / fg.figsize[1]], 
                 {'va':'center', 'fontsize':larfont})
     lkw = {'frameon':False, 'fontsize':smfont - 1, 'loc':'lower left'}
     fg.drawLegend(lkw, (0,0))
@@ -224,7 +226,7 @@ def redshift_evo(ip, savename, withratio):
     fg.setTicks({'labelsize':smfont, 'direction':'in'})
     # labels
     kw = {'fontsize':larfont}
-    ypos = [0, 1 - 0.5*(fg.panel_length * 2 + fg.panel_bt[1] * 1 + fg.yborder[1]) / fg.figsize[1]]
+    ypos = [fg.xborder[0] * 0.1 / fg.figsize[0], 1 - 0.5*(fg.panel_length * 2 + fg.panel_bt[1] * 1 + fg.yborder[1]) / fg.figsize[1]]
     flib.pklabels(fg, ysub = r'\rm{HI-gal}', ypos = ypos, xtxtkw = kw, ytxtkw = kw)
     txtkw = {}
     txtkw['ha'] = 'center'
@@ -240,7 +242,7 @@ def redshift_evo(ip, savename, withratio):
     txtkw['va'] = 'bottom'
     fg.setColLabels(['Real Space', 'Redshift Space'], [0.05, 0.05], txtkw)
     fg.makeYLabel(r'P$_{\rm{red}}$ (k) / P$_{\rm{blue}}$ (k)', 
-                [0, (0.5 * fg.panel_length + fg.yborder[0]) / fg.figsize[1]], 
+                [ypos[0], (0.5 * fg.panel_length + fg.yborder[0]) / fg.figsize[1]], 
                 {'va':'center', 'fontsize':larfont})
     lkw = {'frameon':False, 'fontsize':smfont - 1, 'loc':'lower left'}
     fg.drawLegend(lkw, (1,1))

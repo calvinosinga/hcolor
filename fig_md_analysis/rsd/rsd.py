@@ -5,6 +5,7 @@ from figrid.figrid import Figrid
 import numpy as np
 import seaborn as sb
 import matplotlib as mpl
+import copy
 
 box = 'tng100'
 snap = [99, 67]
@@ -27,32 +28,34 @@ RES = rlib.results['pk'][0].props['grid_resolution']
 cdict = flib.getCdict()
 
 def space_compare(ip, name):
+    print('COMPARING SPACES')
     withall = 'resolved' in ip['color']
-    dl = DataList(master.getMatching(ip))
+    dl = DataList(copy.deepcopy(master.getMatching(ip)))
     rsd = flib.makeRSD(dl)
     rsddl = DataList(rsd)
     fgrsd = Figrid(rsddl)
-    fgrsd.arrange('ratio', 'is_particle', panel_length = 2)
+    fgrsd.arrange('ratio', '', panel_length = 2)
     fkw = {}
-    fkw['label'] = 'Blue Galaxies'
+    fkw['label'] = 'HI-Blue Galaxy\nCross-Power'
     fkw['color'] = cdict['blue']
-    fkw['alpha'] = 0.35
+    fkw['alpha'] = 0.55
     fgrsd.makeFills({'color':'blue'}, fkw)
-    fkw['label'] = 'Red Galaxies'
+    fkw['label'] = 'HI-Red Galaxy\nCross-Power'
     fkw['color'] = cdict['red']
     fgrsd.makeFills({'color':'red'}, fkw)
     if withall:
-        fkw['label'] = 'All Galaxies'
+        fkw['label'] = 'HI-Galaxy\nCross-Power'
         fkw['color'] = cdict['resolved']
         fgrsd.makeFills({'color':'resolved'}, fkw)
 
-    dl = DataList(master.getMatching(ip))
+    dl = DataList(copy.deepcopy(master.getMatching(ip)))
     fg = Figrid(dl)
     if withall:
         fg.setColOrder(['blue', 'red', 'resolved'])
     else:
         fg.setColOrder(['blue', 'red'])
-    fg.arrange('color', 'is_particle', panel_length = 2, panel_bt = 0.11, yborder = 0.3)
+    fg.arrange('color', '', panel_length = 2, xborder = [0.33, 0], yborder = [0.33, 0])
+    fg.combineFigrids(fgrsd)
     pargs = {}
     pargs['label'] = 'Redshift Space'
     pargs['color'] = cdict['real']
@@ -61,12 +64,14 @@ def space_compare(ip, name):
     pargs['label'] = 'Real Space'
     pargs['color'] = cdict['redshift']
     fg.makeFills({'space':'redshift'}, pargs)
+    fg.plot()
     pkslc = (slice(0,fg.dim[0]-1), slice(None))
     # fix the axes
     axparams = {}
-    flib.setNyq(fg, kmin, res, box)
+    # flib.setNyq(fg, kmin, RES, BOX)
     axparams['xscale'] = 'log'
-    axparams['ylim'] = [0, 1.5]
+    axparams['ylim'] = [0, 1.75]
+    axparams['xlim'] = [kmin, 20]
     fg.setAxisParams(axparams)
     axparams['yscale'] = 'log'
     axparams['ylim'] = [0.1, 1e4]
@@ -74,7 +79,7 @@ def space_compare(ip, name):
     fg.setDefaultTicksParams()
     fg.setTicks({'labelsize':smfont, 'direction':'in'})
     kw = {'fontsize':larfont}
-    ypos = [0, 1 - 0.5*(fg.panel_length * 3 + fg.panel_bt[1] * 2 + fg.yborder[1]) / fg.figsize[1]]
+    ypos = [fg.xborder[0] * 0.1 / fg.figsize[0], 1 - 0.5*(np.sum(fg.panel_heights[:-1]) + fg.panel_bt[1] * (fg.dim[1] - 2) + fg.yborder[1]) / fg.figsize[1]]
     flib.pklabels(fg, ysub = r'\rm{HI-gal}', ypos = ypos, xtxtkw = kw, ytxtkw = kw)
     txtkw = {}
     txtkw['ha'] = 'center'
@@ -88,7 +93,7 @@ def space_compare(ip, name):
             txtkw)
     
     fg.makeYLabel(r'P$_{\rm{s}}$ (k) / P$_{\rm{r}}$ (k)', 
-                [0, (0.5 * fg.panel_length + fg.yborder[0]) / fg.figsize[1]], 
+                [ypos[0], (0.5 * fg.panel_heights[-1] + fg.yborder[0]) / fg.figsize[1]], 
                 {'va':'center', 'fontsize':larfont})
     lkw = {'frameon':False, 'fontsize':smfont - 1, 'loc':'lower left'}
     fg.drawLegend(lkw, (0,0))
@@ -100,9 +105,9 @@ def space_compare(ip, name):
     trgba = mpl.colors.to_rgba
     alpha = 0.15
     if withall:
-        fcolors[:,0] = [trgba(cdict['blue'], alpha), trgba(cdict['red'], alpha), trgba(cdict['resolved'], alpha), trgba('white')]
+        fcolors[:,0] = [trgba(cdict['blue'], alpha), trgba(cdict['red'], alpha), trgba(cdict['resolved'], alpha), trgba('white', alpha)]
     else:
-        fcolors[:,0] = [trgba(cdict['blue'], alpha), trgba(cdict['red'], alpha), trgba('white')]
+        fcolors[:,0] = [trgba(cdict['blue'], alpha), trgba(cdict['red'], alpha), trgba('white', alpha)]
     flib.setFacecolor(fg, fcolors)
     flib.plotOnes(fg, (fg.dim[0]-1,0))
     fg.save(name)
@@ -129,22 +134,45 @@ for a in [withall, noall]:
         ip['color'] = a
         
         space_compare(ip, name)
-        
+
+space_compare({'snapshot':99, 'color':noall}, 'space_comparison_FINAL.pdf')
 def zevo_space(ip, savename):
     withall = 'resolved' in ip['color']
-    dc_list = DataList(master.getMatching(ip))
+    dc_list = DataList(copy.deepcopy(master.getMatching(ip)))
     rsd = flib.makeRSD(dc_list)
-    master.dclist.extend(rsd)
-    fg = Figrid(master)
+    dc_list.dclist.extend(rsd)
+    fg = Figrid(dc_list)
+    fg.setRowOrder(['real', 'redshift', 'rsd'])
+    if withall:
+        colorder = ['blue', 'red', 'resolved']
+    else:
+        colorder = ['blue', 'red']
+    fg.setColOrder(colorder)
+    fg.arrange('space', 'color', panel_length = 2, xborder = [0.33, 0], yborder = [0.33, 0])
+    
+    fkw = {}
+    fkw['alpha'] = 0.55
+    zcols = cdict['zevo']
+    for rv in fg.rowValues:
+        if rv in zcols:
+            fkw['label'] = 'z=0.0'
+            fkw['color'] = zcols[rv][0]
+            fg.makeFills({'snapshot':99, 'color':rv}, fkw)
+            fkw['label'] = 'z=0.5'
+            fkw['color'] = zcols[rv][1]
+            fg.makeFills({'snapshot':67, 'color':rv}, fkw)
+
+
     fg.plot()
 
     realslc = (slice(0,1), slice(None))
     redshiftslc = (slice(1,2), slice(None))
     # fix the axes
     axparams = {}
-    flib.setNyq(fg, kmin, res, box)
+    # flib.setNyq(fg, kmin, RES, BOX)
     axparams['xscale'] = 'log'
     axparams['ylim'] = [0, 1.5]
+    axparams['xlim'] = [kmin, 20]
     fg.setAxisParams(axparams)
     axparams['yscale'] = 'log'
     axparams['ylim'] = [0.1, 1e4]
@@ -156,7 +184,7 @@ def zevo_space(ip, savename):
     fg.setTicks({'labelsize':smfont, 'direction':'in'})
     # labels
     kw = {'fontsize':larfont}
-    ypos = [0, 1 - 0.5*(fg.panel_length * 2 + fg.panel_bt[1] * 1 + fg.yborder[1]) / fg.figsize[1]]
+    ypos = [fg.xborder[0] * 0.1 / fg.figsize[0], 1 - 0.5*(np.sum(fg.panel_heights[:-1]) + fg.panel_bt[1] * (fg.dim[1] - 2) + fg.yborder[1]) / fg.figsize[1]]
     flib.pklabels(fg, ysub = r'\rm{HI-gal}', ypos = ypos, xtxtkw = kw, ytxtkw = kw)
     txtkw = {}
     txtkw['ha'] = 'center'
@@ -172,7 +200,7 @@ def zevo_space(ip, savename):
         collabels = ['Blue Galaxies', 'Red Galaxies']
     fg.setColLabels(collabels, [0.05, 0.05], txtkw)
     fg.makeYLabel(r'P$_{\rm{s}}$ (k) / P$_{\rm{r}}$ (k)', 
-                [0, (0.5 * fg.panel_length + fg.yborder[0]) / fg.figsize[1]], 
+                [ypos[0], (0.5 * fg.panel_heights[-1] + fg.yborder[0]) / fg.figsize[1]], 
                 {'va':'center', 'fontsize':larfont})
     lkw = {'frameon':False, 'fontsize':smfont - 1, 'loc':'lower left'}
     fg.drawLegend(lkw, (1,1))
@@ -181,7 +209,7 @@ def zevo_space(ip, savename):
     # fcolors = np.empty(fg.dim, dtype = object)
     # trgba = mpl.colors.to_rgba
     # alpha = 0.15
-    for i in range(3):
+    for i in range(fg.dim[1]):
         flib.plotOnes(fg, (2, i))
     # fcolors[:,0] = [trgba('blue', alpha), trgba('red', alpha), trgba('white')]
     # flib.setFacecolor(fg, fcolors)
@@ -201,5 +229,5 @@ for a in [withall, noall]:
     ip = {}
     ip['color'] = a
     
-    space_compare(ip, name)
+    zevo_space(ip, name)
 
