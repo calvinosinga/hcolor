@@ -54,7 +54,7 @@ def space_compare(ip, name):
         fg.setColOrder(['blue', 'red', 'resolved'])
     else:
         fg.setColOrder(['blue', 'red'])
-    fg.arrange('color', '', panel_length = 2, xborder = [0.33, 0], yborder = [0.33, 0])
+    fg.arrange('color', '', panel_length = 2, xborder = [0.5, 0.1], yborder = [0.5, 0.1])
     fg.combineFigrids(fgrsd)
     pargs = {}
     pargs['label'] = 'Redshift Space'
@@ -148,7 +148,7 @@ def zevo_space(ip, savename):
     else:
         colorder = ['blue', 'red']
     fg.setColOrder(colorder)
-    fg.arrange('space', 'color', panel_length = 2, xborder = [0.33, 0], yborder = [0.33, 0])
+    fg.arrange('space', 'color', panel_length = 2, xborder = [0.5, 0.1], yborder = [0.5, 0.1])
     
     fkw = {}
     fkw['alpha'] = 0.55
