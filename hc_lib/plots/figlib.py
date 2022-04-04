@@ -12,10 +12,13 @@ def getCdict():
     cdict['red'] = 'red'
     cdict['blue'] = 'blue'
     cdict['resolved'] = 'grey'
+    cdict['ratio'] = 'purple'
     zevo = {}
+    zevo['rsd'] = 'YlGn'
     for k, v in cdict.items():
         zevo[k] = sb.color_palette(v.capitalize() + 's', 5)
     cdict['zevo'] = zevo
+    cdict['rsd'] = 'yellowgreen'
     return cdict
 
 def siteFG():
@@ -73,7 +76,7 @@ def makeRSD(datalist):
         mattr = copy.deepcopy(dc.attrs)
         rmattr = []
         for k in mattr:
-            if 'fieldname' in k or 'runtime' in k or 'space' in k:
+            if 'runtime' in k or 'space' in k:
                 rmattr.append(k)
         for rm in rmattr:
             del mattr[rm]

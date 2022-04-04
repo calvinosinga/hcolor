@@ -26,7 +26,7 @@ larfont = 12
 BOX = rlib.results['pk'][0].props['box']
 RES = rlib.results['pk'][0].props['grid_resolution']
 cdict = flib.getCdict()
-
+XBORDER = [0.75, 0.1]
 def space_compare(ip, name):
     print('COMPARING SPACES')
     withall = 'resolved' in ip['color']
@@ -54,7 +54,7 @@ def space_compare(ip, name):
         fg.setColOrder(['blue', 'red', 'resolved'])
     else:
         fg.setColOrder(['blue', 'red'])
-    fg.arrange('color', '', panel_length = 2, xborder = [0.5, 0.1], yborder = [0.5, 0.1])
+    fg.arrange('color', '', panel_length = 2, xborder = XBORDER, yborder = [0.5, 0.1])
     fg.combineFigrids(fgrsd)
     pargs = {}
     pargs['label'] = 'Redshift Space'
@@ -148,19 +148,19 @@ def zevo_space(ip, savename):
     else:
         colorder = ['blue', 'red']
     fg.setColOrder(colorder)
-    fg.arrange('space', 'color', panel_length = 2, xborder = [0.5, 0.1], yborder = [0.5, 0.1])
+    fg.arrange('space', 'color', panel_length = 2, xborder = XBORDER, yborder = [0.5, 0.1])
     
     fkw = {}
     fkw['alpha'] = 0.55
     zcols = cdict['zevo']
-    for rv in fg.rowValues:
-        if rv in zcols:
+    for cv in fg.colValues:
+        if cv in zcols:
             fkw['label'] = 'z=0.0'
-            fkw['color'] = zcols[rv][0]
-            fg.makeFills({'snapshot':99, 'color':rv}, fkw)
+            fkw['color'] = zcols[cv][0]
+            fg.makeFills({'snapshot':99, 'color':cv}, fkw)
             fkw['label'] = 'z=0.5'
-            fkw['color'] = zcols[rv][1]
-            fg.makeFills({'snapshot':67, 'color':rv}, fkw)
+            fkw['color'] = zcols[cv][1]
+            fg.makeFills({'snapshot':67, 'color':cv}, fkw)
 
 
     fg.plot()
