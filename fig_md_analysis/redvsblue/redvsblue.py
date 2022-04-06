@@ -29,7 +29,7 @@ real_color = cdict['real']
 redshift_color = cdict['redshift']
 blue_color = cdict['blue']
 red_color = cdict['red']
-XBORDER = [0.75, 0.1]
+XBORDER, YBORDER = flib.getBorders()
 def color_compare(ip, smooth, savename):
     print('MAKING COLOR COMPARISON')
     def _smooth(ax, data, kwargs):
@@ -72,7 +72,7 @@ def color_compare(ip, smooth, savename):
     fg = Figrid(dl)
     fg.setColOrder(['real', 'redshift'])
     fg.arrange('space', '', panel_length = 2, panel_bt = 0.11, xborder = XBORDER,
-            yborder = [0.5, 0.1])
+            yborder = YBORDER)
     pargs = {}
     pargs['label'] = 'HI-Blue Cross-Power'
     pargs['color'] = blue_color
@@ -195,7 +195,7 @@ def redshift_evo(ip, savename, withratio):
         fg.setColOrder(['blue', 'red'])
     
     fg.arrange('color', 'space', panel_length = 2, panel_bt = 0.11, xborder = XBORDER, 
-            yborder = [0.5, 0.1])
+            yborder = YBORDER)
     zcols = flib.getCdict()['zevo']
     for rv in fg.rowValues:
         if rv in zcols:

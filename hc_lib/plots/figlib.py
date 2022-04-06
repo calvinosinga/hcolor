@@ -1,4 +1,3 @@
-from hc_lib.plots.container import PostResult
 import site
 import pickle as pkl
 import numpy as np
@@ -25,6 +24,11 @@ def getBorders():
     xborder = [0.5, 0.1]
     yborder = [0.5, 0.1]
     return xborder, yborder
+
+def getXlim():
+    xlim = [0, 20]
+    return xlim
+
 def siteFG():
     FGPATH = '/homes/cosinga/figrid/'
     site.addsitedir(FGPATH)
@@ -129,3 +133,15 @@ def plotOnes(fg, idx):
     xlim = p.get_xlim()
     p.plot(xlim, [1, 1], color = 'black', linestyle = ':')
     return
+
+def makeObsBias(nums, denom):
+    from figrid.data_container import DataContainer
+    biaslist = []
+    for n in nums:
+        data = [n.data[0], np.sqrt(n.data[1] / denom.data[1])]
+        dc = DataContainer(data)
+
+        dc.update(copy.deepcopy(n.attrs))
+        dc.add('flib_process', 'obs_bias')
+        biaslist.append(dc)
+    return biaslist
