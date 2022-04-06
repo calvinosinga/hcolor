@@ -21,6 +21,10 @@ def getCdict():
     cdict['rsd'] = 'yellowgreen'
     return cdict
 
+def getBorders():
+    xborder = [0.5, 0.1]
+    yborder = [0.5, 0.1]
+    return xborder, yborder
 def siteFG():
     FGPATH = '/homes/cosinga/figrid/'
     site.addsitedir(FGPATH)

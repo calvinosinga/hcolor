@@ -22,15 +22,21 @@ for f in files:
         RES = rlib.results['pk'][0].props['grid_resolution']
         master.loadResults(rlib.results['pk'])
 
+rlib = flib.load(box, 99, 0, 800, 'galaxygrid', 'all_gals')
+rlib = flib.load(box, 99, 0, 800, 'galaxygrid', 'species')
+
 smfont = 10
 larfont = 12
 cdict = flib.getCdict()
+XBORDER, YBORDER = flib.getBorders()
 
 def matterAuto(ip, name):
     print('MAKING MATTER AUTO POWER SPECTRUM')
-    ip['fieldname'] = True
-    ip['']
+    ip['is_auto'] = True
+    ip['color'] = ['resolved', 'all']
+    ip['gal_species']
     dclist = DataList(master.getMatching(ip))
     fg = Figrid(dclist)
-
+    fg.setRowOrder(['real', 'redshift'])
+    fg.arrange('space', '', )
     return

@@ -119,16 +119,10 @@ class galaxy(Field):
             _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
         
         elif runtype == 'all_test':
-            colors = ['blue', 'red']
-            resolutions = ['diemer']
-            colordefs = ['0.60']
+            colordefs = ['None']
             MAS_type = ['CICW']
             spaces = ['real', 'redshift']
-            mass_type = ['stmass']
-            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
-            colors = ['resolved']
-            colordefs = ['None']
-            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
+            mass_type = ['total', 'stmass']
             colors = ['all']
             resolutions = ['None']
             _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
