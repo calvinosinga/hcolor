@@ -26,7 +26,8 @@ larfont = 12
 BOX = rlib.results['pk'][0].props['box']
 RES = rlib.results['pk'][0].props['grid_resolution']
 cdict = flib.getCdict()
-XBORDER = [0.75, 0.1]
+XBORDER, YBORDER = flib.getBorders()
+XLIM = flib.getXlim()
 def space_compare(ip, name):
     print('COMPARING SPACES')
     withall = 'resolved' in ip['color']
@@ -231,3 +232,76 @@ for a in [withall, noall]:
     
     zevo_space(ip, name)
 zevo_space({'color':noall}, 'space_zevo_FINAL.pdf') 
+
+def allfig():
+    ip = {'color':['red', 'blue'], 'gal_res':'diemer',
+    'gal_species':'stmass', 'is_auto':False}
+
+    rbonly = DataList(master.getMatching(ip))
+    rsdratios = flib.makeRSD(rbonly)
+    rbonly.extend(rsdratios)
+    rvbratios = flib.makeBlueRedRatio(rbonly)
+    rbonly.extend(rvbratios)
+    
+    fg = Figrid(rbonly)
+    fg.arange('space', 'color', panel_length = 2.5, xborder = XBORDER,
+            yborder = YBORDER, panel_bt = [0.5, 0.1])
+    
+    fkw = {}
+    fkw['alpha'] = 0.55
+    zcols = cdict['zevo']
+    for cv in fg.colValues:
+        if cv in zcols:
+            fkw['label'] = 'z=0.0'
+            fkw['color'] = zcols[cv][0]
+            fg.makeFills({'snapshot':99, 'color':cv}, fkw)
+            fkw['label'] = 'z=0.5'
+            fkw['color'] = zcols[cv][1]
+            fg.makeFills({'snapshot':67, 'color':cv}, fkw)
+
+    fg.plot()
+    for i in range(2):
+        for j in range(3):
+            idx = [2, 2]
+
+            idx[i] = j
+
+            flib.plotOnes(fg, idx)
+    axkw = {'xlim':XLIM, 'xscale':'log'}
+    fg.setAxisParams(axkw)
+    
+    fg.setAxisParams({'ylim':[1, 1e4], 'yscale':'log'}, 
+            (0, slice(0, 2)))
+    fg.setAxisParams({'ylim':[0.1, 1e4], 'facecolor':cdict['redshift'], 'yscale':'log'}, 
+            (1, slice(0, 2)))
+    fg.setAxisParams({'ylim':[0, 2]}, (2, slice(0,2)))
+    fg.setAxisParams({'ylim':[0, 2]}, (slice(0,2), 2))
+    rgba = mpl.colors.to_rgba
+    face_alpha = 0.55
+    fg.setAxisParams({'facecolor':rgba(cdict['real'], face_alpha)}, (0, slice(None)))
+    fg.setAxisParams({'facecolor':rgba(cdict['redshift'], face_alpha)}, (1, slice(None)))
+    fg.setAxisParams({'facecolor':rgba('yellowgreen', face_alpha)}, (2, slice(None)))
+
+    fg.setDefaultTicksParams()
+    fg.setTicks({'labelsize':smfont, 'direction':'in'})
+
+    fg.makeXLabel('k (cMpc/h)$^{-1}$')
+    labely = 0.5 * (np.sum(fg.panel_heights[:-1]) + fg.panel_bt[1] * (fg.dim[0] - 2) + fg.yborder[1]) / fg.figsize[1]
+    ypos = [fg.xborder[0] * 0.1 / fg.figsize[0], 1 - labely]
+    tkw = {'fontsize':larfont}
+
+    fg.makeYLabel(
+        'P$_{HI-gal}$ (k) (cMpc/h)$^{-3}$', 
+        [ypos[0], (0.5 * np.sum(fg.panel_heights[-1]) + fg.yborder[0]) / fg.figsize[1]],
+        tkw)
+
+    fg.makeYLabel(
+        r'P$_{\rm{s}}$ (k) / P$_{\rm{r}}$ (k)',
+        [ypos[0], (0.5 * fg.panel_heights[-1] + fg.yborder[0]) / fg.figsize[1]],
+        tkw
+    )
+
+    x = (fg.xborder[0] + np.sum(fg.panel_widths[:-1]) + fg.panel_bt
+    ypos = []
+
+

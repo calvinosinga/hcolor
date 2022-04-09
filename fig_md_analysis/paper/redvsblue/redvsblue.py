@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import copy
+from scipy.signal import _savitzky_golay
 import seaborn as sb
 
 box = 'tng100'
@@ -30,21 +31,16 @@ redshift_color = cdict['redshift']
 blue_color = cdict['blue']
 red_color = cdict['red']
 XBORDER, YBORDER = flib.getBorders()
-def color_compare(ip, smooth, savename):
+XLIM = flib.getXlim()
+
+def color_compare(ip, window_length, polyorder, savename):
     print('MAKING COLOR COMPARISON')
     def _smooth(ax, data, kwargs):
-        x = []
-        ymin = []
-        ymax = []
-
-        idx = 0
-        while idx < len(data[0]):
-            x.append(data[0][idx])
-            ymin.append(np.median(data[1][idx:idx+smooth]))
-            ymax.append(np.median(data[2][idx:idx+smooth]))
-            idx += smooth
+        x = data[0]
 
 
+        ymin = _savitzky_golay(data[1], window_length, polyorder)
+        ymax = _savitzky_golay(data[2], window_length, polyorder)
         ax.fill_between(x, ymin, ymax, **kwargs)      
         return
     
@@ -131,33 +127,29 @@ def color_compare(ip, smooth, savename):
     fg.clf()
     return
 
-def smooth_compare(smooth_vals):
+def smooth_compare(window_length, polyorder):
     print('MAKING SMOOTHING COMPARISON')
-    def _smooth(ax, data, smooth):
-        x = []
-        y = []
-
-        idx = 0
-        while idx < len(data[0]):
-            x.append(data[0][idx])
-            y.append(np.median(data[1][idx:idx+smooth]))
-            idx += smooth
-
-
-        ax.plot(x, y, label = 'smooth%d'%smooth)      
-        return
+    def _smooth(ax, data, wl, po):
+        x = data[0]
+        label = 'window%d_poly%d'
+        y = _savitzky_golay(data[1], wl, po)
+        ax.plot(x, y, {'label':label})      
+        return      
     
     ip = {'snapshot':99, 'vn_fieldname':'vn'}
     dl = DataList(master.getMatching(ip))
     rob = flib.makeBlueRedRatio(dl)
     fig, axs = plt.subplots(1, 2)
-    for sm in smooth_vals:
-        for i in [0, 1]:
-            p = axs[i]
-            data = rob[i].data
-            _smooth(p, data, sm)
-            p.set_xscale('log')
-            p.set_ylim(0, 2)
+    for wl in window_length:
+        for po in polyorder:
+            for i in [0, 1]:
+                    p = axs[i]
+                    data = rob[i].data
+                    _smooth(p, data, wl, po)
+                    p.set_xscale('log')
+                    p.set_ylim(0, 2)
+    for i in [0,1]:
+        axs[i].plot(rob[i].data[i], rob[i].data[1])
     
     axs[0].legend()
 
@@ -168,17 +160,19 @@ def smooth_compare(smooth_vals):
 
 ip = {'color':['red', 'blue']}
 
-smooth_vals = [1, 5, 10]
-for smooth_val in smooth_vals:
-    for ss in [99, 67]:
-        ip['snapshot'] = ss
-        name = 'redvsblue_smooth%d_%03d.png'%(smooth_val, ss)
-        color_compare(ip, smooth_val, name)
+wls = [1,2,5,10]
+pl = [0, 1, 2, 3]
+for wl in wls:
+    for p in pl:
+        for ss in [99, 67]:
+            ip['snapshot'] = ss
+            name = 'redvsblue_w%d_p%d_%03d.png'%(wl, p, ss)
+            color_compare(ip, wl, p, name)
 
 
-#smooth_compare(smooth_vals)
+smooth_compare(wls, pl)
 ip['snapshot'] = 99
-color_compare(ip, 1, 'redvsblue_FINAL.pdf')
+# color_compare(ip, 1, 'redvsblue_FINAL.pdf')
 
 def redshift_evo(ip, savename, withratio):
     print('MAKING REDSHIFT EVOLUTION FIGURE')

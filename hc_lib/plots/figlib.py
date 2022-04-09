@@ -2,6 +2,7 @@ import site
 import pickle as pkl
 import numpy as np
 import copy
+import glob
 import seaborn as sb
 
 def getCdict():
@@ -44,6 +45,14 @@ def load(box, snap, axis, res, filename, dirname = 'fiducial'):
     f = pkl.load(open(filepath, 'rb'))
     return f
 
+def loadpks(dl):
+    
+    path = '/lustre/cosinga/hcolor/output/*/results/*.pkl_rlib.pkl'
+    filenames = glob.glob(path)
+    for f in filenames:
+        f = pkl.load(open(f, 'rb'))
+        dl.loadResults(f.results['pk'])
+    return dl
 
 def logAxes(fg):
     axkw = {}
@@ -142,6 +151,6 @@ def makeObsBias(nums, denom):
         dc = DataContainer(data)
 
         dc.update(copy.deepcopy(n.attrs))
-        dc.add('flib_process', 'obs_bias')
+        dc.add('figlib_process', 'obs_bias')
         biaslist.append(dc)
     return biaslist
