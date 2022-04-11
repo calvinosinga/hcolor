@@ -22,8 +22,8 @@ def getCdict():
     return cdict
 
 def getBorders():
-    xborder = [0.2, 0.01]
-    yborder = [0.01, 0.15]
+    xborder = [0.2, 0.1]
+    yborder = [0.1, 0.15]
     return xborder, yborder
 
 def getXlim():
@@ -128,7 +128,12 @@ def makeBlueRedRatio(datalist):
 
         reds = datalist.getMatching(mattr)
         if len(reds) > 1:
-            print('more than one corresponding red for a blue')
+            print('%d corresponding reds for a blue:'%len(reds))
+            print("BLUE ATTRS:")
+            print(blue.attrs)
+            print("RED ATTRS:")
+            for r in reds:
+                print(r.attrs)
         reds = reds[0]
         data = [dc.data[0], reds.data[1]/dc.data[1]]
         ratio = DataContainer(data)
