@@ -22,12 +22,12 @@ def getCdict():
     return cdict
 
 def getBorders():
-    xborder = [0.5, 0.1]
-    yborder = [0.5, 0.1]
+    xborder = [0.2, 0.01]
+    yborder = [0.01, 0.15]
     return xborder, yborder
 
 def getXlim():
-    xlim = [0, 20]
+    xlim = [0.11866199299595938, 20]
     return xlim
 
 def siteFG():
