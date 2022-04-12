@@ -19,6 +19,9 @@ def getCdict():
         zevo[k] = sb.color_palette(v.capitalize() + 's', 5)
     cdict['zevo'] = zevo
     cdict['rsd'] = 'yellowgreen'
+    cdict['vn'] = 'firebrick'
+    cdict['hisubhalo'] = 'sandybrown'
+    cdict['hiptl'] = 'saddlebrown'
     return cdict
 
 def getBorders():
