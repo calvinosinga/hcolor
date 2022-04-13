@@ -25,8 +25,8 @@ def getCdict():
     return cdict
 
 def getBorders():
-    xborder = [0.2, 0.1]
-    yborder = [0.1, 0.15]
+    xborder = [0.3, 0.1]
+    yborder = [0.1, 0.3]
     return xborder, yborder
 
 def getXlim():
@@ -82,7 +82,9 @@ def pklabels(fg, xpos = [], ypos = [], ysub = '', xtxtkw = {}, ytxtkw = {}):
     xtext = 'k (cMpc/h)$^{-1}$'
     ytext = 'P$_{' + ysub + '}$ (k) (cMpc/h)$^{-3}$'
     if not xpos:
-        xpos = [(fg.xborder[0] + 0.5 *  np.sum(fg.panel_widths)) / fg.figsize[0], 0]
+        xpos = [(fg.xborder[0] + 0.5 *  (np.sum(fg.panel_widths) + np.sum(fg.wspace))) / fg.figsize[0], 0]
+    if not ypos:
+        ypos = [0, (fg.yborder[1] + 0.5 * (np.sum(fg.panel_heights) + np.sum(fg.hspace))) / fg.figsize[1]]
     fg.makeXLabel(xtext, xpos, xtxtkw)
     fg.makeYLabel(ytext, ypos, ytxtkw)
     return
