@@ -268,7 +268,7 @@ class galaxy_dust(galaxy):
     def __init__(self, simname, snapshot, axis, resolution, pkl_path, verbose,
             catshpath, dustpath, runtype = 'fiducial'):
         super().__init__(simname, snapshot, axis, resolution, 
-                pkl_path, verbose, catshpath, 'galaxy_dust')
+                pkl_path, verbose, catshpath, 'galaxy_dust', runtype)
         self.dustpath = dustpath
         return
     
