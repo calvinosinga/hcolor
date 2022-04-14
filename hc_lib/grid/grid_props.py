@@ -114,7 +114,8 @@ class galaxy_grid_props(grid_props):
             both_diemer = sp['gal_res'] == 'diemer' and op['gal_res'] == 'diemer'
             both_fid_cc = sp['color_cut'] == '0.60' and op['color_cut'] == '0.60'
             not_same = not op['color'] == sp['color']
-            return both_stmass and both_diemer and both_fid_cc and not_same and super().isCompatible(other)
+            both_none = sp['color_cut'] == 'None' and op['color_cut'] == '0.60'
+            return both_stmass and both_diemer and (both_fid_cc or both_none) and not_same and super().isCompatible(other)
         
         # hiptlXgalaxy handled by hiptl
         
