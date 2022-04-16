@@ -147,6 +147,37 @@ def makeBlueRedRatio(datalist):
         ratiolist.append(ratio)
     return ratiolist
 
+def makeRatio(nums, denom):
+
+    from figrid.data_container import DataContainer
+    ip = {'color_cut':'0.60'}
+    blues = datalist.getMatching(ip)
+    ratiolist = []
+    for dc in blues:
+        mattr = copy.deepcopy(dc.attrs)
+        rmattr = []
+        for k in mattr:
+            if 'runtime' in k or 'color' in k:
+                rmattr.append(k)
+        for rm in rmattr:
+            del mattr[rm]
+        mattr['color'] = 'red'
+
+        reds = datalist.getMatching(mattr)
+        if len(reds) > 1:
+            print('%d corresponding reds for a blue:'%len(reds))
+            print("BLUE ATTRS:")
+            print(blue.attrs)
+            print("RED ATTRS:")
+            for r in reds:
+                print(r.attrs)
+        reds = reds[0]
+        data = [dc.data[0], reds.data[1]/dc.data[1]]
+        ratio = DataContainer(data)
+        mattr['color'] = 'ratio' 
+        ratio.update(mattr)
+        ratiolist.append(ratio)
+    return ratiolist
 def plotOnes(fg, idx):
     p = fg.axes[idx]
     xlim = p.get_xlim()
