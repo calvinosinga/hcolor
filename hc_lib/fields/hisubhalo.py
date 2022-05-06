@@ -61,7 +61,7 @@ class hisubhalo(Field):
             mas = ['CICW']
             spaces = ['redshift', 'real']
             resolutions = []
-            for r in list(HIResolutionDefinitions().keys()):
+            for r in list(HIResolutionDefinitions(self.simname).keys()):
                 if 'bin' in r or 'threshold' in r:
                     resolutions.append(r)
             _addGrids(models, spaces, resolutions, mas)
