@@ -265,7 +265,7 @@ class Sbatch():
             return int(self._compute_grid_memory()*2.5)
     
     def _compute_xpk_memory(self):
-        if self.resolution:
+        if self.resolution == 1600:
             return 127999
         else:
             return int(self._compute_grid_memory() * 2.25**2)

@@ -16,8 +16,15 @@ if gd['verbose']:
 INGRIDKEY1 = sys.argv[1]
 INGRIDKEY2 = sys.argv[2]
 
-INGRIDPATH1 = gd['grids'] + gd[INGRIDKEY1]
-INGRIDPATH2 = gd['grids']+ gd[INGRIDKEY2]
+if INGRIDKEY1 in gd['grids']:
+    INGRIDPATH1 = gd['grids'] + gd[INGRIDKEY1]
+else:
+    INGRIDPATH1 = INGRIDKEY1
+
+if INGRIDKEY2 in gd['grids']:
+    INGRIDPATH2 = gd['grids']+ gd[INGRIDKEY2]
+else:
+    INGRIDPATH2 = INGRIDKEY2
 
 pkl_paths = []
 gridpaths = []
