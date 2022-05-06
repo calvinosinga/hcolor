@@ -52,9 +52,11 @@ def loadpks(dl):
     
     path = '/lustre/cosinga/hcolor/output/*/results/*.pkl_rlib.pkl'
     filenames = glob.glob(path)
+    print(filenames)
     for f in filenames:
         f = pkl.load(open(f, 'rb'))
-        dl.loadResults(f.results['pk'])
+        if 'pk' in f.results:
+            dl.loadResults(f.results['pk'])
     return dl
 
 def logAxes(fg):
