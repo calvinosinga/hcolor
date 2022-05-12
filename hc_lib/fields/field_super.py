@@ -162,6 +162,9 @@ class Field():
     def _loadGalaxyData(self, simpath, fields):
         return il.groupcat.loadSubhalos(simpath, self.snapshot, fields=fields)
     
+    def _loadGroupData(self, simpath, fields):
+        return il.groupcat.loadHalos(simpath, self.snapshot, fields = fields)
+    
     def _toRedshiftSpace(self, pos, vel):
         boxsize = self.header["BoxSize"] # cMpc/h
         hubble = self.header["HubbleParam"]*100 # defined using big H

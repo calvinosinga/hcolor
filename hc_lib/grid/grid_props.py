@@ -79,10 +79,10 @@ class galaxy_grid_props(grid_props):
     for one grid
     """
     def __init__(self, mas, field, space, color, species, 
-                gal_resolution_def, color_cut):
+                gal_resolution_def, color_cut, censat):
         other = {}
-        lst = [color, species, gal_resolution_def, color_cut]
-        keys = ['color', 'gal_species', 'gal_res','color_cut']
+        lst = [color, species, gal_resolution_def, color_cut, censat]
+        keys = ['color', 'gal_species', 'gal_res','color_cut', 'censat']
         for i in range(len(lst)):
             other[keys[i]] = lst[i]
 
@@ -92,7 +92,7 @@ class galaxy_grid_props(grid_props):
     
     @classmethod
     def loadProps(cls, dct):
-        inputs = ['mas', 'fieldname', 'space', 'color', 'gal_species', 'gal_res', 'color_cut']
+        inputs = ['mas', 'fieldname', 'space', 'color', 'gal_species', 'gal_res', 'color_cut', 'censat']
         prm = []
         for i in inputs:
             try:
@@ -102,7 +102,7 @@ class galaxy_grid_props(grid_props):
             
             prm.append(val)
         
-        return galaxy_grid_props(prm[0], prm[1], prm[2], prm[3], prm[4], prm[5], prm[6])
+        return galaxy_grid_props(prm[0], prm[1], prm[2], prm[3], prm[4], prm[5], prm[6], prm[7])
 
     def isCompatible(self, other):
         op = other.props
@@ -238,18 +238,19 @@ class hiptl_grid_props(grid_props):
 
 class hisubhalo_grid_props(grid_props):
 
-    def __init__(self, mas, field, space, model, HI_res):
+    def __init__(self, mas, field, space, model, HI_res, censat):
         other = {}
         other['model'] = model
         splt = model.split('_')
         other['projection'] = splt[-1]
         other['HI_res'] = HI_res
         other['HI_fieldname'] = field
+        other['censat'] = censat
         super().__init__(mas, field, space, other)
     
     @classmethod
     def loadProps(cls, dct):
-        inputs = ['mas', 'fieldname', 'space', 'model', 'HI_res']
+        inputs = ['mas', 'fieldname', 'space', 'model', 'HI_res', 'censat']
         prm = []
         for i in inputs:
             try:
@@ -259,7 +260,7 @@ class hisubhalo_grid_props(grid_props):
             
             prm.append(val)
         
-        return hisubhalo_grid_props(prm[0], prm[1], prm[2], prm[3], prm[4])
+        return hisubhalo_grid_props(prm[0], prm[1], prm[2], prm[3], prm[4], prm[5])
     
     def isIncluded(self):
         

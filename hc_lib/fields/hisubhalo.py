@@ -31,14 +31,15 @@ class hisubhalo(Field):
     def getGridProps(self):
         gridnames = {}
         runtype = self.runtype
-        def _addGrids(models, spaces, resolutions, MAS):
+        def _addGrids(models, spaces, resolutions, MAS, censat):
             for m in models:
                 for r in resolutions:
                     for M in MAS:
                         for s in spaces:
-                            gp = hisubhalo_grid_props(M, self.fieldname,
-                                s, m, r)
-                            gridnames[gp.getH5DsetName()] = gp
+                            for cs in censat:
+                                gp = hisubhalo_grid_props(M, self.fieldname,
+                                    s, m, r, cs)
+                                gridnames[gp.getH5DsetName()] = gp
         
 
         if runtype == 'fiducial':
@@ -46,15 +47,15 @@ class hisubhalo(Field):
             models = getMolFracModelsGalHI()
             mas = ['CICW']
             spaces = ['redshift', 'real']
-            resolutions = ['diemer']
-            _addGrids(models, spaces, resolutions, mas)
+            censat = ['both']
+            _addGrids(models, spaces, resolutions, mas, censat)
         
         elif runtype == 'alt_MAS':
             models = getMolFracModelsGalHI()
             mas = ['rCICW', 'CIC']
             spaces = ['redshift', 'real']
-            resolutions = ['diemer']
-            _addGrids(models, spaces, resolutions, mas)
+            censat = ['both']
+            _addGrids(models, spaces, resolutions, mas, censat)
         
         elif runtype == 'bins_thresholds':
             models = getMolFracModelsGalHI()
@@ -64,8 +65,16 @@ class hisubhalo(Field):
             for r in list(HIResolutionDefinitions(self.simname).keys()):
                 if 'bin' in r or 'threshold' in r:
                     resolutions.append(r)
-            _addGrids(models, spaces, resolutions, mas)
+            censat = ['both']
+            _addGrids(models, spaces, resolutions, mas, censat)
         
+        elif runtype == 'centrals_test':
+            models = getMolFracModelsGalHI()
+            mas = ['CICW']
+            spaces = ['redshift', 'real']
+            resolutions = ['diemer']
+            censat = ['centrals', 'satellites', 'both']
+            _addGrids(models, spaces, resolutions, mas, censat)
         return gridnames
     
 
@@ -82,21 +91,31 @@ class hisubhalo(Field):
         fields = ['SubhaloPos', 'SubhaloVel']
 
         data = self._loadGalaxyData(self.loadpath, fields) # implemented in superclass
+        ngals = len(data['SubhaloPos'])
         pos = data['SubhaloPos'][ids] # ckpc/h
         vel = data['SubhaloVel'][ids] # km/s
 
         pos = self._convertPos(pos)
-
+        centrals = self._loadGroupData(self.loadpath, ['GroupFirstSub'])
         temp = copy.copy(pos)
         rspos = self._toRedshiftSpace(temp, vel)
         del temp, vel
         ############### HELPER METHOD ###############################
         def computeHI(gprop, pos):
             grid = Grid(gprop.getH5DsetName(), self.grid_resolution, verbose=self.v)
-
+            
             mass = hih2file[gprop.props['model']][:] #already in solar masses
             mask = self.getResolvedSubhalos(mass, gprop.props['HI_res'])
-            
+            if g.props['censat'] == 'centrals':
+                censat_mask = np.zeros(ngals, dtype = bool)
+                censat_mask[centrals[centrals >= 0]] = True
+            elif g.props['censat'] == 'satellites':
+                censat_mask = np.ones(ngals, dtype = bool)
+                censat_mask[centrals[centrals >= 0]] = False
+            else:
+                censat_mask = np.ones(ngals, dtype = bool)
+
+            mask = mask & censat_mask[ids]
             grid.runMAS(gprop.props['mas'], pos[mask, :], self.header['BoxSize'], mass[mask])
             
             
@@ -112,6 +131,7 @@ class hisubhalo(Field):
                 pos_arr = pos
             elif g.props['space'] == 'redshift':
                 pos_arr = rspos
+        
             computeHI(g, pos_arr)
         
         return

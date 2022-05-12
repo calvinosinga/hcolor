@@ -33,66 +33,73 @@ class galaxy(Field):
     def getGridProps(self):
         gridnames = {}
         runtype = self.runtype
-        def _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type):
+        def _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type, censat):
             for c in colors:
                 for r in resolutions:
                     for cd in colordefs:
                         for MT in MAS_type:
                             for mt in mass_type:
                                 for s in spaces:
-                                    gp = galaxy_grid_props(MT, self.fieldname,
-                                        s, c, mt, r, cd)
-                                    gridnames[gp.getH5DsetName()] = gp
+                                    for cs in censat:
+                                        gp = galaxy_grid_props(MT, self.fieldname,
+                                            s, c, mt, r, cd, cs)
+                                        gridnames[gp.getH5DsetName()] = gp
 
 
 
         if runtype == 'fiducial':
             colors = ['blue', 'red']
+            censat = ['both']
             resolutions = ['diemer']
             colordefs = ['0.60']
             MAS_type = ['CICW']
             spaces = ['real', 'redshift']
             mass_type = ['stmass']
-            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
+
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type, censat)
             colors = ['resolved']
             colordefs = ['None']
-            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type, censat)
         
         elif runtype == 'alt_MAS':
             colors = ['blue', 'red']
+            censat = ['both']
             resolutions = ['diemer']
             colordefs = ['0.60']
             MAS_type = ['rCICW', 'CIC']
             spaces = ['real', 'redshift']
             mass_type = ['stmass']
-            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type, censat)
             colors = ['resolved']
             colordefs = ['None']
-            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type, censat)
         
         elif runtype == 'axis_test':
             colors = ['blue', 'red']
+            censat = ['both']
             resolutions = ['diemer']
             colordefs = ['0.60']
             MAS_type = ['CICW']
             spaces = ['redshift']
             mass_type = ['stmass']
-            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type, censat)
             colors = ['resolved']
             colordefs = ['None']
-            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type, censat)
         
         elif runtype == 'colordef_test':
             colors = ['blue', 'red']
+            censat = ['both']
             resolutions = ['diemer']
             colordefs = galaxyColorDefs()
             spaces = ['real']
             mass_type = ['stmass']
             MAS_type = ['CICW']
-            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type, censat)
 
         elif runtype == 'bins_thresholds':
             colors = ['blue', 'red']
+            censat = ['both']
             resolutions = []
             for r in list(galaxyResDefs(self.simname).keys()):
                 if 'bin' in r or 'threshold' in r:
@@ -101,32 +108,46 @@ class galaxy(Field):
             MAS_type = ['CICW']
             spaces = ['real', 'redshift']
             mass_type = ['stmass']
-            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type, censat)
             colors = ['resolved']
             colordefs = ['None']
-            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)            
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type, censat)            
 
         elif runtype == 'species_test':
             colors = ['blue', 'red']
             resolutions = ['diemer']
+            censat = ['both']
             colordefs = ['0.60']
             MAS_type = ['CICW']
             spaces = ['real', 'redshift']
             mass_type = ['stmass', 'total']
-            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type, censat)
             colors = ['resolved']
             colordefs = ['None']
-            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type, censat)
         
         elif runtype == 'all_test':
             colordefs = ['None']
+            censat = ['both']
             MAS_type = ['CICW']
             spaces = ['real', 'redshift']
             mass_type = ['total', 'stmass']
             colors = ['all']
             resolutions = ['None']
-            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type)
-            
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type, censat)
+        
+        elif runtype == 'centrals_test':
+            colordefs = ['0.60']
+            colors = ['blue', 'red']
+            censat = ['centrals', 'satellites', 'both']
+            MAS_type = ['CICW']
+            spaces = ['real', 'redshift']
+            mass_type = ['stmass']
+            resolutions = ['diemer']
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type, censat)
+            colors = ['resolved']
+            colordefs = ['None']
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type, censat)
         return gridnames
     
     
@@ -140,7 +161,7 @@ class galaxy(Field):
 
         photo = data['SubhaloStellarPhotometrics'][:]
         mass = data['SubhaloMassType'][:]
-
+        
         photo_dict = {}
         photo_dict['gr'] = photo[:, 4] - photo[:, 5]
         photo_dict['r'] = photo[:, 5]
@@ -159,7 +180,8 @@ class galaxy(Field):
         pos = self._convertPos(pos)
         vel = self._convertVel(vel)
         return pos, vel, mass, photo_dict
-
+    
+    
     def computeGrids(self, outfile):
         ########################## HELPER FUNCTION ###############################
         def computeGal(pos, mass, gc):
@@ -177,6 +199,7 @@ class galaxy(Field):
         fields = ['SubhaloStellarPhotometrics','SubhaloPos','SubhaloMassType',
                 'SubhaloVel']   
         pos, vel, mass, photo = self._loadGalaxyData(self.loadpath, fields)
+        centrals = self._loadGroupData(self.loadpath, ['GroupFirstSub'])
         temp = copy.copy(pos)
         rspos = self._toRedshiftSpace(temp, vel)
         del vel, temp
@@ -194,6 +217,17 @@ class galaxy(Field):
             else: # "all" does not have resdef -> so none are masked
                 resolved_mask = np.ones_like(mass[:, 4], dtype=bool)
             
+            
+            if gp['censat'] == 'centrals':
+                censat_mask = np.zeros_like(resolved_mask, dtype = bool)
+                censat_mask[centrals[centrals >= 0]] = True
+            elif gp['censat'] == 'satellites':
+                censat_mask = np.ones_like(resolved_mask, dtype = bool)
+                censat_mask[centrals[centrals >= 0]] = False
+            else:
+                censat_mask = np.ones_like(resolved_mask, dtype = bool)
+
+            resolved_mask = resolved_mask & censat_mask
 
             if gp['color'] == 'red':
                 blue_mask, red_mask = galaxyColorMasks(photo, mass[:, 4], gp['color_cut'])
@@ -218,6 +252,8 @@ class galaxy(Field):
             else:
                 total_mass = np.sum(mass, axis = 1)
                 grid = computeGal(pos_arr[mask, :], total_mass[mask], g)
+
+
 
             # commenting out because comparisons to Papastergis will be difficult
             # if gp['gal_res'] not in self.gir_hists.keys() and gp['gal_res'] == 'papastergis_SDSS':
