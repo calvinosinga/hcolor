@@ -55,8 +55,10 @@ def loadpks(dl):
     print(len(filenames))
     for f in range(len(filenames)):
         fl = pkl.load(open(filenames[f], 'rb'))
+        newprops = {'path',filenames[f]}
         if 'pk' in fl.results:
-            dl.loadResults(fl.results['pk'])
+            
+            dl.loadResults(fl.results['pk'], newprops)
         print("%.2f"%(f/len(filenames)*100) + r"% loaded")
     return dl
 
