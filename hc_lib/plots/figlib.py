@@ -138,7 +138,7 @@ def makeBlueRedRatio(datalist):
         if len(reds) > 1:
             print('%d corresponding reds for a blue:'%len(reds))
             print("BLUE ATTRS:")
-            print(blue.attrs)
+            print(dc.attrs)
             print("RED ATTRS:")
             for r in reds:
                 print(r.attrs)
