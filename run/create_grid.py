@@ -40,6 +40,10 @@ else:
 pickle_path = gd['pickles'][FIELDNAME]
 outfile = hp.File(outfilepath, 'w')
 
+if 'galaxy_runtype' not in gd:
+    gd['galaxy_runtype'] = 'fiducial'
+if 'hisubhalo_runtype' not in gd:
+    gd['hisubhalo_runtype'] = 'fiducial'
 #####################################
 if FIELDNAME == 'hiptlgrid':
     field = hiptl(SIMNAME, SNAPSHOT, AXIS, RESOLUTION, CHUNK, pickle_path,
