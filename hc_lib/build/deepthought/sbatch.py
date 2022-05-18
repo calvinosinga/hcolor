@@ -219,7 +219,7 @@ class Sbatch():
         sbatch_dir['mail-user']='cosinga@umd.edu'
         sbatch_dir['mail-type']='ALL'
         sbatch_dir['account']='astronomy-hi'
-        sbatch_dir['time']='2-1:00:00'
+        sbatch_dir['time']='1-1:00:00'
         return sbatch_dir
     
     def _sbatch_lines(self, write_file, sbatch_dir):
