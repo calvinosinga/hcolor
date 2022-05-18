@@ -48,6 +48,7 @@ class hisubhalo(Field):
             mas = ['CICW']
             spaces = ['redshift', 'real']
             censat = ['both']
+            resolutions = ['diemer']
             _addGrids(models, spaces, resolutions, mas, censat)
         
         elif runtype == 'alt_MAS':
@@ -55,6 +56,7 @@ class hisubhalo(Field):
             mas = ['rCICW', 'CIC']
             spaces = ['redshift', 'real']
             censat = ['both']
+            resolutions = ['diemer']
             _addGrids(models, spaces, resolutions, mas, censat)
         
         elif runtype == 'bins_thresholds':
