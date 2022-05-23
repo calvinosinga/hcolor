@@ -286,10 +286,7 @@ class hisubhalo_grid_props(grid_props):
         sp = self.props
         op = other.props
 
-        # if hisubhalo doesnt have diemer resolution definition, don't calculate
-        # cross-power because it ends up looking strange/isn't interesting.
-        if 'threshold' in sp['HI_res'] or 'bin' in sp['HI_res']:
-            return False
+
         # hisubhaloXgalaxy
         if 'galaxy' == op['fieldname']:
             # we have diemer, bin/threshold gal_res to handle
