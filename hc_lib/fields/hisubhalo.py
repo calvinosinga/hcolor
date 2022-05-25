@@ -111,7 +111,7 @@ class hisubhalo(Field):
             grid = Grid(gprop.getH5DsetName(), self.grid_resolution, verbose=self.v)
             
             mass = hih2file[gprop.props['model']][:] #already in solar masses
-            mask = self.getResolvedSubhalos(mass, gprop.props['HI_res'])
+            mask = self.getResolvedSubhalos(mass, gal_masses, gprop.props['HI_res'])
             if g.props['censat'] == 'centrals':
                 censat_mask = np.zeros(ngals, dtype = bool)
                 censat_mask[centrals[centrals >= 0]] = True
