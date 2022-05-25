@@ -67,7 +67,10 @@ class hisubhalo(Field):
             for r in list(HIResolutionDefinitions(self.simname).keys()):
                 if 'bin' in r or 'threshold' in r:
                     resolutions.append(r)
-            censat = ['both']
+            if self.simname == 'tng100':
+                resolutions.append('tng100-2')
+                resolutions.append('tng300')
+            censat = ['both', 'centrals', 'satellites']
             _addGrids(models, spaces, resolutions, mas, censat)
         
         elif runtype == 'centrals_test':
@@ -90,13 +93,14 @@ class hisubhalo(Field):
         ids = hih2file['id_subhalo'][:] # used to idx into the subhalo catalog
         ids = ids.astype(np.int32)
 
-        fields = ['SubhaloPos', 'SubhaloVel']
+        fields = ['SubhaloPos', 'SubhaloVel', 'SubhaloMassType']
 
         data = self._loadGalaxyData(self.loadpath, fields) # implemented in superclass
         ngals = len(data['SubhaloPos'])
         pos = data['SubhaloPos'][ids] # ckpc/h
         vel = data['SubhaloVel'][ids] # km/s
-
+        gal_masses = data['SubhaloMassType'][ids, :]
+        gal_masses = self._convertMass(gal_masses)
         pos = self._convertPos(pos)
         centrals = self._loadGroupData(self.loadpath, ['GroupFirstSub'])
         temp = copy.copy(pos)
@@ -138,12 +142,16 @@ class hisubhalo(Field):
         
         return
 
-    def getResolvedSubhalos(self, mass, resdef):
+    def getResolvedSubhalos(self, HImass, masstype, resdef):
         resdict = HIResolutionDefinitions(self.simname)[resdef]
-        mask = np.ones_like(mass, dtype=bool)
+        mask = np.ones_like(HImass, dtype=bool)
         for k, v in resdict.items():
             if k == 'HI':
-                mask &= (mass >= v[0]) & (mass < v[1])
+                mask &= (HImass >= v[0]) & (HImass < v[1])
+            elif k == 'stmass':
+                mask &= (masstype[:, 4] >= v[0]) & (masstype[:, 4] < v[1])
+            elif k == 'gas':
+                mask &= (masstype[:, 0] >= v[0]) & (masstype[:, 0] < v[1])
         return mask
 
     def makeSlice(self, grid, grid_props, perc=0.1, mid=None):

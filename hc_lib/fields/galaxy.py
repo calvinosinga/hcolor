@@ -99,11 +99,14 @@ class galaxy(Field):
 
         elif runtype == 'bins_thresholds':
             colors = ['blue', 'red']
-            censat = ['both']
+            censat = ['both', 'centrals', 'satellites']
             resolutions = []
             for r in list(galaxyResDefs(self.simname).keys()):
                 if 'bin' in r or 'threshold' in r:
                     resolutions.append(r)
+            if self.simname == 'tng100':
+                resolutions.append('tng100-2')
+                resolutions.append('tng300')
             colordefs = ['0.60']
             MAS_type = ['CICW']
             spaces = ['real', 'redshift']
@@ -213,7 +216,7 @@ class galaxy(Field):
             gp = g.props
             if not gp['gal_res'] is 'None':
                 resolved_dict = galaxyResDefs(self.simname)[gp['gal_res']]
-                resolved_mask = galaxyResolvedMask(mass[:, 4], photo, resolved_dict)
+                resolved_mask = galaxyResolvedMask(mass[:, 4], mass[:, 0], photo, resolved_dict)
             else: # "all" does not have resdef -> so none are masked
                 resolved_mask = np.ones_like(mass[:, 4], dtype=bool)
             

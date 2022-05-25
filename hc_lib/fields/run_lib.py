@@ -47,7 +47,7 @@ def galaxyColorMasks(photo, stmass, color_cut):
     return blue_mask, red_mask
     
 
-def galaxyResolvedMask(stmass, photo, res_dict):
+def galaxyResolvedMask(stmass, gasmass, photo, res_dict):
     ################ HELPER METHODS #############################
     def gr_elg():
         mn = -0.068*photo['rz']+0.457
@@ -68,8 +68,12 @@ def galaxyResolvedMask(stmass, photo, res_dict):
     for r in res_dict:
         if r == 'stmass':
             t = res_dict[r]
-            stmass_resolved = (stmass > t[0]) & (stmass < t[1])
+            stmass_resolved = (stmass >= t[0]) & (stmass < t[1])
             resolved *= stmass_resolved
+        elif r == 'gas':
+            t = res_dict[r]
+            gas_resolved = (gasmass >= t[0]) & (gasmass < t[1])
+            resolved *= gas_resolved
         else:
             t = res_dict[r]
             if t == 'gr_elg':
@@ -138,6 +142,8 @@ def galaxyResDefs(simname):
     galaxy_min_resolution['mid-bin'] = {'stmass':(10**(oom+1), 10**(oom+2))}
     galaxy_min_resolution['high-bin'] = {'stmass':(10**(oom+2), 10**(oom+3))}
 
+    galaxy_min_resolution['tng100-2'] = {'stmass':(1.1e9, np.inf)}
+    galaxy_min_resolution['tng300'] = {'stmass':(5e10, np.inf)}
     return galaxy_min_resolution
 
 def galaxyColorDefs():
@@ -174,6 +180,9 @@ def HIResolutionDefinitions(simname):
     res_defs['high-bin'] = {'HI':(10**9,np.inf)}
     # there is a linewidths restriction, unsure how to approach that in papastergis
     # wolz is intensity map so no minimum threshold
+
+    res_defs['tng100-2'] = {'stmass':(1e9, np.inf), 'gas':(1e9, np.inf)}
+    res_defs['tng300'] = {'stmass':(5e10, np.inf), 'gas':(5e9, np.inf)}
     return res_defs
     
 
