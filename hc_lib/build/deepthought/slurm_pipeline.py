@@ -6,12 +6,14 @@ from hc_lib.build.input import Input
 from hc_lib.build.deepthought.sbatch import Sbatch
 
 OUT_PATH = '/lustre/cosinga/hcolor/output/'
-TNG_PATH = '/lustre/cosinga/'
+TNG_PATH = ''
 #HIH2 = '/lustre/cosinga/tng100/'
 HCOLOR = '/lustre/cosinga/hcolor/'
 
-tng_dict = {'tng100':'L75n1820TNG', 'tng300':'L205n2500TNG',
-        'tng100-2':'L75n910TNG', 'tng100-3':'L75n455TNG', 
+tng_dict = {
+    'tng100':'/lustre/cosinga/L75n1820TNG', 
+    'tng300':'/lustre/kleidig/L205n2500TNG/illustris',
+        'tng100-2':'/lustre/cosinga/L75n910TNG', 'tng100-3':'/lustre/cosinga/L75n455TNG', 
         'tng50':'L35n2160TNG'}
 ioobj = Input()
 rp = ioobj.getParams()
