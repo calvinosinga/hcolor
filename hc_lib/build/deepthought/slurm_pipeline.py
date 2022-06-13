@@ -12,9 +12,11 @@ HCOLOR = '/lustre/cosinga/hcolor/'
 
 tng_dict = {
     'tng100':'/lustre/cosinga/L75n1820TNG', 
-    'tng300':'/lustre/kleidig/L205n2500TNG/illustris',
-        'tng100-2':'/lustre/cosinga/L75n910TNG', 'tng100-3':'/lustre/cosinga/L75n455TNG', 
-        'tng50':'L35n2160TNG'}
+    'tng300':'/lustre/kleidig/illustris/L205n2500TNG',
+    'tng100-2':'/lustre/cosinga/L75n910TNG', 
+    'tng100-3':'/lustre/cosinga/L75n455TNG', 
+    'tng50':'L35n2160TNG'
+    }
 ioobj = Input()
 rp = ioobj.getParams()
 runs = ioobj.getRuns()
