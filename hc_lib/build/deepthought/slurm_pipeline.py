@@ -24,7 +24,6 @@ TNG_PATH += tng_dict[rp['sim']] + '/'
 gdobj = IODict(rp, runs, OUT_PATH, TNG_PATH, HCOLOR)
 #the hih2 particles are in Benedikt's lustre directory
 #gdobj.add('hih2ptl', HIH2 + "hih2_particles_%03d"%rp['snap'] + ".%d.hdf5")
-gdobj.add('TREECOOL', TNG_PATH + 'TREECOOL_fg_dec11')
 gd = gdobj.getGlobalDict()
 pd = gdobj.getPathDict()
 
