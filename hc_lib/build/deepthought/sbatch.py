@@ -116,7 +116,7 @@ class Sbatch():
         combine1_job = open(self.sbatch_path+sbatches[1],'w')
         combine1_dir = self._default_sbatch_settings("%s_combine1"%fn)
 
-        combine1_dir['array']='0-%d:20'%(self.numfiles-self.numfiles%20)
+        combine1_dir['array']='0-%d:20'%(self.numfiles-(self.numfiles - 1)%20)
         combine1_dir['output']=self.log_path+fn+'_combine1_%a.log'
         combine1_dir['mem-per-cpu']='%d'%(grid_mem*2)
         

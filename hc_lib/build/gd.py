@@ -32,13 +32,17 @@ class IODict():
         idict['snapshot'] = idict[simname]+'output/snapdir_%03d/snap_%03d.'%(snap,snap) + "%d.hdf5"
         # the last %d is the chunk, given during run stage
         idict['load_header'] = idict['snapshot']%(0)
-        idict['TREECOOL'] = idict[simname]+'TREECOOL_fg_dec11'
+        if simname == 'tng300':
+            simpath = '/lustre/cosinga/L205n2500TNG/'
+            idict['TREECOOL'] = simpath +'TREECOOL_fg_dec11'
+            post = simpath + 'postprocessing/'
+            idict['hih2catsh'] = post +'hih2/hih2_galaxy_%03d.hdf5'%snap
+            idict['hih2ptl'] = post + 'hih2/hih2_particles_%03d'%snap + ".%d.hdf5"
         # add postprocessing paths
         post = idict[simname] + 'postprocessing/'
         idict['dust'] = post + 'stellar_light/'+ \
                 'Subhalo_StellarPhot_p07c_cf00dust_res_conv_ns1_rad30pkpc_%03d.hdf5'%snap
-        idict['hih2catsh'] = post +'hih2/hih2_galaxy_%03d.hdf5'%snap
-        idict['hih2ptl'] = post + 'hih2/hih2_particles_%03d'%snap + ".%d.hdf5"
+
         # the chunk is given during the run stage
         return
     
