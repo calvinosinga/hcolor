@@ -93,8 +93,8 @@ def galaxyResDefs(simname):
         Mstar_min = 2E8
         Mgas_min = 2E8
     elif simname == 'tng300':
-        Mstar_min = 5E10
-        Mgas_min = 5E9
+        Mstar_min = 2.2E9
+        Mgas_min = 2.2E9
 
     elif simname == 'tng100-2':
         Mstar_min = 1.1E9
