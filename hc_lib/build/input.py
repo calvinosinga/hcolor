@@ -8,7 +8,7 @@ class Input():
     gcat_runs = ['galaxy', 'galaxy_dust', 'hisubhalo', 'h2subhalo']
     implemented = ptl_runs + gcat_runs
     simlist = ['tng100', 'tng100-3', 'tng100-2', 'tng50', 'tng300']
-    snaplist = [99, 67]
+    snaplist = [99, 67, 33]
     axislist = [0,1,2]
     hydrogen_runs = ['hiptl', 'h2ptl', 'hiptl_nH', 'vn', 'hisubhalo', 'h2subhalo']
     matter_runs = ['galaxy', 'galaxy_dust', 'ptl']
