@@ -38,6 +38,11 @@ class IODict():
             post = simpath + 'postprocessing/'
             idict['hih2catsh'] = post +'hih2/hih2_galaxy_%03d.hdf5'%snap
             idict['hih2ptl'] = post + 'hih2/hih2_particles_%03d'%snap + ".%d.hdf5"
+        else:
+            idict['TREECOOL'] = tng_path + 'TREECOOL_fg_dec11'
+            post = simpath + 'postprocessing/'
+            idict['hih2catsh'] = post +'hih2/hih2_galaxy_%03d.hdf5'%snap
+            idict['hih2ptl'] = post + 'hih2/hih2_particles_%03d'%snap + ".%d.hdf5"
         # add postprocessing paths
         post = idict[simname] + 'postprocessing/'
         idict['dust'] = post + 'stellar_light/'+ \
