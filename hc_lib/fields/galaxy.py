@@ -45,13 +45,19 @@ class galaxy(Field):
                                             s, c, mt, r, cd, cs)
                                         gridnames[gp.getH5DsetName()] = gp
 
-
+        def _getCut():
+            if self.snapshot == 67:
+                return ['0.55']
+            elif self.snapshot == 50:
+                return ['0.5']
+            else:
+                return ['0.60']
 
         if runtype == 'fiducial':
             colors = ['blue', 'red']
             censat = ['both']
             resolutions = ['diemer']
-            colordefs = ['0.60']
+            colordefs = _getCut()
             MAS_type = ['CICW']
             spaces = ['real', 'redshift']
             mass_type = ['stmass']
@@ -65,7 +71,7 @@ class galaxy(Field):
             colors = ['blue', 'red']
             censat = ['both']
             resolutions = ['diemer']
-            colordefs = ['0.60']
+            colordefs = _getCut()
             MAS_type = ['rCICW', 'CIC']
             spaces = ['real', 'redshift']
             mass_type = ['stmass']
@@ -78,7 +84,7 @@ class galaxy(Field):
             colors = ['blue', 'red']
             censat = ['both']
             resolutions = ['diemer']
-            colordefs = ['0.60']
+            colordefs = _getCut()
             MAS_type = ['CICW']
             spaces = ['redshift']
             mass_type = ['stmass']
@@ -107,7 +113,7 @@ class galaxy(Field):
             if self.simname == 'tng100':
                 resolutions.append('tng100-2')
                 resolutions.append('tng300')
-            colordefs = ['0.60']
+            colordefs = _getCut()
             MAS_type = ['CICW']
             spaces = ['real', 'redshift']
             mass_type = ['stmass']
@@ -120,7 +126,7 @@ class galaxy(Field):
             colors = ['blue', 'red']
             resolutions = ['diemer']
             censat = ['both']
-            colordefs = ['0.60']
+            colordefs = _getCut()
             MAS_type = ['CICW']
             spaces = ['real', 'redshift']
             mass_type = ['stmass', 'total']
@@ -140,7 +146,7 @@ class galaxy(Field):
             _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type, censat)
         
         elif runtype == 'centrals_test':
-            colordefs = ['0.60']
+            colordefs = _getCut()
             colors = ['blue', 'red']
             censat = ['centrals', 'satellites', 'both']
             MAS_type = ['CICW']
