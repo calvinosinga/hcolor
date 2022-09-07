@@ -31,12 +31,14 @@ def pkrat(name1, name2, fn = 'k', rm = True):
     
     return "P$_{%s}$ $(%s)$ / P$_{%s}$ $(%s)$"%(name1, fn, name2, fn)
 
-def ccrat(name1, name2, fn = 'k', rm = True):
+def ccrat(name1, name2, fn = 'k', rm = True, frac = False):
     if rm:
         name1 = '\\mathrm{%s}'%name1
         name2 = '\\mathrm{%s}'%name2
     
     out = 'r$_{%s}$ $(%s)$ / r$_{%s}$ $(%s)$'%(name1, fn, name2, fn)
+    if frac:
+        out = '$\\frac{r_{%s} (%s)}{r_{%s} (%s)}$'%(name1, fn, name2, fn)
     return out
 
 def obsbiaslab(name1, name2, fn = 'k', rm = True):

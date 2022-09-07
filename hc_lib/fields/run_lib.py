@@ -149,7 +149,7 @@ def galaxyResDefs(simname):
 def galaxyColorDefs():
     obs = galaxyObsColorDefs()
     implemented_color_defs = ['visual_inspection', '0.50', '0.55', 
-            '0.60', '0.65', '0.70']
+            '0.60', '0.65', '0.45']
     
     #implemented_color_defs.extend(obs)
     return implemented_color_defs

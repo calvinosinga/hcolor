@@ -49,7 +49,7 @@ class galaxy(Field):
             if self.snapshot == 67:
                 return ['0.55']
             elif self.snapshot == 50:
-                return ['0.5']
+                return ['0.50']
             else:
                 return ['0.60']
 
