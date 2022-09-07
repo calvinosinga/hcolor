@@ -218,7 +218,7 @@ class Sbatch():
         sbatch_dir['ntasks']='1'
         sbatch_dir['mail-user']='cosinga@umd.edu'
         sbatch_dir['mail-type']='ALL'
-        sbatch_dir['account']='astronomy-hi'
+        sbatch_dir['account']='diemer-prj-aac'
         sbatch_dir['time']='1-1:00:00'
         return sbatch_dir
     
