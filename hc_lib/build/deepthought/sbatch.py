@@ -224,7 +224,7 @@ class Sbatch():
     
     def _sbatch_lines(self, write_file, sbatch_dir):
         write_file.write("#!/bin/bash\n")
-        write_file.write("#SBATCH --share\n")
+        # write_file.write("#SBATCH --share\n")
         write_file.write('#SBATCH --requeue\n')
         keylist = list(sbatch_dir.keys())
         for k in keylist:
