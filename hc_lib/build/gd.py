@@ -33,7 +33,7 @@ class IODict():
         # the last %d is the chunk, given during run stage
         idict['load_header'] = idict['snapshot']%(0)
         if simname == 'tng300':
-            simpath = '/lustre/cosinga/L205n2500TNG/'
+            simpath = '/home/cosinga/scratch/L205n2500TNG/'
             idict['TREECOOL'] = simpath +'TREECOOL_fg_dec11'
             post = simpath + 'postprocessing/'
             idict['hih2catsh'] = post +'hih2/hih2_galaxy_%03d.hdf5'%snap

@@ -5,16 +5,16 @@ from hc_lib.build.gd import IODict
 from hc_lib.build.input import Input
 from hc_lib.build.deepthought.sbatch import Sbatch
 
-OUT_PATH = '/lustre/cosinga/hcolor/output/'
+OUT_PATH = '/home/cosinga/scratch/hcolor/output/'
 TNG_PATH = ''
 #HIH2 = '/lustre/cosinga/tng100/'
-HCOLOR = '/lustre/cosinga/hcolor/'
+HCOLOR = '/home/cosinga/scratch/hcolor/'
 
 tng_dict = {
-    'tng100':'/lustre/cosinga/L75n1820TNG', 
+    'tng100':'/home/cosinga/scratch/L75n1820TNG', 
     'tng300':'/lustre/kleidig/illustris/L205n2500TNG',
-    'tng100-2':'/lustre/cosinga/L75n910TNG', 
-    'tng100-3':'/lustre/cosinga/L75n455TNG', 
+    'tng100-2':'/home/cosinga/scratch/L75n910TNG', 
+    'tng100-3':'/home/cosinga/scratch/L75n455TNG', 
     'tng50':'L35n2160TNG'
     }
 ioobj = Input()
