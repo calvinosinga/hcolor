@@ -1,4 +1,3 @@
-
 #!/bin/bash
 #SBATCH --requeue
 #SBATCH --job-name=post_process
