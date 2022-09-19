@@ -9,5 +9,5 @@
 #SBATCH --time=10:00:00
 #SBATCH --mem-per-cpu=10000
 
-hcsrc
+source /home/cosinga/my-venv/bin/activate
 python3 /home/cosinga/scratch/hcolor/fig_md_analysis/post_process.py
