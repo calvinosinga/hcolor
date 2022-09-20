@@ -107,9 +107,11 @@ for flnm in filenames:
     f = hp.File(flnm, 'r')
     keys = list(f.keys())
     for k in keys:
-        countdict[flnm][k] = f[k].attrs["count"]
-        sumdict[flnm][k] = f[k].attrs["grid_sum"]
-
+        try:
+            countdict[flnm][k] = f[k].attrs["count"]
+            sumdict[flnm][k] = f[k].attrs["grid_sum"]
+        except KeyError:
+            print(flnm, k)
 grid_data = {}
 grid_data['counts'] = countdict
 grid_data['sums'] = sumdict
