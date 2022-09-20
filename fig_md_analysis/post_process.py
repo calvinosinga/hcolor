@@ -26,7 +26,7 @@ def loadpks(dl):
     total = 0
     for f in range(len(filenames)):
         fl = pkl.load(open(filenames[f], 'rb'))
-        newprops = {'path':filenames[f].split('/')[5].split('_')[0]}
+        newprops = {'path':filenames[f].split('/')[6].split('_')[0]}
         if 'pk' in fl.results:
             total += len(fl.results['pk'])
             dl.loadResults(fl.results['pk'], newprops)
