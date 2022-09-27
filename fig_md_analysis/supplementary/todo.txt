@@ -1,0 +1,7 @@
+redshift evolution of HI auto power spectra
+
+redshift evolution of stellar mass/HI halo mass bins if we decide to remove them
+
+MAS analysis results
+
+Why we went only until z = 1

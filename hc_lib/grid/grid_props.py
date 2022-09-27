@@ -1,6 +1,14 @@
 import copy
+from tabnanny import check
 import hc_lib.fields.run_lib as rl
 
+def check_gal_cut(ss, cut):
+    if ss == 99:
+        return cut == '0.60'
+    elif ss == 67:
+        return cut == '0.55'
+    elif ss == 50:
+        return cut == '0.50'
 
 class grid_props():
     
@@ -112,9 +120,9 @@ class galaxy_grid_props(grid_props):
         if op['fieldname'] == sp['fieldname']:
             both_stmass = op['gal_species'] == 'stmass' and sp['gal_species'] == 'stmass'
             both_diemer = sp['gal_res'] == 'diemer' and op['gal_res'] == 'diemer'
-            both_fid_cc = sp['color_cut'] == '0.60' and op['color_cut'] == '0.60'
+            both_fid_cc = check_gal_cut(sp['snapshot'], sp['color_cut']) and check_gal_cut(op['snapshot'], op['color_cut'])
             not_same = not op['color'] == sp['color']
-            both_none = sp['color_cut'] == 'None' and op['color_cut'] == '0.60'
+            both_none = sp['color_cut'] == 'None' and op['color_cut'] == 'None'
             return both_stmass and both_diemer and (both_fid_cc or both_none) and not_same and super().isCompatible(other)
         
         # hiptlXgalaxy handled by hiptl
@@ -204,7 +212,7 @@ class hiptl_grid_props(grid_props):
 
                 # also include resolved
                 is_resolved = op['color'] == 'resolved'
-                fid_colcut = op['color_cut'] == '0.60'
+                fid_colcut = check_gal_cut(op['snapshot'], op['color_cut'])
                 is_stmass = op['gal_species'] == 'stmass'
                 galcheck = (is_resolved or fid_colcut) and is_stmass
 
@@ -294,7 +302,7 @@ class hisubhalo_grid_props(grid_props):
             # if diemer resdef, include fiducial color_cut and resolved definition
             if op['gal_res'] == 'diemer':
                 is_resolved = op['color'] == 'resolved'
-                fid_colcut = op['color_cut'] == '0.60'
+                fid_colcut = check_gal_cut(op['snapshot'], op['color_cut'])
                 is_stmass = op['gal_species'] == 'stmass'
                 # don't want total mass
                 check_gal_props = (is_resolved or fid_colcut) and is_stmass
@@ -305,7 +313,7 @@ class hisubhalo_grid_props(grid_props):
 
             elif 'bin' in op['gal_res'] or 'threshold' in op['gal_res']:
                 is_resolved = op['color'] == 'resolved'
-                fid_colcut = op['color_cut'] == '0.60'
+                fid_colcut = check_gal_cut(op['snapshot'], op['color_cut'])
                 is_stmass = op['gal_species'] == 'stmass'
                 check_gal_props = (is_resolved or fid_colcut) and is_stmass
 
@@ -352,7 +360,7 @@ class ptl_grid_props(grid_props):
     def isCompatible(self, other):
         op = other.props
         if op['fieldname'] == 'galaxy':
-            fid_colcut = op['color_cut'] == '0.60'
+            fid_colcut = check_gal_cut(op['snapshot'], op['color_cut'])
             fid_res = op['gal_res'] == 'diemer'
             stsp = op['gal_species'] == 'stmass'
             match = fid_colcut and fid_res and stsp
@@ -398,7 +406,7 @@ class vn_grid_props(grid_props):
 
                 # also include resolved
                 is_resolved = op['color'] == 'resolved'
-                fid_colcut = op['color_cut'] == '0.60'
+                fid_colcut = check_gal_cut(op['snapshot'], op['color_cut'])
                 is_stmass = op['gal_species'] == 'stmass'
                 check_gal = (is_resolved or fid_colcut) and is_stmass
 
