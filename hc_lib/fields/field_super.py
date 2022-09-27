@@ -275,7 +275,7 @@ class Cross():
             for k2 in keylist2:
                 gp1 = gprops1[k1]
                 gp2 = gprops2[k2]
-                if gp1.isCompatible(gp2) and gp2.isCompatible(gp1):
+                if gp1.isCompatible(gp2, self.snapshot) and gp2.isCompatible(gp1, self.snapshot):
                     grid1 = Grid.loadGrid(gf1[k1])
                     grid2 = Grid.loadGrid(gf2[k2])
                     self._xpk(grid1, grid2, gp1, gp2)
@@ -326,7 +326,7 @@ class Cross():
             for k2 in keylist2:
                 gp1 = gprops1[k1]
                 gp2 = gprops2[k2]
-                is_compatible = gp1.isCompatible(gp1) and gp2.isCompatible(gp2)
+                is_compatible = gp1.isCompatible(gp1, self.snapshot) and gp2.isCompatible(gp2, self.snapshot)
                 for_xi = gp1.props['compute_xi'] and gp2.props['compute_xi']
                 if is_compatible and for_xi:
                     grid1 = Grid.loadGrid(gf1[k1])

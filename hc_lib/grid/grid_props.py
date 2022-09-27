@@ -71,7 +71,7 @@ class grid_props():
             return grid_props(temp.pop('mas'), 
                     temp.pop("fieldname"), temp.pop('space'), temp)
     
-    def isCompatible(self, other):
+    def isCompatible(self, other, snap):
         """
         Reports if two grids are compatible for cross-correlation
         """
@@ -112,7 +112,7 @@ class galaxy_grid_props(grid_props):
         
         return galaxy_grid_props(prm[0], prm[1], prm[2], prm[3], prm[4], prm[5], prm[6], prm[7])
 
-    def isCompatible(self, other):
+    def isCompatible(self, other, snap):
         op = other.props
         sp = self.props
 
@@ -120,7 +120,7 @@ class galaxy_grid_props(grid_props):
         if op['fieldname'] == sp['fieldname']:
             both_stmass = op['gal_species'] == 'stmass' and sp['gal_species'] == 'stmass'
             both_diemer = sp['gal_res'] == 'diemer' and op['gal_res'] == 'diemer'
-            both_fid_cc = check_gal_cut(sp['snapshot'], sp['color_cut']) and check_gal_cut(op['snapshot'], op['color_cut'])
+            both_fid_cc = check_gal_cut(sp['snapshot'], sp['color_cut']) and check_gal_cut(snap, op['color_cut'])
             not_same = not op['color'] == sp['color']
             both_none = sp['color_cut'] == 'None' and op['color_cut'] == 'None'
             return both_stmass and both_diemer and (both_fid_cc or both_none) and not_same and super().isCompatible(other)
@@ -198,7 +198,7 @@ class hiptl_grid_props(grid_props):
             self.props['compute_slice'] = False
         return super().isIncluded and self.props['map'] == 'mass'
     
-    def isCompatible(self, other):
+    def isCompatible(self, other, snap):
         sp = self.props
         op = other.props
 
@@ -212,7 +212,7 @@ class hiptl_grid_props(grid_props):
 
                 # also include resolved
                 is_resolved = op['color'] == 'resolved'
-                fid_colcut = check_gal_cut(op['snapshot'], op['color_cut'])
+                fid_colcut = check_gal_cut(snap, op['color_cut'])
                 is_stmass = op['gal_species'] == 'stmass'
                 galcheck = (is_resolved or fid_colcut) and is_stmass
 
@@ -290,7 +290,7 @@ class hisubhalo_grid_props(grid_props):
     def setupGrids(self, outfile):
         return super().setupGrids(outfile)
     
-    def isCompatible(self, other):
+    def isCompatible(self, other, snap):
         sp = self.props
         op = other.props
 
@@ -302,7 +302,7 @@ class hisubhalo_grid_props(grid_props):
             # if diemer resdef, include fiducial color_cut and resolved definition
             if op['gal_res'] == 'diemer':
                 is_resolved = op['color'] == 'resolved'
-                fid_colcut = check_gal_cut(op['snapshot'], op['color_cut'])
+                fid_colcut = check_gal_cut(snap, op['color_cut'])
                 is_stmass = op['gal_species'] == 'stmass'
                 # don't want total mass
                 check_gal_props = (is_resolved or fid_colcut) and is_stmass
@@ -313,7 +313,7 @@ class hisubhalo_grid_props(grid_props):
 
             elif 'bin' in op['gal_res'] or 'threshold' in op['gal_res']:
                 is_resolved = op['color'] == 'resolved'
-                fid_colcut = check_gal_cut(op['snapshot'], op['color_cut'])
+                fid_colcut = check_gal_cut(snap, op['color_cut'])
                 is_stmass = op['gal_species'] == 'stmass'
                 check_gal_props = (is_resolved or fid_colcut) and is_stmass
 
@@ -357,10 +357,10 @@ class ptl_grid_props(grid_props):
         
         return ptl_grid_props(prm[0], prm[1], prm[2], prm[3])
 
-    def isCompatible(self, other):
+    def isCompatible(self, other, snap):
         op = other.props
         if op['fieldname'] == 'galaxy':
-            fid_colcut = check_gal_cut(op['snapshot'], op['color_cut'])
+            fid_colcut = check_gal_cut(snap, op['color_cut'])
             fid_res = op['gal_res'] == 'diemer'
             stsp = op['gal_species'] == 'stmass'
             match = fid_colcut and fid_res and stsp
@@ -393,7 +393,7 @@ class vn_grid_props(grid_props):
         
         return vn_grid_props(prm[0], prm[1], prm[2], prm[3])
     
-    def isCompatible(self, other):
+    def isCompatible(self, other, snap):
         sp = self.props
         op = other.props
 
@@ -406,7 +406,7 @@ class vn_grid_props(grid_props):
 
                 # also include resolved
                 is_resolved = op['color'] == 'resolved'
-                fid_colcut = check_gal_cut(op['snapshot'], op['color_cut'])
+                fid_colcut = check_gal_cut(snap, op['color_cut'])
                 is_stmass = op['gal_species'] == 'stmass'
                 check_gal = (is_resolved or fid_colcut) and is_stmass
 
