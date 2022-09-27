@@ -71,7 +71,7 @@ class grid_props():
             return grid_props(temp.pop('mas'), 
                     temp.pop("fieldname"), temp.pop('space'), temp)
     
-    def isCompatible(self, other, snap):
+    def isCompatible(self, other):
         """
         Reports if two grids are compatible for cross-correlation
         """
