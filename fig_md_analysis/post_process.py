@@ -28,8 +28,21 @@ def loadpks(dl):
         fl = pkl.load(open(filenames[f], 'rb'))
         newprops = {'path':filenames[f].split('/')[6].split('_')[0]}
         if 'pk' in fl.results:
+            newprops['result_type'] = 'pk'
             total += len(fl.results['pk'])
             dl.loadResults(fl.results['pk'], newprops)
+        if '2Dpk' in fl.results:
+            newprops['result_type'] = '2Dpk'
+            total += len(fl.results['2Dpk'])
+            dl.loadResults(fl.results['2Dpk'], newprops)
+        if 'slice' in fl.results:
+            newprops['result_type'] = 'slice'
+            total += len(fl.results['slice'])
+            dl.loadResults(fl.results['2Dpk'], newprops)
+        if 'xi' in fl.results:
+            newprops['result_type'] = 'xi'
+            total += len(fl.results['xi'])
+            dl.loadResults(fl.results['xi'])
         print("%.2f"%(f/len(filenames)*100) + r"% loaded")
     
     return dl
@@ -88,87 +101,6 @@ def makeBias(datalist):
         del attr
     return biaslist
 
-def makeBlueRedRatio(datalist):
-    print("making pk ratios")
-    from figrid.data_container import DataContainer
-    ip = {'color':'blue', 'color_cut':'0.60', 'path':['galbt', 'HIbt'], 'post_process':'no key found'}
-    blues = datalist.getMatching(ip)
-    ratiolist = []
-    count = 0
-    pnt_threshold = 0.05
-    for dc in blues:
-        mattr = copy.deepcopy(dc.attrs)
-        rmattr = []
-        for k in mattr:
-            if 'runtime' in k or 'color' == k:
-                rmattr.append(k)
-        for rm in rmattr:
-            del mattr[rm]
-        mattr['color'] = 'red'
-        mattr['post_process'] = 'no key found'
-        reds = datalist.getMatching(mattr)
-        if len(reds) > 1:
-            print('%d corresponding reds for a blue:'%len(reds))
-            print("BLUE ATTRS:")
-            print(dc.attrs)
-            print("RED ATTRS:")
-            for r in reds:
-                print(r.attrs)
-        if len(reds) == 0:
-            print('no reds found')
-            print(dc.attrs)
-        else:
-            reds = reds[0]
-            data = [dc.data[0], reds.data[1]/dc.data[1]]
-            ratio = DataContainer(data)
-            mattr['color'] = 'ratio' 
-            ratio.update(mattr)
-            ratiolist.append(ratio)
-        if count / len(blues) >= pnt_threshold:
-            print("calculated bias for %.2f"%pnt_threshold)
-            pnt_threshold += 0.05
-    return ratiolist
-
-def makeBlueRedCCRatio(datalist):
-    print("calculating CC ratios")
-    from figrid.data_container import DataContainer
-    ip = {'color':'blue', 'color_cut':'0.60', 'path':['HIbt', 'galbt'], 'post_process':'corr_coef'}
-    blues = datalist.getMatching(ip)
-    ratiolist = []
-    count = 0
-    pnt_threshold = 0.05
-    for dc in blues:
-        mattr = copy.deepcopy(dc.attrs)
-        rmattr = []
-        for k in mattr:
-            if 'runtime' in k or 'color' == k:
-                rmattr.append(k)
-        for rm in rmattr:
-            del mattr[rm]
-        mattr['color'] = 'red'
-        reds = datalist.getMatching(mattr)
-        if len(reds) > 1:
-            print('%d corresponding reds for a blue:'%len(reds))
-            print("BLUE ATTRS:")
-            print(dc.attrs)
-            print("RED ATTRS:")
-            for r in reds:
-                print(r.attrs)
-        if len(reds) == 0:
-            print('no reds found')
-            print(dc.attrs)
-        else:
-            reds = reds[0]
-            data = [dc.data[0], reds.data[1]/dc.data[1]]
-            ratio = DataContainer(data)
-            mattr['color'] = 'ratio'
-            mattr['post_process'] = 'corr_ratio'
-            ratio.update(mattr)
-            ratiolist.append(ratio)
-        if count / len(blues) >= pnt_threshold:
-            print("calculated bias for %.2f"%pnt_threshold)
-            pnt_threshold += 0.05
-    return ratiolist
 
 def makeCoef(datalist, path):
     print("making biases")

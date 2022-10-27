@@ -5,3 +5,11 @@ redshift evolution of stellar mass/HI halo mass bins if we decide to remove them
 MAS analysis results
 
 Why we went only until z = 1
+
+gr-stmass of dust
+
+gr-stmass of centrals and satellites separately
+
+whether star-forming vs quiescent or red vs blue distinction is important
+
+difference between theoretical and observationally defined biases

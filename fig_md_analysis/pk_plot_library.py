@@ -64,3 +64,15 @@ def cclab(name1, name2, fn = 'k', rm = True):
     denom = '\\mathrm{P}_{%s}(%s) \\mathrm{P}_{%s}(%s)'%(name1, fn, name2, fn)
     CORRCOEF = 'r $(%s)$ = $\\frac{%s}{\\sqrt{%s}}$'%(fn, numerator, denom)
     return CORRCOEF
+
+def darkmode(fg):
+	fg.axisLabelArgs('both', color = 'white')
+	fg.colLabelArgs(color = 'white')
+	fg.rowLabelArgs(color = 'white')
+	fg.spineArgs(edgecolor = 'white')
+	fg.figArgs(facecolor = 'black')
+	fg.axisArgs(facecolor = 'black')
+	fg.tickArgs(color = 'white', labelcolor = 'white')
+	fg.legendArgs(labelcolor = 'white')
+
+	return
