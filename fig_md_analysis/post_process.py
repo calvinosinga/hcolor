@@ -38,7 +38,7 @@ def loadpks(dl):
         if 'slice' in fl.results:
             newprops['result_type'] = 'slice'
             total += len(fl.results['slice'])
-            dl.loadResults(fl.results['2Dpk'], newprops)
+            dl.loadResults(fl.results['slice'], newprops)
         if 'xi' in fl.results:
             newprops['result_type'] = 'xi'
             total += len(fl.results['xi'])
