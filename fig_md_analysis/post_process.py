@@ -177,7 +177,7 @@ gallist = makeCoef(ds, 'galbt')
 hilist = makeCoef(ds, 'HIbt')
 ds.extend(gallist); ds.extend(hilist)
 
-pkl.dump(ds, open('/home/cosinga/scratch/hcolor/fig_md_analysis/9-27_datasort.pkl', 'wb'), pkl.HIGHEST_PROTOCOL)
+pkl.dump(ds, open('/home/cosinga/scratch/hcolor/fig_md_analysis/10-27_datasort.pkl', 'wb'), pkl.HIGHEST_PROTOCOL)
 
 
 countdict = {}
@@ -199,4 +199,4 @@ grid_data = {}
 grid_data['counts'] = countdict
 grid_data['sums'] = sumdict
 
-pkl.dump(grid_data, open("9-27_grid_data.pkl", 'wb'), pkl.HIGHEST_PROTOCOL)
+pkl.dump(grid_data, open("10-27_grid_data.pkl", 'wb'), pkl.HIGHEST_PROTOCOL)
