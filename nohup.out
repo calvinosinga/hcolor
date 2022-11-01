@@ -1,0 +1,328 @@
+cp: error writing '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/grids/ptlcombine2_tng100B_050S_0A_800R.hdf5': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/grids/galaxygrid_tng100B_050S_0A_800R.hdf5': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/grids/vncombine2_tng100B_050S_0A_800R.hdf5': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/results/galaxy_dustgrid_tng100B_050S_0A_800R.pkl': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/results/hiptlXgalaxy_tng100B_050S_0A_800R.pkl': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/results/vnXgalaxy_dust_tng100B_050S_0A_800R.pkl': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/results/hisubhaloXptl_tng100B_050S_0A_800R.pkl_rlib.pkl': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/results/vnXgalaxy_tng100B_050S_0A_800R.pkl': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/results/galaxygrid_tng100B_050S_0A_800R.pkl': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/results/hiptlXptl_tng100B_050S_0A_800R.pkl': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/results/galaxygrid_tng100B_050S_0A_800R.pkl_rlib.pkl': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/results/hiptlgrid_tng100B_050S_0A_800R.pkl': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/results/vnXptl_tng100B_050S_0A_800R.pkl': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/results/hiptlXptl_tng100B_050S_0A_800R.pkl_rlib.pkl': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/results/hisubhaloXgalaxy_dust_tng100B_050S_0A_800R.pkl': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/results/hisubhaloXgalaxy_tng100B_050S_0A_800R.pkl': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/results/galaxy_dustgrid_tng100B_050S_0A_800R.pkl_rlib.pkl': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/results/galaxyXptl_tng100B_050S_0A_800R.pkl_rlib.pkl': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/results/ptlgrid_tng100B_050S_0A_800R.pkl': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/results/galaxyXptl_tng100B_050S_0A_800R.pkl': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/results/hiptlXgalaxy_tng100B_050S_0A_800R.pkl_rlib.pkl': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/results/hiptlXgalaxy_dust_tng100B_050S_0A_800R.pkl': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/results/hiptlgrid_tng100B_050S_0A_800R.pkl_rlib.pkl': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/results/hisubhaloXptl_tng100B_050S_0A_800R.pkl': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/results/ptlgrid_tng100B_050S_0A_800R.pkl_rlib.pkl': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/results/hisubhalogrid_tng100B_050S_0A_800R.pkl_rlib.pkl': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/results/vnXptl_tng100B_050S_0A_800R.pkl_rlib.pkl': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/results/hisubhaloXgalaxy_tng100B_050S_0A_800R.pkl_rlib.pkl': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/results/vngrid_tng100B_050S_0A_800R.pkl': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/results/hisubhalogrid_tng100B_050S_0A_800R.pkl': Disk quota exceeded
+cp: failed to close '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/results/vngrid_tng100B_050S_0A_800R.pkl_rlib.pkl': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl293.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl411.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl129.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl444.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl64.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl334.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl8.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl381.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl15.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl332.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl358.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl46.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl199.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl324.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl156.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl112.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl221.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl258.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl37.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl281.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl394.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl_combine1_360.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl447.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl167.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl194.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl_combine1_240.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl438.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl273.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl_combine1_80.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl110.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl186.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl188.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl402.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl391.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl13.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl14.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl306.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl428.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl318.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl124.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl79.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl364.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl2.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl339.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl142.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl351.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl276.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl66.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl9.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl240.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl299.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl86.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl241.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl235.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl205.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl359.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl303.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl106.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl25.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl250.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl125.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl200.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl193.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl407.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl278.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl27.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl139.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl179.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl317.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl392.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl345.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl105.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl421.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl374.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl207.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl347.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl17.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl163.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl144.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl378.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl57.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl122.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl226.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl131.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl315.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl53.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl19.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl337.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl233.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl7.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl195.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl22.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl366.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl219.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl123.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl137.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl55.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl_combine1_420.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl168.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl160.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl376.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl169.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl_combine1_400.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl319.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl288.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl406.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl384.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl266.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl89.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl177.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl432.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl147.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl220.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl423.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl91.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl70.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl439.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl429.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl88.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl234.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl431.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl261.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl272.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl415.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl10.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl268.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl326.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl44.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl313.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl446.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl305.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl0.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl371.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl419.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl430.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl377.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl393.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl321.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl135.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl152.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl164.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl3.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl209.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl287.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl83.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl30.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl50.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl99.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl375.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl297.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl224.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl103.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl178.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl97.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl289.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl404.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl_combine1_0.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl154.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl320.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl228.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl12.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl102.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl441.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl170.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl210.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl368.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl138.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl283.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl48.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl298.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl302.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl372.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl279.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl413.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl76.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl265.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl191.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl300.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl316.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl171.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl120.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl308.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl340.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl77.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl111.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl71.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl157.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl119.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl96.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl387.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl_combine1_140.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl399.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl420.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl190.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl365.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl197.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl128.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl436.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl78.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl357.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl284.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl400.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl_combine1_160.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl434.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl69.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl65.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl218.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl331.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl101.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl11.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl229.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl370.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl418.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl40.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl212.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl127.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl349.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl353.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl424.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl405.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl43.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl134.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl426.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl45.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl59.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl24.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl118.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl290.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl104.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl121.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl16.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl98.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl109.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl269.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl143.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl355.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl39.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl244.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl327.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl206.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl356.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl60.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl141.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl68.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl282.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl325.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl395.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl383.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl382.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl443.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl26.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl146.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl346.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl92.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl380.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl161.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl238.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl310.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl401.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl28.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl74.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl249.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl108.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl342.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl344.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl396.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl185.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl222.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl286.log': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hiptl/hiptl398.log': Disk quota exceeded
+cp: cannot create directory '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/galaxy_dust': Disk quota exceeded
+cp: cannot create directory '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/vn': Disk quota exceeded
+cp: cannot create directory '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/ptl': Disk quota exceeded
+cp: cannot create directory '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/logs/hisubhalo': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/slurm-70309.out': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/galaxy_dust.sbatch': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/galaxyXptl.sbatch': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/hisubhaloXgalaxy_dust.sbatch': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/galaxyXgalaxy.sbatch': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/hisubhaloXptl.sbatch': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/ptl_auto.sbatch': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/vn_combine1.sbatch': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/hisubhalo.sbatch': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng100B_050S_0A_800R/sbatch/hiptlXptl.sbatch': Disk quota exceeded
+cp: cannot create directory '/home/cosinga/SHELL/hcolor_output/output/allgals_tng300B_099S_0A_800R': Disk quota exceeded
+cp: cannot create directory '/home/cosinga/SHELL/hcolor_output/output/galbt_tng100B_033S_0A_800R': Disk quota exceeded
+cp: cannot create directory '/home/cosinga/SHELL/hcolor_output/output/colordef_tng100B_050S_0A_800R': Disk quota exceeded
+cp: cannot create directory '/home/cosinga/SHELL/hcolor_output/output/midgr_tng100B_099S_0A_1200R': Disk quota exceeded
+cp: cannot create directory '/home/cosinga/SHELL/hcolor_output/output/allgals_tng100B_099S_0A_800R': Disk quota exceeded
+cp: cannot create directory '/home/cosinga/SHELL/hcolor_output/output/fiducial_tng300B_099S_0A_800R': Disk quota exceeded
+cp: cannot create directory '/home/cosinga/SHELL/hcolor_output/output/HIbt_tng100B_067S_0A_800R': Disk quota exceeded
+cp: cannot create directory '/home/cosinga/SHELL/hcolor_output/output/galbt_tng100B_050S_0A_800R': Disk quota exceeded
+cp: cannot create directory '/home/cosinga/SHELL/hcolor_output/output/MAS_tng100B_099S_0A_800R': Disk quota exceeded
+cp: cannot create directory '/home/cosinga/SHELL/hcolor_output/output/colordef_tng100B_033S_0A_800R': Disk quota exceeded
+cp: cannot create regular file '/home/cosinga/SHELL/hcolor_output/output/runs.txt': Disk quota exceeded
+cp: cannot create directory '/home/cosinga/SHELL/hcolor_output/output/axistest1_tng100B_099S_1A_800R': Disk quota exceeded
+cp: cannot create directory '/home/cosinga/SHELL/hcolor_output/output/galbt_tng100B_099S_0A_800R': Disk quota exceeded
