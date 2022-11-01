@@ -20,7 +20,7 @@ def siteFG():
     site.addsitedir(FGPATH)
     return
 
-def loadpks(dl):
+def loadpks(pkdl, tdpkdl, xidl):
     path = '/home/cosinga/scratch/hcolor/output/*/results/*.pkl_rlib.pkl'
     filenames = glob.glob(path)
     total = 0
@@ -30,18 +30,18 @@ def loadpks(dl):
         if 'pk' in fl.results:
             newprops['result_type'] = 'pk'
             total += len(fl.results['pk'])
-            dl.loadResults(fl.results['pk'], newprops)
+            pkdl.loadResults(fl.results['pk'], newprops)
         if '2Dpk' in fl.results:
             newprops['result_type'] = '2Dpk'
             total += len(fl.results['2Dpk'])
-            dl.loadResults(fl.results['2Dpk'], newprops)
+            tdpkdl.loadResults(fl.results['2Dpk'], newprops)
         if 'xi' in fl.results:
             newprops['result_type'] = 'xi'
             total += len(fl.results['xi'])
-            dl.loadResults(fl.results['xi'])
+            xidl.loadResults(fl.results['xi'])
         print("%.2f"%(f/len(filenames)*100) + r"% loaded")
     
-    return dl
+    return pkdl, tdpkdl, xidl
 
 def makeBias(datalist):
     from figrid.data_container import DataContainer
@@ -165,15 +165,19 @@ def makeCoef(datalist, path):
 
 siteFG()
 from figrid.data_sort import DataSort
-ds = DataSort()
-ds = loadpks(ds)
-blist = makeBias(ds)
-ds.extend(blist)
-gallist = makeCoef(ds, 'galbt')
-hilist = makeCoef(ds, 'HIbt')
-ds.extend(gallist); ds.extend(hilist)
+pkds = DataSort()
+tdpkds = DataSort()
+xids = DataSort()
+pkds, tdpkds, xids = loadpks(pkds, tdpkds, xids)
+pkl.dump(tdpkds, open('/home/cosinga/scratch/hcolor/fig_md_analysis/11-1_2Ddatasort.pkl', 'wb'), pkl.HIGHEST_PROTOCOL)
+pkl.dump(xids, open('/home/cosinga/scratch/hcolor/fig_md_analysis/11-1_xidatasort.pkl', 'wb'), pkl.HIGHEST_PROTOCOL)
+blist = makeBias(pkds)
+pkds.extend(blist)
+gallist = makeCoef(pkds, 'galbt')
+hilist = makeCoef(pkds, 'HIbt')
+pkds.extend(gallist); pkds.extend(hilist)
 
-pkl.dump(ds, open('/home/cosinga/scratch/hcolor/fig_md_analysis/10-27_datasort.pkl', 'wb'), pkl.HIGHEST_PROTOCOL)
+pkl.dump(pkds, open('/home/cosinga/scratch/hcolor/fig_md_analysis/11-1_pkdatasort.pkl', 'wb'), pkl.HIGHEST_PROTOCOL)
 
 
 countdict = {}
@@ -195,4 +199,4 @@ grid_data = {}
 grid_data['counts'] = countdict
 grid_data['sums'] = sumdict
 
-pkl.dump(grid_data, open("10-27_grid_data.pkl", 'wb'), pkl.HIGHEST_PROTOCOL)
+pkl.dump(grid_data, open("11-1_grid_data.pkl", 'wb'), pkl.HIGHEST_PROTOCOL)
