@@ -25,20 +25,26 @@ def loadpks(pkdl, tdpkdl, xidl):
     filenames = glob.glob(path)
     total = 0
     for f in range(len(filenames)):
+        print("filename: %s"%filenames[f])
         fl = pkl.load(open(filenames[f], 'rb'))
+        print(fl.results.keys())
         newprops = {'path':filenames[f].split('/')[6].split('_')[0]}
         if 'pk' in fl.results:
             newprops['result_type'] = 'pk'
             total += len(fl.results['pk'])
+            print('pk: %d'%len(fl.results['pk']))
             pkdl.loadResults(fl.results['pk'], newprops)
         if '2Dpk' in fl.results:
             newprops['result_type'] = '2Dpk'
             total += len(fl.results['2Dpk'])
+            print('2Dpk: %d'%len(fl.results['2Dpk']))
             tdpkdl.loadResults(fl.results['2Dpk'], newprops)
         if 'xi' in fl.results:
             newprops['result_type'] = 'xi'
             total += len(fl.results['xi'])
-            xidl.loadResults(fl.results['xi'])
+            print('xi: %d'%len(fl.results['xi']))
+            xidl.loadResults(fl.results['xi'], newprops)
+        print(len(pkdl.dclist), len(xidl.dclist), len(tdpkdl.dclist))
         print("%.2f"%(f/len(filenames)*100) + r"% loaded")
     
     return pkdl, tdpkdl, xidl
@@ -165,9 +171,9 @@ def makeCoef(datalist, path):
 
 siteFG()
 from figrid.data_sort import DataSort
-pkds = DataSort()
-tdpkds = DataSort()
-xids = DataSort()
+pkds = DataSort(list())
+tdpkds = DataSort(list())
+xids = DataSort(list())
 pkds, tdpkds, xids = loadpks(pkds, tdpkds, xids)
 pkl.dump(tdpkds, open('/home/cosinga/scratch/hcolor/fig_md_analysis/11-1_2Ddatasort.pkl', 'wb'), pkl.HIGHEST_PROTOCOL)
 pkl.dump(xids, open('/home/cosinga/scratch/hcolor/fig_md_analysis/11-1_xidatasort.pkl', 'wb'), pkl.HIGHEST_PROTOCOL)
