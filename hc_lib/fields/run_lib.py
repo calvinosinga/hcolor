@@ -2,11 +2,11 @@ import numpy as np
 
 def galaxyRuns():
     runs = ['fiducial', 'alt_MAS', 'axis_test', 'colordef_test',
-            'bins_thresholds', 'species_test', 'all_test', 'centrals_test']
+            'bins_thresholds', 'species_test', 'all_test', 'centrals_test', 'censat']
     return runs
 
 def hisubRuns():
-    runs = ['fiducial', 'alt_MAS', 'bins_thresholds', 'centrals_test']
+    runs = ['fiducial', 'alt_MAS', 'bins_thresholds', 'centrals_test', 'censat']
     return runs
 
 def galaxyColorMasks(photo, stmass, color_cut):
