@@ -121,7 +121,7 @@ class galaxy_grid_props(grid_props):
             both_stmass = op['gal_species'] == 'stmass' and sp['gal_species'] == 'stmass'
             both_diemer = sp['gal_res'] == 'diemer' and op['gal_res'] == 'diemer'
             both_fid_cc = check_gal_cut(sp['snapshot'], sp['color_cut']) and check_gal_cut(snap, op['color_cut'])
-            not_same = not op['color'] == sp['color']
+            not_same = (not op['color'] == sp['color']) and (not op['censat'] == sp['censat'])
             both_none = sp['color_cut'] == 'None' and op['color_cut'] == 'None'
             return both_stmass and both_diemer and (both_fid_cc or both_none) and not_same and super().isCompatible(other)
         
@@ -322,7 +322,7 @@ class hisubhalo_grid_props(grid_props):
 
                 return check_gal_props and is_diemer and super().isCompatible(other)
 
-                
+            
             elif op['color'] == 'all':
                 return False
             
@@ -331,6 +331,10 @@ class hisubhalo_grid_props(grid_props):
         elif 'galaxy_dust' == op['fieldname']:
             return False
         
+        # hisubhaloXhisubhalo
+        elif 'hisubhalo' == op['fieldname']:
+            model_match = op['model'] == sp['model']
+            return model_match and super().isCompatible(other)
         # hisubhaloXptl - default setting
         return super().isCompatible(other)
 

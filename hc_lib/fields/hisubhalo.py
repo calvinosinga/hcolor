@@ -80,8 +80,16 @@ class hisubhalo(Field):
             resolutions = ['diemer']
             censat = ['centrals', 'satellites', 'both']
             _addGrids(models, spaces, resolutions, mas, censat)
-        return gridnames
     
+        elif runtype == 'censat':
+            models = getMolFracModelsGalHI()
+            mas = ['CICW']
+            spaces = ['redshift', 'real']
+            resolutions = ['diemer']
+            censat = ['centrals', 'satellites', 'both']
+            _addGrids(models, spaces, resolutions, mas, censat)
+        
+        return gridnames
 
     def computeGrids(self, outfile):
         super().setupGrids(outfile)

@@ -157,8 +157,21 @@ class galaxy(Field):
             colors = ['resolved']
             colordefs = ['None']
             _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type, censat)
+
+        elif runtype == 'censat':
+            colordefs = _getCut()
+            colors = ['blue', 'red']
+            censat = ['centrals', 'satellites', 'both']
+            MAS_type = ['CICW']
+            spaces = ['real']
+            mass_type = ['stmass']
+            resolutions = ['diemer']
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type, censat)
+            colors = ['resolved']
+            colordefs = ['None']
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type, censat)
+
         return gridnames
-    
     
     def makeSlice(self, grid, grid_props, perc=0.1, mid=None):
         return super().makeSlice(grid, grid_props, perc=perc, mid=mid)
