@@ -7,7 +7,7 @@
 #SBATCH --mail-type=ALL
 #SBATCH --account=diemer-prj-aac
 #SBATCH --time=10:00:00
-#SBATCH --mem-per-cpu=20000
+#SBATCH --mem-per-cpu=60000
 
 source /home/cosinga/my-venv/bin/activate
 python3 /home/cosinga/scratch/hcolor/fig_md_analysis/post_process.py

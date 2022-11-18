@@ -175,15 +175,15 @@ pkds = DataSort(list())
 tdpkds = DataSort(list())
 xids = DataSort(list())
 pkds, tdpkds, xids = loadpks(pkds, tdpkds, xids)
-pkl.dump(tdpkds, open('/home/cosinga/scratch/hcolor/fig_md_analysis/11-1_2Ddatasort.pkl', 'wb'), pkl.HIGHEST_PROTOCOL)
-pkl.dump(xids, open('/home/cosinga/scratch/hcolor/fig_md_analysis/11-1_xidatasort.pkl', 'wb'), pkl.HIGHEST_PROTOCOL)
+pkl.dump(tdpkds, open('/home/cosinga/scratch/hcolor/fig_md_analysis/11-11_2Ddatasort.pkl', 'wb'), pkl.HIGHEST_PROTOCOL)
+pkl.dump(xids, open('/home/cosinga/scratch/hcolor/fig_md_analysis/11-11_xidatasort.pkl', 'wb'), pkl.HIGHEST_PROTOCOL)
 blist = makeBias(pkds)
 pkds.extend(blist)
 gallist = makeCoef(pkds, 'galbt')
 hilist = makeCoef(pkds, 'HIbt')
 pkds.extend(gallist); pkds.extend(hilist)
 
-pkl.dump(pkds, open('/home/cosinga/scratch/hcolor/fig_md_analysis/11-1_pkdatasort.pkl', 'wb'), pkl.HIGHEST_PROTOCOL)
+pkl.dump(pkds, open('/home/cosinga/scratch/hcolor/fig_md_analysis/11-11_pkdatasort.pkl', 'wb'), pkl.HIGHEST_PROTOCOL)
 
 
 countdict = {}
@@ -205,4 +205,4 @@ grid_data = {}
 grid_data['counts'] = countdict
 grid_data['sums'] = sumdict
 
-pkl.dump(grid_data, open("11-1_grid_data.pkl", 'wb'), pkl.HIGHEST_PROTOCOL)
+pkl.dump(grid_data, open("11-11_grid_data.pkl", 'wb'), pkl.HIGHEST_PROTOCOL)
