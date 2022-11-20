@@ -175,15 +175,16 @@ pkds = DataSort(list())
 tdpkds = DataSort(list())
 xids = DataSort(list())
 pkds, tdpkds, xids = loadpks(pkds, tdpkds, xids)
-pkl.dump(tdpkds, open('/home/cosinga/scratch/hcolor/fig_md_analysis/11-11_2Ddatasort.pkl', 'wb'), pkl.HIGHEST_PROTOCOL)
-pkl.dump(xids, open('/home/cosinga/scratch/hcolor/fig_md_analysis/11-11_xidatasort.pkl', 'wb'), pkl.HIGHEST_PROTOCOL)
+pkl.dump(tdpkds, open('/home/cosinga/scratch/hcolor/fig_md_analysis/11-20_2Ddatasort.pkl', 'wb'), pkl.HIGHEST_PROTOCOL)
+pkl.dump(xids, open('/home/cosinga/scratch/hcolor/fig_md_analysis/11-20_xidatasort.pkl', 'wb'), pkl.HIGHEST_PROTOCOL)
 blist = makeBias(pkds)
 pkds.extend(blist)
 gallist = makeCoef(pkds, 'galbt')
 hilist = makeCoef(pkds, 'HIbt')
+cslist = makeCoef(pkds, 'censat')
 pkds.extend(gallist); pkds.extend(hilist)
 
-pkl.dump(pkds, open('/home/cosinga/scratch/hcolor/fig_md_analysis/11-11_pkdatasort.pkl', 'wb'), pkl.HIGHEST_PROTOCOL)
+pkl.dump(pkds, open('/home/cosinga/scratch/hcolor/fig_md_analysis/11-20_pkdatasort.pkl', 'wb'), pkl.HIGHEST_PROTOCOL)
 
 
 countdict = {}
