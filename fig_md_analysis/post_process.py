@@ -206,4 +206,4 @@ grid_data = {}
 grid_data['counts'] = countdict
 grid_data['sums'] = sumdict
 
-pkl.dump(grid_data, open("11-11_grid_data.pkl", 'wb'), pkl.HIGHEST_PROTOCOL)
+pkl.dump(grid_data, open("11-20_grid_data.pkl", 'wb'), pkl.HIGHEST_PROTOCOL)
