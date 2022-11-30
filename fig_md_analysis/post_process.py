@@ -182,7 +182,7 @@ pkds.extend(blist)
 gallist = makeCoef(pkds, 'galbt')
 hilist = makeCoef(pkds, 'HIbt')
 cslist = makeCoef(pkds, 'censat')
-pkds.extend(gallist); pkds.extend(hilist)
+pkds.extend(gallist); pkds.extend(hilist); pkds.extend(cslist)
 
 pkl.dump(pkds, open('/home/cosinga/scratch/hcolor/fig_md_analysis/11-20_pkdatasort.pkl', 'wb'), pkl.HIGHEST_PROTOCOL)
 
