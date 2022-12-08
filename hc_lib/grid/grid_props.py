@@ -365,9 +365,10 @@ class ptl_grid_props(grid_props):
         op = other.props
         if op['fieldname'] == 'galaxy':
             fid_colcut = check_gal_cut(snap, op['color_cut'])
+            is_resolved = op['color'] == 'resolved'
             fid_res = op['gal_res'] == 'diemer'
             stsp = op['gal_species'] == 'stmass'
-            match = fid_colcut and fid_res and stsp
+            match = (fid_colcut or is_resolved) and fid_res and stsp
             return match and super().isCompatible(other)
         elif op['fieldname'] == 'galaxy_dust':
             return False
