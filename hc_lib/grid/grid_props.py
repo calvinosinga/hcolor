@@ -293,7 +293,7 @@ class hisubhalo_grid_props(grid_props):
 
 
         # hisubhaloXgalaxy
-        if 'galaxy' == op['fieldname']:
+        if 'galaxy' in op['fieldname']:
             # we have diemer, bin/threshold gal_res to handle
 
             # if diemer resdef, include fiducial color_cut and resolved definition
@@ -325,8 +325,6 @@ class hisubhalo_grid_props(grid_props):
             
             return False
         # hisubhaloXgalaxy_dust
-        elif 'galaxy_dust' == op['fieldname']:
-            return False
         
         # hisubhaloXhisubhalo
         elif 'hisubhalo' == op['fieldname']:
