@@ -203,7 +203,7 @@ class hiptl_grid_props(grid_props):
         op = other.props
 
         # hiptl/h2ptlXgalaxy
-        if 'galaxy' == op['fieldname']:
+        if 'galaxy' in op['fieldname']:
             
             # if a mass map, it is either diemer
             if op['gal_res'] == 'diemer':
@@ -234,9 +234,6 @@ class hiptl_grid_props(grid_props):
             elif op['color'] == 'all':
                 return False
 
-        # hiptlXgalaxy_dust
-        elif 'galaxy_dust' == op['fieldname']:
-            return False
         # hiptlXptl
         else:
             # include if mass map, not temp map
@@ -403,7 +400,7 @@ class vn_grid_props(grid_props):
         op = other.props
 
         # vnXgalaxy 
-        if 'galaxy' == op['fieldname']:
+        if 'galaxy' in op['fieldname']:
             
             if op['gal_res'] == 'diemer':
                 # the important color definitions
@@ -424,9 +421,7 @@ class vn_grid_props(grid_props):
             # if all = base, then exclude
             elif op['color'] == 'all':
                 return False
-        
-        elif 'galaxy_dust' == op['fieldname']:
-            return False
+
         # vnXptl
         else:
             return sp['map'] == 'mass' and super().isCompatible(other)
