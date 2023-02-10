@@ -299,7 +299,8 @@ class hisubhalo_grid_props(grid_props):
             # if diemer resdef, include fiducial color_cut and resolved definition
             if op['gal_res'] == 'diemer':
                 is_resolved = op['color'] == 'resolved'
-                fid_colcut = check_gal_cut(snap, op['color_cut'])
+                # fid_colcut = check_gal_cut(snap, op['color_cut'])
+                fid_colcut = True
                 is_stmass = op['gal_species'] == 'stmass'
                 # don't want total mass
                 check_gal_props = (is_resolved or fid_colcut) and is_stmass
