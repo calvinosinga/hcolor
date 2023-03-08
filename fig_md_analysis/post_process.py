@@ -53,7 +53,7 @@ def makeBias(datalist):
     from figrid.data_container import DataContainer
     biaslist = []
     
-    crosses = datalist.getMatching({'is_auto' : False, 'path':['fiducial']})
+    crosses = datalist.getMatching({'is_auto' : False, 'path':['fiducial', 'low-2', 'low-3']})
     for cx in crosses:
         fns = cx.get('fieldname').split('_')
         if 'dust' in fns:
