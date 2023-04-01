@@ -115,7 +115,7 @@ class hiptl(Field):
         density = f['PartType0']['Density'][:]
         mass = self._convertMass(mass)
         pos = self._convertPos(pos)
-        vel = self._convertVel(vel)
+        vel = self._convertVel(vel) # removes root a
         density = self._convertDensity(density)
         f.close()
         return pos, vel, mass, density
