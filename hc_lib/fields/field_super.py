@@ -86,10 +86,10 @@ class Field():
         rc = ResultContainer(self, 'pk', grid_props, runtime, pk.k3D, pk.Pk[:,0], 
                 Nmodes = pk.Nmodes3D, count = grid.count)
         self.pks.append(rc)
-        if grid_props.props['space'] == 'redshift':
-            rc2D = ResultContainer(self, '2Dpk', grid_props, runtime, pk.kpar, pk.kper,
-                    pk.Pk2D[:], pk.Nmodes2D, count=grid.count)
-            self.tdpks.append(rc2D)
+
+        rc2D = ResultContainer(self, '2Dpk', grid_props, runtime, pk.kpar, pk.kper,
+                pk.Pk2D[:], pk.Nmodes2D, count=grid.count)
+        self.tdpks.append(rc2D)
         
         return
     
