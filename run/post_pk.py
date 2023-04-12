@@ -47,7 +47,7 @@ for i in range(xpk_list.shape[0]):
             data = np.array([xpk.kpar, xpk.kper, xpk.PkX2D[:, 0]])
         elif sl == 'xi':
             data = np.array([xxi.r3D, xxi.xi[:, 0]])
-        out.create_dataset(name + '_' + sl, data = data)
+        out.create_dataset(name + '_' + sl, data = data, compression = "gzip", compression_opts = 9)
     
 out.close()
     
