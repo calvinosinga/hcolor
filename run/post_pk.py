@@ -27,10 +27,17 @@ xpk_list = np.loadtxt(CROSSLIST, dtype = object)
 for i in range(xpk_list.shape[0]):
     grid1 = f1[xpk_list[i][0]][:] / BOX ** 3
     grid2 = f2[xpk_list[i][1]][:] / BOX ** 3
-    
-    grid1 = (grid1 / np.mean(grid1).astype(np.float32)) - 1
-    grid2 = (grid2 / np.mean(grid2).astype(np.float32)) - 1
+    print(grid1.dtype)
+    grid1 = grid1.astype(np.float32)
+    grid2 = grid2.astype(np.float32)
 
+    grid1 = (grid1 / np.mean(grid1)) - 1
+    grid2 = (grid2 / np.mean(grid2)) - 1
+    
+    print(grid1.dtype)
+    grid1 = grid1.astype(np.float32)
+    grid2 = grid2.astype(np.float32)
+    
     name = xpk_list[i][2]
 
     savelist = xpk_list[i][3:]
