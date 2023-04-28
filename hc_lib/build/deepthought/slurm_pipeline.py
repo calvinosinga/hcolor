@@ -12,7 +12,7 @@ HCOLOR = '/home/cosinga/scratch/hcolor/'
 
 tng_dict = {
     'tng100':'/home/cosinga/scratch/L75n1820TNG', 
-    'tng300':'/lustre/kleidig/illustris/L205n2500TNG',
+    'tng300':'/home/cosinga/scratch/L205n2500TNG',
     'tng100-2':'/home/cosinga/scratch/L75n910TNG', 
     'tng100-3':'/home/cosinga/scratch/L75n455TNG', 
     'tng50':'L35n2160TNG'

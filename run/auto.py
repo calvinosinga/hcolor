@@ -36,16 +36,16 @@ for key in klist:
         grid = Grid.loadGrid(gridfile[key])
         gp = grid_props.loadProps(gridfile[key].attrs)
         field.computePk(grid, gp)
-        #field.computeXi(grid, gp)
-        field.makeSlice(grid, gp)
+        field.computeXi(grid, gp)
+        # field.makeSlice(grid, gp)
 
 
 pickle.dump(field, open(pkl_path, 'wb'), pickle.HIGHEST_PROTOCOL)
 
 rlib = ResultLibrary(field.pkl_path + '_rlib.pkl')
 rlib.addResults(field.getPks())
-rlib.addResults(field.getSlices())
 rlib.addResults(field.get2Dpks())
+rlib.addResults(field.getXis())
 pickle.dump(rlib, open(rlib.path, 'wb'), pickle.HIGHEST_PROTOCOL)
 
 gridfile.close()

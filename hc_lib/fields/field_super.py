@@ -331,7 +331,7 @@ class Cross():
                 if is_compatible and for_xi:
                     grid1 = Grid.loadGrid(gf1[k1])
                     grid2 = Grid.loadGrid(gf2[k2])
-                    # self._xxi(grid1, grid2, gp1, gp2)
+                    self._xxi(grid1, grid2, gp1, gp2)
         return
     
     def _xxi(self, grid1, grid2, gp1, gp2):

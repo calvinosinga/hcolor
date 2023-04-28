@@ -13,7 +13,7 @@ def check_gal_cut(ss, cut):
 class grid_props():
     
     def __init__(self, mas, field, space, other_props,
-                compute_xi = False, compute_slice = True):
+                compute_xi = True, compute_slice = False):
         self.props = {}
         self.props['mas'] = mas
         self.props['fieldname'] = field
@@ -140,7 +140,6 @@ class galaxy_grid_props(grid_props):
             self.props['compute_xi'] = False
             self.props['compute_slice'] = False
 
-
         if self.props['gal_res'] == 'diemer':
             obs_color_cuts = rl.galaxyObsColorDefs()
             coldef_is_compatible = not (self.props['color_cut'] in obs_color_cuts)
@@ -161,6 +160,7 @@ class galaxy_grid_props(grid_props):
         elif self.props['color'] == 'all':
             is_CICW = self.props['mas'] == 'CICW'
             is_stmass = self.props['gal_species'] == 'stmass'
+            only_pk()
             return is_CICW and is_stmass
 
         return False
@@ -192,10 +192,6 @@ class hiptl_grid_props(grid_props):
         return hiptl_grid_props(prm[0], prm[1], prm[2], prm[3], prm[4])
     
     def isIncluded(self):
-        sp = self.props
-        if not sp['model'] == 'GD14':
-            self.props['compute_xi'] = False
-            self.props['compute_slice'] = False
         return super().isIncluded and self.props['map'] == 'mass'
     
     def isCompatible(self, other, snap):
