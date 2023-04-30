@@ -233,7 +233,7 @@ class Sbatch():
         return
     
     def _write_python_line(self, write_file, cmdargs=None):
-        write_file.write("source /home/cosinga/my-env/bin/activate\n")
+        write_file.write("source /home/cosinga/my-venv/bin/activate\n")
         if cmdargs is None:
             cmdargs = self._default_cmd_line()
         write_file.write("python3")
