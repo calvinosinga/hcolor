@@ -342,8 +342,8 @@ class Cross():
         runtime = time.time() - start
 
         
-        rc1 = ResultContainer(self.field1, gp1, runtime, xxi.r3D, xxi.xi[:,0])
-        rc2 = ResultContainer(self.field2, gp2, runtime, xxi.r3D, xxi.xi[:,0])
+        rc1 = ResultContainer(self.field1, 'xi', gp1, runtime, xxi.r3D, xxi.xi[:,0])
+        rc2 = ResultContainer(self.field2, 'xi', gp2, runtime, xxi.r3D, xxi.xi[:,0])
         rc1.addCrossedField(rc2)
         self.xxis.append(rc1)
 
