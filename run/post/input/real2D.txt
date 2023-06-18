@@ -1,0 +1,3 @@
+CICW_galaxy_real_blue_stmass_diemer_0.60 CICW_galaxy_real_blue_stmass_diemer_0.60 blue 2Dpk
+CICW_galaxy_real_red_stmass_diemer_0.60 CICW_galaxy_real_red_stmass_diemer_0.60 red 2Dpk
+CICW_galaxy_real_resolved_stmass_diemer_0.60 CICW_galaxy_real_resolved_stmass_diemer_0.60 resolved 2Dpk
