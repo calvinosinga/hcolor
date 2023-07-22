@@ -3,6 +3,7 @@ This file is responsible for the creation of the contituent sbatch files that ma
 up the pipeline.
 """
 import illustris_python as il
+from colossus.cosmology import cosmology
 import numpy as np
 import h5py as hp
 from Pk_library import Pk, Xi, XPk, XXi
@@ -20,12 +21,11 @@ class Field():
         self.axis = axis
         self.pkl_path = pkl_path
         self.v = verbose
-        
         self.pks = []
         self.xi = []
         self.slices = []
         self.tdpks = []
-
+        self.cosmo = cosmology.setCosmology('planck15')
         if self.v:
             print("\n\ninputs given to superclass constructor:")
             print("the simulation name: %s"%self.simname)
@@ -167,9 +167,10 @@ class Field():
     
     def _toRedshiftSpace(self, pos, vel):
         boxsize = self.header["BoxSize"] # cMpc/h
-        hubble = self.header["HubbleParam"]*100 # defined using big H
         redshift = self.header['Redshift']
-
+        hubble = self.cosmo.Hz(redshift) # km/s/Mpc
+        # convert hubble param to co-moving
+        hubble = hubble * (1 + redshift)
         factor = (1+redshift)/hubble
         pos[:,self.axis] += vel[:,self.axis]*factor
 
