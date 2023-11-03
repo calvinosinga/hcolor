@@ -168,8 +168,9 @@ class Field():
     def _toRedshiftSpace(self, pos, vel):
         boxsize = self.header["BoxSize"] # cMpc/h
         redshift = self.header['Redshift']
-        hubble = self.cosmo.Hz(redshift) # km/s/cMpc
-        # convert hubble param to cMpc (km are physical, not co-moving)
+        Om = self.header['Omega0']
+        Ol = self.header['OmegaLambda']
+        hubble = 100 * np.sqrt(Om*(1 + redshift)**3 + Ol)# km/s/(cMpc / h)
         factor = (1+redshift)/hubble
         pos[:,self.axis] += vel[:,self.axis]*factor
 
