@@ -1,5 +1,4 @@
 import copy
-from tabnanny import check
 import hc_lib.fields.run_lib as rl
 
 def check_gal_cut(ss, cut):

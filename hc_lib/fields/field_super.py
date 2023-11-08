@@ -6,7 +6,7 @@ import illustris_python as il
 from colossus.cosmology import cosmology
 import numpy as np
 import h5py as hp
-from Pk_library import Pk, Xi, XPk, XXi
+from Pk_library import Pk, Xi, XPk, XXi, Pk_theta, XPk_dv
 import copy
 import time
 from hc_lib.plots.container import ResultContainer
@@ -80,6 +80,7 @@ class Field():
         start = time.time()
         arr = grid.getGrid()
         arr = self._toOverdensity(arr)
+        grid_props['type'] = 'delta_delta'
         pk = Pk(arr, self.header["BoxSize"], axis = self.axis, MAS='CIC')
         runtime = time.time() - start
 
@@ -97,6 +98,7 @@ class Field():
         if grid_props.props['compute_xi']:
             start = time.time()
             arr = grid.getGrid()
+            grid_props['type'] = 'delta_delta'
             arr = self._toOverdensity(arr)
             xi = Xi(arr, self.header["BoxSize"], axis = self.axis, MAS='CIC')
             runtime = time.time() - start
@@ -104,6 +106,26 @@ class Field():
             self.xi.append(rc)
         return
 
+    def computePk_theta(self, Vx, Vy, Vz, grid, grid_props):
+        start = time.time()
+        grid_props['type'] = 'theta_theta'
+        k, pkt, Nmodes = Pk_theta(Vx, Vy, Vz, self.header["BoxSize"], axis = self.axis, MAS = 'CIC')
+        runtime = time.time() - start
+        rc = ResultContainer(self, 'pk', grid_props, runtime, k, pkt, count = grid.count)
+        self.pk.append(rc)
+        return
+
+    def computeXpkdv(self, Vx, Vy, Vz, grid, grid_props):
+        start = time.time()
+        grid_props['type'] = 'theta_delta'
+        arr = grid.getGrid()
+        arr = self._toOverdensity(arr)
+        k, xpkt, Nmodes = XPk_dv(arr, Vx, Vy, Vz, grid, grid_props)
+        runtime = time.time() - start
+        rc = ResultContainer(self, 'pk', grid_props, runtime, k, xpkt, count = grid.count)
+        self.pk.append(rc)
+        return
+    
     def makeSlice(self, grid, grid_props, perc=0.1, mid=None):
         if grid_props.props['compute_slice']:
             start = time.time()
