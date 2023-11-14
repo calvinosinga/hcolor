@@ -3,7 +3,7 @@
 
 """
 
-from hc_lib.grid.grid import Grid
+from hc_lib.grid.grid import Grid, VelGrid
 from hc_lib.fields.field_super import Field
 from hc_lib.grid.grid_props import hisubhalo_grid_props
 from hc_lib.fields.run_lib import getMolFracModelsGalH2, getMolFracModelsGalHI
@@ -113,9 +113,10 @@ class hisubhalo(Field):
         centrals = self._loadGroupData(self.loadpath, ['GroupFirstSub'])
         temp = copy.copy(pos)
         rspos = self._toRedshiftSpace(temp, vel)
-        del temp, vel
+        del temp
         ############### HELPER METHOD ###############################
         def computeHI(gprop, pos):
+            gprop.props['type'] = 'mass'
             grid = Grid(gprop.getH5DsetName(), self.grid_resolution, verbose=self.v)
             
             mass = hih2file[gprop.props['model']][:] #already in solar masses
@@ -138,11 +139,24 @@ class hisubhalo(Field):
                 print('\nfinished computing a grid, printing its properties...')
                 print(grid.print())
             return
+        
+        def computeVel(gprop, pos, vel):
+            gprop.props['type'] = 'vel'
+            grid = VelGrid(gprop.getH5DsetName(), self.grid_resolution, self.chunk, verbose = self.v)
+
+            if self.v:
+                hs = '#' * 20
+                print(hs+" COMPUTE HI VEL FOR %s "%(gprop.getH5DsetName().upper()) + hs)
+            
+            grid.CICW(pos, self.header['BoxSize'], vel)
+            self.saveData(outfile, grid, gprop)
+            return
         ###############################################################
 
         for g in list(self.gridprops.values()):
             if g.props["space"] == 'real':
                 pos_arr = pos
+                computeVel(g, pos_arr, vel)
             elif g.props['space'] == 'redshift':
                 pos_arr = rspos
         

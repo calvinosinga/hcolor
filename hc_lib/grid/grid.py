@@ -180,7 +180,6 @@ class Grid():
         grid.is_computed = True
         return grid
     
-        
 class Chunk(Grid):
     def __init__(self, gridname, res, chunk_num, grid=None, verbose=False):
         super().__init__(gridname, res, grid, verbose)
@@ -236,6 +235,90 @@ class Chunk(Grid):
     def loadGrid(cls, dataset, verbose=False):
         dct = dict(dataset.attrs)
         grid = Chunk(dct['gridname'], dct['resolution'], 0, dataset[:], verbose=verbose)
+        grid.is_computed = True
+        grid.mas_runtime = list(dct['mas_runtime'])
+        grid.combine = dct['combine']
+        grid.grid_sum = list(dct['grid_sum'])
+        grid.chunk_nums = list(dct['chunks'])
+        grid.count = dct['count']
+        return grid
+
+class VelGrid(Grid):
+    def __init__(self, gridname, res, grid=None, verbose=False):
+        
+        
+        if grid is None:
+            self.is_computed = False
+            self.grid = np.zeros((res,res,res, 3), dtype=np.float32)
+        else:
+            self.grid = grid
+            self.is_computed = True
+        super().__init__(gridname, res, grid, verbose)
+        return
+    
+    def CICW(self, pos, boxsize, vel):
+        if self.v:
+            print('#'*20 + "CICW"+'#'*20)
+            print("\tstarting CICW in grid.py...")
+            print("\tboxsize given: "+str(boxsize))
+            print("\tboxsize must be Mpc/h")
+
+        start = time.time()
+        ptls = pos.shape[0]; coord = pos.shape[1]; dims = self.grid.shape[0]
+        inv_cell_size = dims/boxsize
+        
+        index_d = np.zeros(3, dtype=np.int64)
+        index_u = np.zeros(3, dtype=np.int64)
+        d = np.zeros(3)
+        u = np.zeros(3)
+
+        for velaxis in range(coord):
+            for i in range(ptls):
+                for axis in range(coord):
+                    dist = pos[i,axis] * inv_cell_size
+                    u[axis] = dist - int(dist)
+                    d[axis] = 1 - u[axis]
+                    index_d[axis] = (int(dist))%dims
+                    index_u[axis] = index_d[axis] + 1
+                    index_u[axis] = index_u[axis]%dims #seems this is faster
+                self.grid[index_d[0],index_d[1],index_d[2], velaxis] += d[0]*d[1]*d[2]*vel[i, velaxis]
+                self.grid[index_d[0],index_d[1],index_u[2], velaxis] += d[0]*d[1]*u[2]*vel[i, velaxis]
+                self.grid[index_d[0],index_u[1],index_d[2], velaxis] += d[0]*u[1]*d[2]*vel[i, velaxis]
+                self.grid[index_d[0],index_u[1],index_u[2], velaxis] += d[0]*u[1]*u[2]*vel[i, velaxis]
+                self.grid[index_u[0],index_d[1],index_d[2], velaxis] += u[0]*d[1]*d[2]*vel[i, velaxis]
+                self.grid[index_u[0],index_d[1],index_u[2], velaxis] += u[0]*d[1]*u[2]*vel[i, velaxis]
+                self.grid[index_u[0],index_u[1],index_d[2], velaxis] += u[0]*u[1]*d[2]*vel[i, velaxis]
+                self.grid[index_u[0],index_u[1],index_u[2], velaxis] += u[0]*u[1]*u[2]*vel[i, velaxis]
+
+
+
+        self.is_computed = True
+        self._computeMASRuntime(start, time.time())
+        self._computeGridSum()
+        self.count = ptls
+        if self.v:
+            print("finished CICW...")
+            print("grid sum: %.3e"%np.sum(self.grid))
+            print('#'*40 + '\n')
+        return
+
+class VelChunk(VelGrid, Chunk):
+    def __init__(self, gridname, res, chunk_num, grid=None, verbose=False):
+        VelGrid.__init__(gridname, res, grid, verbose)
+        self.combine = 1
+        self.mas_runtime = []
+        self.chunk_nums = [chunk_num]
+        self.grid_sum = []
+        self.combine_runtimes = []
+        return
+    
+    def saveGrid(self, outfile):
+        return Chunk.saveGrid(outfile)
+    
+    @classmethod
+    def loadGrid(cls, dataset, verbose=False):
+        dct = dict(dataset.attrs)
+        grid = VelGrid(dct['gridname'], dct['resolution'], 0, dataset[:], verbose=verbose)
         grid.is_computed = True
         grid.mas_runtime = list(dct['mas_runtime'])
         grid.combine = dct['combine']

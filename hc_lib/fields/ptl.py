@@ -5,7 +5,7 @@ import h5py as hp
 import numpy as np
 import copy
 from hc_lib.fields.field_super import Field
-from hc_lib.grid.grid import Chunk
+from hc_lib.grid.grid import Chunk, VelChunk
 from hc_lib.grid.grid_props import ptl_grid_props
 
 
@@ -42,11 +42,11 @@ class ptl(Field):
 
         temp = copy.copy(pos)
         rspos = self._toRedshiftSpace(temp, vel)
-        del temp, vel
+        del temp
 
         ############# HELPER METHOD ##################################
         def computePtl(gprop, pos, mass, slc):
-        
+            gprop.props['type'] = 'mass'
             grid = Chunk(gprop.getH5DsetName(), self.grid_resolution, self.chunk, verbose=self.v)
             
             if self.v:
@@ -54,6 +54,20 @@ class ptl(Field):
             
             # place particles into grid
             grid.CICW(pos[slc, :], self.header['BoxSize'], mass[slc])
+
+            # save them to file
+            self.saveData(outfile, grid, gprop)
+            return
+        
+        def computeVel(gprop, pos, vel, slc):
+            gprop.props['type'] = 'vel'
+            grid = VelChunk(gprop.getH5DsetName(), self.grid_resolution, self.chunk, verbose=self.v)
+            
+            if self.v:
+                grid.print()
+            
+            # place particles into grid
+            grid.CICW(pos[slc, :], self.header['BoxSize'], vel[slc, :])
 
             # save them to file
             self.saveData(outfile, grid, gprop)
@@ -72,6 +86,7 @@ class ptl(Field):
             
             if g.props['space'] == 'real':
                 pos_arr = pos
+                computeVel(g, pos_arr, vel, slc)
             elif g.props['space'] == 'redshift':
                 pos_arr = rspos
             computePtl(g, pos_arr, mass, slc)

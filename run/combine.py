@@ -5,7 +5,7 @@ import os
 import numpy as np
 import h5py as hp
 import pickle
-from hc_lib.grid.grid import Chunk
+from hc_lib.grid.grid import Chunk, VelChunk
 
 IN_GRID = sys.argv[1]
 IN_START = int(sys.argv[2])
@@ -93,7 +93,10 @@ for k in range(len(keylist)):
             print("summing datasets for %s"%keylist[k])
         
         f1 = hp.File(infiles[0], 'r')
-        chunk1 = Chunk.loadGrid(f1[keylist[k]], gd['verbose'])
+        if 'vel' in keylist[k]:
+            chunk1 = VelChunk.loadGrid(f1[keylist[k]], gd['verbose'])
+        else:
+            chunk1 = Chunk.loadGrid(f1[keylist[k]], gd['verbose'])
 
         for i in range(1,len(infiles)):
             try:
@@ -101,7 +104,10 @@ for k in range(len(keylist)):
             except OSError:
                 print("did not find file %s"%infiles[i])
             else:
-                chunk2 = Chunk.loadGrid(f2[keylist[k]], gd['verbose'])
+                if isinstance(chunk1, VelChunk):
+                    chunk2 = VelChunk.loadGrid(f2[keylist[k]], gd['verbose'])
+                else:
+                    chunk2 = Chunk.loadGrid(f2[keylist[k]], gd['verbose'])
                 chunk1.combineChunks(chunk2)
         dat = chunk1.saveGrid(w)
         old_attrs = dict(f1[keylist[k]].attrs)

@@ -34,7 +34,7 @@ class Field():
             print("the grid resolution: %d"%self.grid_resolution)
             print("the pickle path: %s"%self.pkl_path)
         
-        self.header = None # dictionary that stores basic sim info
+        self.header = {} # dictionary that stores basic sim info
         
         # other variables expected to be assigned values in subclasses
         self.gridprops = self.getGridProps()
@@ -64,7 +64,7 @@ class Field():
     def setupGrids(self, outfile):
         if self.v:
             print("starting to compute grids...")
-        if self.header is None:
+        if not self.header:
             raise ValueError("header needs to be loaded before computing grids")
         dat = outfile.create_dataset('pickle', data=[0])
         dat.attrs['path'] = self.pkl_path
@@ -80,7 +80,7 @@ class Field():
         start = time.time()
         arr = grid.getGrid()
         arr = self._toOverdensity(arr)
-        grid_props['type'] = 'delta_delta'
+        grid_props['subtype'] = 'delta_delta'
         pk = Pk(arr, self.header["BoxSize"], axis = self.axis, MAS='CIC')
         runtime = time.time() - start
 
@@ -98,7 +98,7 @@ class Field():
         if grid_props.props['compute_xi']:
             start = time.time()
             arr = grid.getGrid()
-            grid_props['type'] = 'delta_delta'
+            grid_props['subtype'] = 'delta_delta'
             arr = self._toOverdensity(arr)
             xi = Xi(arr, self.header["BoxSize"], axis = self.axis, MAS='CIC')
             runtime = time.time() - start
@@ -106,24 +106,30 @@ class Field():
             self.xi.append(rc)
         return
 
-    def computePk_theta(self, Vx, Vy, Vz, grid, grid_props):
+    def computePk_theta(self, grid, grid_props):
         start = time.time()
-        grid_props['type'] = 'theta_theta'
-        k, pkt, Nmodes = Pk_theta(Vx, Vy, Vz, self.header["BoxSize"], axis = self.axis, MAS = 'CIC')
+        grid_props['subtype'] = 'theta_theta'
+        arr = grid.getGrid()
+        vx = arr[:, :, :, 0]; vy = arr[:, :, :, 1]; vz = arr[:, :, :, 2]
+        grid_props['empty_cells'] = np.count_nonzero(arr <= 0)
+        k, pkt, Nmodes = Pk_theta(vx, vy, vz, self.header["BoxSize"], axis = self.axis, MAS = 'CIC')
         runtime = time.time() - start
         rc = ResultContainer(self, 'pk', grid_props, runtime, k, pkt, count = grid.count)
-        self.pk.append(rc)
+        self.pks.append(rc)
         return
 
-    def computeXpkdv(self, Vx, Vy, Vz, grid, grid_props):
+    def computeXpkdv(self, grid, velgrid, grid_props):
         start = time.time()
-        grid_props['type'] = 'theta_delta'
+        grid_props['subtype'] = 'theta_delta'
         arr = grid.getGrid()
         arr = self._toOverdensity(arr)
-        k, xpkt, Nmodes = XPk_dv(arr, Vx, Vy, Vz, grid, grid_props)
+        velarr = velgrid.getGrid()
+        grid_props['empty_cells'] = np.count_nonzero(velarr <= 0)
+        vx = velarr[:, :, :, 0]; vy = velarr[:, :, :, 1]; vz = velarr[:, :, :, 2]
+        k, xpkt, Nmodes = XPk_dv(arr, vx, vy, vz, self.header['BoxSize'], axis = self.axis, MAS = 'CIC')
         runtime = time.time() - start
         rc = ResultContainer(self, 'pk', grid_props, runtime, k, xpkt, count = grid.count)
-        self.pk.append(rc)
+        self.pks.append(rc)
         return
     
     def makeSlice(self, grid, grid_props, perc=0.1, mid=None):

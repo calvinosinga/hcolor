@@ -4,7 +4,7 @@
 import h5py as hp
 import numpy as np
 from hc_lib.fields.field_super import Field
-from hc_lib.grid.grid import Chunk
+from hc_lib.grid.grid import Chunk, VelChunk
 import copy
 import scipy.constants as sc
 from hc_lib.grid.grid_props import hiptl_grid_props
@@ -45,10 +45,11 @@ class hiptl(Field):
         pos, vel, mass, density = self._loadSnapshotData()
         temp = copy.copy(pos)
         rspos = self._toRedshiftSpace(temp, vel)
-        del temp, vel
+        del temp
 
         ############ HELPER FUNCTION ############################################
         def computeHI(gprop, pos, mass, density):
+            gprop.props['type'] = 'mass'
             grid = Chunk(gprop.getH5DsetName(), self.grid_resolution, self.chunk, verbose=self.v)
             
             if self.v:
@@ -80,14 +81,28 @@ class hiptl(Field):
             # save them to file
             self.saveData(outfile, grid, gprop)
             return
+        
+        def computeVel(gprop, pos, vel):
+            gprop.props['type'] = 'vel'
+            grid = VelChunk(gprop.getH5DsetName(), self.grid_resolution, self.chunk, verbose = self.v)
+
+            if self.v:
+                hs = '#' * 20
+                print(hs+" COMPUTE HI VEL FOR %s "%(gprop.getH5DsetName().upper()) + hs)
+            
+            grid.CICW(pos, self.header['BoxSize'], vel)
+            self.saveData(outfile, grid, gprop)
+            return
         #############################################################################
 
         for g in list(self.gridprops.values()):
             if g.props['space'] == 'real':
                 pos_arr = pos
+                computeVel(g, pos_arr, vel, density)
             elif g.props['space'] == 'redshift':
                 pos_arr = rspos
             computeHI(g, pos_arr, mass, density)
+
 
         return
     

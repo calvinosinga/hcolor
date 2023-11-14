@@ -11,12 +11,13 @@ def check_gal_cut(ss, cut):
 
 class grid_props():
     
-    def __init__(self, mas, field, space, other_props,
+    def __init__(self, mas, field, space, type_, other_props,
                 compute_xi = True, compute_slice = False):
         self.props = {}
         self.props['mas'] = mas
         self.props['fieldname'] = field
         self.props['space'] = space
+        self.props['type'] = type_
         self.props['compute_xi'] = compute_xi
         self.props['compute_slice'] = compute_slice
         self.props.update(other_props)
@@ -68,7 +69,7 @@ class grid_props():
 
         else:
             return grid_props(temp.pop('mas'), 
-                    temp.pop("fieldname"), temp.pop('space'), temp)
+                    temp.pop("fieldname"), temp.pop('space'), temp.pop('type'), temp)
     
     def isCompatible(self, other):
         """
@@ -76,7 +77,11 @@ class grid_props():
         """
         mas = self.props['mas'] == other.props['mas']
         space = self.props['space'] == other.props['space']
-        return mas and space
+        # uncomment line below if I think that I would like cross power spectra for velocity
+        # divergences, but I dont anticipate that
+        # type_ = self.props['type'] == other.props['type']
+        type_ = self.props['type'] == 'mass' and other.props['type'] == 'mass'
+        return (mas and space and type_)
 
 ###############################################################################################
 
@@ -85,7 +90,7 @@ class galaxy_grid_props(grid_props):
     Since each galaxy field has an enormous number of grids, this contains the data
     for one grid
     """
-    def __init__(self, mas, field, space, color, species, 
+    def __init__(self, mas, field, space, type_, color, species, 
                 gal_resolution_def, color_cut, censat):
         other = {}
         lst = [color, species, gal_resolution_def, color_cut, censat]
@@ -93,13 +98,13 @@ class galaxy_grid_props(grid_props):
         for i in range(len(lst)):
             other[keys[i]] = lst[i]
 
-        super().__init__(mas, field, space, other)
+        super().__init__(mas, field, space, type_, other)
 
         return
     
     @classmethod
     def loadProps(cls, dct):
-        inputs = ['mas', 'fieldname', 'space', 'color', 'gal_species', 'gal_res', 'color_cut', 'censat']
+        inputs = ['mas', 'fieldname', 'space', 'type', 'color', 'gal_species', 'gal_res', 'color_cut', 'censat']
         prm = []
         for i in inputs:
             try:
@@ -109,7 +114,7 @@ class galaxy_grid_props(grid_props):
             
             prm.append(val)
         
-        return galaxy_grid_props(prm[0], prm[1], prm[2], prm[3], prm[4], prm[5], prm[6], prm[7])
+        return galaxy_grid_props(prm[0], prm[1], prm[2], prm[3], prm[4], prm[5], prm[6], prm[7], prm[8])
 
     def isCompatible(self, other, snap):
         op = other.props
@@ -168,17 +173,17 @@ class galaxy_grid_props(grid_props):
 
 class hiptl_grid_props(grid_props):
 
-    def __init__(self, mas, field, space, model, mass_or_temp):
+    def __init__(self, mas, field, space, type_, model, mass_or_temp):
         other = {}
         other['map'] = mass_or_temp
         other['model'] = model
         other['HI_fieldname'] = field
-        super().__init__(mas, field, space, other)
+        super().__init__(mas, field, space, type_, other)
         return
     
     @classmethod
     def loadProps(cls, dct):
-        inputs = ['mas', 'fieldname', 'space', 'model', 'map']
+        inputs = ['mas', 'fieldname', 'space', 'type', 'model', 'map']
         prm = []
         for i in inputs:
             try:
@@ -188,7 +193,7 @@ class hiptl_grid_props(grid_props):
             
             prm.append(val)
         
-        return hiptl_grid_props(prm[0], prm[1], prm[2], prm[3], prm[4])
+        return hiptl_grid_props(prm[0], prm[1], prm[2], prm[3], prm[4], prm[5])
     
     def isIncluded(self):
         return super().isIncluded and self.props['map'] == 'mass'
@@ -238,7 +243,7 @@ class hiptl_grid_props(grid_props):
 
 class hisubhalo_grid_props(grid_props):
 
-    def __init__(self, mas, field, space, model, HI_res, censat):
+    def __init__(self, mas, field, space, type_, model, HI_res, censat):
         other = {}
         other['model'] = model
         splt = model.split('_')
@@ -246,11 +251,11 @@ class hisubhalo_grid_props(grid_props):
         other['HI_res'] = HI_res
         other['HI_fieldname'] = field
         other['censat'] = censat
-        super().__init__(mas, field, space, other)
+        super().__init__(mas, field, space, type_, other)
     
     @classmethod
     def loadProps(cls, dct):
-        inputs = ['mas', 'fieldname', 'space', 'model', 'HI_res', 'censat']
+        inputs = ['mas', 'fieldname', 'space', 'type', 'model', 'HI_res', 'censat']
         prm = []
         for i in inputs:
             try:
@@ -260,7 +265,7 @@ class hisubhalo_grid_props(grid_props):
             
             prm.append(val)
         
-        return hisubhalo_grid_props(prm[0], prm[1], prm[2], prm[3], prm[4], prm[5])
+        return hisubhalo_grid_props(prm[0], prm[1], prm[2], prm[3], prm[4], prm[5], prm[6])
     
     def isIncluded(self):
         
@@ -333,14 +338,14 @@ class hisubhalo_grid_props(grid_props):
 
 class ptl_grid_props(grid_props):
     
-    def __init__(self, mas, field, space, species):
+    def __init__(self, mas, field, space, type_, species):
         other = {'ptl_species':species}
-        super().__init__(mas, field, space, other)
+        super().__init__(mas, field, space, type_, other)
         return
     
     @classmethod
     def loadProps(cls, dct):
-        inputs = ['mas', 'fieldname', 'space', 'ptl_species']
+        inputs = ['mas', 'fieldname', 'space', 'type', 'ptl_species']
         prm = []
         for i in inputs:
             try:
@@ -350,7 +355,7 @@ class ptl_grid_props(grid_props):
             
             prm.append(val)
         
-        return ptl_grid_props(prm[0], prm[1], prm[2], prm[3])
+        return ptl_grid_props(prm[0], prm[1], prm[2], prm[3], prm[4])
 
     def isCompatible(self, other, snap):
         op = other.props
@@ -368,16 +373,16 @@ class ptl_grid_props(grid_props):
 ################################################################################################################
 
 class vn_grid_props(grid_props):
-    def __init__(self, mas, field, space, mass_or_temp):
+    def __init__(self, mas, field, space, type_, mass_or_temp):
         other = {}
         other['map'] = mass_or_temp
         other['HI_fieldname'] = field
-        super().__init__(mas, field, space, other)
+        super().__init__(mas, field, space, type_, other)
         return
 
     @classmethod
     def loadProps(cls, dct):
-        inputs = ['mas', 'fieldname', 'space', 'map']
+        inputs = ['mas', 'fieldname', 'space', 'type', 'map']
         prm = []
         for i in inputs:
             try:
@@ -387,7 +392,7 @@ class vn_grid_props(grid_props):
             
             prm.append(val)
         
-        return vn_grid_props(prm[0], prm[1], prm[2], prm[3])
+        return vn_grid_props(prm[0], prm[1], prm[2], prm[3], prm[4])
     
     def isCompatible(self, other, snap):
         sp = self.props

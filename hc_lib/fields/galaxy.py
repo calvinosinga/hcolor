@@ -2,7 +2,7 @@
 """
 
 """
-from hc_lib.grid.grid import Grid
+from hc_lib.grid.grid import Grid, VelGrid
 from hc_lib.grid.grid_props import galaxy_grid_props
 from hc_lib.fields.field_super import Field
 from hc_lib.fields.run_lib import galaxyColorDefs
@@ -207,10 +207,22 @@ class galaxy(Field):
     def computeGrids(self, outfile):
         ########################## HELPER FUNCTION ###############################
         def computeGal(pos, mass, gc):
+            gc.props['type'] = 'mass'
             grid = Grid(gc.getH5DsetName(), self.grid_resolution, verbose=self.v)
             
             grid.runMAS(gc.props['mas'], pos, self.header['BoxSize'], mass)
             
+            return grid
+        
+        def computeVel(pos, vel, gc):
+            gc.props['type'] = 'vel'
+            grid = VelGrid(gc.getH5DsetName(), self.grid_resolution, self.chunk, verbose = self.v)
+
+            if self.v:
+                hs = '#' * 20
+                print(hs+" COMPUTE HI VEL FOR %s "%(gc.getH5DsetName().upper()) + hs)
+            
+            grid.CICW(pos, self.header['BoxSize'], vel)
             return grid
         ###########################################################################
 
@@ -224,7 +236,7 @@ class galaxy(Field):
         centrals = self._loadGroupData(self.loadpath, ['GroupFirstSub'])
         temp = copy.copy(pos)
         rspos = self._toRedshiftSpace(temp, vel)
-        del vel, temp
+        del temp
         
         
         for g in self.gridprops.values():
@@ -266,6 +278,9 @@ class galaxy(Field):
             # count the number of galaxies used for this grid
             if gp['space'] == 'real':
                 pos_arr = pos
+                grid = computeVel(pos, vel, g)
+                self.saveData(outfile, grid, g)
+                del grid
             elif gp['space'] == 'redshift':
                 pos_arr = rspos
 
@@ -276,14 +291,6 @@ class galaxy(Field):
                 grid = computeGal(pos_arr[mask, :], total_mass[mask], g)
 
 
-
-            # commenting out because comparisons to Papastergis will be difficult
-            # if gp['gal_res'] not in self.gir_hists.keys() and gp['gal_res'] == 'papastergis_SDSS':
-            #     gir = self.make_gi_r(photo['gi'][resolved_mask], photo['r'][resolved_mask])
-            #     self.gir_hists[gp['gal_res']] = gir
-            
-            # if gp['gal_res'] not in self.hists_done and not gp['gal_res'] is None:
-            #     self.make_gr_stmass(g, photo['gr'][resolved_mask], mass[resolved_mask, 4])
             
             self.saveData(outfile, grid, g)
             del grid

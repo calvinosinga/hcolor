@@ -35,8 +35,18 @@ for key in klist:
     if 'gridname' in dict(gridfile[key].attrs):
         grid = Grid.loadGrid(gridfile[key])
         gp = grid_props.loadProps(gridfile[key].attrs)
-        field.computePk(grid, gp)
-        field.computeXi(grid, gp)
+        if gp.props['type'] == 'mass':
+            field.computePk(grid, gp)
+            field.computeXi(grid, gp)
+        else:
+            field.computePk_theta(grid, gp)
+            mass_key = key.replace('vel', 'mass', 1)
+            try:
+                mass_grid = Grid.loadGrid(gridfile[mass_key])
+            except KeyError:
+                print("unable to find mass grid for %s; mass key tried %s"%(key, mass_key))
+            else:
+                field.computeXPkdv(mass_grid, grid, gp)
         # field.makeSlice(grid, gp)
 
 
