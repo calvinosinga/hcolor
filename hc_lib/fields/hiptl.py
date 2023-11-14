@@ -29,13 +29,15 @@ class hiptl(Field):
         # mass_or_temp = ['mass', 'temp']
         mass_or_temp = ['mass']
         spaces = ['redshift', 'real']
+        types = ['vel', 'mass']
         grp = {}
         for s in spaces:
             for m in models:
-                for mt in mass_or_temp:
-                    gp = hiptl_grid_props('CICW', self.fieldname, s, m, mass_or_temp = mt)
-                    if gp.isIncluded():
-                        grp[gp.getH5DsetName()] = gp
+                for tp in types:
+                    for mt in mass_or_temp:
+                        gp = hiptl_grid_props('CICW', self.fieldname, s, tp, m, mass_or_temp = mt)
+                        if gp.isIncluded():
+                            grp[gp.getH5DsetName()] = gp
         return grp
     
     

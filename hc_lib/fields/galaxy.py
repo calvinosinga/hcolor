@@ -33,17 +33,18 @@ class galaxy(Field):
     def getGridProps(self):
         gridnames = {}
         runtype = self.runtype
-        def _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type, censat):
+        def _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type, censat, types = ['vel', 'mass']):
             for c in colors:
                 for r in resolutions:
                     for cd in colordefs:
                         for MT in MAS_type:
                             for mt in mass_type:
                                 for s in spaces:
-                                    for cs in censat:
-                                        gp = galaxy_grid_props(MT, self.fieldname,
-                                            s, c, mt, r, cd, cs)
-                                        gridnames[gp.getH5DsetName()] = gp
+                                    for tp in types:
+                                        for cs in censat:
+                                            gp = galaxy_grid_props(MT, self.fieldname,
+                                                s, tp, c, mt, r, cd, cs)
+                                            gridnames[gp.getH5DsetName()] = gp
 
         def _getCut():
             if self.snapshot == 67:

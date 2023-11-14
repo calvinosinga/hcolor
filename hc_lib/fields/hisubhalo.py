@@ -31,15 +31,16 @@ class hisubhalo(Field):
     def getGridProps(self):
         gridnames = {}
         runtype = self.runtype
-        def _addGrids(models, spaces, resolutions, MAS, censat):
+        def _addGrids(models, spaces, resolutions, MAS, censat, types = ['vel', 'mass']):
             for m in models:
                 for r in resolutions:
                     for M in MAS:
                         for s in spaces:
                             for cs in censat:
-                                gp = hisubhalo_grid_props(M, self.fieldname,
-                                    s, m, r, cs)
-                                gridnames[gp.getH5DsetName()] = gp
+                                for tp in types:
+                                    gp = hisubhalo_grid_props(M, self.fieldname,
+                                        s, tp, m, r, cs)
+                                    gridnames[gp.getH5DsetName()] = gp
         
 
         if runtype == 'fiducial':
