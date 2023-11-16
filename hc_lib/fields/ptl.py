@@ -33,9 +33,10 @@ class ptl(Field):
         for g in grids:
             for s in spaces:
                 for tp in types:
-                    gp = ptl_grid_props("CICW", self.fieldname, s, tp, g)
-                    if gp.isIncluded():
-                        grp[gp.getH5DsetName()] = gp
+                    if not tp == 'vel' and s == 'redshift':
+                        gp = ptl_grid_props("CICW", self.fieldname, s, tp, g)
+                        if gp.isIncluded():
+                            grp[gp.getH5DsetName()] = gp
         return grp
 
     def computeGrids(self, outfile):

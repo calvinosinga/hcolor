@@ -42,9 +42,10 @@ class galaxy(Field):
                                 for s in spaces:
                                     for tp in types:
                                         for cs in censat:
-                                            gp = galaxy_grid_props(MT, self.fieldname,
-                                                s, tp, c, mt, r, cd, cs)
-                                            gridnames[gp.getH5DsetName()] = gp
+                                            if not tp == 'vel' and s == 'redshift':
+                                                gp = galaxy_grid_props(MT, self.fieldname,
+                                                    s, tp, c, mt, r, cd, cs)
+                                                gridnames[gp.getH5DsetName()] = gp
 
         def _getCut():
             if self.snapshot == 67:

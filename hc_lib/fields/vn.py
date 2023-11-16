@@ -34,11 +34,12 @@ class vn(Field):
         for s in spaces:
             for mt in MorT:
                 for tp in types:
-                    gp = vn_grid_props("CICW", self.fieldname, s, tp, mt)
-                    if gp.isIncluded():
-                        if mt == 'temp':
-                            gp.props['compute_slice'] = False
-                        grp[gp.getH5DsetName()] = gp
+                    if not tp == 'vel' and s == 'redshift':
+                        gp = vn_grid_props("CICW", self.fieldname, s, tp, mt)
+                        if gp.isIncluded():
+                            if mt == 'temp':
+                                gp.props['compute_slice'] = False
+                            grp[gp.getH5DsetName()] = gp
 
         return grp
     
