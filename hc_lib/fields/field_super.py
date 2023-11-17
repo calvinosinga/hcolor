@@ -98,7 +98,7 @@ class Field():
         if grid_props.props['compute_xi']:
             start = time.time()
             arr = grid.getGrid()
-            grid_props['subtype'] = 'delta_delta'
+            grid_props.props['subtype'] = 'delta_delta'
             arr = self._toOverdensity(arr)
             xi = Xi(arr, self.header["BoxSize"], axis = self.axis, MAS='CIC')
             runtime = time.time() - start
