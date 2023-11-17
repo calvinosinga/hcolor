@@ -108,7 +108,7 @@ class Field():
 
     def computePk_theta(self, grid, grid_props):
         start = time.time()
-        grid_props['subtype'] = 'theta_theta'
+        grid_props.props['subtype'] = 'theta_theta'
         arr = grid.getGrid()
         vx = arr[:, :, :, 0]; vy = arr[:, :, :, 1]; vz = arr[:, :, :, 2]
         grid_props['empty_cells'] = np.count_nonzero(arr <= 0)
@@ -120,7 +120,7 @@ class Field():
 
     def computeXpkdv(self, grid, velgrid, grid_props):
         start = time.time()
-        grid_props['subtype'] = 'theta_delta'
+        grid_props.props['subtype'] = 'theta_delta'
         arr = grid.getGrid()
         arr = self._toOverdensity(arr)
         velarr = velgrid.getGrid()
