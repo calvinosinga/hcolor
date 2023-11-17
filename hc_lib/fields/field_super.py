@@ -80,7 +80,7 @@ class Field():
         start = time.time()
         arr = grid.getGrid()
         arr = self._toOverdensity(arr)
-        grid_props['subtype'] = 'delta_delta'
+        grid_props.props['subtype'] = 'delta_delta'
         pk = Pk(arr, self.header["BoxSize"], axis = self.axis, MAS='CIC')
         runtime = time.time() - start
 
