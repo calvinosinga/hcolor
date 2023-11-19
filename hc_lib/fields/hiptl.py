@@ -35,7 +35,7 @@ class hiptl(Field):
             for m in models:
                 for tp in types:
                     for mt in mass_or_temp:
-                        if not tp == 'vel' and s == 'redshift':
+                        if not (tp == 'vel' and s == 'redshift'):
                             gp = hiptl_grid_props('CICW', self.fieldname, s, tp, m, mass_or_temp = mt)
                             if gp.isIncluded():
                                 grp[gp.getH5DsetName()] = gp

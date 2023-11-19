@@ -42,7 +42,7 @@ class galaxy(Field):
                                 for s in spaces:
                                     for tp in types:
                                         for cs in censat:
-                                            if not tp == 'vel' and s == 'redshift':
+                                            if not (tp == 'vel' and s == 'redshift'):
                                                 gp = galaxy_grid_props(MT, self.fieldname,
                                                     s, tp, c, mt, r, cd, cs)
                                                 gridnames[gp.getH5DsetName()] = gp

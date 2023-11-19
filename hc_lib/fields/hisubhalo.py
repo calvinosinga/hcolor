@@ -38,7 +38,7 @@ class hisubhalo(Field):
                         for s in spaces:
                             for cs in censat:
                                 for tp in types:
-                                    if not tp == 'vel' and s == 'redshift':
+                                    if not (tp == 'vel' and s == 'redshift'):
                                         gp = hisubhalo_grid_props(M, self.fieldname,
                                             s, tp, m, r, cs)
                                         gridnames[gp.getH5DsetName()] = gp

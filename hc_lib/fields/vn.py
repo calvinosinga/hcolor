@@ -34,7 +34,7 @@ class vn(Field):
         for s in spaces:
             for mt in MorT:
                 for tp in types:
-                    if not tp == 'vel' and s == 'redshift':
+                    if not (tp == 'vel' and s == 'redshift'):
                         gp = vn_grid_props("CICW", self.fieldname, s, tp, mt)
                         if gp.isIncluded():
                             if mt == 'temp':

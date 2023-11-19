@@ -33,7 +33,7 @@ class ptl(Field):
         for g in grids:
             for s in spaces:
                 for tp in types:
-                    if not tp == 'vel' and s == 'redshift':
+                    if not (tp == 'vel' and s == 'redshift'):
                         gp = ptl_grid_props("CICW", self.fieldname, s, tp, g)
                         if gp.isIncluded():
                             grp[gp.getH5DsetName()] = gp
