@@ -304,7 +304,7 @@ class VelGrid(Grid):
 
 class VelChunk(VelGrid, Chunk):
     def __init__(self, gridname, res, chunk_num, grid=None, verbose=False):
-        VelGrid.__init__(gridname, res, grid, verbose)
+        VelGrid.__init__(self, gridname, res, grid, verbose)
         self.combine = 1
         self.mas_runtime = []
         self.chunk_nums = [chunk_num]
