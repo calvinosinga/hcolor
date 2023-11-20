@@ -248,13 +248,9 @@ class VelGrid(Grid):
         
         print("grid value at start of VelGrid constructor")
         print(grid)
-        if grid is None:
-            self.is_computed = False
-            self.grid = np.zeros((res,res,res, 3), dtype=np.float32)
-        else:
-            self.grid = grid
-            self.is_computed = True
         super().__init__(gridname, res, grid, verbose)
+        if len(self.grid.shape) <= 3:
+            self.grid = np.zeros((res, res, res, 3), dtype = np.float32)
         print("grid value at end of VelGrid constructor")
         print(self.grid)
         return
