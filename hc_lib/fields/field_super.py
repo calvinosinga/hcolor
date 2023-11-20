@@ -38,9 +38,6 @@ class Field():
         
         # other variables expected to be assigned values in subclasses
         self.gridprops = self.getGridProps()
-        print('gridnames')
-        for gp in self.gridprops:
-            print(gp.getH5DsetName())
         return
     
     def getGridProps(self):
