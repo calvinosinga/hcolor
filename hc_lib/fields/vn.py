@@ -91,7 +91,7 @@ class vn(Field):
             elif g.props['space'] == 'redshift':
                 pos_arr = rspos
             if g.props['type'] == 'mass':
-            computeHI(g, pos_arr, mass, volume)
+                computeHI(g, pos_arr, mass, volume)
         return
     
     def temperatureMap(self, HIdensity):
