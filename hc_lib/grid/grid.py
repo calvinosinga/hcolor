@@ -246,7 +246,8 @@ class Chunk(Grid):
 class VelGrid(Grid):
     def __init__(self, gridname, res, grid=None, verbose=False):
         
-        
+        print("grid value at start of VelGrid constructor")
+        print(grid)
         if grid is None:
             self.is_computed = False
             self.grid = np.zeros((res,res,res, 3), dtype=np.float32)
@@ -254,6 +255,8 @@ class VelGrid(Grid):
             self.grid = grid
             self.is_computed = True
         super().__init__(gridname, res, grid, verbose)
+        print("grid value at end of VelGrid constructor")
+        print(self.grid)
         return
     
     def CICW(self, pos, boxsize, vel):
@@ -304,16 +307,20 @@ class VelGrid(Grid):
 
 class VelChunk(VelGrid, Chunk):
     def __init__(self, gridname, res, chunk_num, grid=None, verbose=False):
+        print("grid value in VelChunk constructor")
+        print(grid)
         VelGrid.__init__(self, gridname, res, grid, verbose)
         self.combine = 1
         self.mas_runtime = []
         self.chunk_nums = [chunk_num]
         self.grid_sum = []
         self.combine_runtimes = []
+        print("grid value at end of VelChunk constructor")
+        print(self.grid)
         return
     
     def saveGrid(self, outfile):
-        return Chunk.saveGrid(outfile)
+        return Chunk.saveGrid(self, outfile)
     
     @classmethod
     def loadGrid(cls, dataset, verbose=False):

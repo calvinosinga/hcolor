@@ -144,7 +144,7 @@ class hisubhalo(Field):
         
         def computeVel(gprop, pos, vel):
             gprop.props['type'] = 'vel'
-            grid = VelGrid(gprop.getH5DsetName(), self.grid_resolution, self.chunk, verbose = self.v)
+            grid = VelGrid(gprop.getH5DsetName(), self.grid_resolution, verbose = self.v)
 
             if self.v:
                 hs = '#' * 20

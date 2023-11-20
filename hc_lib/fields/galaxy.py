@@ -218,7 +218,7 @@ class galaxy(Field):
         
         def computeVel(pos, vel, gc):
             gc.props['type'] = 'vel'
-            grid = VelGrid(gc.getH5DsetName(), self.grid_resolution, self.chunk, verbose = self.v)
+            grid = VelGrid(gc.getH5DsetName(), self.grid_resolution, verbose = self.v)
 
             if self.v:
                 hs = '#' * 20

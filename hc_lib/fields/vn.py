@@ -73,7 +73,7 @@ class vn(Field):
         
         def computeVel(gprop, pos, vel):
             gprop.props['type'] = 'vel'
-            grid = VelChunk(gprop.getH5DsetName(), self.grid_resolution, self.chunk, verbose = self.v)
+            grid = VelChunk(gprop.getH5DsetName(), self.grid_resolution, self.chunk, grid = None, verbose = self.v)
 
             if self.v:
                 hs = '#' * 20
