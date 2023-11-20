@@ -249,7 +249,7 @@ class VelGrid(Grid):
         print("grid value at start of VelGrid constructor")
         print(grid)
         super().__init__(gridname, res, grid, verbose)
-        if len(self.grid.shape) <= 3:
+        if not isinstance(grid, np.ndarray):
             self.grid = np.zeros((res, res, res, 3), dtype = np.float32)
         print("grid value at end of VelGrid constructor")
         print(self.grid)
@@ -303,16 +303,14 @@ class VelGrid(Grid):
 
 class VelChunk(VelGrid, Chunk):
     def __init__(self, gridname, res, chunk_num, grid=None, verbose=False):
-        print("grid value in VelChunk constructor")
-        print(grid)
+        
         VelGrid.__init__(self, gridname, res, grid, verbose)
         self.combine = 1
         self.mas_runtime = []
         self.chunk_nums = [chunk_num]
         self.grid_sum = []
         self.combine_runtimes = []
-        print("grid value at end of VelChunk constructor")
-        print(self.grid)
+
         return
     
     def saveGrid(self, outfile):

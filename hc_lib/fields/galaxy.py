@@ -280,19 +280,18 @@ class galaxy(Field):
             # count the number of galaxies used for this grid
             if gp['space'] == 'real':
                 pos_arr = pos
-                grid = computeVel(pos, vel, g)
-                self.saveData(outfile, grid, g)
-                del grid
+
             elif gp['space'] == 'redshift':
                 pos_arr = rspos
 
-            if gp['gal_species'] == 'stmass':
-                grid = computeGal(pos_arr[mask, :], mass[mask, 4], g)
-            else:
-                total_mass = np.sum(mass, axis = 1)
-                grid = computeGal(pos_arr[mask, :], total_mass[mask], g)
-
-
+            if gp['type'] == 'mass':
+                if gp['gal_species'] == 'stmass':
+                    grid = computeGal(pos_arr[mask, :], mass[mask, 4], g)
+                else:
+                    total_mass = np.sum(mass, axis = 1)
+                    grid = computeGal(pos_arr[mask, :], total_mass[mask], g)
+            if gp['type'] == 'vel' and gp['space'] == 'real':
+                grid = computeVel(pos, vel, g)
             
             self.saveData(outfile, grid, g)
             del grid

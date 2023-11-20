@@ -86,9 +86,11 @@ class vn(Field):
         for g in list(self.gridprops.values()):
             if g.props['space'] == 'real':
                 pos_arr = pos
-                computeVel(g, pos_arr, vel)
+                if g.props['type'] == 'vel':
+                    computeVel(g, pos_arr, vel)
             elif g.props['space'] == 'redshift':
                 pos_arr = rspos
+            if g.props['type'] == 'mass':
             computeHI(g, pos_arr, mass, volume)
         return
     

@@ -89,10 +89,12 @@ class ptl(Field):
             
             if g.props['space'] == 'real':
                 pos_arr = pos
-                computeVel(g, pos_arr, vel, slc)
+                if g.props['type'] == 'vel':
+                    computeVel(g, pos_arr, vel, slc)
             elif g.props['space'] == 'redshift':
                 pos_arr = rspos
-            computePtl(g, pos_arr, mass, slc)
+            if g.props['type'] == 'mass':
+                computePtl(g, pos_arr, mass, slc)
         
         return
     
