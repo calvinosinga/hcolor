@@ -246,13 +246,20 @@ class Chunk(Grid):
 class VelGrid(Grid):
     def __init__(self, gridname, res, grid=None, verbose=False):
         
-        print("grid value at start of VelGrid constructor")
-        print(grid)
-        super().__init__(gridname, res, grid, verbose)
-        if not isinstance(grid, np.ndarray):
+        if grid is None:
+            self.is_computed = False
             self.grid = np.zeros((res, res, res, 3), dtype = np.float32)
-        print("grid value at end of VelGrid constructor")
-        print(self.grid)
+        else:
+            self.grid = grid
+            self.is_computed = True
+        
+        self.gridname = gridname
+        self.combine = -1
+        self.resolution = res
+        self.mas_runtime = 0
+        self.v = verbose
+        self.count = 0
+        self.grid_sum = 0
         return
     
     def CICW(self, pos, boxsize, vel):
