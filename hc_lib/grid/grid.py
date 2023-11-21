@@ -303,7 +303,7 @@ class VelGrid(Grid):
 
 class VelChunk(VelGrid, Chunk):
     def __init__(self, gridname, res, chunk_num, grid=None, verbose=False):
-        
+
         VelGrid.__init__(self, gridname, res, grid, verbose)
         self.combine = 1
         self.mas_runtime = []
@@ -319,7 +319,7 @@ class VelChunk(VelGrid, Chunk):
     @classmethod
     def loadGrid(cls, dataset, verbose=False):
         dct = dict(dataset.attrs)
-        grid = VelGrid(dct['gridname'], dct['resolution'], 0, dataset[:], verbose=verbose)
+        grid = VelChunk(dct['gridname'], dct['resolution'], 0, dataset[:], verbose=verbose)
         grid.is_computed = True
         grid.mas_runtime = list(dct['mas_runtime'])
         grid.combine = dct['combine']

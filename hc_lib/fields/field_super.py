@@ -110,7 +110,7 @@ class Field():
         grid_props.props['subtype'] = 'theta_theta'
         arr = grid.getGrid()
         vx = arr[:, :, :, 0]; vy = arr[:, :, :, 1]; vz = arr[:, :, :, 2]
-        grid_props['empty_cells'] = np.count_nonzero(arr <= 0)
+        grid_props.props['empty_cells'] = np.count_nonzero(arr <= 0)
         k, pkt, Nmodes = Pk_theta(vx, vy, vz, self.header["BoxSize"], axis = self.axis, MAS = 'CIC')
         runtime = time.time() - start
         rc = ResultContainer(self, 'pk', grid_props, runtime, k, pkt, count = grid.count)
