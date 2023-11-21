@@ -46,7 +46,7 @@ for key in klist:
             except KeyError:
                 print("unable to find mass grid for %s; mass key tried %s"%(key, mass_key))
             else:
-                field.computeXPkdv(mass_grid, grid, gp)
+                field.computeXpkdv(mass_grid, grid, gp)
         # field.makeSlice(grid, gp)
 
 
