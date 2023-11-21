@@ -123,7 +123,7 @@ class Field():
         arr = grid.getGrid()
         arr = self._toOverdensity(arr)
         velarr = velgrid.getGrid()
-        grid_props['empty_cells'] = np.count_nonzero(velarr <= 0)
+        grid_props.props['empty_cells'] = np.count_nonzero(velarr <= 0)
         vx = velarr[:, :, :, 0]; vy = velarr[:, :, :, 1]; vz = velarr[:, :, :, 2]
         k, xpkt, Nmodes = XPk_dv(arr, vx, vy, vz, self.header['BoxSize'], axis = self.axis, MAS = 'CIC')
         runtime = time.time() - start
