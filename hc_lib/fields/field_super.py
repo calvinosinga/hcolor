@@ -11,6 +11,7 @@ import copy
 import time
 from hc_lib.plots.container import ResultContainer
 
+
 class Field():
 
     def __init__(self, simname, snapshot, axis, resolution, pkl_path, verbose):
@@ -125,7 +126,7 @@ class Field():
         velarr = velgrid.getGrid()
         grid_props.props['empty_cells'] = np.count_nonzero(velarr <= 0)
         vx = velarr[:, :, :, 0]; vy = velarr[:, :, :, 1]; vz = velarr[:, :, :, 2]
-        k, xpkt, Nmodes = XPk_dv(arr, vx, vy, vz, self.header['BoxSize'], axis = self.axis, MAS = 'CIC')
+        k, pk1, pk2, xpkt, Nmodes = XPk_dv(arr, vx, vy, vz, self.header['BoxSize'], axis = self.axis, MAS = 'CIC')
         runtime = time.time() - start
         rc = ResultContainer(self, 'pk', grid_props, runtime, k, xpkt, count = grid.count)
         self.pks.append(rc)
