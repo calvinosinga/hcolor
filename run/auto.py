@@ -47,7 +47,7 @@ for key in klist:
                 print("unable to find mass grid for %s; mass key tried %s"%(key, mass_key))
             else:
                 field.computeXpkdv(mass_grid, grid, gp)
-        # field.makeSlice(grid, gp)
+
 
 
 pickle.dump(field, open(pkl_path, 'wb'), pickle.HIGHEST_PROTOCOL)
