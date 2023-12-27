@@ -106,11 +106,16 @@ class Field():
             self.xi.append(rc)
         return
 
-    def computePk_theta(self, grid, grid_props):
+    def computePk_theta(self, grid, velgrid, grid_props):
         start = time.time()
         grid_props.props['subtype'] = 'theta_theta'
-        arr = grid.getGrid()
-        vx = arr[:, :, :, 0]; vy = arr[:, :, :, 1]; vz = arr[:, :, :, 2]
+        arr = velgrid.getGrid()
+        density = grid.getGrid() # we want density NOT overdensity
+        
+        vx = arr[:, :, :, 0] / density
+        vy = arr[:, :, :, 1] / density
+        vz = arr[:, :, :, 2] / density
+        
         grid_props.props['empty_cells'] = np.count_nonzero(arr == 0)
         k, pkt, Nmodes = Pk_theta(vx, vy, vz, self.header["BoxSize"], axis = self.axis, MAS = 'CIC')
         runtime = time.time() - start
