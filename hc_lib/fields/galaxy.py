@@ -226,6 +226,13 @@ class galaxy(Field):
             
             grid.CICW(pos, self.header['BoxSize'], vel)
             return grid
+
+        def computeNum(pos, gc):
+            gc.props['type'] = 'number'
+            gridnum = Grid(gc.getH5DsetName(), self.grid_resolution, verbose = self.v)
+            gridnum.CIC(pos, self.header['BoxSize'])
+            return gridnum
+        
         ###########################################################################
 
         # saves the associated pickle filepath to the hdf5 output
@@ -291,7 +298,12 @@ class galaxy(Field):
                     total_mass = np.sum(mass, axis = 1)
                     grid = computeGal(pos_arr[mask, :], total_mass[mask], g)
             if gp['type'] == 'vel' and gp['space'] == 'real':
+                gridnum = computeNum(pos, g)
+                self.saveData(outfile, gridnum, g)
                 grid = computeVel(pos, vel, g)
+                
+
+
             
             self.saveData(outfile, grid, g)
             del grid

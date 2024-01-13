@@ -153,6 +153,14 @@ class hisubhalo(Field):
             grid.CICW(pos, self.header['BoxSize'], vel)
             self.saveData(outfile, grid, gprop)
             return
+
+        def computeNum(gprop, pos):
+            gprop.props['type'] = 'number'
+            gridnum = Grid(gprop.getH5DsetName(), self.grid_resolution, verbose = self.v)
+            gridnum.CIC(pos, self.header['BoxSize'])
+            self.saveData(outfile, gridnum, gprop)
+            return
+        
         ###############################################################
 
         for g in list(self.gridprops.values()):
@@ -160,6 +168,7 @@ class hisubhalo(Field):
                 pos_arr = pos
                 if g.props['type'] == 'vel':
                     computeVel(g, pos_arr, vel)
+                    computeNum(g, pos)
             elif g.props['space'] == 'redshift':
                 pos_arr = rspos
             if g.props['type'] == 'mass':

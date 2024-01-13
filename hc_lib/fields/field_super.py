@@ -110,11 +110,11 @@ class Field():
         start = time.time()
         grid_props.props['subtype'] = 'theta_theta'
         arr = velgrid.getGrid()
-        density = grid.getGrid() # we want density NOT overdensity
+        number = grid.getGrid() # we want number of samples in each
         
-        vx = arr[:, :, :, 0] / density
-        vy = arr[:, :, :, 1] / density
-        vz = arr[:, :, :, 2] / density
+        vx = arr[:, :, :, 0] / number
+        vy = arr[:, :, :, 1] / number
+        vz = arr[:, :, :, 2] / number
         
         grid_props.props['empty_cells'] = np.count_nonzero(arr == 0)
         k, pkt, Nmodes = Pk_theta(vx, vy, vz, self.header["BoxSize"], axis = self.axis, MAS = 'CIC')
@@ -123,14 +123,19 @@ class Field():
         self.pks.append(rc)
         return
 
-    def computeXpkdv(self, grid, velgrid, grid_props):
+    def computeXpkdv(self, grid, numgrid, velgrid, grid_props):
         start = time.time()
         grid_props.props['subtype'] = 'theta_delta'
+        number = numgrid.getGrid()
+
         arr = grid.getGrid()
         arr = self._toOverdensity(arr)
+        
         velarr = velgrid.getGrid()
         grid_props.props['empty_cells'] = np.count_nonzero(velarr == 0)
-        vx = velarr[:, :, :, 0]; vy = velarr[:, :, :, 1]; vz = velarr[:, :, :, 2]
+        vx = velarr[:, :, :, 0] / number
+        vy = velarr[:, :, :, 1] / number
+        vz = velarr[:, :, :, 2] / number
         k, pk1, pk2, xpkt, Nmodes = XPk_dv(arr, vx, vy, vz, self.header['BoxSize'], axis = self.axis, MAS = 'CIC')
         runtime = time.time() - start
         rc = ResultContainer(self, 'pk', grid_props, runtime, k, xpkt, count = grid.count)

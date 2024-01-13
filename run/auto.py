@@ -39,14 +39,16 @@ for key in klist:
             field.computePk(grid, gp)
             field.computeXi(grid, gp)
         else:
+            num_key = key.replace('vel', 'number', 1)
             mass_key = key.replace('vel', 'mass', 1)
             try:
+                num_grid = Grid.loadGrid(gridfile[num_key])
                 mass_grid = Grid.loadGrid(gridfile[mass_key])
             except KeyError:
-                print("unable to find mass grid for %s; mass key tried %s"%(key, mass_key))
+                print("unable to find mass grid for %s; mass key tried %s"%(key, num_key))
             else:
-                field.computeXpkdv(mass_grid, grid, gp)
-                field.computePk_theta(mass_grid, grid, gp)
+                field.computeXpkdv(num_grid, grid, gp)
+                field.computePk_theta(mass_grid, num_grid, grid, gp)
 
 
 
