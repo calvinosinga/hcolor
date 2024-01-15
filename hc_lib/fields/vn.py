@@ -85,7 +85,7 @@ class vn(Field):
         
         def computeNum(gprop, pos):
             gprop.props['type'] = 'number'
-            gridnum = Chunk(gprop.getH5DsetName(), self.grid_resolution, verbose = self.v)
+            gridnum = Chunk(gprop.getH5DsetName(), self.grid_resolution, self.chunk, verbose = self.v)
             gridnum.CIC(pos, self.header['BoxSize'])
             self.saveData(outfile, gridnum, gprop)
             return
