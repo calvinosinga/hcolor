@@ -38,7 +38,7 @@ for key in klist:
         if gp.props['type'] == 'mass':
             field.computePk(grid, gp)
             field.computeXi(grid, gp)
-        else:
+        elif gp.props['type'] == 'vel':
             num_key = key.replace('vel', 'number', 1)
             mass_key = key.replace('vel', 'mass', 1)
             try:
