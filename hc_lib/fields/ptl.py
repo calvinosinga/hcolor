@@ -96,7 +96,7 @@ class ptl(Field):
             
             if g.props['space'] == 'real':
                 pos_arr = pos
-                if g.props['type'] == 'vel':
+                if g.props['type'] == 'vel' and self.grid_resolution <= 600:
                     computeVel(g, pos_arr, vel, slc)
                     computeNum(g, pos_arr)
             elif g.props['space'] == 'redshift':

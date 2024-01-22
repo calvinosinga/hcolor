@@ -297,7 +297,7 @@ class galaxy(Field):
                 else:
                     total_mass = np.sum(mass, axis = 1)
                     grid = computeGal(pos_arr[mask, :], total_mass[mask], g)
-            if gp['type'] == 'vel' and gp['space'] == 'real':
+            if gp['type'] == 'vel' and gp['space'] == 'real' and self.grid_resolution <= 600:
                 gridnum = computeNum(pos, g)
                 self.saveData(outfile, gridnum, g)
                 grid = computeVel(pos, vel, g)

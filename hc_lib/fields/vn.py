@@ -93,7 +93,7 @@ class vn(Field):
         for g in list(self.gridprops.values()):
             if g.props['space'] == 'real':
                 pos_arr = pos
-                if g.props['type'] == 'vel':
+                if g.props['type'] == 'vel' and self.grid_resolution <= 600:
                     computeVel(g, pos_arr, vel)
                     computeNum(g, pos_arr)
             elif g.props['space'] == 'redshift':
