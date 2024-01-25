@@ -181,8 +181,7 @@ def HIResolutionDefinitions(simname):
     # there is a linewidths restriction, unsure how to approach that in papastergis
     # wolz is intensity map so no minimum threshold
 
-    res_defs['tng100-2'] = {'stmass':(1e9, np.inf)}
-    res_defs['tng300'] = {'stmass':(5e10, np.inf)}
+    res_defs['tng100-2'] = {'stmass-gas':(1.1e9, np.inf, 1.1e9, np.inf)}
     return res_defs
     
 

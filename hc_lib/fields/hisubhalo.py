@@ -186,6 +186,11 @@ class hisubhalo(Field):
                 mask &= (masstype[:, 4] >= v[0]) & (masstype[:, 4] < v[1])
             elif k == 'gas':
                 mask &= (masstype[:, 0] >= v[0]) & (masstype[:, 0] < v[1])
+            elif k == 'stmass-gas':
+                stmask = (masstype[:, 4] >= v[0]) & (masstype[:, 4] < v[1])
+                gasmask = ((masstype[:, 0] >= v[2]) & (masstype[:, 0] < v[3]))
+                mask &= (stmask | gasmask)
+
         return mask
 
     def makeSlice(self, grid, grid_props, perc=0.1, mid=None):
