@@ -71,7 +71,7 @@ class vn(Field):
             self.saveData(outfile, grid, gprop)
             return
         
-        def computeVel(gprop, pos, vel):
+        def computeVel(gprop, pos, vel, mass):
             gprop.props['type'] = 'vel'
             grid = VelChunk(gprop.getH5DsetName(), self.grid_resolution, self.chunk, grid = None, verbose = self.v)
 
@@ -79,7 +79,7 @@ class vn(Field):
                 hs = '#' * 20
                 print(hs+" COMPUTE HI VEL FOR %s "%(gprop.getH5DsetName().upper()) + hs)
             
-            grid.CICW(pos, self.header['BoxSize'], vel)
+            grid.CICW(pos, self.header['BoxSize'], vel * mass)
             self.saveData(outfile, grid, gprop)
             return
         
@@ -94,7 +94,7 @@ class vn(Field):
             if g.props['space'] == 'real':
                 pos_arr = pos
                 if g.props['type'] == 'vel' and self.grid_resolution <= 600:
-                    computeVel(g, pos_arr, vel)
+                    computeVel(g, pos_arr, vel, mass)
                     computeNum(g, pos_arr)
             elif g.props['space'] == 'redshift':
                 pos_arr = rspos

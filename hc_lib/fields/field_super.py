@@ -106,37 +106,37 @@ class Field():
             self.xi.append(rc)
         return
 
-    def computePk_theta(self, grid, velgrid, grid_props):
+    def computePk_theta(self, mgrid, velgrid, grid_props):
         start = time.time()
         grid_props.props['subtype'] = 'theta_theta'
         arr = velgrid.getGrid()
-        number = grid.getGrid() # we want number of samples in each
+        mass = mgrid.getGrid() # we want number of samples in each
         
-        vx = arr[:, :, :, 0] / number
-        vy = arr[:, :, :, 1] / number
-        vz = arr[:, :, :, 2] / number
+        vx = arr[:, :, :, 0] / mass
+        vy = arr[:, :, :, 1] / mass
+        vz = arr[:, :, :, 2] / mass
         
         grid_props.props['empty_cells'] = np.count_nonzero(arr == 0)
         k, pkt, Nmodes = Pk_theta(vx, vy, vz, self.header["BoxSize"], axis = self.axis, MAS = 'CIC')
         runtime = time.time() - start
-        rc = ResultContainer(self, 'pk', grid_props, runtime, k, pkt, count = grid.count)
+        rc = ResultContainer(self, 'pk', grid_props, runtime, k, pkt, count = mgrid.count)
         self.pks.append(rc)
         return
 
-    def computeXpkdv(self, grid, numgrid, velgrid, grid_props):
+    def computeXpkdv(self, grid, velgrid, grid_props):
 
         start = time.time()
         grid_props.props['subtype'] = 'theta_delta'
-        number = numgrid.getGrid()
+        mass = grid.getGrid()
 
         arr = grid.getGrid()
         arr = self._toOverdensity(arr)
         
         velarr = velgrid.getGrid()
         grid_props.props['empty_cells'] = np.count_nonzero(velarr == 0)
-        vx = velarr[:, :, :, 0] / number
-        vy = velarr[:, :, :, 1] / number
-        vz = velarr[:, :, :, 2] / number
+        vx = velarr[:, :, :, 0] / mass
+        vy = velarr[:, :, :, 1] / mass
+        vz = velarr[:, :, :, 2] / mass
         k, pk1, pk2, xpkt, Nmodes = XPk_dv(arr, vx, vy, vz, self.header['BoxSize'], axis = self.axis, MAS = 'CIC')
         runtime = time.time() - start
         rc = ResultContainer(self, 'pk', grid_props, runtime, k, xpkt, count = grid.count)

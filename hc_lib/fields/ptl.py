@@ -62,7 +62,7 @@ class ptl(Field):
             self.saveData(outfile, grid, gprop)
             return
         
-        def computeVel(gprop, pos, vel, slc):
+        def computeVel(gprop, pos, vel, slc, mass):
             gprop.props['type'] = 'vel'
             grid = VelChunk(gprop.getH5DsetName(), self.grid_resolution, self.chunk, verbose=self.v)
             
@@ -70,7 +70,7 @@ class ptl(Field):
                 grid.print()
             
             # place particles into grid
-            grid.CICW(pos[slc, :], self.header['BoxSize'], vel[slc, :])
+            grid.CICW(pos[slc, :], self.header['BoxSize'], vel[slc, :] * mass[slc, :])
 
             # save them to file
             self.saveData(outfile, grid, gprop)
@@ -97,7 +97,7 @@ class ptl(Field):
             if g.props['space'] == 'real':
                 pos_arr = pos
                 if g.props['type'] == 'vel' and self.grid_resolution <= 600:
-                    computeVel(g, pos_arr, vel, slc)
+                    computeVel(g, pos_arr, vel, slc, mass)
                     computeNum(g, pos_arr)
             elif g.props['space'] == 'redshift':
                 pos_arr = rspos

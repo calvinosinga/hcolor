@@ -47,8 +47,8 @@ for key in klist:
             except KeyError:
                 print("unable to find mass grid for %s; mass key tried %s"%(key, num_key))
             else:
-                field.computeXpkdv(mass_grid, num_grid, grid, gp)
-                field.computePk_theta(num_grid, grid, gp)
+                field.computeXpkdv(mass_grid, grid, gp)
+                field.computePk_theta(mass_grid, grid, gp)
 
 
 
