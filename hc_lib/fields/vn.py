@@ -79,7 +79,7 @@ class vn(Field):
                 hs = '#' * 20
                 print(hs+" COMPUTE HI VEL FOR %s "%(gprop.getH5DsetName().upper()) + hs)
             
-            grid.CICW(pos, self.header['BoxSize'], vel * mass)
+            grid.CICW(pos, self.header['BoxSize'], vel * mass[:, np.newaxis])
             self.saveData(outfile, grid, gprop)
             return
         

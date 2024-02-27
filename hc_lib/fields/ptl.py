@@ -70,7 +70,7 @@ class ptl(Field):
                 grid.print()
             
             # place particles into grid
-            grid.CICW(pos[slc, :], self.header['BoxSize'], vel[slc, :] * mass[slc, :])
+            grid.CICW(pos[slc, :], self.header['BoxSize'], vel[slc, :] * mass[slc, np.newaxis])
 
             # save them to file
             self.saveData(outfile, grid, gprop)
