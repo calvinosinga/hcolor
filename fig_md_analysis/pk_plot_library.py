@@ -10,10 +10,14 @@ def rgba(color, alpha):
 	import matplotlib as mpl
 	col = mpl.colors.to_rgba(color, alpha)
 	return col
-def wnum():
-	return "$k$ (cMpc/h)$^{-1}$"
+def wnum(comov = True):
+	if comov:
+		unit = 'cMpc/h'
+	else:
+		unit = 'Mpc/h'
+	return "$k$ (%s)$^{-1}$"%unit
 
-def pklab(name1, name2 = '', fn = 'k', rm = True):
+def pklab(name1, name2 = '', fn = 'k', rm = True, comov = True):
 	if rm:
 		name1 = '\\mathrm{%s}'%name1
 		if not name2 == '':
@@ -23,7 +27,11 @@ def pklab(name1, name2 = '', fn = 'k', rm = True):
 	else:
 		name = name1
 	
-	return "P$_{%s}$ $(%s)$ (cMpc/h)$^{-3}$"%(name, fn)
+	if comov:
+		unit = 'cMpc/h'
+	else:
+		unit = 'Mpc/h'
+	return "P$_{%s}$ $(%s)$ (%s)$^{3}$"%(name, fn, unit)
 def pkrat(name1, name2, fn = 'k', rm = True):
     if rm:
         name1 = '\\mathrm{%s}'%name1
