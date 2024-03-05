@@ -8,13 +8,13 @@ from figrid.figrid import Figrid
 from Pk_library import Pk
 
 SIMPATH = '/home/cosinga/scratch/L205n2500TNG/'
-head = il.groupcat.loadHeader(SIMPATH + 'output', 50)
+head = il.groupcat.loadHeader(SIMPATH + 'output/', 50)
 h = head['HubbleParam']
 box = head['BoxSize']
 
 def get_halo_data(ss):
     data = {}
-    f = il.groupcat.loadHalos(SIMPATH + 'output', ss, ['Group_M_Crit200', 'GroupPos', 'GroupFirstSub'])
+    f = il.groupcat.loadHalos(SIMPATH + 'output/', ss, ['Group_M_Crit200', 'GroupPos', 'GroupFirstSub'])
     data['m200c'] = f['Group_M_Crit200'] * 1e10 / h
     data['x'] = f['GroupPos'] / 1e3
     out_mask = data['x'] >= 75
@@ -27,7 +27,7 @@ def get_halo_data(ss):
 
 def get_gal_data(ss):
     data = {}
-    f = il.groupcat.loadSubhalos(SIMPATH + 'output', ss, ['SubhaloPos', 'SubhaloGrNr', 'SubhaloMassType', 'SubhaloStellarPhotometrics'])
+    f = il.groupcat.loadSubhalos(SIMPATH + 'output/', ss, ['SubhaloPos', 'SubhaloGrNr', 'SubhaloMassType', 'SubhaloStellarPhotometrics'])
     data['x'] = f['SubhaloPos'] / 1e3
     data['halo_idx'] = f['SubhaloGrNr']
     data['stmass'] = f['SubhaloMassType'][:, 4] * 1e10 / h
@@ -83,3 +83,13 @@ def CICW(npoints, pos, boxsize, mass):
     return grid
 
 
+hdatas = []; gdatas = []
+snapshots = [99, 67, 50]
+for ss in snapshots:
+    hdatas.append(get_halo_data(ss))
+    gdatas.append(get_gal_data(ss))
+
+for i in range(len(snapshots)):
+
+    blue_mask = get_blue_mask(gdatas[i]['gr'], snapshots[i])
+    print(snapshots[i], np.sum(blue_mask))
