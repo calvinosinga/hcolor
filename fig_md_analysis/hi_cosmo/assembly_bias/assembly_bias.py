@@ -2,16 +2,21 @@ import illustris_python as il
 import h5py as hp
 import numpy as np
 import pickle as pkl
+import matplotlib.pyplot as plt
 from figrid.data_sort import DataSort
 from figrid.data_container import DataContainer
 from figrid.figrid import Figrid
 from Pk_library import Pk
 
 SIMPATH = '/home/cosinga/scratch/L205n2500TNG/'
+SAVEPATH = '/home/cosinga/scratch/hcolor/fig_md_analysis/hi_cosmo/assembly_bias/'
 head = il.groupcat.loadHeader(SIMPATH + 'output/', 50)
 h = head['HubbleParam']
 box = head['BoxSize']
 
+plt.rcParams['mathtext.fontset'] = 'dejavuserif'
+plt.rcParams['font.family'] = 'serif'
+plt.rcParams['text.usetex'] = True
 def get_halo_data(ss):
     data = {}
     f = il.groupcat.loadHalos(SIMPATH + 'output/', ss, ['Group_M_Crit200', 'GroupPos', 'GroupFirstSub'])
@@ -37,6 +42,12 @@ def get_gal_data(ss):
 def get_hi_data(ss):
 
     return
+
+hdatas = []; gdatas = []
+snapshots = [99, 67, 50]
+for ss in snapshots:
+    hdatas.append(get_halo_data(ss))
+    gdatas.append(get_gal_data(ss))
 
 
 def get_blue_mask(gr, ss):
@@ -83,13 +94,24 @@ def CICW(npoints, pos, boxsize, mass):
     return grid
 
 
-hdatas = []; gdatas = []
-snapshots = [99, 67, 50]
-for ss in snapshots:
-    hdatas.append(get_halo_data(ss))
-    gdatas.append(get_gal_data(ss))
+def plot_hmf(bin_width):
+    fig = plt.figure(figsize = (3, 3))
+    for i in range(len(snapshots)):
+        hmass = np.log10(hdatas[i]['m200c'])
+        min_hmass = np.log10(6e9) # at least 100 dm particles
+        max_hmass = np.max(hmass)
+        logM_bins = np.arange(min_hmass, max_hmass, bin_width)
+        hist, edges = np.histogram(hmass, bins=logM_bins)
+        hist = hist / bin_width
+        medges = (edges[:-1] + edges[1:]) / 2
+        plt.plot(medges, hist, label = '')
+    plt.yscale('log')
+    plt.title('TNG300 halo mass function')
+    plt.xlabel(r'$M_{200c} (M_\odot)$')
+    plt.ylabel(r'dN / d log M')
+    plt.savefig(SAVEPATH + 'hmf.png')
 
-for i in range(len(snapshots)):
+    return
 
-    blue_mask = get_blue_mask(gdatas[i]['gr'], snapshots[i])
-    print(snapshots[i], np.sum(blue_mask))
+
+plot_hmf(0.2)
