@@ -86,8 +86,19 @@ class Field():
 
         rc = ResultContainer(self, 'pk', grid_props, runtime, pk.k3D, pk.Pk[:,0], 
                 Nmodes = pk.Nmodes3D, count = grid.count)
+        rc.addProp('ell', 'monopole')
         self.pks.append(rc)
+        rc_quad = ResultContainer(self, 'pk', grid_props, runtime, pk.k3D, pk.Pk[:,1], 
+                Nmodes = pk.Nmodes3D, count = grid.count)
+        rc_quad.addProp('ell', 'quadrapole')
 
+        self.pks.append(rc_quad)
+
+        rc_hexa = ResultContainer(self, 'pk', grid_props, runtime, pk.k3D, pk.Pk[:,2], 
+                Nmodes = pk.Nmodes3D, count = grid.count)
+        rc_hexa.addProp('ell', 'hexadecapole')
+
+        self.pks.append(rc_hexa)
         rc2D = ResultContainer(self, '2Dpk', grid_props, runtime, pk.kpar, pk.kper,
                 pk.Pk2D[:], pk.Nmodes2D, count=grid.count)
         self.tdpks.append(rc2D)
@@ -333,8 +344,24 @@ class Cross():
         rc2 = ResultContainer(self.field2, 'pk', gp2, runtime, xpk.k3D,
                 xpk.XPk[:,0,0], Nmodes=xpk.Nmodes3D)
         rc1.addCrossedField(rc2)
+        rc1.addProp('ell', 'monopole')
         self.xpks.append(rc1)
 
+        rc1 = ResultContainer(self.field1, 'pk', gp1, runtime, xpk.k3D, 
+                xpk.XPk[:,1,0], Nmodes = xpk.Nmodes3D)
+        rc2 = ResultContainer(self.field2, 'pk', gp2, runtime, xpk.k3D,
+                xpk.XPk[:,1,0], Nmodes=xpk.Nmodes3D)
+        rc1.addCrossedField(rc2)
+        rc1.addProp('ell', 'quadrapole')
+        self.xpks.append(rc1)
+
+        rc1 = ResultContainer(self.field1, 'pk', gp1, runtime, xpk.k3D, 
+                xpk.XPk[:,2,0], Nmodes = xpk.Nmodes3D)
+        rc2 = ResultContainer(self.field2, 'pk', gp2, runtime, xpk.k3D,
+                xpk.XPk[:,2,0], Nmodes=xpk.Nmodes3D)
+        rc1.addCrossedField(rc2)
+        rc1.addProp('ell', 'hexadecapole')
+        self.xpks.append(rc1)
         do_2D = gp1.props['space'] == 'redshift' and gp2.props['space'] == 'redshift'
         if do_2D:
             rc1 = ResultContainer(self.field1, '2Dpk', gp1, runtime, xpk.kpar, xpk.kper,
