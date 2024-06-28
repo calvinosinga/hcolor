@@ -147,6 +147,16 @@ class galaxy(Field):
             resolutions = ['None']
             _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type, censat)
         
+        elif runtype == 'two_halo':
+            colors = ['None']
+            colordefs = ['None']
+            censat = ['both']
+            MAS_type = ['CICW']
+            spaces = ['real', 'redshift']
+            mass_type = ['total']
+            resolutions = ['None']
+            _addGrids(colors, resolutions, colordefs, MAS_type, spaces, mass_type, censat)
+
         elif runtype == 'centrals_test':
             colordefs = _getCut()
             colors = ['blue', 'red']
@@ -240,9 +250,14 @@ class galaxy(Field):
 
         # getting the galaxy data
         fields = ['SubhaloStellarPhotometrics','SubhaloPos','SubhaloMassType',
-                'SubhaloVel']   
+                'SubhaloVel', 'SubhaloGrNr']   
         pos, vel, mass, photo = self._loadGalaxyData(self.loadpath, fields)
-        centrals = self._loadGroupData(self.loadpath, ['GroupFirstSub'])
+        gdata = self._loadGroupData(self.loadpath, ['GroupFirstSub', 'GroupPos', 'GroupMass', 'GroupVel'])
+        centrals = gdata['GroupFirstSub']
+        if self.runtype == 'two_halo':
+            pos = self._convertPos(gdata['GroupPos'])
+            mass = self._convertMass(gdata['GroupMass'])
+            vel = gdata['GroupVel'] / self.header['Time']
         temp = copy.copy(pos)
         rspos = self._toRedshiftSpace(temp, vel)
         del temp

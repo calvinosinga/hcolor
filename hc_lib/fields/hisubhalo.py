@@ -75,6 +75,14 @@ class hisubhalo(Field):
             censat = ['both', 'centrals', 'satellites']
             _addGrids(models, spaces, resolutions, mas, censat)
         
+        elif runtype == 'two_halo':
+            models = getMolFracModelsGalHI()
+            mas = ['CICW']
+            spaces = ['redshift', 'real']
+            resolutions = ['diemer']
+            censat = ['both']
+            _addGrids(models, spaces, resolutions, mas, censat)
+
         elif runtype == 'centrals_test':
             models = getMolFracModelsGalHI()
             mas = ['CICW']
@@ -103,7 +111,7 @@ class hisubhalo(Field):
         ids = hih2file['id_subhalo'][:] # used to idx into the subhalo catalog
         ids = ids.astype(np.int32)
 
-        fields = ['SubhaloPos', 'SubhaloVel', 'SubhaloMassType']
+        fields = ['SubhaloPos', 'SubhaloVel', 'SubhaloMassType', 'SubhaloGrNr']
 
         data = self._loadGalaxyData(self.loadpath, fields) # implemented in superclass
         ngals = len(data['SubhaloPos'])
@@ -112,7 +120,14 @@ class hisubhalo(Field):
         gal_masses = data['SubhaloMassType'][ids, :]
         gal_masses = self._convertMass(gal_masses)
         pos = self._convertPos(pos)
-        centrals = self._loadGroupData(self.loadpath, ['GroupFirstSub'])
+        grnr = data['SubhaloGrNr']
+        gdata = self._loadGroupData(self.loadpath, ['GroupFirstSub', 'GroupPos', 'GroupVel'])
+        centrals = gdata['GroupFirstSub']
+        gpos = self._convertPos(gdata['GroupPos'])
+        gvel = gdata['GroupVel'] / self.header['Time']
+        if self.runtype == 'two_halo':
+            pos = gpos[grnr, :]
+            vel = gvel[grnr, :]
         temp = copy.copy(pos)
         rspos = self._toRedshiftSpace(temp, vel)
         del temp
