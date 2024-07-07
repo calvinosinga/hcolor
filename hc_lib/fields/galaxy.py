@@ -267,6 +267,17 @@ class galaxy(Field):
             if self.v:
                 print("now making grids for %s"%g.getH5DsetName())
 
+            if self.runtype == 'two_halo':
+                if gp['space'] == 'real':
+                    pos_arr = pos
+
+                elif gp['space'] == 'redshift':
+                    pos_arr = rspos
+                if gp['type'] == 'mass':
+
+                    total_mass = np.sum(mass, axis = 1)
+                    grid = computeGal(pos_arr[:, :], total_mass[:], g)
+                    self.saveData(outfile, grid, g)
             # create the appropriate mask for the color
             gp = g.props
             if not gp['gal_res'] is 'None':
