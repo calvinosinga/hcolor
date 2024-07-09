@@ -266,7 +266,8 @@ class galaxy(Field):
         for g in self.gridprops.values():
             if self.v:
                 print("now making grids for %s"%g.getH5DsetName())
-
+            # create the appropriate mask for the color
+            gp = g.props
             if self.runtype == 'two_halo':
                 if gp['space'] == 'real':
                     pos_arr = pos
@@ -278,8 +279,7 @@ class galaxy(Field):
                     total_mass = np.sum(mass, axis = 1)
                     grid = computeGal(pos_arr[:, :], total_mass[:], g)
                     self.saveData(outfile, grid, g)
-            # create the appropriate mask for the color
-            gp = g.props
+
             if not gp['gal_res'] is 'None':
                 resolved_dict = galaxyResDefs(self.simname)[gp['gal_res']]
                 resolved_mask = galaxyResolvedMask(mass[:, 4], mass[:, 0], photo, resolved_dict)
