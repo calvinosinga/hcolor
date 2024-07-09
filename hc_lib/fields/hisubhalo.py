@@ -139,6 +139,8 @@ class hisubhalo(Field):
             mass = hih2file[gprop.props['model']][:] #already in solar masses
             if self.runtype == 'two_halo':
                 grpid = hih2file['id_group']
+                print(grpid.dtype)
+                grpid = grpid.astype(np.int32)
                 pos = pos[grpid, :]
                 mass = mass[grpid]
                 grid.runMAS(gprop.props['mas'], pos[:, :], self.header['BoxSize'], mass[:])
