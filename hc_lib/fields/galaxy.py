@@ -279,6 +279,7 @@ class galaxy(Field):
                     total_mass = np.sum(mass, axis = 1)
                     grid = computeGal(pos_arr[:, :], total_mass[:], g)
                     self.saveData(outfile, grid, g)
+                continue
 
             if not gp['gal_res'] is 'None':
                 resolved_dict = galaxyResDefs(self.simname)[gp['gal_res']]
