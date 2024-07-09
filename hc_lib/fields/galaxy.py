@@ -276,8 +276,7 @@ class galaxy(Field):
                     pos_arr = rspos
                 if gp['type'] == 'mass':
 
-                    total_mass = np.sum(mass, axis = 1)
-                    grid = computeGal(pos_arr[:, :], total_mass[:], g)
+                    grid = computeGal(pos_arr[:, :], mass[:], g)
                     self.saveData(outfile, grid, g)
                 continue
 
