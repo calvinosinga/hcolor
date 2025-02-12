@@ -6,14 +6,17 @@ INFILE = '/scratch/zt1/project/diemer-prj/user/cosinga/hcolor/output/fiducial_tn
 
 snaps = [50, 67]
 
-grid_name = 'CICW_vn_redshift_mass_vn'
+grid_name = 'CICW_vn_redshift_mass_mass_vn'
 
-out_file = '/scratch/zt1/project/diemer-prj/user/cosinga/hcolor/output/fiducial_tng300B_%03dS_0A_800R/grids/beam_pk.hdf5'
+out_file = '/scratch/zt1/project/diemer-prj/user/cosinga/hcolor/output/beam_pk.hdf5'
+
+w = hp.File(out_file, 'w')
 for s in snaps:
-    f = hp.File(INFILE%(s, s), 'r+')
+    f = hp.File(INFILE%(s, s), 'r')
+    print(list(f.keys()), grid_name)
+    og_grid = f[grid_name][:]
     for beam in ['mkt', 'gbt']:
-    
-        grid = f[grid_name][:] # for memory sake, not gonna copy this
+        grid = np.copy(og_grid)
         npts = grid.shape[0]
         box_length = 205 # Mpc/h from TNG website
         if s == 67:
@@ -44,6 +47,7 @@ for s in snaps:
         for i in range(npts):
             grid[:, :, i] = gaussian_filter(grid[:, :, i], sigma = R_beam_pix, mode = 'wrap')
         
-        f.create_dataset('%s_beam'%beam, data = grid)
+        w.create_dataset('%s_%03d_beam'%(beam, s), data = grid)
 
     f.close()
+w.close()
