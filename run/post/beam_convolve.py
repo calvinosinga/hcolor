@@ -46,7 +46,7 @@ for s in snaps:
 
         # set cosmo
 
-        d_c = cosmo.comovingDistance(redshift) # already in Mpc/h
+        d_c = abs(cosmo.comovingDistance(redshift)) # already in Mpc/h
 
         R_beam = d_c * np.radians(sig_FWHM)
         dpix = box_length / npts
