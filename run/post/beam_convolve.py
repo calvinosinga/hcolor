@@ -52,7 +52,9 @@ for s in snaps:
         dpix = box_length / npts
         R_beam_pix = R_beam / dpix
         grid = gaussian_filter(grid, sigma = (R_beam_pix, R_beam_pix, 0), mode = 'wrap')
-        
+        grid /= box_length**3
+        grid /= np.mean(grid).astype(np.float32)
+        grid = grid - 1
         w.create_dataset('%s_%03d_beam_field'%(beam, s), data = grid, compression = 'gzip', compression_opts = 9)
 
         pk = Pk(grid, box_length, axis = 0, MAS = 'CIC')
