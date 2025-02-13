@@ -5,7 +5,7 @@ from scipy.ndimage import gaussian_filter
 from Pk_library import Pk, XPk
 cosmo = cosmology.setCosmology('planck15') # using TNG's cosmology
 INFILE = '/scratch/zt1/project/diemer-prj/user/cosinga/hcolor/output/fiducial_tng300B_%03dS_0A_800R/grids/vncombine2_tng300B_%03dS_0A_800R.hdf5'
-
+GALFILE = '/scratch/zt1/project/diemer-prj/user/cosinga/hcolor/output/fiducial_tng300B_%03dS_0A_800R/grids/galaxygrid_tng300B_%03dS_0A_800R.hdf5'
 snaps = [50, 67]
 
 grid_name = 'CICW_vn_redshift_mass_mass_vn'
@@ -15,10 +15,12 @@ out_file = '/scratch/zt1/project/diemer-prj/user/cosinga/hcolor/output/beam_pk.h
 w = hp.File(out_file, 'w')
 for s in snaps:
     f = hp.File(INFILE%(s, s), 'r')
+    fgal = hp.File(GALFILE%(s, s), 'r')
     keys = list(f.keys())
     if grid_name in keys:
         og_grid = f[grid_name][:]
     else:
+        print(keys[1])
         og_grid = f[keys[1]][:]
     f.close()
     for beam in ['mkt', 'gbt']:
@@ -52,14 +54,35 @@ for s in snaps:
         dpix = box_length / npts
         R_beam_pix = R_beam / dpix
         grid = gaussian_filter(grid, sigma = (R_beam_pix, R_beam_pix, 0), mode = 'wrap')
+        w.create_dataset('%s_%03d_beam_field'%(beam, s), data = grid, compression = 'gzip', compression_opts = 9)
         grid /= box_length**3
         grid /= np.mean(grid).astype(np.float32)
         grid = grid - 1
-        w.create_dataset('%s_%03d_beam_field'%(beam, s), data = grid, compression = 'gzip', compression_opts = 9)
 
         pk = Pk(grid, box_length, axis = 0, MAS = 'CIC')
         pk3d = np.zeros((len(pk.k3D), 2))
         pk3d[:, 0] = pk.k3D; pk3d[:, 1] = pk.Pk[:, 0]
         w.create_dataset('%s_%03d_beam_pk'%(beam, s), data = pk3d)
 
+        # cross with galaxy grids
+        for color in ['blue', 'red']:
+            gal_keys = list(fgal.keys())
+            if color == 'blue':
+                print('should be blue', gal_keys[3])
+                gal_grid = fgal[gal_keys[3]][:]
+            elif color == 'red':
+                print('should be red', gal_keys[4])
+                gal_grid = fgal[gal_keys[4]][:]
+            
+            gal_grid /= box_length**3
+            gal_grid /= np.mean(gal_grid) - 1
+            xpk = XPk((grid, gal_grid), box_length, 0, MAS = ['CIC', 'CIC'])
+            xpk3d = np.zeros((len(xpk.k3D), 2))
+            xpk3d[:, 0] = xpk.k3D; xpk3d[:,1] = xpk.XPk[:,0,0]
+            w.create_dataset('%s_%03d_%s_beam_pk'%(beam, s, color), data = xpk3d)
+        
+        fgal.close()
+
 w.close()
+
+
